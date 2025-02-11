@@ -1,2 +1,2 @@
-# civ7-map-trix
-Map Trix mod for Civilization VII
+# Map Trix
+better map tools for Civilization VII

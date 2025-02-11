@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Mod id="bz-map-trix" version="1"
+    xmlns="ModInfo">
+    <Properties>
+        <Name>LOC_MOD_BZ_MAP_TRIX_NAME</Name>
+        <Description>LOC_MOD_BZ_MAP_TRIX_DESCRIPTION</Description>
+        <Authors>beezany</Authors>
+        <Package>Mod</Package>
+        <AffectsSavedGames>0</AffectsSavedGames>
+    </Properties>
+    <Dependencies>
+        <Mod id="base-standard" title="LOC_MODULE_BASE_STANDARD_NAME" />
+    </Dependencies>
+    <ActionCriteria>
+        <Criteria id="always">
+            <AlwaysMet></AlwaysMet>
+        </Criteria>
+    </ActionCriteria>
+    <ActionGroups>
+        <ActionGroup id="game-bz-map-trix" scope="game" criteria="always">
+            <Actions>
+                <UIScripts>
+                    <Item>ui/tooltips/plot-tooltip.js</Item>
+                </UIScripts>
+                <UpdateText>
+                    <Item>text/en_us/InGameText.xml</Item>
+                </UpdateText>
+            </Actions>
+        </ActionGroup>
+    </ActionGroups>
+    <LocalizedText>
+        <File>text/en_us/ModInfoText.xml</File>
+    </LocalizedText>
+</Mod>

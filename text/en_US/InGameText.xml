@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Database>
+    <EnglishText>
+        <Row Tag="LOC_PLOT_BZ_TODO">
+            <Text>TODO</Text>
+        </Row>
+        <Row Tag="LOC_PLOT_BZ_AGELESS">
+            <Text>Ageless</Text>
+        </Row>
+        <Row Tag="LOC_PLOT_BZ_OBSOLETE">
+            <Text>Obsolete</Text>
+        </Row>
+        <Row Tag="LOC_PLOT_BZ_UNIQUE">
+            <Text>Unique</Text>
+        </Row>
+        <Row Tag="LOC_PLOT_BZ_DISTRICT">
+            <Text>District</Text>
+        </Row>
+        <Row Tag="LOC_PLOT_BZ_QUARTER">
+            <Text>Quarter</Text>
+        </Row>
+        <Row Tag="LOC_PLOT_BZ_TOWN_CENTER">
+            <Text>Town Center</Text>
+        </Row>
+        <Row Tag="LOC_PLOT_BZ_UNDEVELOPED">
+            <Text>Undeveloped</Text>
+        </Row>
+        <Row Tag="LOC_PLOT_BZ_ERROR_UNKNOWN">
+            <Text>Unknown</Text>
+        </Row>
+    </EnglishText>
+</Database>
