@@ -900,7 +900,7 @@ class PlotTooltipType {
         // TODO: improve formatting
         const ttContainer = document.createElement("div");
         ttContainer.classList.add("plot-tooltip__resource-container");
-        ttContainer.style.setProperty("margin", "0.333rem 0 0 0");
+        ttContainer.style.setProperty("margin-top", "0.333rem");
         const ttIcon = document.createElement("div");
         ttIcon.classList.add("plot-tooltip__large-resource-icon");
         const ttIconCSS = UI.getIconCSS(info.ConstructibleType);
@@ -913,16 +913,17 @@ class PlotTooltipType {
         const ttDetails = document.createElement("div");
         ttDetails.classList.add("plot-tooltip__resource-details");
         ttDetails.style.setProperty("max-width", "384px");
-        // ttDetails.style.setProperty("background-color", "rgba(150, 57, 57, .35)");
+        // ttDetails.style.setProperty("background-color", "rgba(150, 150, 150, .35)");
         const ttLabel = document.createElement("div");
         ttLabel.classList.add("plot-tooltip__resource-label");
-        ttLabel.style.setProperty("margin", "0.167rem 0 0 0");
+        // ttLabel.style.setProperty("background-color", "rgba(57, 150, 57, .35)");
         ttLabel.setAttribute("data-l10n-id", info.Name);
         ttDetails.appendChild(ttLabel);
         if (notes) {
             const ttNotes = document.createElement("div");
             ttNotes.classList.add("plot-tooltip__resource-label_description");
             ttNotes.style.setProperty("margin-top", "-0.167rem");
+            // ttNotes.style.setProperty("background-color", "rgba(150, 57, 57, .35)");
             ttNotes.innerHTML = notes;
             ttDetails.appendChild(ttNotes);
         }
@@ -930,7 +931,7 @@ class PlotTooltipType {
             ttContainer.style.setProperty("align-items", "flex-start");
             const ttDescription = document.createElement("div");
             ttDescription.classList.add("plot-tooltip__resource-label_description");
-            ttDescription.style.setProperty("margin", "0.167rem 0 0 0");
+            ttDescription.style.setProperty("margin-top", "0.167rem");
             ttDescription.setAttribute("data-l10n-id", info.Description);
             ttDetails.appendChild(ttDescription);
         }
