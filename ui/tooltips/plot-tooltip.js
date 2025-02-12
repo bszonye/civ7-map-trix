@@ -19,6 +19,12 @@ const BZ_CONTENT_WIDTH = "calc(" + BZ_MAX_WIDTH + "-" + BZ_OUTSIDE_WIDTH + ")";
 const BZ_INDENT_WIDTH = "calc(" + BZ_ICON_WIDTH + "+" + BZ_ICON_GUTTER + ")";
 const BZ_DETAIL_WIDTH = "calc(" + BZ_CONTENT_WIDTH + "-" + BZ_INDENT_WIDTH + ")";
 
+const BZ_DOT_DIVIDER = Locale.compose("LOC_PLOT_DIVIDER_DOT");
+const BZ_DIAMOND_BLACK = Locale.compose("LOC_PLOT_BZ_DIAMOND_BLACK");
+const BZ_DIAMOND_WHITE = Locale.compose("LOC_PLOT_BZ_DIAMOND_WHITE");
+const BZ_STAR_BLACK = Locale.compose("LOC_PLOT_BZ_STAR_BLACK");
+const BZ_STAR_WHITE = Locale.compose("LOC_PLOT_BZ_STAR_WHITE");
+
 class PlotTooltipType {
     constructor() {
         this.plotCoord = null;
@@ -503,6 +509,7 @@ class PlotTooltipType {
         this.addConstructibleList(extraBuildings, buildingStatus.Extras);
         this.addConstructibleList(wonders, buildingStatus.Wonder);
         this.addConstructibleList(improvements, buildingStatus.Improvements);
+        this.addRuralPanel(plotCoordinate, districtId, cityId);
     }
     getPlayerName() {
         const playerID = GameplayMap.getOwner(this.plotCoord.x, this.plotCoord.y);
@@ -728,13 +735,8 @@ class PlotTooltipType {
         let label = '';
         const featureType = GameplayMap.getFeatureType(location.x, location.y);
         const feature = GameInfo.Features.lookup(featureType);
-        if (feature) {
-            if (feature.Tooltip) {
-                label = Locale.compose("{1_FeatureName}: {2_FeatureTooltip}", feature.Name, feature.Tooltip);
-            }
-            else {
-                label = feature.Name;
-            }
+        if (feature && !feature.Tooltip) {
+            label = feature.Name;
         }
         if (GameplayMap.isVolcano(location.x, location.y)) {
             const active = GameplayMap.isVolcanoActive(location.x, location.y);
@@ -881,24 +883,67 @@ class PlotTooltipType {
     }
     dotJoin(list) {
         // join text with dots after removing empty elements
-        // TODO: generalize
-        const dot = " " + Locale.compose("LOC_PLOT_DIVIDER_DOT") + " ";
-        return list.filter(e => e).join(dot);
+        return list.filter(e => e).join(" " + BZ_DOT_DIVIDER + " ");
     }
     bracketText(text) {
         // wrap non-empty text with brackets
         return text ? "(" + text + ")" : "";
     }
-    addTitleDivider(name) {
+    addRuralPanel(location, districtId, cityId) {  // includes WILDERNESS
+        let hexName;
+        let hexDescription;
+        // city info
+        const district = Districts.get(districtId);
+        const city = Cities.get(cityId);
+        // special tile types: natural wonder, resource
+        const featureType = GameplayMap.getFeatureType(location.x, location.y);
+        const feature = GameInfo.Features.lookup(featureType);
+        const hexResource = this.getResource();
+        if (feature && feature.Tooltip) {
+            hexName = feature.Name;
+            hexDescription = feature.Tooltip;
+        }
+        else if (hexResource) {
+            hexName = hexResource.Name;
+            hexDescription = hexResource.Tooltip;
+        }
+        else if (district?.type) {
+            hexName = GameInfo.Districts.lookup(district?.type).Name;
+        }
+        else if (city) {
+            hexName = "LOC_PLOT_BZ_UNDEVELOPED";
+        }
+        else {
+            hexName = GameInfo.Districts.lookup(DistrictTypes.WILDERNESS).Name;
+        }
+        // TODO: icons
+        this.addTitleDivider(Locale.compose(hexName));
+        if (hexDescription) {
+            // TODO: customize styling
+            const ttDescription = document.createElement("div");
+            ttDescription.classList.add("plot-tooltip__lineTwo");
+            ttDescription.setAttribute('data-l10n-id', hexDescription);
+            this.container.appendChild(ttDescription);
+        }
+        // TODO: buildings
+        this.addTitleDivider(BZ_DIAMOND_WHITE);
+    }
+    addUrbanPanel(TODO) {  // includes CITY_CENTER
+        // TODO
+    }
+    addWonderPanel(TODO) {
+        // TODO
+    }
+    addTitleDivider(name=BZ_DOT_DIVIDER) {
         const ttLineFlex = document.createElement("div");
         ttLineFlex.classList.add("plot-tooltip__TitleLineFlex");
+        ttLineFlex.style.setProperty("margin-top", "0.167rem");
         this.container.appendChild(ttLineFlex);
         const ttLeftSeparator = document.createElement("div");
         ttLeftSeparator.classList.add("plot-tooltip__TitleLineleft");
         ttLineFlex.appendChild(ttLeftSeparator);
         const ttName = document.createElement("div");
         ttName.classList.add("plot-tooltip__ImprovementName");
-        ttName.style.setProperty("margin-top", "0.167rem");
         ttName.innerHTML = name;
         ttLineFlex.appendChild(ttName);
         const ttRightSeparator = document.createElement("div");
@@ -913,6 +958,7 @@ class PlotTooltipType {
         ttIconBlock.style.setProperty("margin-bottom", "0.167rem");
         const ttIcon = document.createElement("div");
         ttIcon.classList.add("plot-tooltip__large-resource-icon");
+        // TODO: BUILDING_OPEN icon for empty district slot
         const ttIconCSS = UI.getIconCSS(icon);
         ttIcon.style.backgroundImage = ttIconCSS;
         ttIcon.style.setProperty("background-size", "contain");

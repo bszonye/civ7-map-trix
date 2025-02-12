@@ -4,6 +4,18 @@
         <Row Tag="LOC_PLOT_BZ_TODO">
             <Text>TODO</Text>
         </Row>
+        <Row Tag="LOC_PLOT_BZ_DIAMOND_BLACK">
+            <Text>◆</Text>
+        </Row>
+        <Row Tag="LOC_PLOT_BZ_DIAMOND_WHITE">
+            <Text>◇</Text>
+        </Row>
+        <Row Tag="LOC_PLOT_BZ_STAR_BLACK">
+            <Text>★</Text>
+        </Row>
+        <Row Tag="LOC_PLOT_BZ_STAR_WHITE">
+            <Text>☆</Text>
+        </Row>
         <Row Tag="LOC_PLOT_BZ_AGELESS">
             <Text>Ageless</Text>
         </Row>
