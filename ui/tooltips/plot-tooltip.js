@@ -14,7 +14,6 @@ const BZ_PADDING_WIDTH = "0.9444444444rem";  // from default.css
 const BZ_PADDING_HEIGHT = "0.6666666667rem";  // from default.css
 const BZ_ICON_WIDTH = "2.6666666667rem";  // from default.css
 const BZ_ICON_GUTTER = "0.6666666667rem";  // from default.css
-const BZ_ICON_SMALL = "calc(" + BZ_ICON_WIDTH + "-" + BZ_ICON_GUTTER + ")";
 const BZ_OUTSIDE_WIDTH = "calc(2*(" + BZ_BORDER_WIDTH + "+" + BZ_PADDING_WIDTH + "))";
 const BZ_CONTENT_WIDTH = "calc(" + BZ_MAX_WIDTH + "-" + BZ_OUTSIDE_WIDTH + ")";
 const BZ_INDENT_WIDTH = "calc(" + BZ_ICON_WIDTH + "+" + BZ_ICON_GUTTER + ")";
@@ -154,7 +153,23 @@ class PlotTooltipType {
         }
         // District Information
         this.addPlotDistrictInformation(this.plotCoord);
-        //Yields Section
+        this.addOwnerInfo(this.plotCoord, playerID);
+        // Adds info about constructibles, improvements, and wonders to the tooltip
+        this.addConstructibleInformation(this.plotCoord);
+        // Resource icon & description
+        if (hexResource) this.addIconBlock(hexResource.ResourceType, hexResource.Name, null, hexResource.Tooltip);
+        this.getPlotEffectNames(plotIndex);
+        // Trade Route Info
+        if (routeName) {
+            const toolTipHorizontalRule = document.createElement("div");
+            toolTipHorizontalRule.classList.add("plot-tooltip__horizontalRule");
+            this.container.appendChild(toolTipHorizontalRule);
+            const toolTipRouteInfo = document.createElement("div");
+            toolTipRouteInfo.classList.add("plot-tooltip__trade-route-info");
+            toolTipRouteInfo.innerHTML = routeName;
+            this.container.appendChild(toolTipRouteInfo);
+        }
+        // Yields Section
         this.yieldsFlexbox.classList.add("plot-tooltip__resourcesFlex");
         this.container.appendChild(this.yieldsFlexbox);
         this.addPlotYields(this.plotCoord, GameContext.localPlayerID);
@@ -180,21 +195,6 @@ class PlotTooltipType {
             const toolTipHorizontalRule = document.createElement("div");
             toolTipHorizontalRule.classList.add("plot-tooltip__horizontalRule");
             this.container.appendChild(toolTipHorizontalRule);
-            this.addIconBlock(hexResource.ResourceType, hexResource.Name, null, hexResource.Tooltip);
-        }
-        this.addOwnerInfo(this.plotCoord, playerID);
-        this.getPlotEffectNames(plotIndex);
-        // Adds info about constructibles, improvements, and wonders to the tooltip
-        this.addConstructibleInformation(this.plotCoord);
-        // Trade Route Info
-        if (routeName) {
-            const toolTipHorizontalRule = document.createElement("div");
-            toolTipHorizontalRule.classList.add("plot-tooltip__horizontalRule");
-            this.container.appendChild(toolTipHorizontalRule);
-            const toolTipRouteInfo = document.createElement("div");
-            toolTipRouteInfo.classList.add("plot-tooltip__trade-route-info");
-            toolTipRouteInfo.innerHTML = routeName;
-            this.container.appendChild(toolTipRouteInfo);
         }
         // Unit Info
         this.addUnitInfo(this.plotCoord);
@@ -451,16 +451,16 @@ class PlotTooltipType {
         });
         // determine the tile type
         const districtId = MapCities.getDistrict(plotCoordinate.x, plotCoordinate.y);
+        const cityId = GameplayMap.getOwningCityFromXY(plotCoordinate.x, plotCoordinate.y);
+        const city = cityId ? Cities.get(cityId) : null;
         if (districtId) {
-            // city center, quarter, district, wonder, or improvement
+            // city center, quarter, district, wonder, or rural improvement
             const district = Districts.get(districtId);
             const districtType = district?.type ?? DistrictTypes.WILDERNESS;
             // check for special cases: town center, quarter, district
             let tileType;
             if (districtType == DistrictTypes.CITY_CENTER) {
                 // possibly a town center
-                const cityId = GameplayMap.getOwningCityFromXY(plotCoordinate.x, plotCoordinate.y);
-                const city = cityId ? Cities.get(cityId) : null;
                 if (city?.isTown) tileType = Locale.compose("LOC_PLOT_BZ_TOWN_CENTER");
             }
             else if (districtType == DistrictTypes.URBAN) {
@@ -485,14 +485,16 @@ class PlotTooltipType {
                 }
             }
             if (!tileType) {
-                // city center, 
+                // city center, wonder, or rural improvement
                 const districtDefinition = GameInfo.Districts.lookup(districtType);
                 tileType = Locale.compose(districtDefinition.Name);
             }
             this.addTitleDivider(tileType);
         }
-        else if (constructibles?.length) {
-            // constructibles in the wilderness, somehow
+        else if (city) {
+            this.addTitleDivider(Locale.compose("LOC_PLOT_BZ_UNDEVELOPED"));
+        }
+        else {
             const districtDefinition = GameInfo.Districts.lookup(DistrictTypes.WILDERNESS);
             this.addTitleDivider(Locale.compose(districtDefinition.Name));
         }
@@ -519,6 +521,7 @@ class PlotTooltipType {
             return "";
         }
         const name = Locale.compose(GameplayMap.getOwnerName(this.plotCoord.x, this.plotCoord.y));
+        // const name = Locale.compose(player.civilizationAdjective);
         return name;
     }
     getTerrainLabel(location) {
@@ -652,12 +655,13 @@ class PlotTooltipType {
             this.container.appendChild(toolTipOwnershipHorizontalRule);
             const plotTooltipOwnerLeader = document.createElement("div");
             plotTooltipOwnerLeader.classList.add("plot-tooltip__owner-leader-text");
-            plotTooltipOwnerLeader.innerHTML = this.getPlayerName();
+            const owner = this.dotJoin([this.getPlayerName(), this.getCivName()]);
+            plotTooltipOwnerLeader.innerHTML = owner;
             this.container.appendChild(plotTooltipOwnerLeader);
-            const plotTooltipOwnerCiv = document.createElement("div");
-            plotTooltipOwnerCiv.classList.add("plot-tooltip__owner-civ-text");
-            plotTooltipOwnerCiv.innerHTML = this.getCivName();
-            this.container.appendChild(plotTooltipOwnerCiv);
+            // const plotTooltipOwnerCiv = document.createElement("div");
+            // plotTooltipOwnerCiv.classList.add("plot-tooltip__owner-civ-text");
+            // plotTooltipOwnerCiv.innerHTML = this.getCivName();
+            // this.container.appendChild(plotTooltipOwnerCiv);
             const districtId = MapCities.getDistrict(location.x, location.y);
             const plotTooltipConqueror = this.getConquerorInfo(districtId);
             if (plotTooltipConqueror) {
@@ -906,18 +910,22 @@ class PlotTooltipType {
         ttIconBlock.classList.add("plot-tooltip__resource-container");
         // ttIconBlock.style.setProperty("background-color", "rgba(150, 150, 150, .35)");
         ttIconBlock.style.setProperty("max-width", BZ_CONTENT_WIDTH);
-        ttIconBlock.style.setProperty("margin-top", "0.167rem");
         ttIconBlock.style.setProperty("margin-bottom", "0.167rem");
         const ttIcon = document.createElement("div");
         ttIcon.classList.add("plot-tooltip__large-resource-icon");
         const ttIconCSS = UI.getIconCSS(icon);
         ttIcon.style.backgroundImage = ttIconCSS;
         ttIcon.style.setProperty("background-size", "contain");
-        if (!description) {  // use a smaller icon for buildings & improvements
-            ttIcon.style.setProperty("width", BZ_ICON_SMALL);
-            ttIcon.style.setProperty("height", BZ_ICON_SMALL);
-            ttIconBlock.style.setProperty("margin-left", BZ_ICON_GUTTER);
-            ttIconBlock.style.setProperty("margin-right", BZ_ICON_GUTTER);
+        if (!description) {
+            // use a smaller icon for buildings & improvements
+            ttIcon.style.setProperty("width", "2rem");
+            ttIcon.style.setProperty("height", "2rem");
+            ttIcon.style.setProperty("margin-right", "1rem");
+            ttIconBlock.style.setProperty("margin-left", "0.3333333333rem");
+            ttIconBlock.style.setProperty("margin-right", "0.3333333333rem");
+            // also center the text vertically
+            ttIconBlock.style.setProperty("align-items", "center");
+            ttIconBlock.style.setProperty("width", "auto");
         }
         ttIcon.style.setProperty("flex", "none");
         ttIconBlock.appendChild(ttIcon);
@@ -942,6 +950,7 @@ class PlotTooltipType {
             ttTextColumn.appendChild(ttNotes);
         }
         if (description) {
+            ttIconBlock.style.setProperty("margin-top", "0.167rem");  // leave a little extra room
             ttTextColumn.style.setProperty("flex", "auto");
             const ttDescription = document.createElement("div");
             ttDescription.classList.add("plot-tooltip__resource-label_description");
@@ -949,10 +958,6 @@ class PlotTooltipType {
             ttDescription.style.setProperty("margin-top", "0.167rem");
             ttDescription.setAttribute("data-l10n-id", description);
             ttTextColumn.appendChild(ttDescription);
-        }
-        else {
-            ttIconBlock.style.setProperty("align-items", "center");
-            ttIconBlock.style.setProperty("width", "auto");
         }
         ttIconBlock.appendChild(ttTextColumn);
         return ttIconBlock;
