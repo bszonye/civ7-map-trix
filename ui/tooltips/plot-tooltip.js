@@ -7,6 +7,19 @@ import TooltipManager, { PlotTooltipPriority } from '/core/ui/tooltips/tooltip-m
 import { ComponentID } from '/core/ui/utilities/utilities-component-id.js';
 import DistrictHealthManager from '/base-standard/ui/district/district-health-manager.js';
 import LensManager from '/core/ui/lenses/lens-manager.js';
+
+const BZ_MAX_WIDTH = "21.3333333333rem";  // from default.css
+const BZ_BORDER_WIDTH = "0.0555555556rem";  // from default.css
+const BZ_PADDING_WIDTH = "0.9444444444rem";  // from default.css
+const BZ_PADDING_HEIGHT = "0.6666666667rem";  // from default.css
+const BZ_ICON_WIDTH = "2.6666666667rem";  // from default.css
+const BZ_ICON_GUTTER = "0.6666666667rem";  // from default.css
+const BZ_ICON_SMALL = "calc(" + BZ_ICON_WIDTH + "-" + BZ_ICON_GUTTER + ")";
+const BZ_OUTSIDE_WIDTH = "calc(2*(" + BZ_BORDER_WIDTH + "+" + BZ_PADDING_WIDTH + "))";
+const BZ_CONTENT_WIDTH = "calc(" + BZ_MAX_WIDTH + "-" + BZ_OUTSIDE_WIDTH + ")";
+const BZ_INDENT_WIDTH = "calc(" + BZ_ICON_WIDTH + "+" + BZ_ICON_GUTTER + ")";
+const BZ_DETAIL_WIDTH = "calc(" + BZ_CONTENT_WIDTH + "-" + BZ_INDENT_WIDTH + ")";
+
 class PlotTooltipType {
     constructor() {
         this.plotCoord = null;
@@ -15,6 +28,9 @@ class PlotTooltipType {
         this.container = document.createElement('div');
         this.yieldsFlexbox = document.createElement('div');
         this.tooltip.classList.add('plot-tooltip', 'max-w-96');
+        this.tooltip.style.setProperty('max-width', BZ_MAX_WIDTH);
+        this.tooltip.style.setProperty('--padding-top-bottom', BZ_PADDING_HEIGHT);
+        this.tooltip.style.setProperty('--padding-left-right', BZ_PADDING_WIDTH);
         this.tooltip.appendChild(this.container);
         Loading.runWhenFinished(() => {
             for (const y of GameInfo.Yields) {
@@ -164,24 +180,7 @@ class PlotTooltipType {
             const toolTipHorizontalRule = document.createElement("div");
             toolTipHorizontalRule.classList.add("plot-tooltip__horizontalRule");
             this.container.appendChild(toolTipHorizontalRule);
-            const toolTipResourceContainer = document.createElement('div');
-            toolTipResourceContainer.classList.add('plot-tooltip__resource-container');
-            const toolTipResourceLargeIcon = document.createElement("div");
-            toolTipResourceLargeIcon.classList.add("plot-tooltip__large-resource-icon");
-            toolTipResourceLargeIcon.style.backgroundImage = toolTipResourceIconCSS;
-            toolTipResourceContainer.appendChild(toolTipResourceLargeIcon);
-            const toolTipResourceDetails = document.createElement('div');
-            toolTipResourceDetails.classList.add('plot-tooltip__resource-details');
-            const toolTipResourceLabel = document.createElement("div");
-            toolTipResourceLabel.classList.add("plot-tooltip__resource-label");
-            toolTipResourceLabel.setAttribute('data-l10n-id', hexResource.Name);
-            toolTipResourceDetails.appendChild(toolTipResourceLabel);
-            const toolTipResourceDescription = document.createElement("div");
-            toolTipResourceDescription.classList.add("plot-tooltip__resource-label_description");
-            toolTipResourceDescription.setAttribute('data-l10n-id', hexResource.Tooltip);
-            toolTipResourceDetails.appendChild(toolTipResourceDescription);
-            toolTipResourceContainer.appendChild(toolTipResourceDetails);
-            this.container.appendChild(toolTipResourceContainer);
+            this.addIconBlock(hexResource.ResourceType, hexResource.Name, null, hexResource.Tooltip);
         }
         this.addOwnerInfo(this.plotCoord, playerID);
         this.getPlotEffectNames(plotIndex);
@@ -473,10 +472,16 @@ class PlotTooltipType {
                         const uq = GameInfo.UniqueQuarters.find(e => e.TraitType == unique[0]);
                         tileType = Locale.compose(uq.Name);
                     }
-                    else tileType = Locale.compose("LOC_PLOT_BZ_QUARTER");
+                    // quarter (two current buildings)
+                    else tileType = Locale.compose("LOC_PLOT_BZ_URBAN_QUARTER");
                 }
                 else if (thisAgeBuildings.length || previousAgeBuildings.length) {
-                    tileType = Locale.compose("LOC_PLOT_BZ_DISTRICT");
+                    // district (at least one building)
+                    tileType = Locale.compose("LOC_PLOT_BZ_URBAN_DISTRICT");
+                }
+                else {
+                    // vacant district (canceled building production)
+                    tileType = Locale.compose("LOC_PLOT_BZ_URBAN_VACANT");
                 }
             }
             if (!tileType) {
@@ -484,12 +489,12 @@ class PlotTooltipType {
                 const districtDefinition = GameInfo.Districts.lookup(districtType);
                 tileType = Locale.compose(districtDefinition.Name);
             }
-            this.addConstructibleTitle(tileType);
+            this.addTitleDivider(tileType);
         }
         else if (constructibles?.length) {
             // constructibles in the wilderness, somehow
             const districtDefinition = GameInfo.Districts.lookup(DistrictTypes.WILDERNESS);
-            this.addConstructibleTitle(Locale.compose(districtDefinition.Name));
+            this.addTitleDivider(Locale.compose(districtDefinition.Name));
         }
         this.addConstructibleList(thisAgeBuildings, buildingStatus.CurrentAge);
         this.addConstructibleList(previousAgeBuildings, buildingStatus.PreviousAge);
@@ -880,7 +885,7 @@ class PlotTooltipType {
         // wrap non-empty text with brackets
         return text ? "(" + text + ")" : "";
     }
-    addConstructibleTitle(name) {
+    addTitleDivider(name) {
         const ttLineFlex = document.createElement("div");
         ttLineFlex.classList.add("plot-tooltip__TitleLineFlex");
         this.container.appendChild(ttLineFlex);
@@ -889,61 +894,81 @@ class PlotTooltipType {
         ttLineFlex.appendChild(ttLeftSeparator);
         const ttName = document.createElement("div");
         ttName.classList.add("plot-tooltip__ImprovementName");
-        ttName.style.setProperty("margin-top", "0.25rem");
+        ttName.style.setProperty("margin-top", "0.167rem");
         ttName.innerHTML = name;
         ttLineFlex.appendChild(ttName);
         const ttRightSeparator = document.createElement("div");
         ttRightSeparator.classList.add("plot-tooltip__TitleLineRight");
         ttLineFlex.appendChild(ttRightSeparator);
     }
-    addConstructibleBlock(info, notes) {
-        // TODO: improve formatting
-        const ttContainer = document.createElement("div");
-        ttContainer.classList.add("plot-tooltip__resource-container");
-        ttContainer.style.setProperty("margin-top", "0.333rem");
+    iconBlock(icon, name, notes, description) {
+        const ttIconBlock = document.createElement("div");
+        ttIconBlock.classList.add("plot-tooltip__resource-container");
+        // ttIconBlock.style.setProperty("background-color", "rgba(150, 150, 150, .35)");
+        ttIconBlock.style.setProperty("max-width", BZ_CONTENT_WIDTH);
+        ttIconBlock.style.setProperty("margin-top", "0.167rem");
+        ttIconBlock.style.setProperty("margin-bottom", "0.167rem");
         const ttIcon = document.createElement("div");
         ttIcon.classList.add("plot-tooltip__large-resource-icon");
-        const ttIconCSS = UI.getIconCSS(info.ConstructibleType);
+        const ttIconCSS = UI.getIconCSS(icon);
         ttIcon.style.backgroundImage = ttIconCSS;
-        // const size = "2rem";
-        // ttIcon.style.height = size;
-        // ttIcon.style.width = size;
         ttIcon.style.setProperty("background-size", "contain");
-        ttContainer.appendChild(ttIcon);
-        const ttDetails = document.createElement("div");
-        ttDetails.classList.add("plot-tooltip__resource-details");
-        ttDetails.style.setProperty("max-width", "384px");
-        // ttDetails.style.setProperty("background-color", "rgba(150, 150, 150, .35)");
-        const ttLabel = document.createElement("div");
-        ttLabel.classList.add("plot-tooltip__resource-label");
-        // ttLabel.style.setProperty("background-color", "rgba(57, 150, 57, .35)");
-        ttLabel.setAttribute("data-l10n-id", info.Name);
-        ttDetails.appendChild(ttLabel);
+        if (!description) {  // use a smaller icon for buildings & improvements
+            ttIcon.style.setProperty("width", BZ_ICON_SMALL);
+            ttIcon.style.setProperty("height", BZ_ICON_SMALL);
+            ttIconBlock.style.setProperty("margin-left", BZ_ICON_GUTTER);
+            ttIconBlock.style.setProperty("margin-right", BZ_ICON_GUTTER);
+        }
+        ttIcon.style.setProperty("flex", "none");
+        ttIconBlock.appendChild(ttIcon);
+        const ttTextColumn = document.createElement("div");
+        ttTextColumn.classList.add("plot-tooltip__resource-details");
+        // ttTextColumn.style.setProperty("background-color", "rgba(150, 57, 57, .35)");
+        ttTextColumn.style.setProperty("max-width", BZ_DETAIL_WIDTH);
+        const ttName = document.createElement("div");
+        ttName.classList.add("plot-tooltip__resource-label");
+        // ttName.style.setProperty("background-color", "rgba(57, 150, 57, .35)");
+        ttName.setAttribute("data-l10n-id", name);
+        ttTextColumn.appendChild(ttName);
         if (notes) {
             const ttNotes = document.createElement("div");
             ttNotes.classList.add("plot-tooltip__resource-label_description");
-            ttNotes.style.setProperty("margin-top", "-0.167rem");
             // ttNotes.style.setProperty("background-color", "rgba(150, 57, 57, .35)");
+            ttNotes.style.setProperty("margin-top", "-0.111rem");
+            ttNotes.style.setProperty("margin-bottom", "0.222rem");
+            ttNotes.style.setProperty("font-size", "0.667rem");
+            ttNotes.style.setProperty("line-height", "0.667rem");
             ttNotes.innerHTML = notes;
-            ttDetails.appendChild(ttNotes);
+            ttTextColumn.appendChild(ttNotes);
         }
-        if (info.ConstructibleClass == "WONDER") {
-            ttContainer.style.setProperty("align-items", "flex-start");
+        if (description) {
+            ttTextColumn.style.setProperty("flex", "auto");
             const ttDescription = document.createElement("div");
             ttDescription.classList.add("plot-tooltip__resource-label_description");
+            // ttDescription.style.setProperty("background-color", "rgba(57, 57, 150, .35)");
             ttDescription.style.setProperty("margin-top", "0.167rem");
-            ttDescription.setAttribute("data-l10n-id", info.Description);
-            ttDetails.appendChild(ttDescription);
+            ttDescription.setAttribute("data-l10n-id", description);
+            ttTextColumn.appendChild(ttDescription);
         }
         else {
-            ttContainer.style.setProperty("align-items", "center");
+            ttIconBlock.style.setProperty("align-items", "center");
+            ttIconBlock.style.setProperty("width", "auto");
         }
-        ttContainer.appendChild(ttDetails);
-        this.container.appendChild(ttContainer);
+        ttIconBlock.appendChild(ttTextColumn);
+        return ttIconBlock;
     }
-    addConstructibleList(nameList, statusList) {
-        for (let i = 0; i < nameList.length; i++) {
-            this.addConstructibleBlock(nameList[i], statusList[i]);
+    addIconBlock(icon, name, notes, description) {
+        const ttIconBlock = this.iconBlock(icon, name, notes, description);
+        this.container.appendChild(ttIconBlock);
+    }
+    addConstructibleList(infoList, statusList) {
+        for (let i = 0; i < infoList.length; i++) {
+            const info = infoList[i];
+            const icon = info.ConstructibleType;
+            const notes = statusList[i];
+            const desc = info.ConstructibleClass == "WONDER" ? info.Description : null;
+            const ttIconBlock = this.iconBlock(icon, info.Name, notes, desc);
+            this.container.appendChild(ttIconBlock);
         }
     }
 }

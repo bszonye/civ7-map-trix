@@ -13,11 +13,14 @@
         <Row Tag="LOC_PLOT_BZ_UNIQUE">
             <Text>Unique</Text>
         </Row>
-        <Row Tag="LOC_PLOT_BZ_DISTRICT">
+        <Row Tag="LOC_PLOT_BZ_URBAN_DISTRICT">
             <Text>District</Text>
         </Row>
-        <Row Tag="LOC_PLOT_BZ_QUARTER">
+        <Row Tag="LOC_PLOT_BZ_URBAN_QUARTER">
             <Text>Quarter</Text>
+        </Row>
+        <Row Tag="LOC_PLOT_BZ_URBAN_VACANT">
+            <Text>Vacant District</Text>
         </Row>
         <Row Tag="LOC_PLOT_BZ_TOWN_CENTER">
             <Text>Town Center</Text>
