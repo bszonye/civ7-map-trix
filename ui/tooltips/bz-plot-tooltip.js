@@ -3,6 +3,9 @@
  * @copyright 2022, Firaxis Gmaes
  * @description The tooltips that appear based on the cursor hovering over world plots.
  */
+import "/base-standard/ui/tooltips/plot-tooltip.js";
+console.warn("trix");
+
 import TooltipManager, { PlotTooltipPriority } from '/core/ui/tooltips/tooltip-manager.js';
 import { ComponentID } from '/core/ui/utilities/utilities-component-id.js';
 import DistrictHealthManager from '/base-standard/ui/district/district-health-manager.js';
@@ -988,8 +991,8 @@ class PlotTooltipType {
         let hexName;
         let hexDescription;
         // city info
-        const district = Districts.get(districtId);
-        const city = Cities.get(cityId);
+        const district = districtId ? Districts.get(districtId) : null;
+        const city = cityId ? Cities.get(cityId) : null;
         // special tile types: natural wonder, resource
         const featureType = GameplayMap.getFeatureType(location.x, location.y);
         const feature = GameInfo.Features.lookup(featureType);

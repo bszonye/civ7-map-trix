@@ -20,7 +20,7 @@
         <ActionGroup id="game-bz-map-trix" scope="game" criteria="always">
             <Actions>
                 <UIScripts>
-                    <Item>ui/tooltips/plot-tooltip.js</Item>
+                    <Item>ui/tooltips/bz-plot-tooltip.js</Item>
                 </UIScripts>
                 <UpdateText>
                     <Item>text/en_us/InGameText.xml</Item>
