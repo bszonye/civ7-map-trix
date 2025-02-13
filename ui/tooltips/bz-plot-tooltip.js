@@ -4,29 +4,24 @@
  * @description The tooltips that appear based on the cursor hovering over world plots.
  */
 import "/base-standard/ui/tooltips/plot-tooltip.js";
-console.warn("trix");
 
 import TooltipManager, { PlotTooltipPriority } from '/core/ui/tooltips/tooltip-manager.js';
 import { ComponentID } from '/core/ui/utilities/utilities-component-id.js';
 import DistrictHealthManager from '/base-standard/ui/district/district-health-manager.js';
 import LensManager from '/core/ui/lenses/lens-manager.js';
 
+const BZ_DOT_DIVIDER = Locale.compose("LOC_PLOT_DIVIDER_DOT");
+
+// TODO: remove these
 const BZ_MAX_WIDTH = "21.3333333333rem";  // from default.css
 const BZ_BORDER_WIDTH = "0.0555555556rem";  // from default.css
 const BZ_PADDING_WIDTH = "0.9444444444rem";  // from default.css
-const BZ_PADDING_HEIGHT = "0.6666666667rem";  // from default.css
 const BZ_ICON_WIDTH = "2.6666666667rem";  // from default.css
 const BZ_ICON_GUTTER = "0.6666666667rem";  // from default.css
 const BZ_OUTSIDE_WIDTH = "calc(2*(" + BZ_BORDER_WIDTH + "+" + BZ_PADDING_WIDTH + "))";
 const BZ_CONTENT_WIDTH = "calc(" + BZ_MAX_WIDTH + "-" + BZ_OUTSIDE_WIDTH + ")";
 const BZ_INDENT_WIDTH = "calc(" + BZ_ICON_WIDTH + "+" + BZ_ICON_GUTTER + ")";
 const BZ_DETAIL_WIDTH = "calc(" + BZ_CONTENT_WIDTH + "-" + BZ_INDENT_WIDTH + ")";
-
-const BZ_DOT_DIVIDER = Locale.compose("LOC_PLOT_DIVIDER_DOT");
-const BZ_DIAMOND_BLACK = Locale.compose("LOC_PLOT_BZ_DIAMOND_BLACK");
-const BZ_DIAMOND_WHITE = Locale.compose("LOC_PLOT_BZ_DIAMOND_WHITE");
-const BZ_STAR_BLACK = Locale.compose("LOC_PLOT_BZ_STAR_BLACK");
-const BZ_STAR_WHITE = Locale.compose("LOC_PLOT_BZ_STAR_WHITE");
 
 class PlotTooltipType {
     constructor() {
@@ -184,7 +179,6 @@ class PlotTooltipType {
             this.appendTooltipInformation(hexResource.Name, [hexResource.Tooltip], toolTipResourceIconCSS);
         }
         // Adds info about constructibles, improvements, and wonders to the tooltip
-        this.addConstructibleInformation(this.plotCoord);
         this.addPlotEffectNames(plotIndex);
         // Trade Route Info
         if (routeName) {
@@ -830,14 +824,6 @@ class PlotTooltipType {
         if (feature && !feature.Tooltip) {  // BZ
             label = feature.Name;
         }
-        if (feature) {
-            if (feature.Tooltip) {
-                label = Locale.compose("{1_FeatureName}: {2_FeatureTooltip}", feature.Name, feature.Tooltip);
-            }
-            else {
-                label = feature.Name;
-            }
-        }
         if (GameplayMap.isVolcano(location.x, location.y)) {
             const active = GameplayMap.isVolcanoActive(location.x, location.y);
             const volcanoStatus = (active) ? 'LOC_VOLCANO_ACTIVE' : 'LOC_VOLCANO_NOT_ACTIVE';
@@ -1024,8 +1010,6 @@ class PlotTooltipType {
             this.container.appendChild(ttDescription);
         }
         // TODO: buildings
-        // this.appendTitleDivider(BZ_DIAMOND_WHITE);
-        this.appendRuralDivider("IMPROVEMENT_MINE", hexResource?.ResourceType);
     }
     appendUrbanPanel(TODO) {  // includes CITY_CENTER
         // TODO
@@ -1033,7 +1017,7 @@ class PlotTooltipType {
     appendWonderPanel(TODO) {
         // TODO
     }
-    appendSplitDivider(center) {
+    appendFlexDivider(center) {
         const layout = document.createElement("div");
         layout.classList.add("flex", "flex-row", "justify-between", "items-center");
         layout.classList.add("self-center", "-mx-6", "my-1", "flex-auto");
@@ -1056,40 +1040,41 @@ class PlotTooltipType {
         layout.classList.add("self-center", "text-center", "mx-3", "max-w-80");
         layout.classList.add("font-title", "text-sm", "uppercase");
         layout.innerHTML = text;
-        this.appendSplitDivider(layout);
+        this.appendFlexDivider(layout);
     }
-    appendRuralDivider(icon, badge=null) {
+    appendIconDivider(icon, overlay=null) {
+        // icon divider with optional overlay
         const layout = document.createElement("div");
-        layout.classList.add("plot-tooltip__TitleLineFlex");
-        layout.classList.add("justify-between");
-        layout.style.setProperty("margin-top", "0.167rem");
-        this.container.appendChild(layout);
-        // left divider
-        const lineLeft = document.createElement("div");
-        lineLeft.classList.add("plot-tooltip__TitleLineleft");
-        layout.appendChild(lineLeft);
-        // improvement or resource icon with optional badge
-        const icons = document.createElement("div");
-        icons.classList.add("flex", "flex-col", "flex-grow", "relative");
-        const iconBase = document.createElement("div");
-        iconBase.classList.add("plot-tooltip__large-resource-icon", "mx-3", "my-1");
-        iconBase.style.backgroundImage = UI.getIconCSS(icon);
-        icons.appendChild(iconBase);
-        if (badge) {
-            const iconBadge = document.createElement("div");
-            iconBadge.classList.add("plot-tooltip__large-resource-icon",
-                "mx-3", "my-1", "absolute", "top-1\\.5", "left-1\\.5");
-            iconBadge.style.setProperty("width", "2rem");
-            iconBadge.style.setProperty("height", "2rem");
-            iconBadge.style.backgroundImage = UI.getIconCSS(badge);
-            icons.appendChild(iconBadge);
+        layout.classList.add("flex-grow", "relative");
+        const base = document.createElement("div");
+        base.classList.add("bg-contain", "bg-center", "w-12", "h-12", "mx-3", "my-1");
+        base.style.backgroundImage = UI.getIconCSS(icon);
+        layout.appendChild(base);
+        if (overlay) {
+            const over = document.createElement("div");
+            over.classList.add("bg-contain", "bg-center", "w-9", "h-9", "mx-3", "my-1");
+            over.classList.add("absolute", "top-1\\.5", "left-1\\.5");
+            over.style.backgroundImage = UI.getIconCSS(overlay);
+            layout.appendChild(over);
         }
-        layout.appendChild(icons);
-        // right divider
-        const lineRight = document.createElement("div");
-        lineRight.classList.add("plot-tooltip__TitleLineRight");
-        layout.appendChild(lineRight);
-
+        this.appendFlexDivider(layout);
+    }
+    appendUrbanDivider(icons, extras=[]) {
+        // make sure there are at least two buildings, and stick extras in the middle
+        const empty = "BUILDING_OPEN";
+        const b1 = icons.length < 1 ? [empty] : [icons[0]];
+        const b2 = icons.length < 2 ? [empty] : icons.slice(1);
+        const buildings = [...b1, ...extras, ...b2];
+        // render the icons
+        const layout = document.createElement("div");
+        layout.classList.add("flex", "flex-row", "flex-grow", "relative", "mx-3");
+        for (let i = 0; i < buildings.length; i++) {
+            const icon = document.createElement("div");
+            icon.classList.add("bg-contain", "bg-center", "w-12", "h-12", "mx-1", "my-1");
+            icon.style.backgroundImage = UI.getIconCSS(buildings[i]);
+            layout.appendChild(icon);
+        }
+        this.appendFlexDivider(layout);
     }
     iconBlock(icon, name, notes, description) {
         const ttIconBlock = document.createElement("div");
