@@ -16,15 +16,14 @@ const WILDERNESS_NAME = GameInfo.Districts.lookup(DistrictTypes.WILDERNESS).Name
 const VILLAGE_TYPES = ["IMPROVEMENT_VILLAGE", "IMPROVEMENT_ENCAMPMENT"];
 
 // TODO: remove these
-const BZ_MAX_WIDTH = "21.3333333333rem";  // from default.css
-const BZ_BORDER_WIDTH = "0.0555555556rem";  // from default.css
-const BZ_PADDING_WIDTH = "0.9444444444rem";  // from default.css
-const BZ_ICON_WIDTH = "2.6666666667rem";  // from default.css
-const BZ_ICON_GUTTER = "0.6666666667rem";  // from default.css
-const BZ_OUTSIDE_WIDTH = "calc(2*(" + BZ_BORDER_WIDTH + "+" + BZ_PADDING_WIDTH + "))";
-const BZ_CONTENT_WIDTH = "calc(" + BZ_MAX_WIDTH + "-" + BZ_OUTSIDE_WIDTH + ")";
-const BZ_INDENT_WIDTH = "calc(" + BZ_ICON_WIDTH + "+" + BZ_ICON_GUTTER + ")";
-const BZ_DETAIL_WIDTH = "calc(" + BZ_CONTENT_WIDTH + "-" + BZ_INDENT_WIDTH + ")";
+// const BZ_MAX_WIDTH = "21.3333333333rem";  // from default.css
+// const BZ_PADDING_WIDTH = "0.9444444444rem";  // from default.css
+// const BZ_ICON_WIDTH = "2.6666666667rem";  // from default.css
+// const BZ_ICON_GUTTER = "0.6666666667rem";  // from default.css
+// const BZ_INDENT_WIDTH = "3.3333333333rem";  // BZ_ICON_WIDTH + BZ_ICON_GUTTER
+// const BZ_OUTSIDE_WIDTH = "1.8888888888rem";  // 2 * BZ_PADDING_WIDTH
+const BZ_CONTENT_WIDTH = "19.4444444444rem";  // BZ_MAX_WIDTH - BZ_OUTSIDE_WIDTH
+const BZ_DETAIL_WIDTH = "16.1111111111rem";  // BZ_CONTENT_WIDTH - BZ_INDENT_WIDTH
 
 // Settlements
 // BUILDING_PALACE
@@ -1043,7 +1042,6 @@ class PlotTooltipType {
                 hexName = "LOC_DISTRICT_BZ_DISCOVERY";
             }
         }
-        // TODO: icons
         this.appendTitleDivider(Locale.compose(hexName));
         if (hexDescription) {
             // TODO: customize styling
@@ -1052,7 +1050,8 @@ class PlotTooltipType {
             ttDescription.setAttribute('data-l10n-id', hexDescription);
             this.container.appendChild(ttDescription);
         }
-        // TODO: buildings
+        // TODO: icons
+        this.appendUrbanDivider([], []);
     }
     appendUrbanPanel(TODO) {  // includes CITY_CENTER
         // TODO
@@ -1090,12 +1089,12 @@ class PlotTooltipType {
         const layout = document.createElement("div");
         layout.classList.add("flex-grow", "relative");
         const base = document.createElement("div");
-        base.classList.add("bg-contain", "bg-center", "w-12", "h-12", "mx-3", "my-1");
+        base.classList.add("bg-contain", "bg-center", "size-12", "mx-3", "my-1");
         base.style.backgroundImage = UI.getIconCSS(icon);
         layout.appendChild(base);
         if (overlay) {
             const over = document.createElement("div");
-            over.classList.add("bg-contain", "bg-center", "w-9", "h-9", "mx-3", "my-1");
+            over.classList.add("bg-contain", "bg-center", "size-9", "mx-3", "my-1");
             over.classList.add("absolute", "top-1\\.5", "left-1\\.5");
             over.style.backgroundImage = UI.getIconCSS(overlay);
             layout.appendChild(over);
@@ -1110,10 +1109,10 @@ class PlotTooltipType {
         const buildings = [...b1, ...extras, ...b2];
         // render the icons
         const layout = document.createElement("div");
-        layout.classList.add("flex", "flex-row", "flex-grow", "relative", "mx-3");
+        layout.classList.add("flex", "flex-row", "flex-grow", "relative", "mx-2");
         for (let i = 0; i < buildings.length; i++) {
             const icon = document.createElement("div");
-            icon.classList.add("bg-contain", "bg-center", "w-12", "h-12", "mx-1", "my-1");
+            icon.classList.add("bg-contain", "bg-center", "size-12", "m-1");
             icon.style.backgroundImage = UI.getIconCSS(buildings[i]);
             layout.appendChild(icon);
         }
@@ -1127,7 +1126,6 @@ class PlotTooltipType {
         ttIconBlock.style.setProperty("margin-bottom", "0.167rem");
         const ttIcon = document.createElement("div");
         ttIcon.classList.add("plot-tooltip__large-resource-icon");
-        // TODO: BUILDING_OPEN icon for empty district slot
         const ttIconCSS = UI.getIconCSS(icon);
         ttIcon.style.backgroundImage = ttIconCSS;
         ttIcon.style.setProperty("background-size", "contain");
@@ -1149,9 +1147,9 @@ class PlotTooltipType {
         // ttTextColumn.style.setProperty("background-color", "rgba(150, 57, 57, .35)");
         ttTextColumn.style.setProperty("max-width", BZ_DETAIL_WIDTH);
         const ttName = document.createElement("div");
-        // ttName.classList.add("font-title", "text-sm", "uppercase");
-        ttName.classList.add("font-title", "uppercase");
-        // ttName.style.setProperty("background-color", "rgba(57, 150, 57, .35)");
+        // same style as the production list
+        ttName.classList.value = 'font-title text-xs text-accent-2 mb-1 uppercase';
+        // ttName.style.setProperty("background-color", "rgba(150, 57, 57, .35)");
         ttName.setAttribute("data-l10n-id", name);
         ttTextColumn.appendChild(ttName);
         if (notes) {
