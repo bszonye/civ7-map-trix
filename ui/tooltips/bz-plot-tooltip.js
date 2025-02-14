@@ -12,6 +12,9 @@ import LensManager from '/core/ui/lenses/lens-manager.js';
 
 const BZ_DOT_DIVIDER = Locale.compose("LOC_PLOT_DIVIDER_DOT");
 
+const WILDERNESS_NAME = GameInfo.Districts.lookup(DistrictTypes.WILDERNESS).Name;
+const VILLAGE_TYPES = ["IMPROVEMENT_VILLAGE", "IMPROVEMENT_ENCAMPMENT"];
+
 // TODO: remove these
 const BZ_MAX_WIDTH = "21.3333333333rem";  // from default.css
 const BZ_BORDER_WIDTH = "0.0555555556rem";  // from default.css
@@ -22,6 +25,38 @@ const BZ_OUTSIDE_WIDTH = "calc(2*(" + BZ_BORDER_WIDTH + "+" + BZ_PADDING_WIDTH +
 const BZ_CONTENT_WIDTH = "calc(" + BZ_MAX_WIDTH + "-" + BZ_OUTSIDE_WIDTH + ")";
 const BZ_INDENT_WIDTH = "calc(" + BZ_ICON_WIDTH + "+" + BZ_ICON_GUTTER + ")";
 const BZ_DETAIL_WIDTH = "calc(" + BZ_CONTENT_WIDTH + "-" + BZ_INDENT_WIDTH + ")";
+
+// Settlements
+// BUILDING_PALACE
+// BUILDING_CITY_HALL
+// IMPROVEMENT_VILLAGE -- TODO
+// IMPROVEMENT_ENCAMPMENT -- TODO
+// Improvements
+// IMPROVEMENT_FARM
+// IMPROVEMENT_MINE
+// IMPROVEMENT_MINE_RESOURCE
+// IMPROVEMENT_CLAY_PIT
+// IMPROVEMENT_WOODCUTTER
+// IMPROVEMENT_WOODCUTTER_RESOURCE
+// IMPROVEMENT_FISHING_BOAT
+// IMPROVEMENT_FISHING_BOAT_RESOURCE
+// IMPROVEMENT_CAMP
+// IMPROVEMENT_PASTURE
+// IMPROVEMENT_PLANTATION
+// IMPROVEMENT_QUARRY
+// IMPROVEMENT_OIL_RIG
+// IMPROVEMENT_EXPEDITION_BASE
+// Discoveries
+// IMPROVEMENT_CAVE -- TODO
+// IMPROVEMENT_RUINS -- TODO
+// IMPROVEMENT_CAMPFIRE -- TODO
+// IMPROVEMENT_TENTS -- TODO
+// IMPROVEMENT_PLAZA -- TODO
+// IMPROVEMENT_CAIRN -- TODO
+// IMPROVEMENT_RICH -- TODO
+// IMPROVEMENT_WRECKAGE -- TODO
+// IMPROVEMENT_COAST -- TODO
+// IMPROVEMENT_SHIPWRECK -- TODO
 
 class PlotTooltipType {
     constructor() {
@@ -460,17 +495,17 @@ class PlotTooltipType {
                 const uniqueTrait = GameInfo.Buildings.lookup(info.ConstructibleType).TraitType;
                 let ageLabel;
                 if (!info) {
-                    ageLabel = Locale.compose("LOC_PLOT_BZ_ERROR_UNKNOWN");
+                    ageLabel = Locale.compose("LOC_BZ_ERROR_UNKNOWN");
                 }
                 else if (uniqueTrait) {
-                    ageLabel = Locale.compose("LOC_PLOT_BZ_UNIQUE");
+                    ageLabel = Locale.compose("LOC_STATE_BZ_UNIQUE");
                     if (!isExtra) buildingStatus.Unique.push(uniqueTrait);
                 }
                 else if (isAgeless) {
-                    ageLabel = Locale.compose("LOC_PLOT_BZ_AGELESS");
+                    ageLabel = Locale.compose("LOC_STATE_BZ_AGELESS");
                 }
                 else if (isObsolete) {
-                    ageLabel = Locale.compose("LOC_PLOT_BZ_OBSOLETE");
+                    ageLabel = Locale.compose("LOC_STATE_BZ_OBSOLETE");
                 }
                 // get status (damaged, in progress)
                 let statusLabel;
@@ -532,7 +567,7 @@ class PlotTooltipType {
             else {
                 // unknown constructible type
                 console.warn("Unknown constructible type: " + info.ConstructibleClass);
-                improvements.push(Locale.compose("LOC_PLOT_BZ_ERROR_UNKNOWN"));
+                improvements.push(Locale.compose("LOC_BZ_ERROR_UNKNOWN"));
                 buildingStatus.Improvements.push('');
             }
         });
@@ -547,8 +582,14 @@ class PlotTooltipType {
             // check for special cases: town center, quarter, district
             let tileType;
             if (districtType == DistrictTypes.CITY_CENTER) {
-                // possibly a town center
-                if (city?.isTown) tileType = Locale.compose("LOC_PLOT_BZ_TOWN_CENTER");
+                // possibly a town center, village, or encampment
+                if (city?.isTown) {
+                    // TODO: handle independent settlements
+                    // ConstructibleType:
+                    // IMPROVEMENT_VILLAGE
+                    // IMPROVEMENT_ENCAMPMENT
+                    tileType = Locale.compose("LOC_DISTRICT_BZ_TOWN_CENTER");
+                }
             }
             else if (districtType == DistrictTypes.URBAN) {
                 // quarter or district
@@ -560,15 +601,15 @@ class PlotTooltipType {
                         tileType = Locale.compose(uq.Name);
                     }
                     // quarter (two current buildings)
-                    else tileType = Locale.compose("LOC_PLOT_BZ_URBAN_QUARTER");
+                    else tileType = Locale.compose("LOC_DISTRICT_BZ_URBAN_QUARTER");
                 }
                 else if (thisAgeBuildings.length || previousAgeBuildings.length) {
                     // district (at least one building)
-                    tileType = Locale.compose("LOC_PLOT_BZ_URBAN_DISTRICT");
+                    tileType = Locale.compose("LOC_DISTRICT_BZ_URBAN_DISTRICT");
                 }
                 else {
                     // vacant district (canceled building production)
-                    tileType = Locale.compose("LOC_PLOT_BZ_URBAN_VACANT");
+                    tileType = Locale.compose("LOC_DISTRICT_BZ_URBAN_VACANT");
                 }
             }
             if (!tileType) {
@@ -579,18 +620,17 @@ class PlotTooltipType {
             this.appendTitleDivider(tileType);
         }
         else if (city) {
-            this.appendTitleDivider(Locale.compose("LOC_PLOT_BZ_UNDEVELOPED"));
+            this.appendTitleDivider(Locale.compose("LOC_DISTRICT_BZ_UNDEVELOPED"));
         }
         else {
-            const districtDefinition = GameInfo.Districts.lookup(DistrictTypes.WILDERNESS);
-            this.appendTitleDivider(Locale.compose(districtDefinition.Name));
+            this.appendTitleDivider(WILDERNESS_NAME);
         }
         this.appendConstructibleList(thisAgeBuildings, buildingStatus.CurrentAge);
         this.appendConstructibleList(previousAgeBuildings, buildingStatus.PreviousAge);
         this.appendConstructibleList(extraBuildings, buildingStatus.Extras);
         this.appendConstructibleList(wonders, buildingStatus.Wonder);
         this.appendConstructibleList(improvements, buildingStatus.Improvements);
-        this.appendRuralPanel(plotCoordinate, districtId, cityId);
+        this.appendRuralPanel(plotCoordinate, districtId, cityId, improvements);
     }
     getPlayerName() {
         const playerID = GameplayMap.getOwner(this.plotCoord.x, this.plotCoord.y);
@@ -599,7 +639,13 @@ class PlotTooltipType {
             return "";
         }
         const localPlayerID = GameContext.localPlayerID;
-        const name = Locale.stylize(player.name) + ((playerID == localPlayerID) ? (" (" + Locale.compose("LOC_PLOT_TOOLTIP_YOU") + ")") : "");
+        const civ = GameInfo.Civilizations.lookup(player.civilizationType);
+        const name =
+            playerID == localPlayerID ?
+            Locale.compose("LOC_LEADER_BZ_YOU", player.name) :
+            player.isMinor || player.isIndependent ?
+            Locale.compose("LOC_LEADER_BZ_PEOPLE_NAME", player.name) :
+            Locale.compose(player.name);
         return name;
     }
     getCivName() {
@@ -608,7 +654,10 @@ class PlotTooltipType {
         if (player == null) {
             return "";
         }
-        const name = Locale.compose(GameplayMap.getOwnerName(this.plotCoord.x, this.plotCoord.y));
+        const civName = player.civilizationFullName;
+        const name = player.isIndependent ?  // add "Village" to independents
+            Locale.compose("LOC_CIVILIZATION_INDEPENDENT_SINGULAR", civName) :
+            Locale.compose(civName);
         return name;
     }
     getTerrainLabel(location) {
@@ -711,54 +760,38 @@ class PlotTooltipType {
         if (filteredConstructibles.length == 0 && filteredConstructibles.length != constructibles.length) {
             return;
         }
-        if (player.isIndependent) {
-            this.appendDivider();
-            const plotTooltipOwnerLeader = document.createElement("div");
-            plotTooltipOwnerLeader.classList.add("plot-tooltip__owner-leader-text");
-            plotTooltipOwnerLeader.innerHTML = Locale.compose("LOC_CIVILIZATION_INDEPENDENT_SINGULAR", this.getCivName());
-            this.container.appendChild(plotTooltipOwnerLeader);
+        this.appendDivider();
+        const plotTooltipOwner = document.createElement("div");
+        plotTooltipOwner.classList.add("plot-tooltip__owner-leader-text");
+        const owner = this.dotJoin([this.getPlayerName(), this.getCivName()]);
+        plotTooltipOwner.innerHTML = owner;
+        this.container.appendChild(plotTooltipOwner);
+        const districtId = MapCities.getDistrict(location.x, location.y);
+        const plotTooltipConqueror = this.getConquerorInfo(districtId);
+        if (plotTooltipConqueror) {
+            this.container.appendChild(plotTooltipConqueror);
+        }
+        if (player.isMinor || player.isIndependent) {
             const localPlayerID = GameContext.localPlayerID;
-            const relationship = GameplayMap.getOwnerHostility(location.x, location.y, localPlayerID);
-            if (relationship != null) {
-                const plotTooltipOwnerRelationship = document.createElement("div");
-                plotTooltipOwnerRelationship.classList.add("plot-tooltip__owner-relationship-text");
-                plotTooltipOwnerRelationship.innerHTML = Locale.compose("LOC_PLOT_TOOLTIP_RELATIONSHIP") + ": " + Locale.compose(relationship);
-                this.container.appendChild(plotTooltipOwnerRelationship);
-            }
-            const tooltipCityBonusInfo = document.createElement("div");
-            tooltipCityBonusInfo.classList.add("plot-tooltip__unitInfo");
+            // relationship
+            const hostile = player.Diplomacy?.isAtWarWith(localPlayerID);
+            const relationship = hostile ? "LOC_INDEPENDENT_RELATIONSHIP_HOSTILE" : "LOC_INDEPENDENT_RELATIONSHIP_FRIENDLY";
+            const plotTooltipOwnerRelationship = document.createElement("div");
+            plotTooltipOwnerRelationship.classList.add("plot-tooltip__owner-relationship-text");
+            plotTooltipOwnerRelationship.setAttribute('data-l10n-id', relationship);
+            // plotTooltipOwnerRelationship.innerHTML = Locale.compose("LOC_PLOT_TOOLTIP_RELATIONSHIP") + ": " + Locale.compose(relationship);
+            this.container.appendChild(plotTooltipOwnerRelationship);
+            // city-state unique bonus (not very useful)
             const bonusType = Game.CityStates.getBonusType(playerID);
-            const bonusDefinition = GameInfo.CityStateBonuses.find(t => t.$hash == bonusType);
-            tooltipCityBonusInfo.innerHTML = Locale.compose(bonusDefinition?.Name ?? "");
-            this.container.appendChild(tooltipCityBonusInfo);
-        }
-        else if (false) {  // TODO: remove this
-            this.appendDivider();
-            const plotTooltipOwnerLeader = document.createElement("div");
-            plotTooltipOwnerLeader.classList.add("plot-tooltip__owner-leader-text");
-            plotTooltipOwnerLeader.innerHTML = this.getPlayerName();
-            this.container.appendChild(plotTooltipOwnerLeader);
-            const plotTooltipOwnerCiv = document.createElement("div");
-            plotTooltipOwnerCiv.classList.add("plot-tooltip__owner-civ-text");
-            plotTooltipOwnerCiv.innerHTML = this.getCivName();
-            this.container.appendChild(plotTooltipOwnerCiv);
-            const districtId = MapCities.getDistrict(location.x, location.y);
-            const plotTooltipConqueror = this.getConquerorInfo(districtId);
-            if (plotTooltipConqueror) {
-                this.container.appendChild(plotTooltipConqueror);
-            }
-        }
-        else {  // BZ
-            this.appendDivider();
-            const plotTooltipOwner = document.createElement("div");
-            plotTooltipOwner.classList.add("plot-tooltip__owner-leader-text");
-            const owner = this.dotJoin([this.getPlayerName(), this.getCivName()]);
-            plotTooltipOwner.innerHTML = owner;
-            this.container.appendChild(plotTooltipOwner);
-            const districtId = MapCities.getDistrict(location.x, location.y);
-            const plotTooltipConqueror = this.getConquerorInfo(districtId);
-            if (plotTooltipConqueror) {
-                this.container.appendChild(plotTooltipConqueror);
+            const bonus = GameInfo.CityStateBonuses.find(t => t.$hash == bonusType);
+            if (bonus) {
+                const ttBonusName = document.createElement("div");
+                ttBonusName.classList.add("font-title", "text-sm", "uppercase");
+                ttBonusName.setAttribute('data-l10n-id', bonus.Name);
+                this.container.appendChild(ttBonusName);
+                const ttBonusDescription = document.createElement("div");
+                ttBonusDescription.setAttribute('data-l10n-id', bonus.Description);
+                this.container.appendChild(ttBonusDescription);
             }
         }
     }
@@ -973,7 +1006,7 @@ class PlotTooltipType {
         // wrap non-empty text with brackets
         return text ? "(" + text + ")" : "";
     }
-    appendRuralPanel(location, districtId, cityId) {  // includes WILDERNESS
+    appendRuralPanel(location, districtId, cityId, improvements) {
         let hexName;
         let hexDescription;
         // city info
@@ -995,10 +1028,20 @@ class PlotTooltipType {
             hexName = GameInfo.Districts.lookup(district?.type).Name;
         }
         else if (city) {
-            hexName = "LOC_PLOT_BZ_UNDEVELOPED";
+            hexName = "LOC_DISTRICT_BZ_UNDEVELOPED";
         }
         else {
-            hexName = GameInfo.Districts.lookup(DistrictTypes.WILDERNESS).Name;
+            hexName = WILDERNESS_NAME;
+        }
+        // "improvements" in the wilderness are villages or discoveries
+        if (hexName == WILDERNESS_NAME && improvements.length) {
+            if (VILLAGE_TYPES.includes(improvements[0].ConstructibleType)) {
+                // TODO: handle villages in the district type dispatcher?
+                // TODO: show village info
+                hexName = improvements[0].Name;
+            } else {
+                hexName = "LOC_DISTRICT_BZ_DISCOVERY";
+            }
         }
         // TODO: icons
         this.appendTitleDivider(Locale.compose(hexName));

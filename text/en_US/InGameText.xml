@@ -1,47 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Database>
     <EnglishText>
-        <Row Tag="LOC_PLOT_BZ_TODO">
+        <Row Tag="LOC_BZ_TODO">
             <Text>TODO</Text>
         </Row>
-        <Row Tag="LOC_PLOT_BZ_DIAMOND_BLACK">
-            <Text>◆</Text>
+        <Row Tag="LOC_BZ_ERROR_UNKNOWN">
+            <Text>Unknown</Text>
         </Row>
-        <Row Tag="LOC_PLOT_BZ_DIAMOND_WHITE">
-            <Text>◇</Text>
+        <Row Tag="LOC_DISTRICT_BZ_DISCOVERY">
+            <Text>Discovery</Text>
         </Row>
-        <Row Tag="LOC_PLOT_BZ_STAR_BLACK">
-            <Text>★</Text>
-        </Row>
-        <Row Tag="LOC_PLOT_BZ_STAR_WHITE">
-            <Text>☆</Text>
-        </Row>
-        <Row Tag="LOC_PLOT_BZ_AGELESS">
-            <Text>Ageless</Text>
-        </Row>
-        <Row Tag="LOC_PLOT_BZ_OBSOLETE">
-            <Text>Obsolete</Text>
-        </Row>
-        <Row Tag="LOC_PLOT_BZ_UNIQUE">
-            <Text>Unique</Text>
-        </Row>
-        <Row Tag="LOC_PLOT_BZ_URBAN_DISTRICT">
-            <Text>District</Text>
-        </Row>
-        <Row Tag="LOC_PLOT_BZ_URBAN_QUARTER">
-            <Text>Quarter</Text>
-        </Row>
-        <Row Tag="LOC_PLOT_BZ_URBAN_VACANT">
-            <Text>Vacant District</Text>
-        </Row>
-        <Row Tag="LOC_PLOT_BZ_TOWN_CENTER">
+        <Row Tag="LOC_DISTRICT_BZ_TOWN_CENTER">
             <Text>Town Center</Text>
         </Row>
-        <Row Tag="LOC_PLOT_BZ_UNDEVELOPED">
+        <Row Tag="LOC_DISTRICT_BZ_URBAN_DISTRICT">
+            <Text>District</Text>
+        </Row>
+        <Row Tag="LOC_DISTRICT_BZ_URBAN_QUARTER">
+            <Text>Quarter</Text>
+        </Row>
+        <Row Tag="LOC_DISTRICT_BZ_URBAN_VACANT">
+            <Text>Vacant District</Text>
+        </Row>
+        <Row Tag="LOC_DISTRICT_BZ_UNDEVELOPED">
             <Text>Undeveloped</Text>
         </Row>
-        <Row Tag="LOC_PLOT_BZ_ERROR_UNKNOWN">
-            <Text>Unknown</Text>
+        <Row Tag="LOC_LEADER_BZ_PEOPLE_NAME">
+            <Text>{1_Name} People</Text>
+        </Row>
+        <Row Tag="LOC_LEADER_BZ_YOU">
+            <Text>{1_Name} (You)</Text>
+        </Row>
+        <Row Tag="LOC_STATE_BZ_AGELESS">
+            <Text>Ageless</Text>
+        </Row>
+        <Row Tag="LOC_STATE_BZ_OBSOLETE">
+            <Text>Obsolete</Text>
+        </Row>
+        <Row Tag="LOC_STATE_BZ_UNIQUE">
+            <Text>Unique</Text>
         </Row>
     </EnglishText>
 </Database>

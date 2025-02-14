@@ -17,7 +17,7 @@
         </Criteria>
     </ActionCriteria>
     <ActionGroups>
-        <ActionGroup id="game-bz-map-trix" scope="game" criteria="always">
+        <ActionGroup id="bz-map-trix-ui" scope="game" criteria="always">
             <Actions>
                 <UIScripts>
                     <Item>ui/tooltips/bz-plot-tooltip.js</Item>
