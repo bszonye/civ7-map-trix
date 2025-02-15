@@ -189,7 +189,6 @@ class PlotTooltipType {
         // District Information
         this.addPlotDistrictInformation(this.plotCoord);  // TODO: move into appendHexDistrict
         this.appendHexPanel(this.plotCoord);
-        this.BZaddConstructibleInformation(this.plotCoord);
         //Yields Section
         this.yieldsFlexbox.classList.add("plot-tooltip__resourcesFlex");
         this.container.appendChild(this.yieldsFlexbox);
@@ -419,12 +418,11 @@ class PlotTooltipType {
             const icon = UI.getIconCSS(info.ConstructibleType);
             const state = [];
 
-            const curAge = Game.age;
-            const buildingAge = Database.makeHash(info.Age ?? "");
-
             const isExtra = this.extraBuildings.has(info.ConstructibleType);
             const isAgeless = this.agelessBuildings.has(info.ConstructibleType);
-            const isObsolete = isBuilding && buildingAge != curAge && !isAgeless;
+            const currentAge = GameInfo.Ages.lookup(Game.age).ChronologyIndex;
+            const buildingAge = isAgeless ? currentAge : GameInfo.Ages.lookup(info.Age)?.ChronologyIndex ?? 0;
+            const isObsolete = isBuilding && buildingAge != currentAge;
             const uniqueTrait =
                 isBuilding ?
                 GameInfo.Buildings.lookup(info.ConstructibleType).TraitType :
@@ -432,7 +430,7 @@ class PlotTooltipType {
                 GameInfo.Improvements.lookup(info.ConstructibleType).TraitType :
                 null;
 
-            let sortOrder = 1;
+            const sortOrder = isExtra ? -1 : buildingAge;
             if (instance.damaged) state.push("LOC_PLOT_TOOLTIP_DAMAGED");
             if (!instance.complete) state.push("LOC_PLOT_TOOLTIP_IN_PROGRESS");
             if (uniqueTrait) {
@@ -441,14 +439,15 @@ class PlotTooltipType {
                 state.push("LOC_UI_PRODUCTION_AGELESS");
             } else if (isObsolete) {
                 state.push("LOC_STATE_BZ_OBSOLETE");
-                sortOrder = 0;
+                const ageName = GameInfo.Ages.lookup(info.Age).Name;
+                if (ageName) state.push(Locale.compose(ageName));
             }
-            if (isExtra) sortOrder = 2;
             constructibleInfo.push({info, icon, uniqueTrait, state, sortOrder});
         };
-        constructibleInfo.sort((a, b) => a.sortOrder - b.sortOrder);
+        constructibleInfo.sort((a, b) => b.sortOrder - a.sortOrder);
         return constructibleInfo;
     }
+    // TODO: remove
     BZaddConstructibleInformation(plotCoordinate) {
         const thisAgeBuildings = [];
         const previousAgeBuildings = [];
@@ -810,6 +809,7 @@ class PlotTooltipType {
         this.container.appendChild(plotTooltipOwner);
         const districtID = MapCities.getDistrict(location.x, location.y);
         const plotTooltipConqueror = this.getConquerorInfo(districtID);
+        console.warn(`TRIX conqueror=${plotTooltipConqueror}`);
         if (plotTooltipConqueror) {
             this.container.appendChild(plotTooltipConqueror);
         }
@@ -1044,13 +1044,7 @@ class PlotTooltipType {
         // join text with dots after removing empty elements
         return list.filter(e => e).join(" " + BZ_DOT_DIVIDER + " ");
     }
-    bracketText(text) {
-        // wrap non-empty text with brackets
-        return text ? "(" + text + ")" : "";
-    }
     appendRuralPanel(location, districtID, cityID) {
-        const layout = document.createElement("div");
-        layout.classList.add("flex", "flex-col", "items-center");
         let hexName;
         let hexDescription;
         let hexIcon;
@@ -1079,17 +1073,22 @@ class PlotTooltipType {
         const improvements = this.getConstructibleInfo(location);
         // "improvements" in the wilderness are villages or discoveries
         if (hexName == WILDERNESS_NAME && improvements.length) {
-            hexIcon = null;  // none of these have icons
             if (VILLAGE_TYPES.includes(improvements[0].info.ConstructibleType)) {
                 // TODO: handle villages in the district type dispatcher?
                 // TODO: show village info
                 hexName = improvements[0].info.Name;
+                hexIcon = this.getVillageIcon(location);
             } else {
                 hexName = "LOC_DISTRICT_BZ_DISCOVERY";
+                // hexIcon = "BUILDING_WARNING";
+                hexIcon = "url('blp:tech_cartography')";
             }
         }
         // title bar
         this.appendTitleDivider(Locale.compose(hexName));
+        // panel interior
+        const layout = document.createElement("div");
+        layout.classList.add("flex", "flex-col", "items-center", "max-w-80");
         // optional description
         if (hexDescription) {
             // TODO: customize styling
@@ -1100,20 +1099,24 @@ class PlotTooltipType {
         // constructibles
         for (const imp of improvements) {
             if (imp.info.Name == hexName) continue;  // already handled
-            if (hexIcon !== null) hexIcon = imp.info.ConstructibleType;
+            if (!hexIcon) hexIcon = imp.info.ConstructibleType;
             // TODO: adjust spacing
+            const ttConstructible = document.createElement("div");
+            ttConstructible.classList.value = "flex flex-col items-center";
             const ttName = document.createElement("div");
             ttName.classList.value = "font-title text-xs text-accent-2 uppercase";
             ttName.setAttribute("data-l10n-id", imp.info.Name);
-            layout.appendChild(ttName);
+            ttConstructible.appendChild(ttName);
             const state = this.dotJoin([...imp.state.map(e => Locale.compose(e))]);
-            if (!state) continue;  // skip if empty
-            const ttState = document.createElement("div");
-            ttState.classList.add("text-xs", "-mt-1");
-            ttState.style.setProperty("font-size", "0.667rem");
-            ttState.style.setProperty("line-height", "0.667rem");
-            ttState.innerHTML = state;
-            layout.appendChild(ttState);
+            if (state) {
+                const ttState = document.createElement("div");
+                ttState.classList.add("text-xs", "-mt-1");
+                ttState.style.setProperty("font-size", "0.667rem");
+                ttState.style.setProperty("line-height", "0.667rem");
+                ttState.innerHTML = state;
+                ttConstructible.appendChild(ttState);
+            }
+            layout.appendChild(ttConstructible);
         }
         this.container.appendChild(layout);
         // bottom bar
@@ -1130,6 +1133,43 @@ class PlotTooltipType {
     }
     appendWonderPanel(TODO) {
         // TODO
+    }
+    getVillageIcon(location) {
+        const villages = {
+            "MILITARISTIC": [
+                "IMPROVEMENT_HILLFORT",
+                "IMPROVEMENT_KASBAH",
+                "IMPROVEMENT_SHORE_BATTERY"
+            ],
+            "CULTURAL": [
+                "IMPROVEMENT_MEGALITH",
+                "IMPROVEMENT_STONE_HEAD",
+                "IMPROVEMENT_OPEN_AIR_MUSEUM"
+            ],
+            "ECONOMIC": [
+                "IMPROVEMENT_SOUQ",
+                "IMPROVEMENT_TRADING_FACTORY",
+                "IMPROVEMENT_ENTREPOT"
+            ],
+            "SCIENTIFIC": [
+                "IMPROVEMENT_ZIGGURAT",
+                "IMPROVEMENT_MONASTERY",
+                "IMPROVEMENT_INSTITUTE"
+            ]
+        };
+        // get the minor civ type
+        const playerID = GameplayMap.getOwner(location.x, location.y);
+        const player = Players.get(playerID);
+        let ctype = "MILITARISTIC";  // default
+        GameInfo.Independents.forEach(i => {
+            if (player.civilizationAdjective == i.CityStateName) ctype = i.CityStateType;
+        });
+        // get the current age
+        const age = GameInfo.Ages.lookup(Game.age).ChronologyIndex;
+        // select an icon
+        const icons = villages[ctype ?? "MILITARISTIC"];
+        const icon = icons[Math.min(age, icons.length-1)];
+        return icon;
     }
     appendFlexDivider(center) {
         const layout = document.createElement("div");
@@ -1158,17 +1198,20 @@ class PlotTooltipType {
     }
     appendIconDivider(icon, overlay=null) {
         // icon divider with optional overlay
+        if (!icon.startsWith("url(")) icon = UI.getIconCSS(icon);
+        if (overlay && !overlay.startsWith("url(")) overlay = UI.getIconCSS(overlay);
+        console.warn(`TRIX icon=${icon} overlay=${overlay}`);
         const layout = document.createElement("div");
         layout.classList.add("flex-grow", "relative");
         const base = document.createElement("div");
         base.classList.add("bg-contain", "bg-center", "size-12", "mx-3", "my-1");
-        base.style.backgroundImage = UI.getIconCSS(icon);
+        base.style.backgroundImage = icon;
         layout.appendChild(base);
         if (overlay) {
             const over = document.createElement("div");
             over.classList.add("bg-contain", "bg-center", "size-9", "mx-3", "my-1");
             over.classList.add("absolute", "top-1\\.5", "left-1\\.5");
-            over.style.backgroundImage = UI.getIconCSS(overlay);
+            over.style.backgroundImage = overlay;
             layout.appendChild(over);
         }
         this.appendFlexDivider(layout);
@@ -1190,6 +1233,7 @@ class PlotTooltipType {
         }
         this.appendFlexDivider(layout);
     }
+    // TODO: remove
     iconBlock(icon, name, notes, description) {
         const ttIconBlock = document.createElement("div");
         ttIconBlock.classList.add("plot-tooltip__resource-container");
@@ -1247,6 +1291,7 @@ class PlotTooltipType {
         ttIconBlock.appendChild(ttTextColumn);
         return ttIconBlock;
     }
+    // TODO: remove
     appendConstructibleList(infoList, statusList) {
         for (let i = 0; i < infoList.length; i++) {
             const info = infoList[i];
