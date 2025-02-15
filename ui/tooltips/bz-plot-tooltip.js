@@ -10,6 +10,13 @@ import { ComponentID } from '/core/ui/utilities/utilities-component-id.js';
 import DistrictHealthManager from '/base-standard/ui/district/district-health-manager.js';
 import LensManager from '/core/ui/lenses/lens-manager.js';
 
+const DEBUG_GRAY = ["background-color", "rgba(150, 150, 150, .35)"];
+const DEBUG_RED = ["background-color", "rgba(150, 57, 57, .35)"];
+const DEBUG_GREEN = ["background-color", "rgba(57, 150, 57, .35)"];
+const DEBUG_BLUE = ["background-color", "rgba(57, 57, 150, .35)"];
+
+const TEXT_XXS = ["font-size", "0.6666666667rem"];
+
 const BZ_DOT_DIVIDER = Locale.compose("LOC_PLOT_DIVIDER_DOT");
 
 const WILDERNESS_NAME = GameInfo.Districts.lookup(DistrictTypes.WILDERNESS).Name;
@@ -186,14 +193,24 @@ class PlotTooltipType {
                 this.container.appendChild(tooltipThirdLine);
             }
         }
-        // District Information
-        this.addPlotDistrictInformation(this.plotCoord);  // TODO: move into appendHexDistrict
+        // civ & settlement panel
+        this.addOwnerInfo(this.plotCoord, playerID);
+        // hex tile panel
         this.appendHexPanel(this.plotCoord);
-        //Yields Section
+        // TODO: what is this?
+        this.addPlotEffectNames(plotIndex);
+        // Trade Route Info
+        if (routeName) {
+            const toolTipRouteInfo = document.createElement("div");
+            toolTipRouteInfo.classList.add("plot-tooltip__trade-route-info");
+            toolTipRouteInfo.innerHTML = routeName;
+            this.container.appendChild(toolTipRouteInfo);
+        }
+        // yields panel
+        // TODO: refactor this into a method
         this.yieldsFlexbox.classList.add("plot-tooltip__resourcesFlex");
         this.container.appendChild(this.yieldsFlexbox);
         this.addPlotYields(this.plotCoord, GameContext.localPlayerID);
-        this.addOwnerInfo(this.plotCoord, playerID);
         if (hexResource) {
             //add resources to the yield box
             const tooltipIndividualYieldFlex = document.createElement("div");
@@ -212,19 +229,9 @@ class PlotTooltipType {
             toolTipIndividualYieldValues.classList.add("plot-tooltip__IndividualYieldValues", "font-body");
             toolTipIndividualYieldValues.innerHTML = "1"; //TODO: Change This value
             tooltipIndividualYieldFlex.appendChild(toolTipIndividualYieldValues);
-            this.appendTooltipInformation(hexResource.Name, [hexResource.Tooltip], toolTipResourceIconCSS);
         }
-        // Adds info about constructibles, improvements, and wonders to the tooltip
-        this.addPlotEffectNames(plotIndex);
-        // Trade Route Info
-        if (routeName) {
-            this.appendDivider();
-            const toolTipRouteInfo = document.createElement("div");
-            toolTipRouteInfo.classList.add("plot-tooltip__trade-route-info");
-            toolTipRouteInfo.innerHTML = routeName;
-            this.container.appendChild(toolTipRouteInfo);
-        }
-        // Unit Info
+        // unit info panel
+        // TODO: refactor this into a method
         this.addUnitInfo(this.plotCoord);
         UI.setPlotLocation(this.plotCoord.x, this.plotCoord.y, plotIndex);
         // Adjust cursor between normal and red based on the plot owner's hostility
@@ -415,7 +422,6 @@ class PlotTooltipType {
             if (!(isWonder || isBuilding || isImprovement)) {
                 continue;
             }
-            const icon = UI.getIconCSS(info.ConstructibleType);
             const state = [];
 
             const isExtra = this.extraBuildings.has(info.ConstructibleType);
@@ -430,7 +436,7 @@ class PlotTooltipType {
                 GameInfo.Improvements.lookup(info.ConstructibleType).TraitType :
                 null;
 
-            const sortOrder = isExtra ? -1 : buildingAge;
+            const sortOrder = isExtra ? currentAge + 1 : buildingAge;
             if (instance.damaged) state.push("LOC_PLOT_TOOLTIP_DAMAGED");
             if (!instance.complete) state.push("LOC_PLOT_TOOLTIP_IN_PROGRESS");
             if (uniqueTrait) {
@@ -442,9 +448,9 @@ class PlotTooltipType {
                 const ageName = GameInfo.Ages.lookup(info.Age).Name;
                 if (ageName) state.push(Locale.compose(ageName));
             }
-            constructibleInfo.push({info, icon, uniqueTrait, state, sortOrder});
+            constructibleInfo.push({info, uniqueTrait, state, sortOrder});
         };
-        constructibleInfo.sort((a, b) => b.sortOrder - a.sortOrder);
+        constructibleInfo.sort((a, b) => a.sortOrder - b.sortOrder);
         return constructibleInfo;
     }
     // TODO: remove
@@ -1070,22 +1076,29 @@ class PlotTooltipType {
         } else {
             hexName = WILDERNESS_NAME;
         }
+        // get the panel icon and adjust the title if necessary
         const improvements = this.getConstructibleInfo(location);
-        // "improvements" in the wilderness are villages or discoveries
-        if (hexName == WILDERNESS_NAME && improvements.length) {
-            if (VILLAGE_TYPES.includes(improvements[0].info.ConstructibleType)) {
-                // TODO: handle villages in the district type dispatcher?
-                // TODO: show village info
-                hexName = improvements[0].info.Name;
-                hexIcon = this.getVillageIcon(location);
-            } else {
-                hexName = "LOC_DISTRICT_BZ_DISCOVERY";
-                // hexIcon = "BUILDING_WARNING";
-                hexIcon = "url('blp:tech_cartography')";
-            }
+        if (improvements.length == 0) {
+            // no improvements, no icon
+            hexIcon = null;
+        } else if (VILLAGE_TYPES.includes(improvements[0].info.ConstructibleType)) {
+            // encampments and villages get icons based on their unique improvements,
+            // appropriate for the age and minor civ type
+            hexName = improvements[0].info.Name;
+            hexIcon = this.getVillageIcon(location);
+        } else if (hexName == WILDERNESS_NAME) {
+            // other "improvements" in the wilderness are discoveries
+            // they don't have a standard icon, so let's use this nice map
+            hexName = "LOC_DISTRICT_BZ_DISCOVERY";
+            hexIcon = "url('blp:tech_cartography')";
+        } else {
+            // use the standard icon for the improvement
+            hexIcon = improvements[0].info.ConstructibleType;
         }
         // title bar
         this.appendTitleDivider(Locale.compose(hexName));
+        // TODO: move this to the urban panel
+        this.addPlotDistrictInformation(this.plotCoord);
         // panel interior
         const layout = document.createElement("div");
         layout.classList.add("flex", "flex-col", "items-center", "max-w-80");
@@ -1093,26 +1106,27 @@ class PlotTooltipType {
         if (hexDescription) {
             // TODO: customize styling
             const ttDescription = document.createElement("div");
+            ttDescription.classList.value = "text-xs leading-tight text-center mb-1";
+            // ttDescription.style.setProperty(...DEBUG_GRAY);
             ttDescription.setAttribute('data-l10n-id', hexDescription);
             layout.appendChild(ttDescription);
         }
         // constructibles
         for (const imp of improvements) {
-            if (imp.info.Name == hexName) continue;  // already handled
-            if (!hexIcon) hexIcon = imp.info.ConstructibleType;
             // TODO: adjust spacing
             const ttConstructible = document.createElement("div");
-            ttConstructible.classList.value = "flex flex-col items-center";
+            ttConstructible.classList.value = "flex-col items-center mb-1";
             const ttName = document.createElement("div");
-            ttName.classList.value = "font-title text-xs text-accent-2 uppercase";
+            ttName.classList.value = "font-title uppercase text-xs leading-tight text-accent-2 text-center";
+            // ttName.style.setProperty(...DEBUG_RED);
             ttName.setAttribute("data-l10n-id", imp.info.Name);
             ttConstructible.appendChild(ttName);
             const state = this.dotJoin([...imp.state.map(e => Locale.compose(e))]);
             if (state) {
                 const ttState = document.createElement("div");
-                ttState.classList.add("text-xs", "-mt-1");
-                ttState.style.setProperty("font-size", "0.667rem");
-                ttState.style.setProperty("line-height", "0.667rem");
+                ttState.style.setProperty(...TEXT_XXS);
+                ttState.classList.value = "leading-tight text-center -mt-0\\.5";
+                // ttState.style.setProperty(...DEBUG_GREEN);
                 ttState.innerHTML = state;
                 ttConstructible.appendChild(ttState);
             }
@@ -1174,7 +1188,7 @@ class PlotTooltipType {
     appendFlexDivider(center) {
         const layout = document.createElement("div");
         layout.classList.add("flex", "flex-row", "justify-between", "items-center");
-        layout.classList.add("self-center", "-mx-6", "my-1", "flex-auto");
+        layout.classList.add("self-center", "-mx-6", "flex-auto");
         this.container.appendChild(layout);
         // left frame
         const lineLeft = document.createElement("div");
@@ -1191,8 +1205,8 @@ class PlotTooltipType {
     }
     appendTitleDivider(text=BZ_DOT_DIVIDER) {
         const layout = document.createElement("div");
-        layout.classList.add("self-center", "text-center", "mx-3", "max-w-80");
-        layout.classList.add("font-title", "text-sm", "uppercase");
+        layout.classList.add("self-center", "text-center", "my-1", "mx-3", "max-w-80");
+        layout.classList.add("font-title", "uppercase", "text-sm", "leading-tight");
         layout.innerHTML = text;
         this.appendFlexDivider(layout);
     }
@@ -1200,16 +1214,15 @@ class PlotTooltipType {
         // icon divider with optional overlay
         if (!icon.startsWith("url(")) icon = UI.getIconCSS(icon);
         if (overlay && !overlay.startsWith("url(")) overlay = UI.getIconCSS(overlay);
-        console.warn(`TRIX icon=${icon} overlay=${overlay}`);
         const layout = document.createElement("div");
         layout.classList.add("flex-grow", "relative");
         const base = document.createElement("div");
-        base.classList.add("bg-contain", "bg-center", "size-12", "mx-3", "my-1");
+        base.classList.add("bg-contain", "bg-center", "size-12", "mx-3");
         base.style.backgroundImage = icon;
         layout.appendChild(base);
         if (overlay) {
             const over = document.createElement("div");
-            over.classList.add("bg-contain", "bg-center", "size-9", "mx-3", "my-1");
+            over.classList.add("bg-contain", "bg-center", "size-9", "mx-3");
             over.classList.add("absolute", "top-1\\.5", "left-1\\.5");
             over.style.backgroundImage = overlay;
             layout.appendChild(over);
@@ -1226,10 +1239,12 @@ class PlotTooltipType {
         const layout = document.createElement("div");
         layout.classList.add("flex", "flex-row", "flex-grow", "relative", "mx-2");
         for (let i = 0; i < buildings.length; i++) {
-            const icon = document.createElement("div");
-            icon.classList.add("bg-contain", "bg-center", "size-12", "m-1");
-            icon.style.backgroundImage = UI.getIconCSS(buildings[i]);
-            layout.appendChild(icon);
+            const ttIcon = document.createElement("div");
+            ttIcon.classList.add("bg-contain", "bg-center", "size-12", "m-1");
+            const icon = buildings[i];
+            if (!icon.startsWith("url(")) icon = UI.getIconCSS(icon);
+            ttIcon.style.backgroundImage = icon;
+            layout.appendChild(ttIcon);
         }
         this.appendFlexDivider(layout);
     }
@@ -1237,7 +1252,7 @@ class PlotTooltipType {
     iconBlock(icon, name, notes, description) {
         const ttIconBlock = document.createElement("div");
         ttIconBlock.classList.add("plot-tooltip__resource-container");
-        // ttIconBlock.style.setProperty("background-color", "rgba(150, 150, 150, .35)");
+        // ttIconBlock.style.setProperty(...DEBUG_GRAY);
         ttIconBlock.style.setProperty("max-width", BZ_CONTENT_WIDTH);
         ttIconBlock.style.setProperty("margin-bottom", "0.167rem");
         const ttIcon = document.createElement("div");
@@ -1260,18 +1275,18 @@ class PlotTooltipType {
         ttIconBlock.appendChild(ttIcon);
         const ttTextColumn = document.createElement("div");
         ttTextColumn.classList.add("plot-tooltip__resource-details");
-        // ttTextColumn.style.setProperty("background-color", "rgba(150, 57, 57, .35)");
+        // ttTextColumn.style.setProperty(...DEBUG_RED);
         ttTextColumn.style.setProperty("max-width", BZ_DETAIL_WIDTH);
         const ttName = document.createElement("div");
         // same style as the production list
         ttName.classList.value = 'font-title text-xs text-accent-2 mb-1 uppercase';
-        // ttName.style.setProperty("background-color", "rgba(150, 57, 57, .35)");
+        // ttName.style.setProperty(...DEBUG_RED);
         ttName.setAttribute("data-l10n-id", name);
         ttTextColumn.appendChild(ttName);
         if (notes) {
             const ttNotes = document.createElement("div");
             ttNotes.classList.add("plot-tooltip__resource-label_description");
-            // ttNotes.style.setProperty("background-color", "rgba(150, 57, 57, .35)");
+            // ttNotes.style.setProperty(...DEBUG_RED);
             ttNotes.style.setProperty("margin-top", "-0.111rem");
             ttNotes.style.setProperty("margin-bottom", "0.222rem");
             ttNotes.style.setProperty("font-size", "0.667rem");
@@ -1284,7 +1299,7 @@ class PlotTooltipType {
             ttTextColumn.style.setProperty("flex", "auto");
             const ttDescription = document.createElement("div");
             ttDescription.classList.add("plot-tooltip__resource-label_description");
-            // ttDescription.style.setProperty("background-color", "rgba(57, 57, 150, .35)");
+            // ttDescription.style.setProperty(...DEBUG_BLUE);
             ttDescription.setAttribute("data-l10n-id", description);
             ttTextColumn.appendChild(ttDescription);
         }
