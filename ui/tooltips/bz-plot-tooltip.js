@@ -687,8 +687,8 @@ class PlotTooltipType {
     }
     appendSettlementPanel(location, city) {
     }
-    getPlayerName() {
-        const playerID = GameplayMap.getOwner(this.plotCoord.x, this.plotCoord.y);
+    getPlayerName(playerID=null) {
+        playerID = playerID ?? GameplayMap.getOwner(this.plotCoord.x, this.plotCoord.y);
         const player = Players.get(playerID);
         if (player == null) {
             return "";
@@ -703,19 +703,30 @@ class PlotTooltipType {
             Locale.compose(player.name);
         return name;
     }
-    getCivName() {
-        const playerID = GameplayMap.getOwner(this.plotCoord.x, this.plotCoord.y);
+    getCivName(playerID=null, fullName=false) {
+        playerID = playerID ?? GameplayMap.getOwner(this.plotCoord.x, this.plotCoord.y);
         const player = Players.get(playerID);
         if (player == null) {
             return "";
         }
-        const civName = player.isMinor || player.isIndependent ?
+        const civName = fullName || player.isMinor || player.isIndependent ?
             player.civilizationFullName :  // "Venice"
             player.civilizationName;  // "Spain"
         const name = player.isIndependent ?  // add "Village" to independents
             Locale.compose("LOC_CIVILIZATION_INDEPENDENT_SINGULAR", civName) :
             Locale.compose(civName);
         return name;
+    }
+    getCivRelationship(player) {
+        const localPlayerID = GameContext.localPlayerID;
+        // relationship
+        if (player.isMinor || player.isIndependent) {
+            const hostile = player.Diplomacy?.isAtWarWith(localPlayerID);
+            const relationship = hostile ? "LOC_INDEPENDENT_RELATIONSHIP_HOSTILE" : "LOC_INDEPENDENT_RELATIONSHIP_FRIENDLY";
+            return relationship;
+        }
+        // TODO: determine relationships for major civs
+        return null;
     }
     getTerrainLabel(location) {
         const terrainType = GameplayMap.getTerrainType(location.x, location.y);
@@ -824,21 +835,15 @@ class PlotTooltipType {
         const owner = this.dotJoin([this.getPlayerName(), this.getCivName()]);
         plotTooltipOwner.innerHTML = owner;
         this.container.appendChild(plotTooltipOwner);
-        const districtID = MapCities.getDistrict(location.x, location.y);
-        const plotTooltipConqueror = this.getConquerorInfo(districtID);
-        if (plotTooltipConqueror) {
-            this.container.appendChild(plotTooltipConqueror);
-        }
-        if (player.isMinor || player.isIndependent) {
-            const localPlayerID = GameContext.localPlayerID;
-            // relationship
-            const hostile = player.Diplomacy?.isAtWarWith(localPlayerID);
-            const relationship = hostile ? "LOC_INDEPENDENT_RELATIONSHIP_HOSTILE" : "LOC_INDEPENDENT_RELATIONSHIP_FRIENDLY";
+        const relationship = this.getCivRelationship(player);
+        if (relationship) {
             const plotTooltipOwnerRelationship = document.createElement("div");
             plotTooltipOwnerRelationship.classList.add("plot-tooltip__owner-relationship-text");
             plotTooltipOwnerRelationship.classList.value = "text-xs leading-tight text-center";
             plotTooltipOwnerRelationship.setAttribute('data-l10n-id', relationship);
             this.container.appendChild(plotTooltipOwnerRelationship);
+        }
+        if (player.isMinor || player.isIndependent) {
             // city-state unique bonus (not very useful)
             const bonusType = Game.CityStates.getBonusType(playerID);
             const bonus = GameInfo.CityStateBonuses.find(t => t.$hash == bonusType);
@@ -852,42 +857,6 @@ class PlotTooltipType {
                 ttDescription.setAttribute('data-l10n-id', bonus.Description);
                 this.container.appendChild(ttDescription);
             }
-        }
-    }
-    getConquerorInfo(districtID) {
-        // TODO: figure out how this works. is it related to multi-hex defenses?
-        if (!districtID) {
-            return null;
-        }
-        const district = Districts.get(districtID);
-        if (!district || !ComponentID.isValid(districtID)) {
-            console.error(`plot-tooltip: couldn't find any district with the given id: ${districtID}`);
-            return null;
-        }
-        if (district.owner != district.controllingPlayer) {
-            const conqueror = Players.get(district.controllingPlayer);
-            if (!conqueror) {
-                console.error(`plot-tooltip: couldn't find any civilization with the given player ${district.controllingPlayer}`);
-                return null;
-            }
-            if (conqueror.isIndependent) {
-                const plotTooltipOwnerLeader = document.createElement("div");
-                plotTooltipOwnerLeader.classList.add("plot-tooltip__owner-leader-text");
-                const label = Locale.compose("{1_Term}: {2_Subject}", "LOC_PLOT_TOOLTIP_CONQUEROR", "LOC_PLOT_TOOLTIP_INDEPENDENT_CONQUEROR");
-                plotTooltipOwnerLeader.innerHTML = label;
-                return plotTooltipOwnerLeader;
-            }
-            else {
-                const conquerorName = Locale.compose(conqueror.civilizationFullName);
-                const plotTooltipConqueredCiv = document.createElement("div");
-                plotTooltipConqueredCiv.classList.add("plot-tooltip__owner-civ-text");
-                const label = Locale.compose("{1_Term}: {2_Subject}", "LOC_PLOT_TOOLTIP_CONQUEROR", conquerorName);
-                plotTooltipConqueredCiv.innerHTML = label;
-                return plotTooltipConqueredCiv;
-            }
-        }
-        else {
-            return null;
         }
     }
     getRiverLabel(location) {
@@ -1028,16 +997,32 @@ class PlotTooltipType {
             this.yieldsFlexbox.classList.add(maxValueLength > 3 ? 'resourcesFlex--triple-digits' : 'resourcesFlex--double-digits');
         }
     }
-    /**
-     * Add to a plot tooltip district info and show it if the health is not 100 nor 0
-     * @param {float2} location The X,Y plot location.
-    */
-    addPlotDistrictInformation(location) {
+    setWarningBannerStyle(element) {
+        element.style.setProperty("margin-left", BZ_BORDER_MARGIN);
+        element.style.setProperty("margin-right", BZ_BORDER_MARGIN);
+        element.style.setProperty("padding-left", BZ_BORDER_PADDING);
+        element.style.setProperty("padding-right", BZ_BORDER_PADDING);
+        element.style.setProperty("background-color", "#3a0806");
+    }
+    appendDistrictDefense(location) {
+        const districtID = MapCities.getDistrict(location.x, location.y);
+        if (!districtID) return;
+        // occupation status
+        const district = Districts.get(districtID);
+        if (district.owner != district.controllingPlayer) {
+            const conquerorName = this.getCivName(district.controllingPlayer, true);
+            const conquerorText = Locale.compose("{1_Term} {2_Subject}", "LOC_PLOT_TOOLTIP_CONQUEROR", conquerorName);
+            const ttConqueror = document.createElement("div");
+            ttConqueror.classList.value = "text-xs leading-tight text-center";
+            ttConqueror.style.setProperty("color", "#cea92f");  // amber
+            this.setWarningBannerStyle(ttConqueror);
+            ttConqueror.innerHTML = conquerorText;
+            this.container.appendChild(ttConqueror);
+        }
+        // district health
         const playerID = GameplayMap.getOwner(location.x, location.y);
         const playerDistricts = Players.Districts.get(playerID);
-        if (!playerDistricts) {
-            return;
-        }
+        if (!playerDistricts) return;
         // This type is unresolved, is it meant to be number instead?
         const currentHealth = playerDistricts.getDistrictHealth(location);
         const maxHealth = playerDistricts.getDistrictMaxHealth(location);
@@ -1047,10 +1032,7 @@ class PlotTooltipType {
         }
         const districtContainer = document.createElement("div");
         districtContainer.classList.add("plot-tooltip__district-container");
-        districtContainer.style.setProperty("margin-left", BZ_BORDER_MARGIN);
-        districtContainer.style.setProperty("margin-right", BZ_BORDER_MARGIN);
-        districtContainer.style.setProperty("padding-left", BZ_BORDER_PADDING);
-        districtContainer.style.setProperty("padding-right", BZ_BORDER_PADDING);
+        this.setWarningBannerStyle(districtContainer);  // fix margins
         const districtTitle = document.createElement("div");
         districtTitle.classList.add("plot-tooltip__district-title", "plot-tooltip__lineThree");
         districtTitle.innerHTML = isUnderSiege ? Locale.compose("LOC_PLOT_TOOLTIP_UNDER_SIEGE") : Locale.compose("LOC_PLOT_TOOLTIP_HEALING_DISTRICT");
@@ -1135,7 +1117,7 @@ class PlotTooltipType {
         // title bar
         if (hexName) this.appendTitleDivider(Locale.compose(hexName));
         // TODO: move this to the urban panel
-        this.addPlotDistrictInformation(this.plotCoord);
+        this.appendDistrictDefense(this.plotCoord);
         // panel interior
         const layout = document.createElement("div");
         layout.classList.add("flex", "flex-col", "items-center", "max-w-80");
