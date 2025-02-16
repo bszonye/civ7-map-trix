@@ -7,8 +7,14 @@
         <Row Tag="LOC_BZ_ERROR_UNKNOWN">
             <Text>Unknown</Text>
         </Row>
+        <Row Tag="LOC_DISTRICT_BZ_CITY_STATE">
+            <Text>City-State</Text>
+        </Row>
         <Row Tag="LOC_DISTRICT_BZ_DISCOVERY">
             <Text>Discovery</Text>
+        </Row>
+        <Row Tag="LOC_DISTRICT_BZ_INDEPENDENT">
+            <Text>Independent</Text>
         </Row>
         <Row Tag="LOC_DISTRICT_BZ_TOWN_CENTER">
             <Text>Town Center</Text>

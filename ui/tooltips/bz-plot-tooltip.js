@@ -10,7 +10,7 @@ import { ComponentID } from '/core/ui/utilities/utilities-component-id.js';
 import DistrictHealthManager from '/base-standard/ui/district/district-health-manager.js';
 import LensManager from '/core/ui/lenses/lens-manager.js';
 
-const DEBUG_GRAY = ["background-color", "rgba(150, 150, 150, .35)"];
+const DEBUG_GRAY = ["background-color", "rgba(141, 151, 166, 0.5)"];
 const DEBUG_RED = ["background-color", "rgba(150, 57, 57, .35)"];
 const DEBUG_GREEN = ["background-color", "rgba(57, 150, 57, .35)"];
 const DEBUG_BLUE = ["background-color", "rgba(57, 57, 150, .35)"];
@@ -21,6 +21,10 @@ const BZ_DOT_DIVIDER = Locale.compose("LOC_PLOT_DIVIDER_DOT");
 
 const WILDERNESS_NAME = GameInfo.Districts.lookup(DistrictTypes.WILDERNESS).Name;
 const VILLAGE_TYPES = ["IMPROVEMENT_VILLAGE", "IMPROVEMENT_ENCAMPMENT"];
+
+const BZ_BORDER_WIDTH = "0.1111111111rem";
+const BZ_BORDER_MARGIN = `calc(${BZ_BORDER_WIDTH} - var(--padding-left-right))`;
+const BZ_BORDER_PADDING = `calc(var(--padding-left-right) - ${BZ_BORDER_WIDTH})`;
 
 // TODO: remove these
 // const BZ_MAX_WIDTH = "21.3333333333rem";  // from default.css
@@ -375,7 +379,7 @@ class PlotTooltipType {
             iconContainer.classList.add("flex", "flex-col", "justify-center");
             layout.appendChild(iconContainer);
             const iconElement = document.createElement("div");
-            iconElement.classList.add("plot-tooltip__large-resource-icon", "my-2");
+            iconElement.classList.add("plot-tooltip__large-resource-icon", "mt-2");
             iconElement.style.backgroundImage = icon;
             iconContainer.appendChild(iconElement);
         }
@@ -436,7 +440,6 @@ class PlotTooltipType {
                 GameInfo.Improvements.lookup(info.ConstructibleType).TraitType :
                 null;
 
-            const sortOrder = isExtra ? currentAge + 1 : buildingAge;
             if (instance.damaged) state.push("LOC_PLOT_TOOLTIP_DAMAGED");
             if (!instance.complete) state.push("LOC_PLOT_TOOLTIP_IN_PROGRESS");
             if (uniqueTrait) {
@@ -448,9 +451,11 @@ class PlotTooltipType {
                 const ageName = GameInfo.Ages.lookup(info.Age).Name;
                 if (ageName) state.push(Locale.compose(ageName));
             }
+            // sort by age, with ageless buildings second and walls last
+            const sortOrder = isExtra ? -1 : isAgeless ? currentAge - 0.5 : buildingAge;
             constructibleInfo.push({info, uniqueTrait, state, sortOrder});
         };
-        constructibleInfo.sort((a, b) => a.sortOrder - b.sortOrder);
+        constructibleInfo.sort((a, b) => b.sortOrder - a.sortOrder);
         return constructibleInfo;
     }
     // TODO: remove
@@ -578,7 +583,9 @@ class PlotTooltipType {
             if (districtType == DistrictTypes.CITY_CENTER) {
                 // possibly a town center, village, or encampment
                 if (city?.isTown) {
-                    // TODO: handle minors & villages
+                    // TODO: distinguish between towns and city-states
+                    // tileType = Locale.compose("LOC_DISTRICT_BZ_CITY_STATE");
+                    // TODO: also rename "City Hall" to "Town Hall" in towns?
                     tileType = Locale.compose("LOC_DISTRICT_BZ_TOWN_CENTER");
                 }
             }
@@ -826,20 +833,21 @@ class PlotTooltipType {
             const relationship = hostile ? "LOC_INDEPENDENT_RELATIONSHIP_HOSTILE" : "LOC_INDEPENDENT_RELATIONSHIP_FRIENDLY";
             const plotTooltipOwnerRelationship = document.createElement("div");
             plotTooltipOwnerRelationship.classList.add("plot-tooltip__owner-relationship-text");
+            plotTooltipOwnerRelationship.classList.value = "text-xs leading-tight text-center";
             plotTooltipOwnerRelationship.setAttribute('data-l10n-id', relationship);
-            // plotTooltipOwnerRelationship.innerHTML = Locale.compose("LOC_PLOT_TOOLTIP_RELATIONSHIP") + ": " + Locale.compose(relationship);
             this.container.appendChild(plotTooltipOwnerRelationship);
             // city-state unique bonus (not very useful)
             const bonusType = Game.CityStates.getBonusType(playerID);
             const bonus = GameInfo.CityStateBonuses.find(t => t.$hash == bonusType);
             if (bonus) {
                 const ttBonusName = document.createElement("div");
-                ttBonusName.classList.add("font-title", "text-sm", "uppercase");
+                ttBonusName.classList.add("font-title", "text-xs", "uppercase");
                 ttBonusName.setAttribute('data-l10n-id', bonus.Name);
                 this.container.appendChild(ttBonusName);
-                const ttBonusDescription = document.createElement("div");
-                ttBonusDescription.setAttribute('data-l10n-id', bonus.Description);
-                this.container.appendChild(ttBonusDescription);
+                const ttDescription = document.createElement("div");
+                ttDescription.classList.value = "text-xs leading-tight text-center";
+                ttDescription.setAttribute('data-l10n-id', bonus.Description);
+                this.container.appendChild(ttDescription);
             }
         }
     }
@@ -1029,6 +1037,10 @@ class PlotTooltipType {
         }
         const districtContainer = document.createElement("div");
         districtContainer.classList.add("plot-tooltip__district-container");
+        districtContainer.style.setProperty("margin-left", BZ_BORDER_MARGIN);
+        districtContainer.style.setProperty("margin-right", BZ_BORDER_MARGIN);
+        districtContainer.style.setProperty("padding-left", BZ_BORDER_PADDING);
+        districtContainer.style.setProperty("padding-right", BZ_BORDER_PADDING);
         const districtTitle = document.createElement("div");
         districtTitle.classList.add("plot-tooltip__district-title", "plot-tooltip__lineThree");
         districtTitle.innerHTML = isUnderSiege ? Locale.compose("LOC_PLOT_TOOLTIP_UNDER_SIEGE") : Locale.compose("LOC_PLOT_TOOLTIP_HEALING_DISTRICT");
@@ -1084,7 +1096,7 @@ class PlotTooltipType {
         } else if (VILLAGE_TYPES.includes(improvements[0].info.ConstructibleType)) {
             // encampments and villages get icons based on their unique improvements,
             // appropriate for the age and minor civ type
-            hexName = improvements[0].info.Name;
+            hexName = "LOC_DISTRICT_BZ_INDEPENDENT";
             hexIcon = this.getVillageIcon(location);
         } else if (hexName == WILDERNESS_NAME) {
             // other "improvements" in the wilderness are discoveries
@@ -1104,9 +1116,8 @@ class PlotTooltipType {
         layout.classList.add("flex", "flex-col", "items-center", "max-w-80");
         // optional description
         if (hexDescription) {
-            // TODO: customize styling
             const ttDescription = document.createElement("div");
-            ttDescription.classList.value = "text-xs leading-tight text-center mb-1";
+            ttDescription.classList.value = "text-xs leading-tight text-center mt-1";
             // ttDescription.style.setProperty(...DEBUG_GRAY);
             ttDescription.setAttribute('data-l10n-id', hexDescription);
             layout.appendChild(ttDescription);
@@ -1115,7 +1126,7 @@ class PlotTooltipType {
         for (const imp of improvements) {
             // TODO: adjust spacing
             const ttConstructible = document.createElement("div");
-            ttConstructible.classList.value = "flex-col items-center mb-1";
+            ttConstructible.classList.value = "flex-col items-center mt-1";
             const ttName = document.createElement("div");
             ttName.classList.value = "font-title uppercase text-xs leading-tight text-accent-2 text-center";
             // ttName.style.setProperty(...DEBUG_RED);
@@ -1125,7 +1136,7 @@ class PlotTooltipType {
             if (state) {
                 const ttState = document.createElement("div");
                 ttState.style.setProperty(...TEXT_XXS);
-                ttState.classList.value = "leading-tight text-center -mt-0\\.5";
+                ttState.classList.value = "leading-none text-center";
                 // ttState.style.setProperty(...DEBUG_GREEN);
                 ttState.innerHTML = state;
                 ttConstructible.appendChild(ttState);
@@ -1205,7 +1216,7 @@ class PlotTooltipType {
     }
     appendTitleDivider(text=BZ_DOT_DIVIDER) {
         const layout = document.createElement("div");
-        layout.classList.add("self-center", "text-center", "my-1", "mx-3", "max-w-80");
+        layout.classList.add("self-center", "text-center", "mt-1", "mx-3", "max-w-80");
         layout.classList.add("font-title", "uppercase", "text-sm", "leading-tight");
         layout.innerHTML = text;
         this.appendFlexDivider(layout);
@@ -1215,7 +1226,7 @@ class PlotTooltipType {
         if (!icon.startsWith("url(")) icon = UI.getIconCSS(icon);
         if (overlay && !overlay.startsWith("url(")) overlay = UI.getIconCSS(overlay);
         const layout = document.createElement("div");
-        layout.classList.add("flex-grow", "relative");
+        layout.classList.add("flex-grow", "relative", "mt-1");
         const base = document.createElement("div");
         base.classList.add("bg-contain", "bg-center", "size-12", "mx-3");
         base.style.backgroundImage = icon;
@@ -1237,10 +1248,10 @@ class PlotTooltipType {
         const buildings = [...b1, ...extras, ...b2];
         // render the icons
         const layout = document.createElement("div");
-        layout.classList.add("flex", "flex-row", "flex-grow", "relative", "mx-2");
+        layout.classList.add("flex", "flex-grow", "relative", "mt-2", "mx-2");
         for (let i = 0; i < buildings.length; i++) {
             const ttIcon = document.createElement("div");
-            ttIcon.classList.add("bg-contain", "bg-center", "size-12", "m-1");
+            ttIcon.classList.add("bg-contain", "bg-center", "size-12", "mx-1");
             const icon = buildings[i];
             if (!icon.startsWith("url(")) icon = UI.getIconCSS(icon);
             ttIcon.style.backgroundImage = icon;
@@ -1278,8 +1289,7 @@ class PlotTooltipType {
         // ttTextColumn.style.setProperty(...DEBUG_RED);
         ttTextColumn.style.setProperty("max-width", BZ_DETAIL_WIDTH);
         const ttName = document.createElement("div");
-        // same style as the production list
-        ttName.classList.value = 'font-title text-xs text-accent-2 mb-1 uppercase';
+        ttName.classList.value = 'font-title text-xs text-accent-2 mt-1 uppercase';
         // ttName.style.setProperty(...DEBUG_RED);
         ttName.setAttribute("data-l10n-id", name);
         ttTextColumn.appendChild(ttName);
