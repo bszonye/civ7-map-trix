@@ -116,6 +116,7 @@ class PlotTooltipType {
         const featureLabel = this.getFeatureLabel(plotCoord);
         const continentName = this.getContinentName(plotCoord);
         const riverLabel = this.getRiverLabel(plotCoord);
+        const distantLandsLabel = this.getDistantLandsLabel(plotCoord);
         const routeName = this.getRouteName();
         const hexResource = this.getResource();
         const playerID = GameplayMap.getOwner(plotCoord.x, plotCoord.y);
@@ -164,8 +165,9 @@ class PlotTooltipType {
                 this.appendDivider();
             }
         }
+        // show terrain & biome
         const tooltipFirstLine = document.createElement("div");
-        tooltipFirstLine.classList.add('text-secondary', 'text-center', 'uppercase', 'font-title');
+        tooltipFirstLine.classList.value = "text-secondary font-title uppercase leading-tight text-center";
         if (biomeLabel) {
             // TODO - Add hard-coded string to localization XML.
             const label = Locale.compose("{1_TerrainName} {2_BiomeName}", terrainLabel, biomeLabel);
@@ -175,27 +177,21 @@ class PlotTooltipType {
             tooltipFirstLine.setAttribute('data-l10n-id', terrainLabel);
         }
         this.container.appendChild(tooltipFirstLine);
+        // show major geographical features
+        const geoStyle = "text-sm leading-tight text-center";
         if (featureLabel) {
-            const tooltipSecondLine = document.createElement("div");
-            tooltipSecondLine.classList.add("plot-tooltip__lineTwo");
-            tooltipSecondLine.setAttribute('data-l10n-id', featureLabel);
-            this.container.appendChild(tooltipSecondLine);
+            const ttFeature = document.createElement("div");
+            ttFeature.classList.value = geoStyle;
+            ttFeature.setAttribute('data-l10n-id', featureLabel);
+            this.container.appendChild(ttFeature);
         }
-        if (continentName) {
-            if (riverLabel) {
-                const tooltipThirdLine = document.createElement("div");
-                tooltipThirdLine.classList.add("plot-tooltip__lineThree");
-                // TODO - This hard-coded string should be in loc XML.
-                const label = Locale.compose('{1_ContinentName} {LOC_PLOT_DIVIDER_DOT} {2_RiverName}', continentName, riverLabel);
-                tooltipThirdLine.setAttribute('data-l10n-id', label);
-                this.container.appendChild(tooltipThirdLine);
-            }
-            else {
-                const tooltipThirdLine = document.createElement("div");
-                tooltipThirdLine.classList.add("plot-tooltip__lineThree");
-                tooltipThirdLine.setAttribute('data-l10n-id', continentName);
-                this.container.appendChild(tooltipThirdLine);
-            }
+        this.appendDotList([continentName, riverLabel], geoStyle);
+        if (continentName && distantLandsLabel) {
+            const ttLand = document.createElement("div");
+            ttLand.style.setProperty(...TEXT_XXS);
+            ttLand.classList.value = "leading-none text-center";
+            ttLand.setAttribute('data-l10n-id', distantLandsLabel);
+            this.container.appendChild(ttLand);
         }
         // civ & settlement panel
         this.addOwnerInfo(this.plotCoord, playerID);
@@ -431,7 +427,8 @@ class PlotTooltipType {
             const isExtra = this.extraBuildings.has(info.ConstructibleType);
             const isAgeless = this.agelessBuildings.has(info.ConstructibleType);
             const currentAge = GameInfo.Ages.lookup(Game.age).ChronologyIndex;
-            const buildingAge = isAgeless ? currentAge : GameInfo.Ages.lookup(info.Age)?.ChronologyIndex ?? 0;
+            const buildingAge = isAgeless ? currentAge :
+                GameInfo.Ages.lookup(info.Age ?? "")?.ChronologyIndex ?? 0;
             const isObsolete = isBuilding && buildingAge != currentAge;
             const uniqueTrait =
                 isBuilding ?
@@ -630,17 +627,19 @@ class PlotTooltipType {
         this.appendConstructibleList(improvements, buildingStatus.Improvements);
     }
     appendHexPanel(location) {
+        // first, the settlement & ownership info
+        const cityID = GameplayMap.getOwningCityFromXY(location.x, location.y);
+        const city = cityID ? Cities.get(cityID) : null;
+        if (city) this.appendSettlementPanel(location, city);
         // determine the tile type
         const districtID = MapCities.getDistrict(location.x, location.y);
-        const cityID = GameplayMap.getOwningCityFromXY(location.x, location.y);
+        const district = districtID ? Districts.get(districtID) : null;
         // TODO: determine actual type
-        this.appendRuralPanel(location, districtID, cityID);
+        this.appendRuralPanel(location, district, city);
 
         return;  // TODO
-        const city = cityID ? Cities.get(cityID) : null;
         if (districtID) {
             // city center, quarter, district, wonder, or rural improvement
-            const district = Districts.get(districtID);
             const districtType = district?.type ?? DistrictTypes.WILDERNESS;
             // check for special cases: town center, quarter, district
             let tileType;
@@ -686,6 +685,8 @@ class PlotTooltipType {
             this.appendTitleDivider(WILDERNESS_NAME);
         }
     }
+    appendSettlementPanel(location, city) {
+    }
     getPlayerName() {
         const playerID = GameplayMap.getOwner(this.plotCoord.x, this.plotCoord.y);
         const player = Players.get(playerID);
@@ -708,7 +709,9 @@ class PlotTooltipType {
         if (player == null) {
             return "";
         }
-        const civName = player.civilizationFullName;
+        const civName = player.isMinor || player.isIndependent ?
+            player.civilizationFullName :  // "Venice"
+            player.civilizationName;  // "Spain"
         const name = player.isIndependent ?  // add "Village" to independents
             Locale.compose("LOC_CIVILIZATION_INDEPENDENT_SINGULAR", civName) :
             Locale.compose(civName);
@@ -776,17 +779,18 @@ class PlotTooltipType {
         return returnString;
     }
     addPlotEffectNames(plotIndex) {
+        // TODO: this includes temporary fortifications. what else?
         const plotEffects = MapPlotEffects.getPlotEffects(plotIndex);
         const localPlayerID = GameContext.localPlayerID;
         plotEffects?.forEach((item) => {
             const effectInfo = GameInfo.PlotEffects.lookup(item.effectType);
             if (!item.onlyVisibleToOwner || (item.onlyVisibleToOwner && (item.owner == localPlayerID))) {
                 if (effectInfo) {
-                    this.appendDivider();
                     const toolTipPlotEffectsText = document.createElement("div");
                     toolTipPlotEffectsText.classList.add("plot-tooltip__plot-effect-text");
                     toolTipPlotEffectsText.setAttribute('data-l10n-id', effectInfo.Name);
                     this.container.appendChild(toolTipPlotEffectsText);
+                    this.appendDivider();
                 }
             }
         });
@@ -822,7 +826,6 @@ class PlotTooltipType {
         this.container.appendChild(plotTooltipOwner);
         const districtID = MapCities.getDistrict(location.x, location.y);
         const plotTooltipConqueror = this.getConquerorInfo(districtID);
-        console.warn(`TRIX conqueror=${plotTooltipConqueror}`);
         if (plotTooltipConqueror) {
             this.container.appendChild(plotTooltipConqueror);
         }
@@ -852,6 +855,7 @@ class PlotTooltipType {
         }
     }
     getConquerorInfo(districtID) {
+        // TODO: figure out how this works. is it related to multi-hex defenses?
         if (!districtID) {
             return null;
         }
@@ -905,6 +909,12 @@ class PlotTooltipType {
         else {
             return "";
         }
+    }
+    getDistantLandsLabel(location) {
+        const localPlayerID = GameContext.localPlayerID;
+        const localPlayer = Players.get(GameContext.localPlayerID);
+        return localPlayer?.isDistantLands(location) ?
+            "LOC_RESOURCE_GENERAL_TYPE_DISTANT_LANDS" : "";
     }
     getFeatureLabel(location) {
         let label = '';
@@ -1062,18 +1072,32 @@ class PlotTooltipType {
         // join text with dots after removing empty elements
         return list.filter(e => e).join(" " + BZ_DOT_DIVIDER + " ");
     }
-    appendRuralPanel(location, districtID, cityID) {
+    appendDotList(list, style=null) {
+        list = list.filter(e => e);  // remove empty elements
+        if (!list.length) return;
+        const ttList = document.createElement("div");
+        if (style) ttList.classList.value = style;
+        if (list.length == 1) {
+            ttList.setAttribute('data-l10n-id', list[0]);
+        } else {
+            list = list.map(e => Locale.compose(e));
+            ttList.innerHTML = list.join(" " + BZ_DOT_DIVIDER + " ");
+        }
+        this.container.appendChild(ttList);
+    }
+    appendRuralPanel(location, district, city) {
         let hexName;
         let hexDescription;
         let hexIcon;
         let resourceIcon;
-        // city info
-        const district = districtID ? Districts.get(districtID) : null;
-        const city = cityID ? Cities.get(cityID) : null;
         // special tile types: natural wonder, resource
         const featureType = GameplayMap.getFeatureType(location.x, location.y);
         const feature = GameInfo.Features.lookup(featureType);
         const hexResource = this.getResource();
+        const improvements = this.getConstructibleInfo(location);
+        const impInfo = improvements[0]?.info;
+        const impType = impInfo?.ConstructibleType;
+        // set name & description
         if (feature && feature.Tooltip) {
             hexName = feature.Name;
             hexDescription = feature.Tooltip;
@@ -1086,29 +1110,30 @@ class PlotTooltipType {
         } else if (city) {
             hexName = "LOC_DISTRICT_BZ_UNDEVELOPED";
         } else {
-            hexName = WILDERNESS_NAME;
+            // default to Wilderness, except on open water
+            const biomeType = GameplayMap.getBiomeType(location.x, location.y);
+            const biome = GameInfo.Biomes.lookup(biomeType);
+            if (biome?.BiomeType != "BIOME_MARINE") hexName = WILDERNESS_NAME;
         }
         // get the panel icon and adjust the title if necessary
-        const improvements = this.getConstructibleInfo(location);
         if (improvements.length == 0) {
             // no improvements, no icon
             hexIcon = null;
-        } else if (VILLAGE_TYPES.includes(improvements[0].info.ConstructibleType)) {
+        } else if (VILLAGE_TYPES.includes(impType)) {
             // encampments and villages get icons based on their unique improvements,
             // appropriate for the age and minor civ type
             hexName = "LOC_DISTRICT_BZ_INDEPENDENT";
             hexIcon = this.getVillageIcon(location);
-        } else if (hexName == WILDERNESS_NAME) {
-            // other "improvements" in the wilderness are discoveries
-            // they don't have a standard icon, so let's use this nice map
+        } else if (impInfo?.Discovery) {
+            // discoveries don't have a standard icon, so let's use this nice map
             hexName = "LOC_DISTRICT_BZ_DISCOVERY";
             hexIcon = "url('blp:tech_cartography')";
         } else {
             // use the standard icon for the improvement
-            hexIcon = improvements[0].info.ConstructibleType;
+            hexIcon = impType;
         }
         // title bar
-        this.appendTitleDivider(Locale.compose(hexName));
+        if (hexName) this.appendTitleDivider(Locale.compose(hexName));
         // TODO: move this to the urban panel
         this.addPlotDistrictInformation(this.plotCoord);
         // panel interior
@@ -1149,14 +1174,12 @@ class PlotTooltipType {
             this.appendIconDivider(hexIcon, resourceIcon);
         } else if (resourceIcon) {
             this.appendIconDivider(resourceIcon);
-        } else {
-            this.appendDivider();
         }
     }
-    appendUrbanPanel(TODO) {  // includes CITY_CENTER
+    appendUrbanPanel(location, district, city) {  // includes CITY_CENTER
         // TODO
     }
-    appendWonderPanel(TODO) {
+    appendWonderPanel(location, district, city) {
         // TODO
     }
     getVillageIcon(location) {
