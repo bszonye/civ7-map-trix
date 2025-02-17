@@ -43,6 +43,7 @@ class PlotTooltipType {
         this.tooltip = document.createElement('fxs-tooltip');
         this.container = document.createElement('div');
         this.yieldsFlexbox = document.createElement('div');
+        this.totalYields = 0;
         this.tooltip.classList.add('plot-tooltip', 'max-w-96');
         this.tooltip.appendChild(this.container);
         this.agelessBuildings = this.buildingsTagged("AGELESS");
@@ -70,6 +71,7 @@ class PlotTooltipType {
     reset() {
         this.container.innerHTML = '';
         this.yieldsFlexbox.innerHTML = '';
+        this.totalYields = 0;
     }
     update() {
         if (this.plotCoord == null) {
@@ -78,17 +80,24 @@ class PlotTooltipType {
         }
         this.isShowingDebug = UI.isDebugPlotInfoVisible(); // Ensure debug status hasn't changed
         // Obtain names and IDs
-        const plotCoord = this.plotCoord;
-        const terrainLabel = this.getTerrainLabel(plotCoord);
-        const biomeLabel = this.getBiomeLabel(plotCoord);
-        const featureLabel = this.getFeatureLabel(plotCoord);
-        const continentName = this.getContinentName(plotCoord);
-        const riverLabel = this.getRiverLabel(plotCoord);
-        const distantLandsLabel = this.getDistantLandsLabel(plotCoord);
+        const loc = this.plotCoord;
+        const terrainLabel = this.getTerrainLabel(loc);
+        const biomeLabel = this.getBiomeLabel(loc);
+        const featureLabel = this.getFeatureLabel(loc);
+        const continentName = this.getContinentName(loc);
+        const riverLabel = this.getRiverLabel(loc);
+        const distantLandsLabel = this.getDistantLandsLabel(loc);
         const routeName = this.getRouteName();
         const hexResource = this.getResource();
-        const playerID = GameplayMap.getOwner(plotCoord.x, plotCoord.y);
-        const plotIndex = GameplayMap.getIndexFromLocation(plotCoord);
+        const playerID = GameplayMap.getOwner(loc.x, loc.y);
+        const plotIndex = GameplayMap.getIndexFromLocation(loc);
+        const cityID = GameplayMap.getOwningCityFromXY(loc.x, loc.y);
+        const districtID = MapCities.getDistrict(loc.x, loc.y);
+        // city & district objects
+        const city = cityID ? Cities.get(cityID) : null;
+        const district = districtID ? Districts.get(districtID) : null;
+        // collect yields first, to inform panel layouts
+        this.collectYields(loc, GameContext.localPlayerID, city);
         // Top Section
         if (LensManager.getActiveLens() == "fxs-settler-lens") {
             //Add more details to the tooltip if we are in the settler lens
@@ -102,7 +111,7 @@ class PlotTooltipType {
                 console.error("plot-tooltip: Attempting to update settler tooltip, but no valid local player Diplomacy object!");
                 return;
             }
-            else if (!GameplayMap.isWater(this.plotCoord.x, this.plotCoord.y) && !GameplayMap.isImpassable(this.plotCoord.x, this.plotCoord.y) && !GameplayMap.isNavigableRiver(this.plotCoord.x, this.plotCoord.y)) {
+            else if (!GameplayMap.isWater(loc.x, loc.y) && !GameplayMap.isImpassable(loc.x, loc.y) && !GameplayMap.isNavigableRiver(loc.x, loc.y)) {
                 //Dont't add any extra tooltip to mountains, oceans, or navigable rivers, should be obvious enough w/o them
                 const settlerTooltip = document.createElement("div");
                 settlerTooltip.classList.add("plot-tooltip__settler-tooltip");
@@ -112,20 +121,20 @@ class PlotTooltipType {
                     return;
                 }
                 //Show why we can't settle here
-                if (!GameplayMap.isPlotInAdvancedStartRegion(GameContext.localPlayerID, this.plotCoord.x, this.plotCoord.y) && !localPlayerAdvancedStart?.getPlacementComplete()) {
+                if (!GameplayMap.isPlotInAdvancedStartRegion(GameContext.localPlayerID, loc.x, loc.y) && !localPlayerAdvancedStart?.getPlacementComplete()) {
                     settlerTooltip.classList.add("blocked-location");
                     settlerTooltip.innerHTML = Locale.compose("LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_FAR");
                 }
-                else if (!localPlayerDiplomacy.isValidLandClaimLocation(this.plotCoord, true /*bIgnoreFriendlyUnitRequirement*/)) {
+                else if (!localPlayerDiplomacy.isValidLandClaimLocation(loc, true /*bIgnoreFriendlyUnitRequirement*/)) {
                     settlerTooltip.classList.add("blocked-location");
-                    if (GameplayMap.isCityWithinMinimumDistance(this.plotCoord.x, this.plotCoord.y)) {
+                    if (GameplayMap.isCityWithinMinimumDistance(loc.x, loc.y)) {
                         settlerTooltip.innerHTML = Locale.compose("LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_CLOSE");
                     }
-                    else if (GameplayMap.getResourceType(this.plotCoord.x, this.plotCoord.y) != ResourceTypes.NO_RESOURCE) {
+                    else if (GameplayMap.getResourceType(loc.x, loc.y) != ResourceTypes.NO_RESOURCE) {
                         settlerTooltip.innerHTML = Locale.compose("LOC_PLOT_TOOLTIP_CANT_SETTLE_RESOURCES");
                     }
                 }
-                else if (!GameplayMap.isFreshWater(this.plotCoord.x, this.plotCoord.y)) {
+                else if (!GameplayMap.isFreshWater(loc.x, loc.y)) {
                     settlerTooltip.classList.add("okay-location");
                     settlerTooltip.innerHTML = Locale.compose("LOC_PLOT_TOOLTIP_NO_FRESH_WATER");
                 }
@@ -161,22 +170,6 @@ class PlotTooltipType {
             ttLand.setAttribute('data-l10n-id', distantLandsLabel);
             this.container.appendChild(ttLand);
         }
-        // TODO: const location = this.plotCoord early in this scope
-        // civ & settlement panel
-        this.addOwnerInfo(this.plotCoord, playerID);
-        // settlement & ownership info
-        const cityID = GameplayMap.getOwningCityFromXY(this.plotCoord.x, this.plotCoord.y);
-        const city = cityID ? Cities.get(cityID) : null;
-        if (city) {
-            this.appendSettlementPanel(this.plotCoord, city);
-        }
-        // determine the hex tile type
-        const districtID = MapCities.getDistrict(this.plotCoord.x, this.plotCoord.y);
-        const district = districtID ? Districts.get(districtID) : null;
-        // hex tile panel
-        this.appendHexPanel(this.plotCoord);
-        // fortifications & environmental effects like snow
-        this.appendPlotEffects(plotIndex);
         // Trade Route Info
         if (routeName) {
             const toolTipRouteInfo = document.createElement("div");
@@ -184,45 +177,31 @@ class PlotTooltipType {
             toolTipRouteInfo.innerHTML = routeName;
             this.container.appendChild(toolTipRouteInfo);
         }
+        // fortifications & environmental effects like snow
+        this.appendPlotEffects(plotIndex);
+        // civ & settlement panel
+        if (city) this.appendSettlementPanel(loc, city, playerID);
+        // determine the hex tile type
+        // hex tile panel
+        this.appendHexPanel(loc, city, district);
         // yields panel
         // TODO: refactor this into a method
-        this.yieldsFlexbox.classList.add("plot-tooltip__resourcesFlex");
         this.container.appendChild(this.yieldsFlexbox);
-        this.appendYields(this.plotCoord, GameContext.localPlayerID, city);
-        if (false && hexResource) {  // TODO: remove this
-            //add resources to the yield box
-            const tooltipIndividualYieldFlex = document.createElement("div");
-            tooltipIndividualYieldFlex.classList.add("plot-tooltip__IndividualYieldFlex");
-            this.yieldsFlexbox.appendChild(tooltipIndividualYieldFlex);
-            const toolTipResourceIconCSS = UI.getIconCSS(hexResource.ResourceType);
-            const yieldIconShadow = document.createElement("div");
-            yieldIconShadow.classList.add("plot-tooltip__IndividualYieldIcons-Shadow");
-            yieldIconShadow.style.backgroundImage = toolTipResourceIconCSS;
-            tooltipIndividualYieldFlex.appendChild(yieldIconShadow);
-            const yieldIcon = document.createElement("div");
-            yieldIcon.classList.add("plot-tooltip__IndividualYieldIcons");
-            yieldIcon.style.backgroundImage = toolTipResourceIconCSS;
-            yieldIconShadow.appendChild(yieldIcon);
-            const toolTipIndividualYieldValues = document.createElement("div");
-            toolTipIndividualYieldValues.classList.add("plot-tooltip__IndividualYieldValues", "font-body");
-            toolTipIndividualYieldValues.innerHTML = "1"; //TODO: Change This value
-            tooltipIndividualYieldFlex.appendChild(toolTipIndividualYieldValues);
-        }
         // unit info panel
         // TODO: refactor this into a method
-        this.addUnitInfo(this.plotCoord);
-        UI.setPlotLocation(this.plotCoord.x, this.plotCoord.y, plotIndex);
+        this.addUnitInfo(loc);
+        UI.setPlotLocation(loc.x, loc.y, plotIndex);
         // Adjust cursor between normal and red based on the plot owner's hostility
         if (!UI.isCursorLocked()) {
             const localPlayerID = GameContext.localPlayerID;
-            const topUnit = this.getTopUnit(this.plotCoord);
+            const topUnit = this.getTopUnit(loc);
             let showHostileCursor = false;
-            let owningPlayerID = GameplayMap.getOwner(this.plotCoord.x, this.plotCoord.y);
+            let owningPlayerID = GameplayMap.getOwner(loc.x, loc.y);
             // if there's a unit on the plot, that player overrides the tile's owner
             if (topUnit) {
                 owningPlayerID = topUnit.owner;
             }
-            const revealedState = GameplayMap.getRevealedState(localPlayerID, plotCoord.x, plotCoord.y);
+            const revealedState = GameplayMap.getRevealedState(localPlayerID, loc.x, loc.y);
             if (Players.isValid(localPlayerID) && Players.isValid(owningPlayerID) && (revealedState == RevealedStates.VISIBLE)) {
                 const owningPlayer = Players.get(owningPlayerID);
                 // Is it an independent?
@@ -234,7 +213,7 @@ class PlotTooltipType {
                     }
                     else {
                         // Get the independent from the plot, can reutrn -1
-                        independentID = Game.IndependentPowers.getIndependentPlayerIDAt(this.plotCoord.x, this.plotCoord.y);
+                        independentID = Game.IndependentPowers.getIndependentPlayerIDAt(loc.x, loc.y);
                     }
                     if (independentID != PlayerIds.NO_PLAYER) {
                         const relationship = Game.IndependentPowers.getIndependentRelationship(independentID, localPlayerID);
@@ -272,9 +251,9 @@ class PlotTooltipType {
             tooltipDebugFlexbox.classList.add("plot-tooltip__debug-flexbox");
             this.container.appendChild(tooltipDebugFlexbox);
             this.appendDivider();
-            const playerID = GameplayMap.getOwner(this.plotCoord.x, this.plotCoord.y);
-            const currHp = Players.Districts.get(playerID)?.getDistrictHealth(this.plotCoord);
-            const maxHp = Players.Districts.get(playerID)?.getDistrictMaxHealth(this.plotCoord);
+            const playerID = GameplayMap.getOwner(loc.x, loc.y);
+            const currHp = Players.Districts.get(playerID)?.getDistrictHealth(loc);
+            const maxHp = Players.Districts.get(playerID)?.getDistrictMaxHealth(loc);
             const toolTipDebugTitle = document.createElement("div");
             toolTipDebugTitle.classList.add("plot-tooltip__debug-title-text");
             if ((currHp != undefined && currHp != 0) && (maxHp != undefined && maxHp != 0)) {
@@ -287,7 +266,7 @@ class PlotTooltipType {
             }
             const toolTipDebugPlotCoord = document.createElement("div");
             toolTipDebugPlotCoord.classList.add("plot-tooltip__coordinate-text");
-            toolTipDebugPlotCoord.innerHTML = Locale.compose("LOC_PLOT_TOOLTIP_PLOT") + `: (${this.plotCoord.x},${this.plotCoord.y})`;
+            toolTipDebugPlotCoord.innerHTML = Locale.compose("LOC_PLOT_TOOLTIP_PLOT") + `: (${loc.x},${loc.y})`;
             tooltipDebugFlexbox.appendChild(toolTipDebugPlotCoord);
             const toolTipDebugPlotIndex = document.createElement("div");
             toolTipDebugPlotIndex.classList.add("plot-tooltip__coordinate-text");
@@ -295,7 +274,7 @@ class PlotTooltipType {
             tooltipDebugFlexbox.appendChild(toolTipDebugPlotIndex);
             const localPlayer = Players.get(GameContext.localPlayerID);
             if (localPlayer != null) {
-                if (localPlayer.isDistantLands(this.plotCoord)) {
+                if (localPlayer.isDistantLands(loc)) {
                     const toolTipDebugPlotTag = document.createElement("div");
                     toolTipDebugPlotTag.classList.add("plot-tooltip__coordinate-text");
                     toolTipDebugPlotTag.innerHTML = Locale.compose("LOC_PLOT_TOOLTIP_HEMISPHERE_WEST");
@@ -375,8 +354,8 @@ class PlotTooltipType {
         }
         this.container.appendChild(layout);
     }
-    getContinentName(location) {
-        const continentType = GameplayMap.getContinentType(location.x, location.y);
+    getContinentName(loc) {
+        const continentType = GameplayMap.getContinentType(loc.x, loc.y);
         const continent = GameInfo.Continents.lookup(continentType);
         if (continent && continent.Description) {
             return continent.Description;
@@ -385,9 +364,9 @@ class PlotTooltipType {
             return "";
         }
     }
-    getConstructibleInfo(location) {
+    getConstructibleInfo(loc) {
         const constructibleInfo = [];
-        const constructibles = MapConstructibles.getHiddenFilteredConstructibles(location.x, location.y);
+        const constructibles = MapConstructibles.getHiddenFilteredConstructibles(loc.x, loc.y);
         const agelessTypes = new Set(GameInfo.TypeTags.filter(e => e.Tag == "AGELESS").map(e => e.Type));
         for (const constructible of constructibles) {
             const instance = Constructibles.getByComponentID(constructible);
@@ -604,19 +583,19 @@ class PlotTooltipType {
         this.appendConstructibleList(wonders, buildingStatus.Wonder);
         this.appendConstructibleList(improvements, buildingStatus.Improvements);
     }
-    appendHexPanel(location, district, city) {
+    appendHexPanel(loc, city, district) {
         switch (district?.type) {
             case DistrictTypes.CITY_CENTER:
             case DistrictTypes.URBAN:
-                this.appendUrbanPanel(location, district, city);
+                this.appendUrbanPanel(loc, city, district);
                 break;
             case DistrictTypes.WONDER:
-                this.appendWonderPanel(location, district, city);
+                this.appendWonderPanel(loc, city, district);
                 break;
             case DistrictTypes.RURAL:
             case DistrictTypes.WILDERNESS:
             default:
-                this.appendRuralPanel(location, district, city);
+                this.appendRuralPanel(loc, city, district);
         }
         // TODO: anything else?
         return;
@@ -668,7 +647,8 @@ class PlotTooltipType {
             this.appendTitleDivider(WILDERNESS_NAME);
         }
     }
-    appendSettlementPanel(location, city) {
+    appendSettlementPanel(loc, city, playerID) {
+        this.addOwnerInfo(loc, playerID);
         // TODO
     }
     getPlayerName(playerID=null) {
@@ -712,20 +692,20 @@ class PlotTooltipType {
         // TODO: determine relationships for major civs
         return null;
     }
-    getTerrainLabel(location) {
-        const terrainType = GameplayMap.getTerrainType(location.x, location.y);
+    getTerrainLabel(loc) {
+        const terrainType = GameplayMap.getTerrainType(loc.x, loc.y);
         const terrain = GameInfo.Terrains.lookup(terrainType);
         if (terrain) {
             if (this.isShowingDebug) {
                 // despite being "coast" this is a check for a lake
-                if (terrain.TerrainType == "TERRAIN_COAST" && GameplayMap.isLake(location.x, location.y)) {
+                if (terrain.TerrainType == "TERRAIN_COAST" && GameplayMap.isLake(loc.x, loc.y)) {
                     return Locale.compose('{1_Name} ({2_Value})', "LOC_TERRAIN_LAKE_NAME", terrainType.toString());
                 }
                 return Locale.compose('{1_Name} ({2_Value})', terrain.Name, terrainType.toString());
             }
             else {
                 // despite being "coast" this is a check for a lake
-                if (terrain.TerrainType == "TERRAIN_COAST" && GameplayMap.isLake(location.x, location.y)) {
+                if (terrain.TerrainType == "TERRAIN_COAST" && GameplayMap.isLake(loc.x, loc.y)) {
                     return "LOC_TERRAIN_LAKE_NAME";
                 }
                 return terrain.Name;
@@ -735,8 +715,8 @@ class PlotTooltipType {
             return "";
         }
     }
-    getBiomeLabel(location) {
-        const biomeType = GameplayMap.getBiomeType(location.x, location.y);
+    getBiomeLabel(loc) {
+        const biomeType = GameplayMap.getBiomeType(loc.x, loc.y);
         const biome = GameInfo.Biomes.lookup(biomeType);
         // Do not show a label if marine biome.
         if (biome && biome.BiomeType != "BIOME_MARINE") {
@@ -788,36 +768,30 @@ class PlotTooltipType {
         // PLOTEFFECT_STONE_TRAP_NAME
         // PLOTEFFECT_UNIT_FORTIFICATIONS
         const plotEffects = MapPlotEffects.getPlotEffects(plotIndex);
+        if (!plotEffects) return;
         const localPlayerID = GameContext.localPlayerID;
-        plotEffects?.forEach((item) => {
+        for (const item of plotEffects) {
+            if (item.onlyVisibleToOwner && item.owner != localPlayerID) continue;
             const effectInfo = GameInfo.PlotEffects.lookup(item.effectType);
-            if (!item.onlyVisibleToOwner || (item.onlyVisibleToOwner && (item.owner == localPlayerID))) {
-                if (effectInfo) {
-                    const toolTipPlotEffectsText = document.createElement("div");
-                    toolTipPlotEffectsText.classList.add("plot-tooltip__plot-effect-text");
-                    toolTipPlotEffectsText.setAttribute('data-l10n-id', effectInfo.Name);
-                    this.container.appendChild(toolTipPlotEffectsText);
-                    this.appendDivider();
-                }
-            }
-        });
+            if (!effectInfo) return;
+            this.appendDivider();
+            const toolTipPlotEffectsText = document.createElement("div");
+            toolTipPlotEffectsText.classList.add("plot-tooltip__plot-effect-text");
+            toolTipPlotEffectsText.setAttribute('data-l10n-id', effectInfo.Name);
+            this.container.appendChild(toolTipPlotEffectsText);
+        }
     }
-    getTopUnit(location) {
-        let plotUnits = MapUnits.getUnits(location.x, location.y);
+    getTopUnit(loc) {
+        let plotUnits = MapUnits.getUnits(loc.x, loc.y);
         if (plotUnits && plotUnits.length > 0) {
             const topUnit = Units.get(plotUnits[0]);
             return topUnit;
         }
         return null;
     }
-    /**
-     * Add to a plot tooltip information on the plot's owner
-     * @param {float2} location The X,Y plot location.
-     * @param {playerID} playerID The player associated with the request.
-     */
-    addOwnerInfo(location, playerID) {
-        const filteredConstructibles = MapConstructibles.getHiddenFilteredConstructibles(location.x, location.y);
-        const constructibles = MapConstructibles.getConstructibles(location.x, location.y);
+    addOwnerInfo(loc, playerID) {
+        const filteredConstructibles = MapConstructibles.getHiddenFilteredConstructibles(loc.x, loc.y);
+        const constructibles = MapConstructibles.getConstructibles(loc.x, loc.y);
         const player = Players.get(playerID);
         if (!player || !Players.isAlive(playerID)) {
             return;
@@ -855,10 +829,10 @@ class PlotTooltipType {
             }
         }
     }
-    getRiverLabel(location) {
-        const riverType = GameplayMap.getRiverType(location.x, location.y);
+    getRiverLabel(loc) {
+        const riverType = GameplayMap.getRiverType(loc.x, loc.y);
         if (riverType != RiverTypes.NO_RIVER) {
-            let riverNameLabel = GameplayMap.getRiverName(location.x, location.y);
+            let riverNameLabel = GameplayMap.getRiverName(loc.x, loc.y);
             if (!riverNameLabel) {
                 switch (riverType) {
                     case RiverTypes.RIVER_MINOR:
@@ -875,34 +849,34 @@ class PlotTooltipType {
             return "";
         }
     }
-    getDistantLandsLabel(location) {
+    getDistantLandsLabel(loc) {
         const localPlayerID = GameContext.localPlayerID;
         const localPlayer = Players.get(GameContext.localPlayerID);
-        return localPlayer?.isDistantLands(location) ?
+        return localPlayer?.isDistantLands(loc) ?
             "LOC_RESOURCE_GENERAL_TYPE_DISTANT_LANDS" : "";
     }
-    getFeatureLabel(location) {
+    getFeatureLabel(loc) {
         let label = '';
-        const featureType = GameplayMap.getFeatureType(location.x, location.y);
+        const featureType = GameplayMap.getFeatureType(loc.x, loc.y);
         const feature = GameInfo.Features.lookup(featureType);
         if (feature && !feature.Tooltip) {  // BZ
             label = feature.Name;
         }
-        if (GameplayMap.isVolcano(location.x, location.y)) {
-            const active = GameplayMap.isVolcanoActive(location.x, location.y);
+        if (GameplayMap.isVolcano(loc.x, loc.y)) {
+            const active = GameplayMap.isVolcanoActive(loc.x, loc.y);
             const volcanoStatus = (active) ? 'LOC_VOLCANO_ACTIVE' : 'LOC_VOLCANO_NOT_ACTIVE';
-            const volcanoName = GameplayMap.getVolcanoName(location.x, location.y);
+            const volcanoName = GameplayMap.getVolcanoName(loc.x, loc.y);
             const volcanoDetailsKey = (volcanoName) ? 'LOC_UI_NAMED_VOLCANO_DETAILS' : 'LOC_UI_VOLCANO_DETAILS';
             label = Locale.compose(volcanoDetailsKey, label, volcanoStatus, volcanoName);
         }
         return label;
     }
-    addUnitInfo(location) {
+    addUnitInfo(loc) {
         const localPlayerID = GameContext.localObserverID;
-        if (GameplayMap.getRevealedState(localPlayerID, location.x, location.y) != RevealedStates.VISIBLE) {
+        if (GameplayMap.getRevealedState(localPlayerID, loc.x, loc.y) != RevealedStates.VISIBLE) {
             return this;
         }
-        let topUnit = this.getTopUnit(location);
+        let topUnit = this.getTopUnit(loc);
         if (topUnit) {
             if (!Visibility.isVisible(localPlayerID, topUnit?.id)) {
                 return this;
@@ -954,29 +928,34 @@ class PlotTooltipType {
         }
         return this;
     }
-    appendYields(location, playerID, city) {
+    collectYields(loc, playerID, city) {
+        this.yieldsFlexbox.classList.value = "plot-tooltip__resourcesFlex";
+        this.yieldsFlexbox.innerHTML = '';
+        this.totalYields = 0;
         const fragment = document.createDocumentFragment();
-        let total = 0;
+        // one column per yield type
         GameInfo.Yields.forEach(info => {
-            const amount = GameplayMap.getYield(location.x, location.y, info.YieldType, playerID);
+            const amount = GameplayMap.getYield(loc.x, loc.y, info.YieldType, playerID);
             if (amount > 0) {
-                total += amount;
+                this.totalYields += amount;
                 const col = this.yieldColumn(info.YieldType, amount, info.Name);
                 fragment.appendChild(col);
             }
         });
-        if (total) {
-            const icon = city ? "CITY_URBAN" : "CITY_RURAL";
-            const col = this.yieldColumn(icon, total, "LOC_YIELD_BZ_TOTAL");
-            fragment.appendChild(col);
-        }
-        const yieldWidth = total.toString().length;
-        this.yieldsFlexbox.appendChild(fragment);
-        // Give all the yields extra room if one of them has extra digits, to keep the spacing even.
-        this.yieldsFlexbox.classList.remove('resourcesFlex--double-digits', 'resourcesFlex--triple-digits');
+        if (!this.totalYields) return;  // no yields to show
+        // total yield column
+        const icon = city ? "CITY_URBAN" : "CITY_RURAL";
+        const col = this.yieldColumn(icon, this.totalYields, "LOC_YIELD_BZ_TOTAL");
+        fragment.appendChild(col);
+        // set column width based on number of digits
+        // (class names are misleading, possibly an off-by-one error?)
+        const yieldWidth = this.totalYields.toString().length;
         if (yieldWidth > 2) {
-            this.yieldsFlexbox.classList.add(yieldWidth > 3 ? 'resourcesFlex--triple-digits' : 'resourcesFlex--double-digits');
+            this.yieldsFlexbox.classList.add(yieldWidth == 3 ?
+                'resourcesFlex--double-digits' :  // 3-digit numbers
+                'resourcesFlex--triple-digits');  // 4-digit numbers
         }
+        this.yieldsFlexbox.appendChild(fragment);
     }
     yieldColumn(icon, amount, name) {
         const ttIndividualYieldFlex = document.createElement("div");
@@ -1005,8 +984,8 @@ class PlotTooltipType {
         element.style.setProperty("padding-right", BZ_BORDER_PADDING);
         element.style.setProperty("background-color", "#3a0806");
     }
-    appendDistrictDefense(location) {
-        const districtID = MapCities.getDistrict(location.x, location.y);
+    appendDistrictDefense(loc) {
+        const districtID = MapCities.getDistrict(loc.x, loc.y);
         if (!districtID) return;
         // occupation status
         const district = Districts.get(districtID);
@@ -1021,13 +1000,13 @@ class PlotTooltipType {
             this.container.appendChild(ttConqueror);
         }
         // district health
-        const playerID = GameplayMap.getOwner(location.x, location.y);
+        const playerID = GameplayMap.getOwner(loc.x, loc.y);
         const playerDistricts = Players.Districts.get(playerID);
         if (!playerDistricts) return;
         // This type is unresolved, is it meant to be number instead?
-        const currentHealth = playerDistricts.getDistrictHealth(location);
-        const maxHealth = playerDistricts.getDistrictMaxHealth(location);
-        const isUnderSiege = playerDistricts.getDistrictIsBesieged(location);
+        const currentHealth = playerDistricts.getDistrictHealth(loc);
+        const maxHealth = playerDistricts.getDistrictMaxHealth(loc);
+        const isUnderSiege = playerDistricts.getDistrictIsBesieged(loc);
         if (!DistrictHealthManager.canShowDistrictHealth(currentHealth, maxHealth)) {
             return;
         }
@@ -1068,16 +1047,16 @@ class PlotTooltipType {
         }
         this.container.appendChild(ttList);
     }
-    appendRuralPanel(location, district, city) {
+    appendRuralPanel(loc, city, district) {
         let hexName;
         let hexDescription;
         let hexIcon;
         let resourceIcon;
         // special tile types: natural wonder, resource
-        const featureType = GameplayMap.getFeatureType(location.x, location.y);
+        const featureType = GameplayMap.getFeatureType(loc.x, loc.y);
         const feature = GameInfo.Features.lookup(featureType);
         const hexResource = this.getResource();
-        const improvements = this.getConstructibleInfo(location);
+        const improvements = this.getConstructibleInfo(loc);
         const impInfo = improvements[0]?.info;
         const impType = impInfo?.ConstructibleType;
         // set name & description
@@ -1090,13 +1069,12 @@ class PlotTooltipType {
             resourceIcon = hexResource.ResourceType;
         } else if (district?.type) {
             hexName = GameInfo.Districts.lookup(district?.type).Name;
+        } else if (improvements.length == 0 && this.totalYields == 0) {
+            return;  // nothing to show and nothing to follow
         } else if (city) {
             hexName = "LOC_DISTRICT_BZ_UNDEVELOPED";
         } else {
-            // default to Wilderness, except on open water
-            const biomeType = GameplayMap.getBiomeType(location.x, location.y);
-            const biome = GameInfo.Biomes.lookup(biomeType);
-            if (biome?.BiomeType != "BIOME_MARINE") hexName = WILDERNESS_NAME;
+            hexName = WILDERNESS_NAME;
         }
         // get the panel icon and adjust the title if necessary
         if (improvements.length == 0) {
@@ -1106,7 +1084,7 @@ class PlotTooltipType {
             // encampments and villages get icons based on their unique improvements,
             // appropriate for the age and minor civ type
             hexName = "LOC_DISTRICT_BZ_INDEPENDENT";
-            hexIcon = this.getVillageIcon(location);
+            hexIcon = this.getVillageIcon(loc);
         } else if (impInfo?.Discovery) {
             // discoveries don't have a standard icon, so let's use this nice map
             hexName = "LOC_DISTRICT_BZ_DISCOVERY";
@@ -1162,13 +1140,13 @@ class PlotTooltipType {
             this.appendDivider(resourceIcon);
         }
     }
-    appendUrbanPanel(location, district, city) {  // includes CITY_CENTER
+    appendUrbanPanel(loc, city, district) {  // includes CITY_CENTER
         // TODO
     }
-    appendWonderPanel(location, district, city) {
+    appendWonderPanel(loc, city, district) {
         // TODO
     }
-    getVillageIcon(location) {
+    getVillageIcon(loc) {
         const villages = {
             "MILITARISTIC": [
                 "IMPROVEMENT_HILLFORT",
@@ -1192,7 +1170,7 @@ class PlotTooltipType {
             ]
         };
         // get the minor civ type
-        const playerID = GameplayMap.getOwner(location.x, location.y);
+        const playerID = GameplayMap.getOwner(loc.x, loc.y);
         const player = Players.get(playerID);
         let ctype = "MILITARISTIC";  // default
         GameInfo.Independents.forEach(i => {
