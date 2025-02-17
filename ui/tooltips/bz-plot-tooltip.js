@@ -396,54 +396,6 @@ class PlotTooltipType {
             default:
                 this.appendRuralPanel(loc, city, district);
         }
-        return;
-        // TODO: is any of this still useful?
-        if (districtID) {
-            // city center, quarter, district, wonder, or rural improvement
-            const districtType = district?.type ?? DistrictTypes.WILDERNESS;
-            // check for special cases: town center, quarter, district
-            let tileType;
-            if (districtType == DistrictTypes.CITY_CENTER) {
-                // possibly a town center, village, or encampment
-                if (city?.isTown) {
-                    // TODO: handle minors & villages
-                    tileType = Locale.compose("LOC_DISTRICT_BZ_TOWN_CENTER");
-                }
-            }
-            else if (districtType == DistrictTypes.URBAN) {
-                // quarter or district
-                if (thisAgeBuildings.length == 2) {
-                    const unique = buildingStatus.Unique;
-                    if (unique.length == 2 && unique[0] == unique[1]) {
-                        // unique quarter
-                        const uq = GameInfo.UniqueQuarters.find(e => e.TraitType == unique[0]);
-                        tileType = Locale.compose(uq.Name);
-                    }
-                    // quarter (two current buildings)
-                    else tileType = Locale.compose("LOC_DISTRICT_BZ_URBAN_QUARTER");
-                }
-                else if (thisAgeBuildings.length || previousAgeBuildings.length) {
-                    // district (at least one building)
-                    tileType = Locale.compose("LOC_DISTRICT_BZ_URBAN_DISTRICT");
-                }
-                else {
-                    // vacant district (canceled building production)
-                    tileType = Locale.compose("LOC_DISTRICT_BZ_URBAN_VACANT");
-                }
-            }
-            if (!tileType) {
-                // city center, wonder, or rural improvement
-                const districtDefinition = GameInfo.Districts.lookup(districtType);
-                tileType = Locale.compose(districtDefinition.Name);
-            }
-            this.appendTitleDivider(tileType);
-        }
-        else if (city) {
-            this.appendTitleDivider(Locale.compose("LOC_DISTRICT_BZ_UNDEVELOPED"));
-        }
-        else {
-            this.appendTitleDivider(WILDERNESS_NAME);
-        }
     }
     appendSettlementPanel(loc, city, playerID) {
         this.addOwnerInfo(loc, playerID);
@@ -858,6 +810,7 @@ class PlotTooltipType {
             hexName = "LOC_DISTRICT_BZ_URBAN_DISTRICT";
         } else {
             hexName = "LOC_DISTRICT_BZ_URBAN_QUARTER";
+            // TODO: in-progress buildings do not make a quarter
             // TODO: unique quarter
         }
         // title bar
@@ -871,7 +824,7 @@ class PlotTooltipType {
             const ttDescription = document.createElement("div");
             ttDescription.classList.value = "text-xs leading-tight text-center";
             // ttDescription.style.setProperty(...DEBUG_GRAY);
-            ttDescription.setAttribute("data-l10n-id", wonder.Tooltip);
+            // ttDescription.setAttribute("data-l10n-id", uq.Tooltip);
             layout.appendChild(ttDescription);
         }
         // constructibles
