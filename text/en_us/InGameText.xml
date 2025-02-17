@@ -20,10 +20,10 @@
             <Text>Town Center</Text>
         </Row>
         <Row Tag="LOC_DISTRICT_BZ_URBAN_DISTRICT">
-            <Text>District</Text>
+            <Text>Urban District</Text>
         </Row>
         <Row Tag="LOC_DISTRICT_BZ_URBAN_QUARTER">
-            <Text>Quarter</Text>
+            <Text>Urban Quarter</Text>
         </Row>
         <Row Tag="LOC_DISTRICT_BZ_URBAN_VACANT">
             <Text>Vacant District</Text>
