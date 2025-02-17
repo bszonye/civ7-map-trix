@@ -18,6 +18,9 @@
     </ActionCriteria>
     <ActionGroups>
         <ActionGroup id="bz-map-trix-ui" scope="game" criteria="always">
+            <Properties>
+                <LoadOrder>1000</LoadOrder>
+            </Properties>
             <Actions>
                 <UIScripts>
                     <Item>ui/tooltips/bz-plot-tooltip.js</Item>
