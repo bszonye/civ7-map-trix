@@ -1104,16 +1104,22 @@ class PlotTooltipType {
         if (hexDescription) {
             // TODO: improve spacing
             const ttDescription = document.createElement("div");
-            ttDescription.classList.value = "text-xs leading-tight text-center my-1";
+            ttDescription.classList.value = "flex flex-col my-1";
             // ttDescription.style.setProperty(...DEBUG_GRAY);
-            ttDescription.setAttribute('data-l10n-id', hexDescription);
+            const description = this.splitWords(Locale.compose(hexDescription));
+            for (const line of description) {
+                const ttLine = document.createElement("div");
+                ttLine.classList.value = "text-xs leading-tight text-center";
+                ttLine.setAttribute("data-l10n-id", line);
+                ttDescription.appendChild(ttLine);
+            }
             layout.appendChild(ttDescription);
         }
         // constructibles
         for (const imp of improvements) {
             // TODO: adjust spacing
             const ttConstructible = document.createElement("div");
-            ttConstructible.classList.value = "flex-col items-center mt-1";
+            ttConstructible.classList.value = "flex flex-col items-center mt-1";
             const ttName = document.createElement("div");
             ttName.classList.value = "font-title uppercase text-xs leading-tight text-accent-2 text-center";
             // ttName.style.setProperty(...DEBUG_RED);
@@ -1139,6 +1145,18 @@ class PlotTooltipType {
         } else if (hexDescription) {
             this.appendDivider(resourceIcon);
         }
+    }
+    splitWords(text) {
+        // first split into phrases that start with ± modifiers
+        const phrases = text.split(/\s+(?=[-+].+\s.+\s)/);
+        if (phrases.length != 1) return phrases;  // empty is ok
+        // text with no icons is fine, leave it alone
+        if (!/\[icon:\w+]/.test(text)) return [text];
+        // otherwise split roughly in half
+        const words = text.split(/\s+/);
+        const half = Math.ceil(words.length / 2);  // round up
+        if (half < 3) return [text];  // too short
+        return [words.slice(0, half).join(' '), words.slice(half).join(' ')];
     }
     appendUrbanPanel(loc, city, district) {  // includes CITY_CENTER
         // TODO
