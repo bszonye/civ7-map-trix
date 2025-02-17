@@ -36,38 +36,6 @@ const BZ_BORDER_PADDING = `calc(var(--padding-left-right) - ${BZ_BORDER_WIDTH})`
 const BZ_CONTENT_WIDTH = "19.4444444444rem";  // BZ_MAX_WIDTH - BZ_OUTSIDE_WIDTH
 const BZ_DETAIL_WIDTH = "16.1111111111rem";  // BZ_CONTENT_WIDTH - BZ_INDENT_WIDTH
 
-// Settlements
-// BUILDING_PALACE
-// BUILDING_CITY_HALL
-// IMPROVEMENT_VILLAGE -- TODO
-// IMPROVEMENT_ENCAMPMENT -- TODO
-// Improvements
-// IMPROVEMENT_FARM
-// IMPROVEMENT_MINE
-// IMPROVEMENT_MINE_RESOURCE
-// IMPROVEMENT_CLAY_PIT
-// IMPROVEMENT_WOODCUTTER
-// IMPROVEMENT_WOODCUTTER_RESOURCE
-// IMPROVEMENT_FISHING_BOAT
-// IMPROVEMENT_FISHING_BOAT_RESOURCE
-// IMPROVEMENT_CAMP
-// IMPROVEMENT_PASTURE
-// IMPROVEMENT_PLANTATION
-// IMPROVEMENT_QUARRY
-// IMPROVEMENT_OIL_RIG
-// IMPROVEMENT_EXPEDITION_BASE
-// Discoveries
-// IMPROVEMENT_CAVE -- TODO
-// IMPROVEMENT_RUINS -- TODO
-// IMPROVEMENT_CAMPFIRE -- TODO
-// IMPROVEMENT_TENTS -- TODO
-// IMPROVEMENT_PLAZA -- TODO
-// IMPROVEMENT_CAIRN -- TODO
-// IMPROVEMENT_RICH -- TODO
-// IMPROVEMENT_WRECKAGE -- TODO
-// IMPROVEMENT_COAST -- TODO
-// IMPROVEMENT_SHIPWRECK -- TODO
-
 class PlotTooltipType {
     constructor() {
         this.plotCoord = null;
@@ -193,12 +161,22 @@ class PlotTooltipType {
             ttLand.setAttribute('data-l10n-id', distantLandsLabel);
             this.container.appendChild(ttLand);
         }
+        // TODO: const location = this.plotCoord early in this scope
         // civ & settlement panel
         this.addOwnerInfo(this.plotCoord, playerID);
+        // settlement & ownership info
+        const cityID = GameplayMap.getOwningCityFromXY(this.plotCoord.x, this.plotCoord.y);
+        const city = cityID ? Cities.get(cityID) : null;
+        if (city) {
+            this.appendSettlementPanel(this.plotCoord, city);
+        }
+        // determine the hex tile type
+        const districtID = MapCities.getDistrict(this.plotCoord.x, this.plotCoord.y);
+        const district = districtID ? Districts.get(districtID) : null;
         // hex tile panel
         this.appendHexPanel(this.plotCoord);
-        // TODO: what is this?
-        this.addPlotEffectNames(plotIndex);
+        // fortifications & environmental effects like snow
+        this.appendPlotEffects(plotIndex);
         // Trade Route Info
         if (routeName) {
             const toolTipRouteInfo = document.createElement("div");
@@ -210,8 +188,8 @@ class PlotTooltipType {
         // TODO: refactor this into a method
         this.yieldsFlexbox.classList.add("plot-tooltip__resourcesFlex");
         this.container.appendChild(this.yieldsFlexbox);
-        this.addPlotYields(this.plotCoord, GameContext.localPlayerID);
-        if (hexResource) {
+        this.appendYields(this.plotCoord, GameContext.localPlayerID, city);
+        if (false && hexResource) {  // TODO: remove this
             //add resources to the yield box
             const tooltipIndividualYieldFlex = document.createElement("div");
             tooltipIndividualYieldFlex.classList.add("plot-tooltip__IndividualYieldFlex");
@@ -626,18 +604,23 @@ class PlotTooltipType {
         this.appendConstructibleList(wonders, buildingStatus.Wonder);
         this.appendConstructibleList(improvements, buildingStatus.Improvements);
     }
-    appendHexPanel(location) {
-        // first, the settlement & ownership info
-        const cityID = GameplayMap.getOwningCityFromXY(location.x, location.y);
-        const city = cityID ? Cities.get(cityID) : null;
-        if (city) this.appendSettlementPanel(location, city);
-        // determine the tile type
-        const districtID = MapCities.getDistrict(location.x, location.y);
-        const district = districtID ? Districts.get(districtID) : null;
-        // TODO: determine actual type
-        this.appendRuralPanel(location, district, city);
-
-        return;  // TODO
+    appendHexPanel(location, district, city) {
+        switch (district?.type) {
+            case DistrictTypes.CITY_CENTER:
+            case DistrictTypes.URBAN:
+                this.appendUrbanPanel(location, district, city);
+                break;
+            case DistrictTypes.WONDER:
+                this.appendWonderPanel(location, district, city);
+                break;
+            case DistrictTypes.RURAL:
+            case DistrictTypes.WILDERNESS:
+            default:
+                this.appendRuralPanel(location, district, city);
+        }
+        // TODO: anything else?
+        return;
+        // TODO: is any of this still useful?
         if (districtID) {
             // city center, quarter, district, wonder, or rural improvement
             const districtType = district?.type ?? DistrictTypes.WILDERNESS;
@@ -686,6 +669,7 @@ class PlotTooltipType {
         }
     }
     appendSettlementPanel(location, city) {
+        // TODO
     }
     getPlayerName(playerID=null) {
         playerID = playerID ?? GameplayMap.getOwner(this.plotCoord.x, this.plotCoord.y);
@@ -789,8 +773,20 @@ class PlotTooltipType {
         }
         return returnString;
     }
-    addPlotEffectNames(plotIndex) {
-        // TODO: this includes temporary fortifications. what else?
+    appendPlotEffects(plotIndex) {
+        // TODO: placement & formatting
+        // PLOTEFFECT_BURNED
+        // PLOTEFFECT_DIGSITE_NAME
+        // PLOTEFFECT_FLOODED
+        // PLOTEFFECT_IS_BURNING_NAME
+        // PLOTEFFECT_PLAGUE_NAME
+        // PLOTEFFECT_RADIOACTIVE_FALLOUT_NAME
+        // PLOTEFFECT_SAND
+        // PLOTEFFECT_SNOW_LIGHT
+        // PLOTEFFECT_SNOW_MEDIUM
+        // PLOTEFFECT_SNOW_HEAVY
+        // PLOTEFFECT_STONE_TRAP_NAME
+        // PLOTEFFECT_UNIT_FORTIFICATIONS
         const plotEffects = MapPlotEffects.getPlotEffects(plotIndex);
         const localPlayerID = GameContext.localPlayerID;
         plotEffects?.forEach((item) => {
@@ -958,44 +954,49 @@ class PlotTooltipType {
         }
         return this;
     }
-    /**
-     * Add to a plot tooltip any yields that are greater than 0 for that plot
-     * @param {float2} location The X,Y plot location.
-     * @param {playerID} playerID The player associated with the request.
-     */
-    addPlotYields(location, playerID) {
+    appendYields(location, playerID, city) {
         const fragment = document.createDocumentFragment();
-        let maxValueLength = 0;
-        GameInfo.Yields.forEach(yield_define => {
-            const yield_amount = GameplayMap.getYield(location.x, location.y, yield_define.YieldType, playerID);
-            if (yield_amount > 0) {
-                const tooltipIndividualYieldFlex = document.createElement("div");
-                tooltipIndividualYieldFlex.classList.add("plot-tooltip__IndividualYieldFlex");
-                tooltipIndividualYieldFlex.ariaLabel = `${Locale.toNumber(yield_amount)} ${Locale.compose(yield_define.Name)}`;
-                fragment.appendChild(tooltipIndividualYieldFlex);
-                const yieldIconCSS = UI.getIconCSS(yield_define.YieldType, "YIELD");
-                const yieldIconShadow = document.createElement("div");
-                yieldIconShadow.classList.add("plot-tooltip__IndividualYieldIcons-Shadow");
-                yieldIconShadow.style.backgroundImage = yieldIconCSS;
-                tooltipIndividualYieldFlex.appendChild(yieldIconShadow);
-                const yieldIcon = document.createElement("div");
-                yieldIcon.classList.add("plot-tooltip__IndividualYieldIcons");
-                yieldIcon.style.backgroundImage = yieldIconCSS;
-                yieldIconShadow.appendChild(yieldIcon);
-                const toolTipIndividualYieldValues = document.createElement("div");
-                toolTipIndividualYieldValues.classList.add("plot-tooltip__IndividualYieldValues", "font-body");
-                const value = yield_amount.toString();
-                maxValueLength = Math.max(maxValueLength, value.length);
-                toolTipIndividualYieldValues.textContent = value;
-                tooltipIndividualYieldFlex.appendChild(toolTipIndividualYieldValues);
+        let total = 0;
+        GameInfo.Yields.forEach(info => {
+            const amount = GameplayMap.getYield(location.x, location.y, info.YieldType, playerID);
+            if (amount > 0) {
+                total += amount;
+                const col = this.yieldColumn(info.YieldType, amount, info.Name);
+                fragment.appendChild(col);
             }
         });
+        if (total) {
+            const icon = city ? "CITY_URBAN" : "CITY_RURAL";
+            const col = this.yieldColumn(icon, total, "LOC_YIELD_BZ_TOTAL");
+            fragment.appendChild(col);
+        }
+        const yieldWidth = total.toString().length;
         this.yieldsFlexbox.appendChild(fragment);
         // Give all the yields extra room if one of them has extra digits, to keep the spacing even.
         this.yieldsFlexbox.classList.remove('resourcesFlex--double-digits', 'resourcesFlex--triple-digits');
-        if (maxValueLength > 2) {
-            this.yieldsFlexbox.classList.add(maxValueLength > 3 ? 'resourcesFlex--triple-digits' : 'resourcesFlex--double-digits');
+        if (yieldWidth > 2) {
+            this.yieldsFlexbox.classList.add(yieldWidth > 3 ? 'resourcesFlex--triple-digits' : 'resourcesFlex--double-digits');
         }
+    }
+    yieldColumn(icon, amount, name) {
+        const ttIndividualYieldFlex = document.createElement("div");
+        ttIndividualYieldFlex.classList.add("plot-tooltip__IndividualYieldFlex");
+        const ariaLabel = `${Locale.toNumber(amount)} ${Locale.compose(name)}`;
+        ttIndividualYieldFlex.ariaLabel = ariaLabel;
+        const yieldIconCSS = UI.getIconCSS(icon, "YIELD");
+        const yieldIconShadow = document.createElement("div");
+        yieldIconShadow.classList.add("plot-tooltip__IndividualYieldIcons-Shadow");
+        yieldIconShadow.style.backgroundImage = yieldIconCSS;
+        ttIndividualYieldFlex.appendChild(yieldIconShadow);
+        const yieldIcon = document.createElement("div");
+        yieldIcon.classList.add("plot-tooltip__IndividualYieldIcons");
+        yieldIcon.style.backgroundImage = yieldIconCSS;
+        yieldIconShadow.appendChild(yieldIcon);
+        const ttIndividualYieldValues = document.createElement("div");
+        ttIndividualYieldValues.classList.add("plot-tooltip__IndividualYieldValues", "font-body");
+        ttIndividualYieldValues.textContent = amount.toString();
+        ttIndividualYieldFlex.appendChild(ttIndividualYieldValues);
+        return ttIndividualYieldFlex;
     }
     setWarningBannerStyle(element) {
         element.style.setProperty("margin-left", BZ_BORDER_MARGIN);
@@ -1123,8 +1124,9 @@ class PlotTooltipType {
         layout.classList.add("flex", "flex-col", "items-center", "max-w-80");
         // optional description
         if (hexDescription) {
+            // TODO: improve spacing
             const ttDescription = document.createElement("div");
-            ttDescription.classList.value = "text-xs leading-tight text-center mt-1";
+            ttDescription.classList.value = "text-xs leading-tight text-center my-1";
             // ttDescription.style.setProperty(...DEBUG_GRAY);
             ttDescription.setAttribute('data-l10n-id', hexDescription);
             layout.appendChild(ttDescription);
@@ -1156,6 +1158,8 @@ class PlotTooltipType {
             this.appendIconDivider(hexIcon, resourceIcon);
         } else if (resourceIcon) {
             this.appendIconDivider(resourceIcon);
+        } else if (hexDescription) {
+            this.appendDivider(resourceIcon);
         }
     }
     appendUrbanPanel(location, district, city) {  // includes CITY_CENTER

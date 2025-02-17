@@ -46,5 +46,8 @@
         <Row Tag="LOC_STATE_BZ_UNIQUE">
             <Text>Unique</Text>
         </Row>
+        <Row Tag="LOC_YIELD_BZ_TOTAL">
+            <Text>Total Yield</Text>
+        </Row>
     </EnglishText>
 </Database>
