@@ -370,7 +370,7 @@ class PlotTooltipType {
         const agelessTypes = new Set(GameInfo.TypeTags.filter(e => e.Tag == "AGELESS").map(e => e.Type));
         for (const constructible of constructibles) {
             const instance = Constructibles.getByComponentID(constructible);
-            if (!instance || instance.location.x != location.x || instance.location.y != location.y) continue;
+            if (!instance || instance.location.x != loc.x || instance.location.y != loc.y) continue;
             const info = GameInfo.Constructibles.lookup(instance.type);
             if (!info) continue;
             const isBuilding = info.ConstructibleClass == "BUILDING";
