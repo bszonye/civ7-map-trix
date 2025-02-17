@@ -24,16 +24,6 @@ const BZ_BORDER_WIDTH = "0.1111111111rem";
 const BZ_BORDER_MARGIN = `calc(${BZ_BORDER_WIDTH} - var(--padding-left-right))`;
 const BZ_BORDER_PADDING = `calc(var(--padding-left-right) - ${BZ_BORDER_WIDTH})`;
 
-// TODO: remove these
-// const BZ_MAX_WIDTH = "21.3333333333rem";  // from default.css
-// const BZ_PADDING_WIDTH = "0.9444444444rem";  // from default.css
-// const BZ_ICON_WIDTH = "2.6666666667rem";  // from default.css
-// const BZ_ICON_GUTTER = "0.6666666667rem";  // from default.css
-// const BZ_INDENT_WIDTH = "3.3333333333rem";  // BZ_ICON_WIDTH + BZ_ICON_GUTTER
-// const BZ_OUTSIDE_WIDTH = "1.8888888888rem";  // 2 * BZ_PADDING_WIDTH
-const BZ_CONTENT_WIDTH = "19.4444444444rem";  // BZ_MAX_WIDTH - BZ_OUTSIDE_WIDTH
-const BZ_DETAIL_WIDTH = "16.1111111111rem";  // BZ_CONTENT_WIDTH - BZ_INDENT_WIDTH
-
 class PlotTooltipType {
     constructor() {
         this.plotCoord = null;
@@ -80,7 +70,6 @@ class PlotTooltipType {
         // Obtain names and IDs
         const loc = this.plotCoord;
         const routeName = this.getRouteName();
-        const hexResource = this.getResource();
         const playerID = GameplayMap.getOwner(loc.x, loc.y);
         const plotIndex = GameplayMap.getIndexFromLocation(loc);
         const cityID = GameplayMap.getOwningCityFromXY(loc.x, loc.y);
@@ -301,7 +290,6 @@ class PlotTooltipType {
     getConstructibleInfo(loc) {
         const constructibleInfo = [];
         const constructibles = MapConstructibles.getHiddenFilteredConstructibles(loc.x, loc.y);
-        const agelessTypes = new Set(GameInfo.TypeTags.filter(e => e.Tag == "AGELESS").map(e => e.Type));
         for (const constructible of constructibles) {
             const instance = Constructibles.getByComponentID(constructible);
             if (!instance || instance.location.x != loc.x || instance.location.y != loc.y) continue;
@@ -389,7 +377,7 @@ class PlotTooltipType {
                 this.appendUrbanPanel(loc, city, district);
                 break;
             case DistrictTypes.WONDER:
-                this.appendWonderPanel(loc, city, district);
+                this.appendWonderPanel(loc);
                 break;
             case DistrictTypes.RURAL:
             case DistrictTypes.WILDERNESS:
@@ -408,7 +396,6 @@ class PlotTooltipType {
             return "";
         }
         const localPlayerID = GameContext.localPlayerID;
-        const civ = GameInfo.Civilizations.lookup(player.civilizationType);
         const name =
             playerID == localPlayerID ?
             Locale.compose("LOC_LEADER_BZ_YOU", player.name) :
@@ -601,7 +588,6 @@ class PlotTooltipType {
         }
     }
     getDistantLandsLabel(loc) {
-        const localPlayerID = GameContext.localPlayerID;
         const localPlayer = Players.get(GameContext.localPlayerID);
         return localPlayer?.isDistantLands(loc) ?
             "LOC_RESOURCE_GENERAL_TYPE_DISTANT_LANDS" : "";
@@ -836,7 +822,7 @@ class PlotTooltipType {
         const eIcons = extras.map(e => e.info.ConstructibleType);
         this.appendUrbanDivider(bIcons, eIcons);
     }
-    appendWonderPanel(loc, city, district) {
+    appendWonderPanel(loc) {
         // TODO
         const constructibles = this.getConstructibleInfo(loc);
         if (constructibles.length != 1) {
