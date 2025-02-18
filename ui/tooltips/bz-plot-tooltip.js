@@ -17,8 +17,22 @@ const DEBUG_BLUE = ["background-color", "rgba(57, 57, 150, .35)"];
 
 const BZ_DOT_DIVIDER = Locale.compose("LOC_PLOT_DIVIDER_DOT");
 
-const WILDERNESS_NAME = GameInfo.Districts.lookup(DistrictTypes.WILDERNESS).Name;
-const VILLAGE_TYPES = ["IMPROVEMENT_VILLAGE", "IMPROVEMENT_ENCAMPMENT"];
+const BZ_WILDERNESS_NAME = GameInfo.Districts.lookup(DistrictTypes.WILDERNESS).Name;
+const BZ_VILLAGE_TYPES = ["IMPROVEMENT_VILLAGE", "IMPROVEMENT_ENCAMPMENT"];
+
+const BZ_YIELD_TOTAL_RURAL = "CITY_RURAL";
+const BZ_YIELD_TOTAL_URBAN = "CITY_URBAN";
+
+const BZ_YIELD_COLOR = {
+    "YIELD_CULTURE": "#bf99e6",
+    "YIELD_DIPLOMACY": "#99e6bf",
+    "YIELD_FOOD": "#a6cc33",
+    "YIELD_GOLD": "#f0c442",
+    "YIELD_HAPPINESS": "#ff9933",
+    "YIELD_PRODUCTION": "#a33d29",
+    "YIELD_SCIENCE": "#80bfff",
+    null: "#a3a5a7",
+}
 
 const BZ_BORDER_WIDTH = "0.1111111111rem";
 const BZ_BORDER_MARGIN = `calc(${BZ_BORDER_WIDTH} - var(--padding-left-right))`;
@@ -36,9 +50,14 @@ class PlotTooltipType {
         this.tooltip.appendChild(this.container);
         this.agelessBuildings = this.buildingsTagged("AGELESS");
         this.extraBuildings = this.buildingsTagged("IGNORE_DISTRICT_PLACEMENT_CAP");
+        this.largeBuildings = this.buildingsTagged("FULL_TILE");
         Loading.runWhenFinished(() => {
             for (const y of GameInfo.Yields) {
                 const url = UI.getIcon(`${y.YieldType}`, "YIELD");
+                Controls.preloadImage(url, 'plot-tooltip');
+            }
+            for (const y of [BZ_YIELD_TOTAL_RURAL, BZ_YIELD_TOTAL_URBAN]) {
+                const url = UI.getIcon(y, "YIELD");
                 Controls.preloadImage(url, 'plot-tooltip');
             }
         });
@@ -301,37 +320,42 @@ class PlotTooltipType {
             if (!(isWonder || isBuilding || isImprovement)) {
                 continue;
             }
-            const state = [];
+            const notes = [];
 
+            const isComplete = instance.complete;
+            const isDamaged = instance.damaged;
             const isExtra = this.extraBuildings.has(info.ConstructibleType);
+            const isLarge = this.largeBuildings.has(info.ConstructibleType);
             const isAgeless = this.agelessBuildings.has(info.ConstructibleType);
             const currentAge = GameInfo.Ages.lookup(Game.age).ChronologyIndex;
-            const buildingAge = isAgeless ? currentAge :
+            const age = isAgeless ? currentAge - 0.5 :
                 GameInfo.Ages.lookup(info.Age ?? "")?.ChronologyIndex ?? 0;
-            const isObsolete = isBuilding && buildingAge != currentAge;
+            const isObsolete = isBuilding && Math.ceil(age) != currentAge;
             const uniqueTrait =
                 isBuilding ?
                 GameInfo.Buildings.lookup(info.ConstructibleType).TraitType :
                 isImprovement ?
                 GameInfo.Improvements.lookup(info.ConstructibleType).TraitType :
                 null;
+            const isCurrent = isComplete && !isDamaged && !isObsolete && !isExtra;
 
-            if (instance.damaged) state.push("LOC_PLOT_TOOLTIP_DAMAGED");
-            if (!instance.complete) state.push("LOC_PLOT_TOOLTIP_IN_PROGRESS");
+            if (isDamaged) notes.push("LOC_PLOT_TOOLTIP_DAMAGED");
+            if (!isComplete) notes.push("LOC_PLOT_TOOLTIP_IN_PROGRESS");
             if (uniqueTrait) {
-                state.push("LOC_STATE_BZ_UNIQUE");
+                notes.push("LOC_STATE_BZ_UNIQUE");
             } else if (isAgeless && !isWonder) {
-                state.push("LOC_UI_PRODUCTION_AGELESS");
+                notes.push("LOC_UI_PRODUCTION_AGELESS");
             } else if (isObsolete) {
-                state.push("LOC_STATE_BZ_OBSOLETE");
+                notes.push("LOC_STATE_BZ_OBSOLETE");
                 const ageName = GameInfo.Ages.lookup(info.Age).Name;
-                if (ageName) state.push(Locale.compose(ageName));
+                if (ageName) notes.push(Locale.compose(ageName));
             }
-            // sort by age, with ageless buildings second and walls last
-            const age = isExtra ? -1 : isAgeless ? currentAge - 0.5 : buildingAge;
-            constructibleInfo.push({info, uniqueTrait, state, age});
+            constructibleInfo.push({
+                info, age, isCurrent, isExtra, isLarge, notes, uniqueTrait
+            });
         };
-        constructibleInfo.sort((a, b) => b.age - a.age);
+        constructibleInfo.sort((a, b) =>
+            (b.isExtra ? -1 : b.age) - (a.isExtra ? -1 : a.age));
         return constructibleInfo;
     }
     appendGeographyPanel(loc) {
@@ -681,7 +705,7 @@ class PlotTooltipType {
         });
         if (!this.totalYields) return;  // no yields to show
         // total yield column
-        const icon = city ? "CITY_URBAN" : "CITY_RURAL";
+        const icon = city ? BZ_YIELD_TOTAL_URBAN : BZ_YIELD_TOTAL_RURAL;
         const col = this.yieldColumn(icon, this.totalYields, "LOC_YIELD_BZ_TOTAL");
         fragment.appendChild(col);
         // set column width based on number of digits
@@ -775,7 +799,6 @@ class PlotTooltipType {
         // TODO rural stuff -> urban
         const constructibles = this.getConstructibleInfo(loc);
         const buildings = constructibles.filter(e => e.age != -1);
-        const extras = constructibles.filter(e => e.age == -1);  // walls
         const currentAge = GameInfo.Ages.lookup(Game.age).ChronologyIndex;
         const oldest = Math.ceil(Math.min(currentAge, ...buildings.map(e => e.age)));
         let hexName = GameInfo.Districts.lookup(district?.type).Name;
@@ -818,9 +841,7 @@ class PlotTooltipType {
         // add to tooltip
         this.container.appendChild(layout);
         // bottom bar
-        const bIcons = buildings.map(e => e.info.ConstructibleType);
-        const eIcons = extras.map(e => e.info.ConstructibleType);
-        this.appendUrbanDivider(bIcons, eIcons);
+        this.appendUrbanDivider(buildings.filter(e => !e.isExtra));
     }
     appendWonderPanel(loc) {
         // TODO
@@ -830,16 +851,16 @@ class PlotTooltipType {
             if (!constructibles.length) return;
         }
         const wonder = constructibles[0]?.info;
-        const state = constructibles[0]?.state;
+        const notes = constructibles[0]?.notes;
         this.appendTitleDivider(Locale.compose(wonder.Name));
         const layout = document.createElement("div");
         layout.classList.add("flex", "flex-col", "items-center", "max-w-80");
-        if (state) {
+        if (notes) {
             const ttState = document.createElement("div");
             ttState.classList.value = "leading-none";
             ttState.style.setProperty("font-size", "85%");
             // ttState.style.setProperty(...DEBUG_GREEN);
-            ttState.innerHTML = this.dotJoin(state.map(e => Locale.compose(e)));
+            ttState.innerHTML = this.dotJoin(notes.map(e => Locale.compose(e)));
             layout.appendChild(ttState);
         }
         const ttDescription = document.createElement("div");
@@ -877,13 +898,13 @@ class PlotTooltipType {
         } else if (city) {
             hexName = "LOC_DISTRICT_BZ_UNDEVELOPED";
         } else {
-            hexName = WILDERNESS_NAME;
+            hexName = BZ_WILDERNESS_NAME;
         }
         // get the panel icon and adjust the title if necessary
         if (!improvement) {
             // no improvements, no icon
             hexIcon = null;
-        } else if (VILLAGE_TYPES.includes(improvementType)) {
+        } else if (BZ_VILLAGE_TYPES.includes(improvementType)) {
             // encampments and villages get icons based on their unique improvements,
             // appropriate for the age and minor civ type
             hexName = "LOC_DISTRICT_BZ_INDEPENDENT";
@@ -952,13 +973,13 @@ class PlotTooltipType {
             // ttName.style.setProperty(...DEBUG_RED);
             ttName.setAttribute("data-l10n-id", c.info.Name);
             ttConstructible.appendChild(ttName);
-            const state = this.dotJoin(c.state.map(e => Locale.compose(e)));
-            if (state) {
+            const notes = this.dotJoin(c.notes.map(e => Locale.compose(e)));
+            if (notes) {
                 const ttState = document.createElement("div");
                 ttState.classList.value = "leading-none";
                 ttState.style.setProperty("font-size", "85%");
                 // ttState.style.setProperty(...DEBUG_GREEN);
-                ttState.innerHTML = state;
+                ttState.innerHTML = notes;
                 ttConstructible.appendChild(ttState);
             }
             layout.appendChild(ttConstructible);
@@ -970,22 +991,22 @@ class PlotTooltipType {
             "MILITARISTIC": [
                 "IMPROVEMENT_HILLFORT",
                 "IMPROVEMENT_KASBAH",
-                "IMPROVEMENT_SHORE_BATTERY"
+                "IMPROVEMENT_SHORE_BATTERY",
             ],
             "CULTURAL": [
                 "IMPROVEMENT_MEGALITH",
                 "IMPROVEMENT_STONE_HEAD",
-                "IMPROVEMENT_OPEN_AIR_MUSEUM"
+                "IMPROVEMENT_OPEN_AIR_MUSEUM",
             ],
             "ECONOMIC": [
                 "IMPROVEMENT_SOUQ",
                 "IMPROVEMENT_TRADING_FACTORY",
-                "IMPROVEMENT_ENTREPOT"
+                "IMPROVEMENT_ENTREPOT",
             ],
             "SCIENTIFIC": [
                 "IMPROVEMENT_ZIGGURAT",
                 "IMPROVEMENT_MONASTERY",
-                "IMPROVEMENT_INSTITUTE"
+                "IMPROVEMENT_INSTITUTE",
             ]
         };
         // get the minor civ type
@@ -1047,22 +1068,55 @@ class PlotTooltipType {
         }
         this.appendFlexDivider(layout);
     }
-    appendUrbanDivider(icons, extras=[]) {
-        // make sure there are at least two buildings, and stick extras in the middle
-        const empty = "BUILDING_OPEN";
-        const b1 = icons.length < 1 ? [empty] : [icons[0]];
-        const b2 = icons.length < 2 ? [empty] : icons.slice(1);
-        const buildings = [...b1, ...extras, ...b2];
+    adjacencyYield(building) {
+        if (!building) return [];
+        const adjTypes = GameInfo.Constructible_Adjacencies.filter(at =>
+            at.ConstructibleType == building.ConstructibleType && !at.RequiresActivation
+        );
+        const adjYields = adjTypes.map(at => GameInfo.Adjacency_YieldChanges.find(
+            ay => ay.ID == at.YieldChangeId));
+        const yieldSet = new Set(adjYields.map(ay => ay.YieldType));
+        return [...yieldSet];
+    }
+    appendUrbanDivider(buildings) {
+        // there are at least two building slots (unless one is large)
+        const slots = [...buildings];
+        if (slots.length < 2 && !buildings[0]?.isLarge)
+            slots.push(...[null, null].slice(buildings.length));
         // render the icons
         const layout = document.createElement("div");
-        layout.classList.add("flex", "flex-grow", "relative", "my-2", "mx-2");
-        for (let i = 0; i < buildings.length; i++) {
+        layout.classList.value = "flex flex-grow relative m-2";
+        for (let slot of slots) {
+            if (!slot) {
+                // show an empty slot with a transparent yield ring
+                const ttFrame = document.createElement("div");
+                ttFrame.classList.value = "border-2 rounded-full my-1 mx-1\\.5";
+                ttFrame.style.setProperty("border-color", "rgba(0, 0, 0, 0)");
+                const ttIcon = document.createElement("div");
+                ttIcon.classList.value = "bg-contain bg-center size-12";
+                ttIcon.style.backgroundImage = UI.getIconCSS("BUILDING_OPEN");
+                ttFrame.appendChild(ttIcon);
+                layout.appendChild(ttFrame);
+                continue;
+            }
+            // if the building has more than one yield type, like the
+            // Palace, use one type for the ring and one for the glow
+            const yields = this.adjacencyYield(slot.info);
+            const slotColor = BZ_YIELD_COLOR[yields[0] ?? null];
+            const glowColor = BZ_YIELD_COLOR[yields[1] ?? yields[0] ?? null];
+            // ring the slot with an appropriate color for the yield
+            const ttFrame = document.createElement("div");
+            ttFrame.classList.value = "border-2 rounded-full my-1 mx-1\\.5";
+            ttFrame.style.setProperty("border-color", slotColor);
+            // also glow if the building is fully operational
+            if (slot.isCurrent) ttFrame.style.setProperty(
+                "box-shadow", `0rem 0rem 0.33333rem 0.16667rem ${glowColor}`);
+            // display the icon
             const ttIcon = document.createElement("div");
-            ttIcon.classList.add("bg-contain", "bg-center", "size-12", "mx-1");
-            let icon = buildings[i];
-            if (!icon.startsWith("url(")) icon = UI.getIconCSS(icon);
-            ttIcon.style.backgroundImage = icon;
-            layout.appendChild(ttIcon);
+            ttIcon.classList.value = "bg-contain bg-center size-12";
+            ttIcon.style.backgroundImage = UI.getIconCSS(slot.info.ConstructibleType);
+            ttFrame.appendChild(ttIcon);
+            layout.appendChild(ttFrame);
         }
         this.appendFlexDivider(layout);
     }
