@@ -88,12 +88,13 @@ class PlotTooltipType {
         this.isShowingDebug = UI.isDebugPlotInfoVisible(); // Ensure debug status hasn't changed
         // Obtain names and IDs
         const loc = this.plotCoord;
-        const routeName = this.getRouteName();
-        const playerID = GameplayMap.getOwner(loc.x, loc.y);
         const plotIndex = GameplayMap.getIndexFromLocation(loc);
+        const playerID = GameplayMap.getOwner(loc.x, loc.y);
         const cityID = GameplayMap.getOwningCityFromXY(loc.x, loc.y);
         const districtID = MapCities.getDistrict(loc.x, loc.y);
-        // city & district objects
+        const routeName = this.getRouteName();
+        // player, city, district objects
+        const player = Players.get(playerID);
         const city = cityID ? Cities.get(cityID) : null;
         const district = districtID ? Districts.get(districtID) : null;
         // collect yields first, to inform panel layouts
@@ -153,7 +154,7 @@ class PlotTooltipType {
         // fortifications & environmental effects like snow
         this.appendPlotEffects(plotIndex);
         // civ & settlement panel
-        if (city) this.appendSettlementPanel(loc, city, playerID);
+        if (player) this.appendSettlementPanel(loc, player, city);
         // determine the hex tile type
         // hex tile panel
         this.appendHexPanel(loc, city, district);
@@ -216,49 +217,6 @@ class PlotTooltipType {
             }
             else {
                 UI.setCursorByType(UIHTMLCursorTypes.Default);
-            }
-        }
-        //debug info
-        if (this.isShowingDebug) {
-            const tooltipDebugFlexbox = document.createElement("div");
-            tooltipDebugFlexbox.classList.add("plot-tooltip__debug-flexbox");
-            this.container.appendChild(tooltipDebugFlexbox);
-            this.appendDivider();
-            const playerID = GameplayMap.getOwner(loc.x, loc.y);
-            const currHp = Players.Districts.get(playerID)?.getDistrictHealth(loc);
-            const maxHp = Players.Districts.get(playerID)?.getDistrictMaxHealth(loc);
-            const toolTipDebugTitle = document.createElement("div");
-            toolTipDebugTitle.classList.add("plot-tooltip__debug-title-text");
-            if ((currHp != undefined && currHp != 0) && (maxHp != undefined && maxHp != 0)) {
-                toolTipDebugTitle.innerHTML = Locale.compose("LOC_PLOT_TOOLTIP_DEBUG_TITLE") + ": " + currHp + " / " + maxHp;
-                tooltipDebugFlexbox.appendChild(toolTipDebugTitle);
-            }
-            else {
-                toolTipDebugTitle.innerHTML = Locale.compose("LOC_PLOT_TOOLTIP_DEBUG_TITLE") + ":";
-                tooltipDebugFlexbox.appendChild(toolTipDebugTitle);
-            }
-            const toolTipDebugPlotCoord = document.createElement("div");
-            toolTipDebugPlotCoord.classList.add("plot-tooltip__coordinate-text");
-            toolTipDebugPlotCoord.innerHTML = Locale.compose("LOC_PLOT_TOOLTIP_PLOT") + `: (${loc.x},${loc.y})`;
-            tooltipDebugFlexbox.appendChild(toolTipDebugPlotCoord);
-            const toolTipDebugPlotIndex = document.createElement("div");
-            toolTipDebugPlotIndex.classList.add("plot-tooltip__coordinate-text");
-            toolTipDebugPlotIndex.innerHTML = Locale.compose("LOC_PLOT_TOOLTIP_INDEX") + `: ${plotIndex}`;
-            tooltipDebugFlexbox.appendChild(toolTipDebugPlotIndex);
-            const localPlayer = Players.get(GameContext.localPlayerID);
-            if (localPlayer != null) {
-                if (localPlayer.isDistantLands(loc)) {
-                    const toolTipDebugPlotTag = document.createElement("div");
-                    toolTipDebugPlotTag.classList.add("plot-tooltip__coordinate-text");
-                    toolTipDebugPlotTag.innerHTML = Locale.compose("LOC_PLOT_TOOLTIP_HEMISPHERE_WEST");
-                    tooltipDebugFlexbox.appendChild(toolTipDebugPlotTag);
-                }
-                else {
-                    const toolTipDebugPlotTag = document.createElement("div");
-                    toolTipDebugPlotTag.classList.add("plot-tooltip__coordinate-text");
-                    toolTipDebugPlotTag.innerHTML = Locale.compose("LOC_PLOT_TOOLTIP_HEMISPHERE_EAST");
-                    tooltipDebugFlexbox.appendChild(toolTipDebugPlotTag);
-                }
             }
         }
     }
@@ -409,31 +367,24 @@ class PlotTooltipType {
                 this.appendRuralPanel(loc, city, district);
         }
     }
-    appendSettlementPanel(loc, city, playerID) {
-        this.addOwnerInfo(loc, playerID);
+    appendSettlementPanel(loc, player, city) {
+        console.warn(`TRIX ${player.id} ${city?.name}`);
+        this.addOwnerInfo(loc, player);
         // TODO
     }
-    getPlayerName(playerID=null) {
-        playerID = playerID ?? GameplayMap.getOwner(this.plotCoord.x, this.plotCoord.y);
-        const player = Players.get(playerID);
-        if (player == null) {
-            return "";
-        }
+    getPlayerName(player) {
+        if (player == null) return "";
         const localPlayerID = GameContext.localPlayerID;
         const name =
-            playerID == localPlayerID ?
+            player.id == localPlayerID ?
             Locale.compose("LOC_LEADER_BZ_YOU", player.name) :
             player.isMinor || player.isIndependent ?
             Locale.compose("LOC_LEADER_BZ_PEOPLE_NAME", player.name) :
             Locale.compose(player.name);
         return name;
     }
-    getCivName(playerID=null, fullName=false) {
-        playerID = playerID ?? GameplayMap.getOwner(this.plotCoord.x, this.plotCoord.y);
-        const player = Players.get(playerID);
-        if (player == null) {
-            return "";
-        }
+    getCivName(player, fullName=false) {
+        if (player == null) return "";
         const civName = fullName || player.isMinor || player.isIndependent ?
             player.civilizationFullName :  // "Venice"
             player.civilizationName;  // "Spain"
@@ -550,11 +501,10 @@ class PlotTooltipType {
         }
         return null;
     }
-    addOwnerInfo(loc, playerID) {
+    addOwnerInfo(loc, player) {
         const filteredConstructibles = MapConstructibles.getHiddenFilteredConstructibles(loc.x, loc.y);
         const constructibles = MapConstructibles.getConstructibles(loc.x, loc.y);
-        const player = Players.get(playerID);
-        if (!player || !Players.isAlive(playerID)) {
+        if (!player || !Players.isAlive(player.id)) {
             return;
         }
         if (filteredConstructibles.length == 0 && filteredConstructibles.length != constructibles.length) {
@@ -563,7 +513,7 @@ class PlotTooltipType {
         this.appendDivider();
         const plotTooltipOwner = document.createElement("div");
         plotTooltipOwner.classList.add("plot-tooltip__owner-leader-text");
-        const owner = this.dotJoin([this.getPlayerName(), this.getCivName()]);
+        const owner = this.dotJoin([this.getPlayerName(player), this.getCivName(player)]);
         plotTooltipOwner.innerHTML = owner;
         this.container.appendChild(plotTooltipOwner);
         const relationship = this.getCivRelationship(player);
@@ -577,7 +527,7 @@ class PlotTooltipType {
         if (player.isMinor || player.isIndependent) {
             // city-state unique bonus
             // TODO: formatting
-            const bonusType = Game.CityStates.getBonusType(playerID);
+            const bonusType = Game.CityStates.getBonusType(player.id);
             const bonus = GameInfo.CityStateBonuses.find(t => t.$hash == bonusType);
             if (bonus) {
                 const ttBonusName = document.createElement("div");
@@ -751,7 +701,8 @@ class PlotTooltipType {
         // occupation status
         const district = Districts.get(districtID);
         if (district.owner != district.controllingPlayer) {
-            const conquerorName = this.getCivName(district.controllingPlayer, true);
+            const conqueror = Players.get(district.controllingPlayer);
+            const conquerorName = this.getCivName(conqueror, true);
             const conquerorText = Locale.compose("{1_Term} {2_Subject}", "LOC_PLOT_TOOLTIP_CONQUEROR", conquerorName);
             const ttConqueror = document.createElement("div");
             ttConqueror.classList.value = "text-xs leading-tight text-center";
