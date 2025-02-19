@@ -48,6 +48,34 @@ function adjacencyYield(building) {
     const yieldSet = new Set(adjYields.map(ay => ay.YieldType));
     return [...yieldSet];
 }
+function dotJoin(list) {
+    // join text with dots after removing empty elements
+    return list.filter(e => e).join(" " + BZ_DOT_DIVIDER + " ");
+}
+// lay out a column of constructibles and their construction notes
+function layoutConstructibles(layout, constructibles) {
+    for (const c of constructibles) {
+        // TODO: adjust spacing
+        const ttConstructible = document.createElement("div");
+        ttConstructible.classList.value = "flex flex-col items-center text-xs mt-1";
+        const ttName = document.createElement("div");
+        ttName.classList.value = "font-title uppercase leading-tight text-accent-2";
+        // ttName.style.setProperty(...DEBUG_RED);
+        ttName.setAttribute("data-l10n-id", c.info.Name);
+        ttConstructible.appendChild(ttName);
+        const notes = dotJoin(c.notes.map(e => Locale.compose(e)));
+        if (notes) {
+            const ttState = document.createElement("div");
+            ttState.classList.value = "leading-none";
+            ttState.style.setProperty("font-size", "85%");
+            // ttState.style.setProperty(...DEBUG_GREEN);
+            ttState.innerHTML = notes;
+            ttConstructible.appendChild(ttState);
+        }
+        layout.appendChild(ttConstructible);
+    }
+}
+// lay out a paragraph of rules text
 function layoutRules(layout, text) {
     const ttDescription = document.createElement("div");
     ttDescription.classList.value = "flex flex-col my-1";
@@ -61,11 +89,15 @@ function layoutRules(layout, text) {
     }
     layout.appendChild(ttDescription);
 }
+// split yield modifiers into separate lines to avoid layout bugs
 function splitModifiers(text) {
-    // split "+N[icon] Yield" phrases into separate lines
-    // (avoids a bug with centering text with icons)
-    const yieldModifierPattern = /(\s*\S*\[icon:\w+\]\S*\s+\S+\s*)/u;
-    return text.split(yieldModifierPattern);
+    // examples:
+    // +10[icon:YIELD_PRODUCTION] Production
+    // +1[icon:YIELD_CULTURE] Culture and[icon:YIELD_GOLD] Gold
+    const yieldModifierPattern = /\s*(\S*\[icon:\w+\]\S*\s+\S+(?:\s+\S*\[icon:\w+\]\S*\s+\S+)?)\s+/u;
+    const lines = text.split(yieldModifierPattern);
+    console.warn(`TRIX ${lines}`);
+    return lines;
 }
 
 class PlotTooltipType {
@@ -376,7 +408,7 @@ class PlotTooltipType {
         if (continentName) {
             const tt = document.createElement("div");
             const text = [continentName, distantLandsLabel].map(e => Locale.compose(e));
-            tt.setAttribute('data-l10n-id', this.dotJoin(text));
+            tt.setAttribute('data-l10n-id', dotJoin(text));
             ttGeo.appendChild(tt);
         }
         this.container.appendChild(ttGeo);
@@ -542,7 +574,7 @@ class PlotTooltipType {
         this.appendDivider();
         const plotTooltipOwner = document.createElement("div");
         plotTooltipOwner.classList.add("plot-tooltip__owner-leader-text");
-        const owner = this.dotJoin([this.getPlayerName(player), this.getCivName(player)]);
+        const owner = dotJoin([this.getPlayerName(player), this.getCivName(player)]);
         plotTooltipOwner.innerHTML = owner;
         this.container.appendChild(plotTooltipOwner);
         const relationship = this.getCivRelationship(player);
@@ -774,17 +806,11 @@ class PlotTooltipType {
     buildingsTagged(tag) {
         return new Set(GameInfo.TypeTags.filter(e => e.Tag == tag).map(e => e.Type));
     }
-    dotJoin(list) {
-        // join text with dots after removing empty elements
-        return list.filter(e => e).join(" " + BZ_DOT_DIVIDER + " ");
-    }
     appendUrbanPanel(loc, city, district) {  // includes CITY_CENTER
         const constructibles = this.getConstructibleInfo(loc);
         const buildings = constructibles.filter(e => e.age != -1);
-        const currentAge = GameInfo.Ages.lookup(Game.age).ChronologyIndex;
-        const oldest = Math.ceil(Math.min(currentAge, ...buildings.map(e => e.age)));
         let hexName = GameInfo.Districts.lookup(district?.type).Name;
-        let hexDescription;  // TODO: unique quarter
+        let hexDescription;
         // set name & description
         if (district.type == DistrictTypes.CITY_CENTER) {
             if (city.isTown) {
@@ -797,12 +823,17 @@ class PlotTooltipType {
         } else if (buildings.length == 0) {
             // urban tile with canceled production
             hexName = "LOC_DISTRICT_BZ_URBAN_VACANT";
-        } else if (buildings.length < 2 || oldest < currentAge) {
-            hexName = "LOC_DISTRICT_BZ_URBAN_DISTRICT";
+        } else if (buildings.length >= 2 && buildings.every(b => b.isCurrent)) {
+            const unique = buildings[0].uniqueTrait;
+            if (buildings.every(b => b.uniqueTrait = unique)) {
+                const uq = GameInfo.UniqueQuarters.find(e => e.TraitType == unique);
+                hexName = uq.Name;
+                hexDescription = uq.Description;
+            } else {
+                hexName = "LOC_DISTRICT_BZ_URBAN_QUARTER";
+            }
         } else {
-            hexName = "LOC_DISTRICT_BZ_URBAN_QUARTER";
-            // TODO: in-progress buildings do not make a quarter
-            // TODO: unique quarter
+            hexName = "LOC_DISTRICT_BZ_URBAN_DISTRICT";
         }
         // title bar
         this.appendTitleDivider(Locale.compose(hexName));
@@ -810,16 +841,10 @@ class PlotTooltipType {
         // panel interior
         const layout = document.createElement("div");
         layout.classList.value = "flex flex-col items-center max-w-80";
-        // TODO: unique quarter tooltip
-        if (hexDescription) {
-            const ttDescription = document.createElement("div");
-            ttDescription.classList.value = "text-xs leading-tight text-center";
-            // ttDescription.style.setProperty(...DEBUG_GRAY);
-            // ttDescription.setAttribute("data-l10n-id", uq.Tooltip);
-            layout.appendChild(ttDescription);
-        }
+        // unique quarter tooltip
+        if (hexDescription) layoutRules(layout, hexDescription);
         // constructibles
-        layout.appendChild(this.layoutConstructibles(constructibles));
+        layoutConstructibles(layout, constructibles);
         // add to tooltip
         this.container.appendChild(layout);
         // bottom bar
@@ -840,7 +865,7 @@ class PlotTooltipType {
             const ttState = document.createElement("div");
             ttState.classList.value = "leading-none";
             ttState.style.setProperty("font-size", "85%");
-            ttState.innerHTML = this.dotJoin(notes.map(e => Locale.compose(e)));
+            ttState.innerHTML = dotJoin(notes.map(e => Locale.compose(e)));
             layout.appendChild(ttState);
         }
         layoutRules(layout, wonder.Tooltip);
@@ -901,7 +926,7 @@ class PlotTooltipType {
         // optional description
         if (hexDescription) layoutRules(layout, hexDescription);
         // constructibles
-        layout.appendChild(this.layoutConstructibles(constructibles));
+        layoutConstructibles(layout, constructibles);
         // add to tooltip
         this.container.appendChild(layout);
         // bottom bar
@@ -912,30 +937,6 @@ class PlotTooltipType {
         } else if (hexDescription) {
             this.appendDivider(resourceIcon);
         }
-    }
-    layoutConstructibles(constructibles) {
-        const layout = document.createElement("div");
-        for (const c of constructibles) {
-            // TODO: adjust spacing
-            const ttConstructible = document.createElement("div");
-            ttConstructible.classList.value = "flex flex-col items-center text-xs mt-1";
-            const ttName = document.createElement("div");
-            ttName.classList.value = "font-title uppercase leading-tight text-accent-2";
-            // ttName.style.setProperty(...DEBUG_RED);
-            ttName.setAttribute("data-l10n-id", c.info.Name);
-            ttConstructible.appendChild(ttName);
-            const notes = this.dotJoin(c.notes.map(e => Locale.compose(e)));
-            if (notes) {
-                const ttState = document.createElement("div");
-                ttState.classList.value = "leading-none";
-                ttState.style.setProperty("font-size", "85%");
-                // ttState.style.setProperty(...DEBUG_GREEN);
-                ttState.innerHTML = notes;
-                ttConstructible.appendChild(ttState);
-            }
-            layout.appendChild(ttConstructible);
-        }
-        return layout;
     }
     getVillageIcon(loc) {
         const villages = {
