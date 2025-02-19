@@ -24,19 +24,49 @@ const BZ_YIELD_TOTAL_RURAL = "CITY_RURAL";
 const BZ_YIELD_TOTAL_URBAN = "CITY_URBAN";
 
 const BZ_YIELD_COLOR = {
-    "YIELD_CULTURE": "#bf99e6",
-    "YIELD_DIPLOMACY": "#99e6bf",
-    "YIELD_FOOD": "#a6cc33",
-    "YIELD_GOLD": "#f0c442",
-    "YIELD_HAPPINESS": "#ff9933",
-    "YIELD_PRODUCTION": "#a33d29",
-    "YIELD_SCIENCE": "#80bfff",
-    null: "#a3a5a7",
+    "YIELD_CULTURE": "#bf99e6",  // violet
+    "YIELD_DIPLOMACY": "#99e6bf",  // teal
+    "YIELD_FOOD": "#a6cc33",  // green
+    "YIELD_GOLD": "#f0c442",  // yellow
+    "YIELD_HAPPINESS": "#ff9933",  // orange
+    "YIELD_PRODUCTION": "#a33d29",  // brown
+    "YIELD_SCIENCE": "#80bfff",  // blue
+    null: "#d9c8a6",  // pale gold
 }
 
 const BZ_BORDER_WIDTH = "0.1111111111rem";
 const BZ_BORDER_MARGIN = `calc(${BZ_BORDER_WIDTH} - var(--padding-left-right))`;
 const BZ_BORDER_PADDING = `calc(var(--padding-left-right) - ${BZ_BORDER_WIDTH})`;
+
+function adjacencyYield(building) {
+    if (!building) return [];
+    const adjTypes = GameInfo.Constructible_Adjacencies.filter(at =>
+        at.ConstructibleType == building.ConstructibleType && !at.RequiresActivation
+    );
+    const adjYields = adjTypes.map(at => GameInfo.Adjacency_YieldChanges.find(
+        ay => ay.ID == at.YieldChangeId));
+    const yieldSet = new Set(adjYields.map(ay => ay.YieldType));
+    return [...yieldSet];
+}
+function layoutRules(layout, text) {
+    const ttDescription = document.createElement("div");
+    ttDescription.classList.value = "flex flex-col my-1";
+    // ttDescription.style.setProperty(...DEBUG_GRAY);
+    const description = splitModifiers(Locale.compose(text));
+    for (const line of description) {
+        const ttLine = document.createElement("div");
+        ttLine.classList.value = "text-xs leading-snug text-center";
+        ttLine.setAttribute("data-l10n-id", line);
+        ttDescription.appendChild(ttLine);
+    }
+    layout.appendChild(ttDescription);
+}
+function splitModifiers(text) {
+    // split "+N[icon] Yield" phrases into separate lines
+    // (avoids a bug with centering text with icons)
+    const yieldModifierPattern = /(\s*\S*\[icon:\w+\]\S*\s+\S+\s*)/u;
+    return text.split(yieldModifierPattern);
+}
 
 class PlotTooltipType {
     constructor() {
@@ -159,7 +189,6 @@ class PlotTooltipType {
         // hex tile panel
         this.appendHexPanel(loc, city, district);
         // yields panel
-        // TODO: refactor this into a method
         this.container.appendChild(this.yieldsFlexbox);
         // unit info panel
         // TODO: refactor this into a method
@@ -669,8 +698,10 @@ class PlotTooltipType {
         this.yieldsFlexbox.appendChild(fragment);
     }
     yieldColumn(icon, amount, name) {
+        const isTotal = name == "LOC_YIELD_BZ_TOTAL";
         const ttIndividualYieldFlex = document.createElement("div");
         ttIndividualYieldFlex.classList.add("plot-tooltip__IndividualYieldFlex");
+        if (isTotal) ttIndividualYieldFlex.classList.add("ml-0\\.5");  // extra room
         const ariaLabel = `${Locale.toNumber(amount)} ${Locale.compose(name)}`;
         ttIndividualYieldFlex.ariaLabel = ariaLabel;
         const yieldIconCSS = UI.getIconCSS(icon, "YIELD");
@@ -684,6 +715,7 @@ class PlotTooltipType {
         yieldIconShadow.appendChild(yieldIcon);
         const ttIndividualYieldValues = document.createElement("div");
         ttIndividualYieldValues.classList.add("plot-tooltip__IndividualYieldValues", "font-body");
+        if (isTotal) ttIndividualYieldValues.classList.add("text-secondary");
         ttIndividualYieldValues.textContent = amount.toString();
         ttIndividualYieldFlex.appendChild(ttIndividualYieldValues);
         return ttIndividualYieldFlex;
@@ -747,7 +779,6 @@ class PlotTooltipType {
         return list.filter(e => e).join(" " + BZ_DOT_DIVIDER + " ");
     }
     appendUrbanPanel(loc, city, district) {  // includes CITY_CENTER
-        // TODO rural stuff -> urban
         const constructibles = this.getConstructibleInfo(loc);
         const buildings = constructibles.filter(e => e.age != -1);
         const currentAge = GameInfo.Ages.lookup(Game.age).ChronologyIndex;
@@ -795,7 +826,6 @@ class PlotTooltipType {
         this.appendUrbanDivider(buildings.filter(e => !e.isExtra));
     }
     appendWonderPanel(loc) {
-        // TODO
         const constructibles = this.getConstructibleInfo(loc);
         if (constructibles.length != 1) {
             console.error(`expected exactly one wonder, got ${constructibles.length}`);
@@ -810,15 +840,10 @@ class PlotTooltipType {
             const ttState = document.createElement("div");
             ttState.classList.value = "leading-none";
             ttState.style.setProperty("font-size", "85%");
-            // ttState.style.setProperty(...DEBUG_GREEN);
             ttState.innerHTML = this.dotJoin(notes.map(e => Locale.compose(e)));
             layout.appendChild(ttState);
         }
-        const ttDescription = document.createElement("div");
-        ttDescription.classList.value = "text-xs leading-tight text-center";
-        // ttDescription.style.setProperty(...DEBUG_GRAY);
-        ttDescription.setAttribute("data-l10n-id", wonder.Tooltip);
-        layout.appendChild(ttDescription);
+        layoutRules(layout, wonder.Tooltip);
         this.container.appendChild(layout);
         this.appendIconDivider(wonder.ConstructibleType);
     }
@@ -874,20 +899,7 @@ class PlotTooltipType {
         const layout = document.createElement("div");
         layout.classList.add("flex", "flex-col", "items-center", "max-w-80");
         // optional description
-        if (hexDescription) {
-            // TODO: improve spacing
-            const ttDescription = document.createElement("div");
-            ttDescription.classList.value = "flex flex-col my-1";
-            // ttDescription.style.setProperty(...DEBUG_GRAY);
-            const description = this.splitWords(Locale.compose(hexDescription));
-            for (const line of description) {
-                const ttLine = document.createElement("div");
-                ttLine.classList.value = "text-xs leading-tight text-center";
-                ttLine.setAttribute("data-l10n-id", line);
-                ttDescription.appendChild(ttLine);
-            }
-            layout.appendChild(ttDescription);
-        }
+        if (hexDescription) layoutRules(layout, hexDescription);
         // constructibles
         layout.appendChild(this.layoutConstructibles(constructibles));
         // add to tooltip
@@ -900,18 +912,6 @@ class PlotTooltipType {
         } else if (hexDescription) {
             this.appendDivider(resourceIcon);
         }
-    }
-    splitWords(text) {
-        // first split into phrases that start with ± modifiers
-        const phrases = text.split(/\s+(?=[-+].+\s.+\s)/);
-        if (phrases.length != 1) return phrases;  // empty is ok
-        // text with no icons is fine, leave it alone
-        if (!/\[icon:\w+]/.test(text)) return [text];
-        // otherwise split roughly in half
-        const words = text.split(/\s+/);
-        const half = Math.ceil(words.length / 2);  // round up
-        if (half < 3) return [text];  // too short
-        return [words.slice(0, half).join(' '), words.slice(half).join(' ')];
     }
     layoutConstructibles(constructibles) {
         const layout = document.createElement("div");
@@ -1019,16 +1019,6 @@ class PlotTooltipType {
         }
         this.appendFlexDivider(layout);
     }
-    adjacencyYield(building) {
-        if (!building) return [];
-        const adjTypes = GameInfo.Constructible_Adjacencies.filter(at =>
-            at.ConstructibleType == building.ConstructibleType && !at.RequiresActivation
-        );
-        const adjYields = adjTypes.map(at => GameInfo.Adjacency_YieldChanges.find(
-            ay => ay.ID == at.YieldChangeId));
-        const yieldSet = new Set(adjYields.map(ay => ay.YieldType));
-        return [...yieldSet];
-    }
     appendUrbanDivider(buildings) {
         // there are at least two building slots (unless one is large)
         const slots = [...buildings];
@@ -1052,7 +1042,7 @@ class PlotTooltipType {
             }
             // if the building has more than one yield type, like the
             // Palace, use one type for the ring and one for the glow
-            const yields = this.adjacencyYield(slot.info);
+            const yields = adjacencyYield(slot.info);
             const slotColor = BZ_YIELD_COLOR[yields[0] ?? null];
             const glowColor = BZ_YIELD_COLOR[yields[1] ?? yields[0] ?? null];
             // ring the slot with an appropriate color for the yield
