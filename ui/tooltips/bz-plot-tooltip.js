@@ -15,6 +15,10 @@ const DEBUG_RED = ["background-color", "rgba(150, 57, 57, .35)"];
 const DEBUG_GREEN = ["background-color", "rgba(57, 150, 57, .35)"];
 const DEBUG_BLUE = ["background-color", "rgba(57, 57, 150, .35)"];
 
+const BZ_WARNING_BLACK = "#000000";
+const BZ_WARNING_RED = "#3a0806";
+const BZ_WARNING_AMBER = "#cea92f";
+
 const BZ_DOT_DIVIDER = Locale.compose("LOC_PLOT_DIVIDER_DOT");
 
 const BZ_WILDERNESS_NAME = GameInfo.Districts.lookup(DistrictTypes.WILDERNESS).Name;
@@ -35,8 +39,10 @@ const BZ_YIELD_COLOR = {
 }
 
 const BZ_BORDER_WIDTH = "0.1111111111rem";
-const BZ_BORDER_MARGIN = `calc(${BZ_BORDER_WIDTH} - var(--padding-left-right))`;
-const BZ_BORDER_PADDING = `calc(var(--padding-left-right) - ${BZ_BORDER_WIDTH})`;
+const BZ_SIDE_MARGIN = `calc(${BZ_BORDER_WIDTH} - var(--padding-left-right))`;
+const BZ_SIDE_PADDING = `calc(var(--padding-left-right) - ${BZ_BORDER_WIDTH})`;
+const BZ_TOP_MARGIN = `calc(${BZ_BORDER_WIDTH} - var(--padding-top-bottom))`;
+const BZ_TOP_PADDING = `calc(var(--padding-top-bottom) - ${BZ_BORDER_WIDTH})`;
 
 function adjacencyYield(building) {
     if (!building) return [];
@@ -155,7 +161,7 @@ class PlotTooltipType {
             console.error("Tooltip was unable to read plot values due to a coordinate error.");
             return;
         }
-        this.isShowingDebug = UI.isDebugPlotInfoVisible(); // Ensure debug status hasn't changed
+        this.isShowingDebug = UI.isDebugPlotInfoVisible();  // Ensure debug status hasn't changed
         // Obtain names and IDs
         const loc = this.plotCoord;
         const plotIndex = GameplayMap.getIndexFromLocation(loc);
@@ -171,47 +177,7 @@ class PlotTooltipType {
         this.collectYields(loc, GameContext.localPlayerID, city);
         // Top Section
         if (LensManager.getActiveLens() == "fxs-settler-lens") {
-            //Add more details to the tooltip if we are in the settler lens
-            const localPlayer = Players.get(GameContext.localPlayerID);
-            if (!localPlayer) {
-                console.error("plot-tooltip: Attempting to update settler tooltip, but no valid local player!");
-                return;
-            }
-            const localPlayerDiplomacy = localPlayer?.Diplomacy;
-            if (localPlayerDiplomacy === undefined) {
-                console.error("plot-tooltip: Attempting to update settler tooltip, but no valid local player Diplomacy object!");
-                return;
-            }
-            else if (!GameplayMap.isWater(loc.x, loc.y) && !GameplayMap.isImpassable(loc.x, loc.y) && !GameplayMap.isNavigableRiver(loc.x, loc.y)) {
-                //Dont't add any extra tooltip to mountains, oceans, or navigable rivers, should be obvious enough w/o them
-                const settlerTooltip = document.createElement("div");
-                settlerTooltip.classList.add("plot-tooltip__settler-tooltip");
-                const localPlayerAdvancedStart = localPlayer?.AdvancedStart;
-                if (localPlayerAdvancedStart === undefined) {
-                    console.error("plot-tooltip: Attempting to update settler tooltip, but no valid local player advanced start object!");
-                    return;
-                }
-                //Show why we can't settle here
-                if (!GameplayMap.isPlotInAdvancedStartRegion(GameContext.localPlayerID, loc.x, loc.y) && !localPlayerAdvancedStart?.getPlacementComplete()) {
-                    settlerTooltip.classList.add("blocked-location");
-                    settlerTooltip.innerHTML = Locale.compose("LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_FAR");
-                }
-                else if (!localPlayerDiplomacy.isValidLandClaimLocation(loc, true /*bIgnoreFriendlyUnitRequirement*/)) {
-                    settlerTooltip.classList.add("blocked-location");
-                    if (GameplayMap.isCityWithinMinimumDistance(loc.x, loc.y)) {
-                        settlerTooltip.innerHTML = Locale.compose("LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_CLOSE");
-                    }
-                    else if (GameplayMap.getResourceType(loc.x, loc.y) != ResourceTypes.NO_RESOURCE) {
-                        settlerTooltip.innerHTML = Locale.compose("LOC_PLOT_TOOLTIP_CANT_SETTLE_RESOURCES");
-                    }
-                }
-                else if (!GameplayMap.isFreshWater(loc.x, loc.y)) {
-                    settlerTooltip.classList.add("okay-location");
-                    settlerTooltip.innerHTML = Locale.compose("LOC_PLOT_TOOLTIP_NO_FRESH_WATER");
-                }
-                this.container.appendChild(settlerTooltip);
-                this.appendDivider();
-            }
+            this.appendSettlerBanner(loc);
         }
         this.appendGeographyPanel(loc);
         // Trade Route Info
@@ -231,8 +197,8 @@ class PlotTooltipType {
         // yields panel
         this.container.appendChild(this.yieldsFlexbox);
         // unit info panel
-        // TODO: refactor this into a method
         this.addUnitInfo(loc);
+        // TODO: refactor this into a method
         UI.setPlotLocation(loc.x, loc.y, plotIndex);
         // Adjust cursor between normal and red based on the plot owner's hostility
         if (!UI.isCursorLocked()) {
@@ -384,6 +350,60 @@ class PlotTooltipType {
         constructibleInfo.sort((a, b) =>
             (b.isExtra ? -1 : b.age) - (a.isExtra ? -1 : a.age));
         return constructibleInfo;
+    }
+    appendSettlerBanner(loc) {
+        //Add more details to the tooltip if we are in the settler lens
+        const localPlayer = Players.get(GameContext.localPlayerID);
+        if (!localPlayer) {
+            console.error("plot-tooltip: Attempting to update settler tooltip, but no valid local player!");
+            return;
+        }
+        const localPlayerDiplomacy = localPlayer?.Diplomacy;
+        if (localPlayerDiplomacy === undefined) {
+            console.error("plot-tooltip: Attempting to update settler tooltip, but no valid local player Diplomacy object!");
+            return;
+        }
+        if (GameplayMap.isWater(loc.x, loc.y) || GameplayMap.isImpassable(loc.x, loc.y) || GameplayMap.isNavigableRiver(loc.x, loc.y)) {
+            // Dont't add any extra tooltip to mountains, oceans, or navigable rivers, should be obvious enough w/o them
+            return;
+        }
+        const localPlayerAdvancedStart = localPlayer?.AdvancedStart;
+        if (localPlayerAdvancedStart === undefined) {
+            console.error("plot-tooltip: Attempting to update settler tooltip, but no valid local player advanced start object!");
+            return;
+        }
+        // Show why we can't settle here
+        let warning;
+        let color = BZ_WARNING_AMBER;
+        let bgcolor = BZ_WARNING_RED;
+        if (!GameplayMap.isPlotInAdvancedStartRegion(GameContext.localPlayerID, loc.x, loc.y) && !localPlayerAdvancedStart?.getPlacementComplete()) {
+            warning = Locale.compose("LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_FAR");
+        }
+        else if (!localPlayerDiplomacy.isValidLandClaimLocation(loc, true /*bIgnoreFriendlyUnitRequirement*/)) {
+            if (GameplayMap.isCityWithinMinimumDistance(loc.x, loc.y)) {
+                warning = Locale.compose("LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_CLOSE");
+            }
+            else if (GameplayMap.getResourceType(loc.x, loc.y) != ResourceTypes.NO_RESOURCE) {
+                warning = Locale.compose("LOC_PLOT_TOOLTIP_CANT_SETTLE_RESOURCES");
+            }
+        }
+        else if (!GameplayMap.isFreshWater(loc.x, loc.y)) {
+            color = BZ_WARNING_BLACK;
+            bgcolor = BZ_WARNING_AMBER;
+            warning = Locale.compose("LOC_PLOT_TOOLTIP_NO_FRESH_WATER");
+        }
+        if (warning) {
+            const tt = document.createElement("div");
+            tt.classList.value = "plot-tooltip__settler-tooltip pb-2";
+            this.setWarningBannerStyle(tt, bgcolor);
+            tt.style.setProperty("margin-top", BZ_TOP_MARGIN);
+            tt.style.setProperty("margin-bottom", BZ_TOP_PADDING);
+            tt.style.setProperty("padding-top", BZ_TOP_PADDING);
+            tt.style.setProperty("padding-bottom", BZ_TOP_PADDING);
+            tt.style.setProperty("color", color);
+            tt.setAttribute('data-l10n-id', warning);
+            this.container.appendChild(tt);
+        }
     }
     appendGeographyPanel(loc) {
         // show geographical features
@@ -744,12 +764,12 @@ class PlotTooltipType {
         ttIndividualYieldFlex.appendChild(ttIndividualYieldValues);
         return ttIndividualYieldFlex;
     }
-    setWarningBannerStyle(element) {
-        element.style.setProperty("margin-left", BZ_BORDER_MARGIN);
-        element.style.setProperty("margin-right", BZ_BORDER_MARGIN);
-        element.style.setProperty("padding-left", BZ_BORDER_PADDING);
-        element.style.setProperty("padding-right", BZ_BORDER_PADDING);
-        element.style.setProperty("background-color", "#3a0806");
+    setWarningBannerStyle(element, color=BZ_WARNING_RED) {
+        element.style.setProperty("margin-left", BZ_SIDE_MARGIN);
+        element.style.setProperty("margin-right", BZ_SIDE_MARGIN);
+        element.style.setProperty("padding-left", BZ_SIDE_PADDING);
+        element.style.setProperty("padding-right", BZ_SIDE_PADDING);
+        element.style.setProperty("background-color", color);
     }
     appendDistrictDefense(loc) {
         const districtID = MapCities.getDistrict(loc.x, loc.y);
@@ -762,7 +782,7 @@ class PlotTooltipType {
             const conquerorText = Locale.compose("{1_Term} {2_Subject}", "LOC_PLOT_TOOLTIP_CONQUEROR", conquerorName);
             const ttConqueror = document.createElement("div");
             ttConqueror.classList.value = "text-xs leading-tight text-center";
-            ttConqueror.style.setProperty("color", "#cea92f");  // amber
+            ttConqueror.style.setProperty("color", BZ_WARNING_AMBER);
             this.setWarningBannerStyle(ttConqueror);
             ttConqueror.innerHTML = conquerorText;
             this.container.appendChild(ttConqueror);
