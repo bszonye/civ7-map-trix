@@ -16,8 +16,9 @@ const DEBUG_GREEN = ["background-color", "rgba(57, 150, 57, .35)"];
 const DEBUG_BLUE = ["background-color", "rgba(57, 57, 150, .35)"];
 
 const BZ_WARNING_BLACK = "#000000";
-const BZ_WARNING_RED = "#3a0806";
-const BZ_WARNING_AMBER = "#cea92f";
+const BZ_WARNING_RED = "#3a0806";  // danger
+const BZ_WARNING_AMBER = "#cea92f";  // caution
+const BZ_WARNING_BRONZE = "#604639";  // note
 
 const BZ_DOT_DIVIDER = Locale.compose("LOC_PLOT_DIVIDER_DOT");
 
@@ -27,6 +28,7 @@ const BZ_VILLAGE_TYPES = ["IMPROVEMENT_VILLAGE", "IMPROVEMENT_ENCAMPMENT"];
 const BZ_YIELD_TOTAL_RURAL = "CITY_RURAL";
 const BZ_YIELD_TOTAL_URBAN = "CITY_URBAN";
 
+const BZ_COLOR_BRONZE = "#e5d2ac";  // matches game titles
 const BZ_YIELD_COLOR = {
     "YIELD_CULTURE": "#bf99e6",  // violet
     "YIELD_DIPLOMACY": "#99e6bf",  // teal
@@ -35,7 +37,7 @@ const BZ_YIELD_COLOR = {
     "YIELD_HAPPINESS": "#ff9933",  // orange
     "YIELD_PRODUCTION": "#a33d29",  // brown
     "YIELD_SCIENCE": "#80bfff",  // blue
-    null: "#d9c8a6",  // pale gold
+    null: BZ_COLOR_BRONZE,  //default
 }
 
 const BZ_BORDER_WIDTH = "0.1111111111rem";
@@ -409,7 +411,7 @@ class PlotTooltipType {
         const name = city?.name ?? this.getCivName(player);
         this.appendTitleDivider(name);
         this.appendOwnerInfo(loc, player);
-        // TODO: stats?
+        // TODO: settlement stats?
     }
     getPlayerName(player) {
         if (player == null) return "";
@@ -518,7 +520,7 @@ class PlotTooltipType {
         return returnString;
     }
     appendPlotEffects(plotIndex) {
-        // TODO: placement & formatting
+        // TODO: customize banner color to effect types?
         // PLOTEFFECT_BURNED
         // PLOTEFFECT_DIGSITE_NAME
         // PLOTEFFECT_FLOODED
@@ -538,11 +540,11 @@ class PlotTooltipType {
             if (item.onlyVisibleToOwner && item.owner != localPlayerID) continue;
             const effectInfo = GameInfo.PlotEffects.lookup(item.effectType);
             if (!effectInfo) return;
-            this.appendDivider();
-            const toolTipPlotEffectsText = document.createElement("div");
-            toolTipPlotEffectsText.classList.add("plot-tooltip__plot-effect-text");
-            toolTipPlotEffectsText.setAttribute('data-l10n-id', effectInfo.Name);
-            this.container.appendChild(toolTipPlotEffectsText);
+            const tt = document.createElement("div");
+            tt.classList.value = "text-center";
+            this.setWarningBannerStyle(tt, BZ_WARNING_BRONZE);
+            tt.setAttribute('data-l10n-id', effectInfo.Name);
+            this.container.appendChild(tt);
         }
     }
     getTopUnit(loc) {
@@ -562,7 +564,6 @@ class PlotTooltipType {
         }
         const layout = document.createElement("div");
         layout.classList.value = "my-1";
-        // TODO: more formatting
         const playerName = this.getPlayerName(player);
         const relationship = this.getCivRelationship(player);
         const relType = Locale.compose(relationship?.type);
@@ -665,9 +666,11 @@ class PlotTooltipType {
         this.totalYields = 0;
         const fragment = document.createDocumentFragment();
         // one column per yield type
+        const amounts = [];
         GameInfo.Yields.forEach(info => {
             const amount = GameplayMap.getYield(loc.x, loc.y, info.YieldType, playerID);
-            if (amount > 0) {
+            if (amount) {
+                amounts.push(amount);
                 this.totalYields += amount;
                 const col = this.yieldColumn(info.YieldType, amount, info.Name);
                 fragment.appendChild(col);
@@ -676,16 +679,18 @@ class PlotTooltipType {
         if (!this.totalYields) return;  // no yields to show
         // total yield column
         const icon = city ? BZ_YIELD_TOTAL_URBAN : BZ_YIELD_TOTAL_RURAL;
+        amounts.push(this.totalYields);
         const col = this.yieldColumn(icon, this.totalYields, "LOC_YIELD_BZ_TOTAL");
         fragment.appendChild(col);
-        // set column width based on number of digits
-        // (class names are misleading, possibly an off-by-one error?)
-        const yieldWidth = this.totalYields.toString().length;
-        if (yieldWidth > 2) {
-            this.yieldsFlexbox.classList.add(yieldWidth == 3 ?
-                'resourcesFlex--double-digits' :  // 3-digit numbers
-                'resourcesFlex--triple-digits');  // 4-digit numbers
-        }
+        // set column width based on number of digits (at least two)
+        const numWidth = (n) => {
+            const frac = n % 1 != 0;
+            // decimal points need a little less room
+            return n.toString().length - (frac ? 0.4 : 0);
+        };
+        const maxWidth = Math.max(2, ...amounts.map(n => numWidth(n)));
+        const yieldWidth = 1 + maxWidth / 3;  // width in rem
+        this.yieldsFlexbox.style.setProperty("--yield-width", `${yieldWidth}rem`);
         this.yieldsFlexbox.appendChild(fragment);
     }
     yieldColumn(icon, amount, name) {
@@ -783,7 +788,8 @@ class PlotTooltipType {
                     hexRules = bonus.Description;  // .Tooltip doesn't exist
                 }
             } else if (city.isTown) {
-                // city-state or town hall
+                // rename "City Center" to "Town Center" in towns
+                // TODO: also rename "City Hall" to "Town Hall"?
                 hexName = "LOC_DISTRICT_BZ_TOWN_CENTER";
             }
         } else if (buildings.length == 0) {
