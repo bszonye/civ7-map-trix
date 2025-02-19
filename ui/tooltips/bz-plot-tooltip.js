@@ -55,7 +55,6 @@ function dotJoin(list) {
 // lay out a column of constructibles and their construction notes
 function layoutConstructibles(layout, constructibles) {
     for (const c of constructibles) {
-        // TODO: adjust spacing
         const ttConstructible = document.createElement("div");
         ttConstructible.classList.value = "flex flex-col items-center text-xs mt-1";
         const ttName = document.createElement("div");
@@ -76,7 +75,13 @@ function layoutConstructibles(layout, constructibles) {
     }
 }
 // lay out a paragraph of rules text
-function layoutRules(layout, text) {
+function layoutRules(layout, text, caption=null) {
+    if (caption) {
+        const ttCaption = document.createElement("div");
+        ttCaption.classList.value = "font-title text-xs leading-tight uppercase text-center";
+        ttCaption.setAttribute('data-l10n-id', caption);
+        layout.appendChild(ttCaption);
+    }
     const ttDescription = document.createElement("div");
     ttDescription.classList.value = "flex flex-col my-1";
     // ttDescription.style.setProperty(...DEBUG_GRAY);
@@ -94,9 +99,12 @@ function splitModifiers(text) {
     // examples:
     // +10[icon:YIELD_PRODUCTION] Production
     // +1[icon:YIELD_CULTURE] Culture and[icon:YIELD_GOLD] Gold
-    const yieldModifierPattern = /\s*(\S*\[icon:\w+\]\S*\s+\S+(?:\s+\S*\[icon:\w+\]\S*\s+\S+)?)\s+/u;
-    const lines = text.split(yieldModifierPattern);
-    console.warn(`TRIX ${lines}`);
+    // +1[icon:YIELD_CULTURE] Culture,[icon:YIELD_GOLD] Gold,[icon:YIELD_SCIENCE] and
+    const iconWords = "(?:\\S*\\[icon:\\w+\\]\\S*)+";
+    const modPhrase = `(?:${iconWords}\\s+\\S+)`;
+    const modList = `(?:${modPhrase}(?:(?<![.;])\\s+${modPhrase})*)`
+    const modPattern = new RegExp(`\\s*(${modList})\\s+`, "u");
+    const lines = text.split(modPattern).filter(t => t);
     return lines;
 }
 
@@ -585,22 +593,6 @@ class PlotTooltipType {
             plotTooltipOwnerRelationship.setAttribute('data-l10n-id', relationship);
             this.container.appendChild(plotTooltipOwnerRelationship);
         }
-        if (player.isMinor || player.isIndependent) {
-            // city-state unique bonus
-            // TODO: formatting
-            const bonusType = Game.CityStates.getBonusType(player.id);
-            const bonus = GameInfo.CityStateBonuses.find(t => t.$hash == bonusType);
-            if (bonus) {
-                const ttBonusName = document.createElement("div");
-                ttBonusName.classList.add("font-title", "text-xs", "uppercase");
-                ttBonusName.setAttribute('data-l10n-id', bonus.Name);
-                this.container.appendChild(ttBonusName);
-                const ttDescription = document.createElement("div");
-                ttDescription.classList.value = "text-xs leading-tight text-center";
-                ttDescription.setAttribute('data-l10n-id', bonus.Description);
-                this.container.appendChild(ttDescription);
-            }
-        }
     }
     getRiverLabel(loc) {
         const riverType = GameplayMap.getRiverType(loc.x, loc.y);
@@ -810,15 +802,22 @@ class PlotTooltipType {
         const constructibles = this.getConstructibleInfo(loc);
         const buildings = constructibles.filter(e => e.age != -1);
         let hexName = GameInfo.Districts.lookup(district?.type).Name;
-        let hexDescription;
+        let hexSubtitle;
+        let hexRules;
         // set name & description
         if (district.type == DistrictTypes.CITY_CENTER) {
-            if (city.isTown) {
+            const player = Players.get(city.owner);
+            if (player.isMinor) {
+                hexName = "LOC_DISTRICT_BZ_CITY_STATE";
+                const bonusType = Game.CityStates.getBonusType(player.id);
+                const bonus = GameInfo.CityStateBonuses.find(b => b.$hash == bonusType);
+                if (bonus) {
+                    hexSubtitle = bonus.Name;
+                    hexRules = bonus.Description;  // .Tooltip doesn't exist
+                }
+            } else if (city.isTown) {
                 // city-state or town hall
-                const player = Players.get(city.owner);
-                hexName = player.isMinor ?
-                    "LOC_DISTRICT_BZ_CITY_STATE" :
-                    "LOC_DISTRICT_BZ_TOWN_CENTER";
+                hexName = "LOC_DISTRICT_BZ_TOWN_CENTER";
             }
         } else if (buildings.length == 0) {
             // urban tile with canceled production
@@ -828,7 +827,11 @@ class PlotTooltipType {
             if (buildings.every(b => b.uniqueTrait = unique)) {
                 const uq = GameInfo.UniqueQuarters.find(e => e.TraitType == unique);
                 hexName = uq.Name;
-                hexDescription = uq.Description;
+                // UQs don't have .Tooltip but they all have parallel
+                // LOC_QUARTER_XXX_DESCRIPTION and
+                // LOC_QUARTER_XXX_TOOLTIP localization strings
+                const tooltip = uq.Description.replace("_DESCRIPTION", "_TOOLTIP");
+                hexRules = Locale.compose(tooltip) ?? uq.Description;
             } else {
                 hexName = "LOC_DISTRICT_BZ_URBAN_QUARTER";
             }
@@ -841,8 +844,8 @@ class PlotTooltipType {
         // panel interior
         const layout = document.createElement("div");
         layout.classList.value = "flex flex-col items-center max-w-80";
-        // unique quarter tooltip
-        if (hexDescription) layoutRules(layout, hexDescription);
+        // show rules for city-states and unique quarters
+        if (hexRules) layoutRules(layout, hexRules, hexSubtitle);
         // constructibles
         layoutConstructibles(layout, constructibles);
         // add to tooltip
@@ -877,7 +880,7 @@ class PlotTooltipType {
         const improvement = constructibles[0]?.info;
         const improvementType = improvement?.ConstructibleType;
         let hexName;
-        let hexDescription;
+        let hexRules;
         let hexIcon;
         let resourceIcon;
         // special tile types: natural wonder, resource
@@ -887,10 +890,10 @@ class PlotTooltipType {
         // set name & description
         if (feature && feature.Tooltip) {
             hexName = feature.Name;
-            hexDescription = feature.Tooltip;
+            hexRules = feature.Tooltip;
         } else if (hexResource) {
             hexName = hexResource.Name;
-            hexDescription = hexResource.Tooltip;
+            hexRules = hexResource.Tooltip;
             resourceIcon = hexResource.ResourceType;
         } else if (district?.type) {
             hexName = GameInfo.Districts.lookup(district?.type).Name;
@@ -924,7 +927,7 @@ class PlotTooltipType {
         const layout = document.createElement("div");
         layout.classList.add("flex", "flex-col", "items-center", "max-w-80");
         // optional description
-        if (hexDescription) layoutRules(layout, hexDescription);
+        if (hexRules) layoutRules(layout, hexRules);
         // constructibles
         layoutConstructibles(layout, constructibles);
         // add to tooltip
@@ -934,7 +937,7 @@ class PlotTooltipType {
             this.appendIconDivider(hexIcon, resourceIcon);
         } else if (resourceIcon) {
             this.appendIconDivider(resourceIcon);
-        } else if (hexDescription) {
+        } else if (hexRules) {
             this.appendDivider(resourceIcon);
         }
     }
