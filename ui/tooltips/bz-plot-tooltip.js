@@ -789,7 +789,6 @@ class PlotTooltipType {
                 }
             } else if (city.isTown) {
                 // rename "City Center" to "Town Center" in towns
-                // TODO: also rename "City Hall" to "Town Hall"?
                 hexName = "LOC_DISTRICT_BZ_TOWN_CENTER";
             }
         } else if (buildings.length == 0) {
