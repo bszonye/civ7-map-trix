@@ -119,11 +119,12 @@ class PlotTooltipType {
         this.plotCoord = null;
         this.isShowingDebug = false;
         this.tooltip = document.createElement('fxs-tooltip');
+        this.tooltip.classList.value = "plot-tooltip max-w-96 text-xs leading-tight";
         this.container = document.createElement('div');
+        this.tooltip.appendChild(this.container);
         this.yieldsFlexbox = document.createElement('div');
         this.totalYields = 0;
-        this.tooltip.classList.value = "plot-tooltip max-w-96 text-xs leading-tight";
-        this.tooltip.appendChild(this.container);
+        this.isEnemy = false;  // is the plot held by an enemy?
         this.agelessBuildings = this.buildingsTagged("AGELESS");
         this.extraBuildings = this.buildingsTagged("IGNORE_DISTRICT_PLACEMENT_CAP");
         this.largeBuildings = this.buildingsTagged("FULL_TILE");
@@ -155,6 +156,7 @@ class PlotTooltipType {
         this.container.innerHTML = '';
         this.yieldsFlexbox.innerHTML = '';
         this.totalYields = 0;
+        this.isEnemy = false;
     }
     update() {
         if (this.plotCoord == null) {
@@ -197,63 +199,9 @@ class PlotTooltipType {
         // yields panel
         this.container.appendChild(this.yieldsFlexbox);
         // unit info panel
-        this.addUnitInfo(loc);
-        // TODO: refactor this into a method
+        this.appendUnitInfo(loc, player);
         UI.setPlotLocation(loc.x, loc.y, plotIndex);
-        // Adjust cursor between normal and red based on the plot owner's hostility
-        if (!UI.isCursorLocked()) {
-            const localPlayerID = GameContext.localPlayerID;
-            const topUnit = this.getTopUnit(loc);
-            let showHostileCursor = false;
-            let owningPlayerID = GameplayMap.getOwner(loc.x, loc.y);
-            // if there's a unit on the plot, that player overrides the tile's owner
-            if (topUnit) {
-                owningPlayerID = topUnit.owner;
-            }
-            const revealedState = GameplayMap.getRevealedState(localPlayerID, loc.x, loc.y);
-            if (Players.isValid(localPlayerID) && Players.isValid(owningPlayerID) && (revealedState == RevealedStates.VISIBLE)) {
-                const owningPlayer = Players.get(owningPlayerID);
-                // Is it an independent?
-                if (owningPlayer?.isIndependent) {
-                    let independentID = PlayerIds.NO_PLAYER;
-                    if (topUnit) {
-                        // We got the player from the unit, so use the unit
-                        independentID = Game.IndependentPowers.getIndependentPlayerIDFromUnit(topUnit.id);
-                    }
-                    else {
-                        // Get the independent from the plot, can reutrn -1
-                        independentID = Game.IndependentPowers.getIndependentPlayerIDAt(loc.x, loc.y);
-                    }
-                    if (independentID != PlayerIds.NO_PLAYER) {
-                        const relationship = Game.IndependentPowers.getIndependentRelationship(independentID, localPlayerID);
-                        if (relationship == IndependentRelationship.HOSTILE) {
-                            showHostileCursor = true;
-                        }
-                    }
-                }
-                else {
-                    var hasHiddenUnit = false;
-                    if (topUnit?.hasHiddenVisibility) {
-                        hasHiddenUnit = true;
-                    }
-                    const localPlayer = Players.get(localPlayerID);
-                    if (localPlayer) {
-                        const localPlayerDiplomacy = localPlayer.Diplomacy;
-                        if (localPlayerDiplomacy) {
-                            if (localPlayerDiplomacy.isAtWarWith(owningPlayerID) && !hasHiddenUnit) {
-                                showHostileCursor = true;
-                            }
-                        }
-                    }
-                }
-            }
-            if (showHostileCursor) {
-                UI.setCursorByURL("fs://game/core/ui/cursors/enemy.ani");
-            }
-            else {
-                UI.setCursorByType(UIHTMLCursorTypes.Default);
-            }
-        }
+        this.setWarningCursor(loc);
     }
     isBlank() {
         if (this.plotCoord == null) {
@@ -457,17 +405,15 @@ class PlotTooltipType {
         }
     }
     appendSettlementPanel(loc, player, city) {
-        console.warn(`TRIX ${player.id} ${city?.name}`);
-        this.addOwnerInfo(loc, player);
-        // TODO
+        // const name = player.isIndependent ?  this.getCivName(player) : city.name;
+        const name = city?.name ?? this.getCivName(player);
+        this.appendTitleDivider(name);
+        this.appendOwnerInfo(loc, player);
+        // TODO: stats?
     }
     getPlayerName(player) {
         if (player == null) return "";
-        const localPlayerID = GameContext.localPlayerID;
-        const name =
-            player.id == localPlayerID ?
-            Locale.compose("LOC_LEADER_BZ_YOU", player.name) :
-            player.isMinor || player.isIndependent ?
+        const name = player.isMinor || player.isIndependent ?
             Locale.compose("LOC_LEADER_BZ_PEOPLE_NAME", player.name) :
             Locale.compose(player.name);
         return name;
@@ -477,21 +423,38 @@ class PlotTooltipType {
         const civName = fullName || player.isMinor || player.isIndependent ?
             player.civilizationFullName :  // "Venice"
             player.civilizationName;  // "Spain"
-        const name = player.isIndependent ?  // add "Village" to independents
+        const name = player.isIndependent && fullName ?
+            // add "Village" to the full name of independents
             Locale.compose("LOC_CIVILIZATION_INDEPENDENT_SINGULAR", civName) :
             Locale.compose(civName);
         return name;
     }
     getCivRelationship(player) {
         const localPlayerID = GameContext.localPlayerID;
-        // relationship
-        if (player.isMinor || player.isIndependent) {
-            const hostile = player.Diplomacy?.isAtWarWith(localPlayerID);
-            const relationship = hostile ? "LOC_INDEPENDENT_RELATIONSHIP_HOSTILE" : "LOC_INDEPENDENT_RELATIONSHIP_FRIENDLY";
-            return relationship;
+        if (player.id == localPlayerID) {
+            return { type: "LOC_PLOT_TOOLTIP_YOU", isEnemy: false };
         }
-        // TODO: determine relationships for major civs
-        return null;
+        if (!player.Diplomacy) return null;
+        // is the other player a city-state or village?
+        if (player.isMinor || player.isIndependent) {
+            const isVassal = player.Influence?.hasSuzerain &&
+                player.Influence.getSuzerain() == localPlayerID;
+            const isEnemy = player.Diplomacy?.isAtWarWith(localPlayerID);
+            const name = isVassal ?  "LOC_INDEPENDENT_BZ_RELATIONSHIP_TRIBUTARY" :
+                 isEnemy ?  "LOC_INDEPENDENT_RELATIONSHIP_HOSTILE" :
+                "LOC_INDEPENDENT_RELATIONSHIP_FRIENDLY";
+            return { type: name, isEnemy: isEnemy };
+        }
+        // is the other player at war?
+        if (player.Diplomacy.isAtWarWith(localPlayerID)) {
+            return { type: "LOC_PLAYER_RELATIONSHIP_AT_WAR", isEnemy: true };
+        }
+        // not an enemy
+        if (player.Diplomacy.hasAllied(localPlayerID)) {
+            return { type: "LOC_PLAYER_RELATIONSHIP_ALLIANCE", isEnemy: false };
+        }
+        const name = player.Diplomacy.getRelationshipLevelName(localPlayerID);
+        return { type: name, isEnemy: false };
     }
     getTerrainLabel(loc) {
         const terrainType = GameplayMap.getTerrainType(loc.x, loc.y);
@@ -590,29 +553,39 @@ class PlotTooltipType {
         }
         return null;
     }
-    addOwnerInfo(loc, player) {
+    appendOwnerInfo(loc, player) {
+        if (!player || !Players.isAlive(player.id)) return;
         const filteredConstructibles = MapConstructibles.getHiddenFilteredConstructibles(loc.x, loc.y);
         const constructibles = MapConstructibles.getConstructibles(loc.x, loc.y);
-        if (!player || !Players.isAlive(player.id)) {
-            return;
-        }
         if (filteredConstructibles.length == 0 && filteredConstructibles.length != constructibles.length) {
             return;
         }
-        this.appendDivider();
-        const plotTooltipOwner = document.createElement("div");
-        plotTooltipOwner.classList.add("plot-tooltip__owner-leader-text");
-        const owner = dotJoin([this.getPlayerName(player), this.getCivName(player)]);
-        plotTooltipOwner.innerHTML = owner;
-        this.container.appendChild(plotTooltipOwner);
+        const layout = document.createElement("div");
+        layout.classList.value = "my-1";
+        // TODO: more formatting
+        const playerName = this.getPlayerName(player);
         const relationship = this.getCivRelationship(player);
+        const relType = Locale.compose(relationship?.type);
+        const civName = this.getCivName(player, true);
+        // highlight enemy players
         if (relationship) {
-            const plotTooltipOwnerRelationship = document.createElement("div");
-            plotTooltipOwnerRelationship.classList.add("plot-tooltip__owner-relationship-text");
-            plotTooltipOwnerRelationship.classList.value = "text-xs leading-tight text-center";
-            plotTooltipOwnerRelationship.setAttribute('data-l10n-id', relationship);
-            this.container.appendChild(plotTooltipOwnerRelationship);
+            this.isEnemy = relationship.isEnemy;
+            if (relationship.isEnemy) {
+                layout.classList.add("py-1");
+                this.setWarningBannerStyle(layout);
+            }
         }
+        // show name & relationship
+        const ttPlayer = document.createElement("div");
+        ttPlayer.classList.value = "text-xs leading-tight text-center";
+        ttPlayer.innerHTML = dotJoin([playerName, relType]);
+        layout.appendChild(ttPlayer);
+        // show full civ name
+        const ttCiv = document.createElement("div");
+        ttCiv.classList.value = "text-xs leading-tight text-center";
+        ttCiv.setAttribute('data-l10n-id', civName);
+        layout.appendChild(ttCiv);
+        this.container.appendChild(layout);
     }
     getRiverLabel(loc) {
         const riverType = GameplayMap.getRiverType(loc.x, loc.y);
@@ -655,62 +628,36 @@ class PlotTooltipType {
         }
         return label;
     }
-    addUnitInfo(loc) {
+    appendUnitInfo(loc) {
         const localPlayerID = GameContext.localObserverID;
-        if (GameplayMap.getRevealedState(localPlayerID, loc.x, loc.y) != RevealedStates.VISIBLE) {
-            return this;
-        }
+        if (GameplayMap.getRevealedState(localPlayerID, loc.x, loc.y) != RevealedStates.VISIBLE) return;
+        // get topmost unit and owner
         let topUnit = this.getTopUnit(loc);
-        if (topUnit) {
-            if (!Visibility.isVisible(localPlayerID, topUnit?.id)) {
-                return this;
-            }
+        if (!topUnit || !Visibility.isVisible(localPlayerID, topUnit.id)) return;
+        const owner = Players.get(topUnit.owner);
+        if (!owner) return;
+        // friendly unit? clear the enemy flag
+        if (owner.id == localPlayerID) {
+            this.isEnemy = false;
+            return;
         }
-        else {
-            return this;
-        }
-        const player = Players.get(topUnit.owner);
-        if (!player) {
-            return this;
-        }
-        if (player.id == localPlayerID) {
-            return this;
-        }
-        let unitName = Locale.compose(topUnit.name);
+        // show unit panel
         this.appendDivider();
-        const toolTipUnitInfo = document.createElement("div");
-        toolTipUnitInfo.classList.add("plot-tooltip__unitInfo");
-        toolTipUnitInfo.innerHTML = unitName;
-        this.container.appendChild(toolTipUnitInfo);
-        const plotOwner = GameplayMap.getOwner(this.plotCoord.x, this.plotCoord.y);
-        if (plotOwner != topUnit.owner) {
-            const toolTipUnitCiv = document.createElement("div");
-            toolTipUnitCiv.classList.add("plot-tooltip__Civ-Info");
-            if (player.isIndependent) {
-                const independentID = Game.IndependentPowers.getIndependentPlayerIDFromUnit(topUnit.id);
-                if (independentID != PlayerIds.NO_PLAYER) {
-                    const indy = Players.get(independentID);
-                    if (indy) {
-                        toolTipUnitCiv.innerHTML = Locale.compose("LOC_CIVILIZATION_INDEPENDENT_SINGULAR", Locale.compose(indy.civilizationFullName));
-                        this.container.appendChild(toolTipUnitCiv);
-                        const relationship = Game.IndependentPowers.getIndependentHostility(independentID, localPlayerID);
-                        const toolTipUnitRelationship = document.createElement("div");
-                        toolTipUnitRelationship.classList.add("plot-tooltip__Unit-Relationship-Info");
-                        toolTipUnitRelationship.innerHTML = Locale.compose("LOC_INDEPENDENT_RELATIONSHIP") + ": " + Locale.compose(relationship);
-                        this.container.appendChild(toolTipUnitRelationship);
-                    }
-                }
-            }
-            else {
-                const toolTipUnitOwner = document.createElement('div');
-                toolTipUnitOwner.classList.add('plot-tooltip__owner-leader-text');
-                toolTipUnitOwner.innerHTML = Locale.stylize(player.name);
-                this.container.appendChild(toolTipUnitOwner);
-                toolTipUnitCiv.innerHTML = Locale.compose(player.civilizationFullName);
-                this.container.appendChild(toolTipUnitCiv);
+        const layout = document.createElement("div");
+        layout.classList.add("plot-tooltip__unitInfo");
+        const unitName = topUnit.name;
+        const civName = this.getCivName(owner);
+        const relationship = this.getCivRelationship(owner);
+        const unitInfo = [unitName, civName, relationship?.type];
+        layout.innerHTML = dotJoin(unitInfo.map(e => Locale.compose(e)));
+        if (relationship) {
+            this.isEnemy = relationship.isEnemy;
+            if (relationship.isEnemy) {
+                layout.classList.add("py-1");
+                this.setWarningBannerStyle(layout);
             }
         }
-        return this;
+        this.container.appendChild(layout);
     }
     collectYields(loc, playerID, city) {
         this.yieldsFlexbox.classList.value = "plot-tooltip__resourcesFlex";
@@ -820,7 +767,7 @@ class PlotTooltipType {
     }
     appendUrbanPanel(loc, city, district) {  // includes CITY_CENTER
         const constructibles = this.getConstructibleInfo(loc);
-        const buildings = constructibles.filter(e => e.age != -1);
+        const buildings = constructibles.filter(e => !e.isExtra);
         let hexName = GameInfo.Districts.lookup(district?.type).Name;
         let hexSubtitle;
         let hexRules;
@@ -1021,7 +968,7 @@ class PlotTooltipType {
         const layout = document.createElement("div");
         layout.classList.add("self-center", "text-center", "mx-3", "max-w-80");
         layout.classList.add("font-title", "uppercase", "text-sm", "leading-tight");
-        layout.innerHTML = text;
+        layout.setAttribute("data-l10n-id", text);
         this.appendFlexDivider(layout, "mt-1");
     }
     appendIconDivider(icon, overlay=null) {
@@ -1084,6 +1031,60 @@ class PlotTooltipType {
             layout.appendChild(ttFrame);
         }
         this.appendFlexDivider(layout);
+    }
+    setWarningCursor(loc) {
+        // Adjust cursor between normal and red based on the plot owner's hostility
+        if (UI.isCursorLocked()) return;
+        const localPlayerID = GameContext.localPlayerID;
+        const topUnit = this.getTopUnit(loc);
+        let owningPlayerID = GameplayMap.getOwner(loc.x, loc.y);
+        // if there's a unit on the plot, that player overrides the tile's owner
+        if (topUnit) {
+            owningPlayerID = topUnit.owner;
+        }
+        const revealedState = GameplayMap.getRevealedState(localPlayerID, loc.x, loc.y);
+        if (Players.isValid(localPlayerID) && Players.isValid(owningPlayerID) && (revealedState == RevealedStates.VISIBLE)) {
+            const owningPlayer = Players.get(owningPlayerID);
+            // Is it an independent?
+            if (owningPlayer?.isIndependent) {
+                let independentID = PlayerIds.NO_PLAYER;
+                if (topUnit) {
+                    // We got the player from the unit, so use the unit
+                    independentID = Game.IndependentPowers.getIndependentPlayerIDFromUnit(topUnit.id);
+                }
+                else {
+                    // Get the independent from the plot, can reutrn -1
+                    independentID = Game.IndependentPowers.getIndependentPlayerIDAt(loc.x, loc.y);
+                }
+                if (independentID != PlayerIds.NO_PLAYER) {
+                    const relationship = Game.IndependentPowers.getIndependentRelationship(independentID, localPlayerID);
+                    if (relationship == IndependentRelationship.HOSTILE) {
+                        this.isEnemy = true;
+                    }
+                }
+            }
+            else {
+                var hasHiddenUnit = false;
+                if (topUnit?.hasHiddenVisibility) {
+                    hasHiddenUnit = true;
+                }
+                const localPlayer = Players.get(localPlayerID);
+                if (localPlayer) {
+                    const localPlayerDiplomacy = localPlayer.Diplomacy;
+                    if (localPlayerDiplomacy) {
+                        if (localPlayerDiplomacy.isAtWarWith(owningPlayerID) && !hasHiddenUnit) {
+                            this.isEnemy = true;
+                        }
+                    }
+                }
+            }
+        }
+        if (this.isEnemy) {
+            UI.setCursorByURL("fs://game/core/ui/cursors/enemy.ani");
+        }
+        else {
+            UI.setCursorByType(UIHTMLCursorTypes.Default);
+        }
     }
 }
 TooltipManager.registerPlotType('plot', PlotTooltipPriority.LOW, new PlotTooltipType());

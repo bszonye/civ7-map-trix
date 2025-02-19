@@ -31,11 +31,11 @@
         <Row Tag="LOC_DISTRICT_BZ_UNDEVELOPED">
             <Text>Undeveloped</Text>
         </Row>
+        <Row Tag="LOC_INDEPENDENT_BZ_RELATIONSHIP_TRIBUTARY">
+            <Text>Tributary</Text>
+        </Row>
         <Row Tag="LOC_LEADER_BZ_PEOPLE_NAME">
             <Text>{1_Name} People</Text>
-        </Row>
-        <Row Tag="LOC_LEADER_BZ_YOU">
-            <Text>{1_Name} (You)</Text>
         </Row>
         <Row Tag="LOC_STATE_BZ_AGELESS">
             <Text>Ageless</Text>
