@@ -195,7 +195,7 @@ class PlotTooltipType {
         const city = cityID ? Cities.get(cityID) : null;
         const district = districtID ? Districts.get(districtID) : null;
         // collect yields first, to inform panel layouts
-        this.collectYields(loc, GameContext.localPlayerID, city);
+        this.collectYields(loc, district);
         // Top Section
         if (LensManager.getActiveLens() == "fxs-settler-lens") {
             this.appendSettlerBanner(loc);
@@ -676,15 +676,16 @@ class PlotTooltipType {
         }
         this.container.appendChild(layout);
     }
-    collectYields(loc, playerID, city) {
+    collectYields(loc, district) {
         this.yieldsFlexbox.classList.value = "plot-tooltip__resourcesFlex";
         this.yieldsFlexbox.innerHTML = '';
         this.totalYields = 0;
+        const localPlayerID = GameContext.localPlayerID;
         const fragment = document.createDocumentFragment();
         // one column per yield type
         const amounts = [];
         GameInfo.Yields.forEach(info => {
-            const amount = GameplayMap.getYield(loc.x, loc.y, info.YieldType, playerID);
+            const amount = GameplayMap.getYield(loc.x, loc.y, info.YieldType, localPlayerID);
             if (amount) {
                 amounts.push(amount);
                 this.totalYields += amount;
@@ -694,7 +695,7 @@ class PlotTooltipType {
         });
         if (!this.totalYields) return;  // no yields to show
         // total yield column
-        const icon = city ? BZ_YIELD_TOTAL_URBAN : BZ_YIELD_TOTAL_RURAL;
+        const icon = district ? BZ_YIELD_TOTAL_URBAN : BZ_YIELD_TOTAL_RURAL;
         amounts.push(this.totalYields);
         const col = this.yieldColumn(icon, this.totalYields, "LOC_YIELD_BZ_TOTAL");
         fragment.appendChild(col);

@@ -23,4 +23,5 @@ independents. a bronze banner highlights important tile effects like
 temporary fortifications, floods, and storms.
 
 ## yield totals
-every tile shows the total of all its yields.
+every tile shows the total of all its yields in the rightmost column,
+under a bronze hexagon.
