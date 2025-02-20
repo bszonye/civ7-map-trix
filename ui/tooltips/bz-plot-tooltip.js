@@ -10,24 +10,17 @@ import { ComponentID } from '/core/ui/utilities/utilities-component-id.js';
 import DistrictHealthManager from '/base-standard/ui/district/district-health-manager.js';
 import LensManager from '/core/ui/lenses/lens-manager.js';
 
-const DEBUG_GRAY = ["background-color", "rgba(141, 151, 166, 0.5)"];
-const DEBUG_RED = ["background-color", "rgba(150, 57, 57, .35)"];
-const DEBUG_GREEN = ["background-color", "rgba(57, 150, 57, .35)"];
-const DEBUG_BLUE = ["background-color", "rgba(57, 57, 150, .35)"];
-
-const BZ_WARNING_BLACK = "#000000";
-const BZ_WARNING_RED = "#3a0806";  // danger
-const BZ_WARNING_AMBER = "#cea92f";  // caution
-const BZ_WARNING_BRONZE = "#604639";  // note
-
+// horizontal list separator
 const BZ_DOT_DIVIDER = Locale.compose("LOC_PLOT_DIVIDER_DOT");
 
-const BZ_WILDERNESS_NAME = GameInfo.Districts.lookup(DistrictTypes.WILDERNESS).Name;
+// constructible type for independent settlements
 const BZ_VILLAGE_TYPES = ["IMPROVEMENT_VILLAGE", "IMPROVEMENT_ENCAMPMENT"];
 
+// total yield icons
 const BZ_YIELD_TOTAL_RURAL = "CITY_RURAL";
 const BZ_YIELD_TOTAL_URBAN = "CITY_URBAN";
 
+// accent colors for building icons
 const BZ_COLOR_BRONZE = "#e5d2ac";  // matches game titles
 const BZ_YIELD_COLOR = {
     "YIELD_CULTURE": "#bf99e6",  // violet
@@ -40,6 +33,19 @@ const BZ_YIELD_COLOR = {
     null: BZ_COLOR_BRONZE,  //default
 }
 
+// background colors for box placement debugging
+const DEBUG_GRAY = ["background-color", "rgba(141, 151, 166, 0.5)"];
+const DEBUG_RED = ["background-color", "rgba(150, 57, 57, .35)"];
+const DEBUG_GREEN = ["background-color", "rgba(57, 150, 57, .35)"];
+const DEBUG_BLUE = ["background-color", "rgba(57, 57, 150, .35)"];
+
+// accent colors for warning banners
+const BZ_WARNING_BLACK = "#000000";
+const BZ_WARNING_RED = "#3a0806";  // danger
+const BZ_WARNING_AMBER = "#cea92f";  // caution
+const BZ_WARNING_BRONZE = "#604639";  // note
+
+// box metrics for warning banners
 const BZ_BORDER_WIDTH = "0.1111111111rem";
 const BZ_SIDE_MARGIN = `calc(${BZ_BORDER_WIDTH} - var(--padding-left-right))`;
 const BZ_SIDE_PADDING = `calc(var(--padding-left-right) - ${BZ_BORDER_WIDTH})`;
@@ -408,10 +414,10 @@ class PlotTooltipType {
     }
     appendSettlementPanel(loc, player, city) {
         // const name = player.isIndependent ?  this.getCivName(player) : city.name;
+        // TODO: settlement stats?
         const name = city?.name ?? this.getCivName(player);
         this.appendTitleDivider(name);
         this.appendOwnerInfo(loc, player);
-        // TODO: settlement stats?
     }
     getPlayerName(player) {
         if (player == null) return "";
@@ -874,7 +880,7 @@ class PlotTooltipType {
         } else if (city) {
             hexName = "LOC_DISTRICT_BZ_UNDEVELOPED";
         } else {
-            hexName = BZ_WILDERNESS_NAME;
+            hexName = GameInfo.Districts.lookup(DistrictTypes.WILDERNESS).Name;
         }
         // get the panel icon and adjust the title if necessary
         if (!improvement) {
