@@ -178,7 +178,6 @@ class PlotTooltipType {
         const playerID = GameplayMap.getOwner(loc.x, loc.y);
         const cityID = GameplayMap.getOwningCityFromXY(loc.x, loc.y);
         const districtID = MapCities.getDistrict(loc.x, loc.y);
-        const routeName = this.getRouteName();
         // player, city, district objects
         const player = Players.get(playerID);
         const city = cityID ? Cities.get(cityID) : null;
@@ -190,13 +189,6 @@ class PlotTooltipType {
             this.appendSettlerBanner(loc);
         }
         this.appendGeographyPanel(loc);
-        // Trade Route Info
-        if (routeName) {
-            const toolTipRouteInfo = document.createElement("div");
-            toolTipRouteInfo.classList.add("plot-tooltip__trade-route-info");
-            toolTipRouteInfo.innerHTML = routeName;
-            this.container.appendChild(toolTipRouteInfo);
-        }
         // fortifications & environmental effects like snow
         this.appendPlotEffects(plotIndex);
         // civ & settlement panel
@@ -369,6 +361,7 @@ class PlotTooltipType {
         const riverLabel = this.getRiverLabel(loc);
         const continentName = this.getContinentName(loc);
         const distantLandsLabel = this.getDistantLandsLabel(loc);
+        const routeName = this.getRouteName();
         const ttGeo = document.createElement("div");
         ttGeo.classList.value = "text-xs leading-tight text-center";
         // show terrain & biome
@@ -394,6 +387,11 @@ class PlotTooltipType {
             const text = [continentName, distantLandsLabel].map(e => Locale.compose(e));
             tt.setAttribute('data-l10n-id', dotJoin(text));
             ttGeo.appendChild(tt);
+        }
+        if (routeName) {  // road, ferry, trade route info
+            const toolTipRouteInfo = document.createElement("div");
+            toolTipRouteInfo.innerHTML = routeName;
+            ttGeo.appendChild(toolTipRouteInfo);
         }
         this.container.appendChild(ttGeo);
     }
