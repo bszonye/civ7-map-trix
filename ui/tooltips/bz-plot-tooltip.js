@@ -62,9 +62,21 @@ function adjacencyYield(building) {
     const yieldSet = new Set(adjYields.map(ay => ay.YieldType));
     return [...yieldSet];
 }
+function buildingsTagged(tag) {
+    return new Set(GameInfo.TypeTags.filter(e => e.Tag == tag).map(e => e.Type));
+}
 function dotJoin(list) {
     // join text with dots after removing empty elements
     return list.filter(e => e).join(" " + BZ_DOT_DIVIDER + " ");
+}
+function getConnections(city) {
+    const ids = city?.getConnectedCities();
+    const total = ids?.length;
+    if (!total) return null;
+    const conns = ids.map(id => Cities.get(id));
+    const towns = conns.filter(t => t.isTown);
+    const cities = conns.filter(t => !t.isTown);
+    return { cities, towns };
 }
 // lay out a column of constructibles and their construction notes
 function layoutConstructibles(layout, constructibles) {
@@ -133,9 +145,9 @@ class PlotTooltipType {
         this.yieldsFlexbox = document.createElement('div');
         this.totalYields = 0;
         this.isEnemy = false;  // is the plot held by an enemy?
-        this.agelessBuildings = this.buildingsTagged("AGELESS");
-        this.extraBuildings = this.buildingsTagged("IGNORE_DISTRICT_PLACEMENT_CAP");
-        this.largeBuildings = this.buildingsTagged("FULL_TILE");
+        this.agelessBuildings = buildingsTagged("AGELESS");
+        this.extraBuildings = buildingsTagged("IGNORE_DISTRICT_PLACEMENT_CAP");
+        this.largeBuildings = buildingsTagged("FULL_TILE");
         Loading.runWhenFinished(() => {
             for (const y of GameInfo.Yields) {
                 const url = UI.getIcon(`${y.YieldType}`, "YIELD");
@@ -770,10 +782,6 @@ class PlotTooltipType {
         districtContainer.appendChild(districtHealth);
         this.container.appendChild(districtContainer);
     }
-    // BZ utility methods
-    buildingsTagged(tag) {
-        return new Set(GameInfo.TypeTags.filter(e => e.Tag == tag).map(e => e.Type));
-    }
     appendUrbanPanel(loc, city, district) {  // includes CITY_CENTER
         const constructibles = this.getConstructibleInfo(loc);
         const buildings = constructibles.filter(e => !e.isExtra);
@@ -794,6 +802,12 @@ class PlotTooltipType {
             } else if (city.isTown) {
                 // rename "City Center" to "Town Center" in towns
                 hexName = "LOC_DISTRICT_BZ_TOWN_CENTER";
+            }
+            // report city connections
+            const conn = getConnections(city);
+            if (conn) {
+                hexRules = Locale.compose("LOC_BZ_CITY_CONNECTIONS",
+                    conn.cities.length, conn.towns.length);
             }
         } else if (buildings.length == 0) {
             // urban tile with canceled production
