@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Database>
+    <EnglishText>
+        <Row Tag="LOC_DISTRICT_BZ_CITY_STATE">
+            <Text>City-State</Text>
+        </Row>
+        <Row Tag="LOC_DISTRICT_BZ_DISCOVERY">
+            <Text>Discovery</Text>
+        </Row>
+        <Row Tag="LOC_DISTRICT_BZ_INDEPENDENT">
+            <Text>Independent</Text>
+        </Row>
+        <Row Tag="LOC_DISTRICT_BZ_TOWN_CENTER">
+            <Text>Town Center</Text>
+        </Row>
+        <Row Tag="LOC_DISTRICT_BZ_URBAN_DISTRICT">
+            <Text>District</Text>
+        </Row>
+        <Row Tag="LOC_DISTRICT_BZ_URBAN_QUARTER">
+            <Text>Quarter</Text>
+        </Row>
+        <Row Tag="LOC_DISTRICT_BZ_URBAN_VACANT">
+            <Text>Vacant District</Text>
+        </Row>
+        <Row Tag="LOC_DISTRICT_BZ_UNDEVELOPED">
+            <Text>Undeveloped</Text>
+        </Row>
+        <Row Tag="LOC_INDEPENDENT_BZ_RELATIONSHIP_TRIBUTARY">
+            <Text>Tributary</Text>
+        </Row>
+        <Row Tag="LOC_LEADER_BZ_PEOPLE_NAME">
+            <Text>{1_Name} People</Text>
+        </Row>
+        <Row Tag="LOC_STATE_BZ_OBSOLETE">
+            <Text>Obsolete</Text>
+        </Row>
+        <Row Tag="LOC_STATE_BZ_UNIQUE">
+            <Text>Unique</Text>
+        </Row>
+        <Row Tag="LOC_YIELD_BZ_TOTAL">
+            <Text>Total Yield</Text>
+        </Row>
+    </EnglishText>
+</Database>
