@@ -1059,6 +1059,8 @@ class PlotTooltipType {
     setWarningCursor(loc) {
         // Adjust cursor between normal and red based on the plot owner's hostility
         if (UI.isCursorLocked()) return;
+        // TODO: also exit early in INTERFACEMODE_ACQUIRE_TILE
+        // https://forums.civfanatics.com/threads/tcs-ui-mods.694803/post-16780255
         const localPlayerID = GameContext.localPlayerID;
         const topUnit = this.getTopUnit(loc);
         let owningPlayerID = GameplayMap.getOwner(loc.x, loc.y);
