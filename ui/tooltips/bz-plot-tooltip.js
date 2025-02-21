@@ -9,6 +9,7 @@ import TooltipManager, { PlotTooltipPriority } from '/core/ui/tooltips/tooltip-m
 import { ComponentID } from '/core/ui/utilities/utilities-component-id.js';
 import DistrictHealthManager from '/base-standard/ui/district/district-health-manager.js';
 import LensManager from '/core/ui/lenses/lens-manager.js';
+import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
 
 // horizontal list separator
 const BZ_DOT_DIVIDER = Locale.compose("LOC_PLOT_DIVIDER_DOT");
@@ -1059,8 +1060,9 @@ class PlotTooltipType {
     setWarningCursor(loc) {
         // Adjust cursor between normal and red based on the plot owner's hostility
         if (UI.isCursorLocked()) return;
-        // TODO: also exit early in INTERFACEMODE_ACQUIRE_TILE
-        // https://forums.civfanatics.com/threads/tcs-ui-mods.694803/post-16780255
+        // don't block cursor changes from interface-mode-acquire-tile
+        if (InterfaceMode.getCurrent() == "INTERFACEMODE_ACQUIRE_TILE") return;
+        // determine who controls the hex under the cursor
         const localPlayerID = GameContext.localPlayerID;
         const topUnit = this.getTopUnit(loc);
         let owningPlayerID = GameplayMap.getOwner(loc.x, loc.y);
