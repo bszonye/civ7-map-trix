@@ -215,6 +215,7 @@ class PlotTooltipType {
         this.appendUnitInfo(loc, player);
         UI.setPlotLocation(loc.x, loc.y, plotIndex);
         this.setWarningCursor(loc);
+        if (this.isShowingDebug) this.appendDebugInfo(loc);
     }
     isBlank() {
         if (this.plotCoord == null) {
@@ -402,9 +403,9 @@ class PlotTooltipType {
             ttGeo.appendChild(tt);
         }
         if (routeName) {  // road, ferry, trade route info
-            const toolTipRouteInfo = document.createElement("div");
-            toolTipRouteInfo.innerHTML = routeName;
-            ttGeo.appendChild(toolTipRouteInfo);
+            const ttRouteInfo = document.createElement("div");
+            ttRouteInfo.innerHTML = routeName;
+            ttGeo.appendChild(ttRouteInfo);
         }
         this.container.appendChild(ttGeo);
     }
@@ -1114,7 +1115,52 @@ class PlotTooltipType {
             UI.setCursorByType(UIHTMLCursorTypes.Default);
         }
     }
-}
+    appendDebugInfo(loc) {
+        //debug info
+        const plotIndex = GameplayMap.getIndexFromLocation(loc);
+        const layout = document.createElement("div");
+        // layout.classList.add("plot-tooltip__debug-flexbox");
+        layout.classList.value = "flex flex-col";
+        this.setWarningBannerStyle(layout);
+        this.container.appendChild(layout);
+        const playerID = GameplayMap.getOwner(this.plotCoord.x, this.plotCoord.y);
+        const currHp = Players.Districts.get(playerID)?.getDistrictHealth(this.plotCoord);
+        const maxHp = Players.Districts.get(playerID)?.getDistrictMaxHealth(this.plotCoord);
+        const ttDebugTitle = document.createElement("div");
+        ttDebugTitle.classList.value = "text-secondary font-title uppercase text-xs text-center";
+        if ((currHp != undefined && currHp != 0) && (maxHp != undefined && maxHp != 0)) {
+            ttDebugTitle.innerHTML = Locale.compose("LOC_PLOT_TOOLTIP_DEBUG_TITLE") + ": " + currHp + " / " + maxHp;
+            layout.appendChild(ttDebugTitle);
+        }
+        else {
+            ttDebugTitle.innerHTML = Locale.compose("LOC_PLOT_TOOLTIP_DEBUG_TITLE") + ":";
+            layout.appendChild(ttDebugTitle);
+        }
+        const ttDebugPlotCoord = document.createElement("div");
+        ttDebugPlotCoord.classList.add("plot-tooltip__coordinate-text");
+        ttDebugPlotCoord.innerHTML = Locale.compose("LOC_PLOT_TOOLTIP_PLOT") + `: (${this.plotCoord.x},${this.plotCoord.y})`;
+        layout.appendChild(ttDebugPlotCoord);
+        const ttDebugPlotIndex = document.createElement("div");
+        ttDebugPlotIndex.classList.add("plot-tooltip__coordinate-text");
+        ttDebugPlotIndex.innerHTML = Locale.compose("LOC_PLOT_TOOLTIP_INDEX") + `: ${plotIndex}`;
+        layout.appendChild(ttDebugPlotIndex);
+        const localPlayer = Players.get(GameContext.localPlayerID);
+        if (localPlayer != null) {
+            if (localPlayer.isDistantLands(this.plotCoord)) {
+                const ttDebugPlotTag = document.createElement("div");
+                ttDebugPlotTag.classList.add("plot-tooltip__coordinate-text");
+                ttDebugPlotTag.innerHTML = Locale.compose("LOC_PLOT_TOOLTIP_HEMISPHERE_WEST");
+                layout.appendChild(ttDebugPlotTag);
+            }
+            else {
+                const ttDebugPlotTag = document.createElement("div");
+                ttDebugPlotTag.classList.add("plot-tooltip__coordinate-text");
+                ttDebugPlotTag.innerHTML = Locale.compose("LOC_PLOT_TOOLTIP_HEMISPHERE_EAST");
+                layout.appendChild(ttDebugPlotTag);
+            }
+        }
+    }
+    }
 TooltipManager.registerPlotType('plot', PlotTooltipPriority.LOW, new PlotTooltipType());
 
 //# sourceMappingURL=file:///base-standard/ui/tooltips/plot-tooltip.js.map
