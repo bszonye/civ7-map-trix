@@ -9,6 +9,7 @@ import TooltipManager, { PlotTooltipPriority } from '/core/ui/tooltips/tooltip-m
 import { ComponentID } from '/core/ui/utilities/utilities-component-id.js';
 import DistrictHealthManager from '/base-standard/ui/district/district-health-manager.js';
 import LensManager from '/core/ui/lenses/lens-manager.js';
+import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
 
 // horizontal list separator
 const BZ_DOT_DIVIDER = Locale.compose("LOC_PLOT_DIVIDER_DOT");
@@ -62,9 +63,21 @@ function adjacencyYield(building) {
     const yieldSet = new Set(adjYields.map(ay => ay.YieldType));
     return [...yieldSet];
 }
+function buildingsTagged(tag) {
+    return new Set(GameInfo.TypeTags.filter(e => e.Tag == tag).map(e => e.Type));
+}
 function dotJoin(list) {
     // join text with dots after removing empty elements
     return list.filter(e => e).join(" " + BZ_DOT_DIVIDER + " ");
+}
+function getConnections(city) {
+    const ids = city?.getConnectedCities();
+    const total = ids?.length;
+    if (!total) return null;
+    const conns = ids.map(id => Cities.get(id));
+    const towns = conns.filter(t => t.isTown);
+    const cities = conns.filter(t => !t.isTown);
+    return { cities, towns };
 }
 // lay out a column of constructibles and their construction notes
 function layoutConstructibles(layout, constructibles) {
@@ -133,9 +146,9 @@ class PlotTooltipType {
         this.yieldsFlexbox = document.createElement('div');
         this.totalYields = 0;
         this.isEnemy = false;  // is the plot held by an enemy?
-        this.agelessBuildings = this.buildingsTagged("AGELESS");
-        this.extraBuildings = this.buildingsTagged("IGNORE_DISTRICT_PLACEMENT_CAP");
-        this.largeBuildings = this.buildingsTagged("FULL_TILE");
+        this.agelessBuildings = buildingsTagged("AGELESS");
+        this.extraBuildings = buildingsTagged("IGNORE_DISTRICT_PLACEMENT_CAP");
+        this.largeBuildings = buildingsTagged("FULL_TILE");
         Loading.runWhenFinished(() => {
             for (const y of GameInfo.Yields) {
                 const url = UI.getIcon(`${y.YieldType}`, "YIELD");
@@ -178,25 +191,17 @@ class PlotTooltipType {
         const playerID = GameplayMap.getOwner(loc.x, loc.y);
         const cityID = GameplayMap.getOwningCityFromXY(loc.x, loc.y);
         const districtID = MapCities.getDistrict(loc.x, loc.y);
-        const routeName = this.getRouteName();
         // player, city, district objects
         const player = Players.get(playerID);
         const city = cityID ? Cities.get(cityID) : null;
         const district = districtID ? Districts.get(districtID) : null;
         // collect yields first, to inform panel layouts
-        this.collectYields(loc, GameContext.localPlayerID, city);
+        this.collectYields(loc, district);
         // Top Section
         if (LensManager.getActiveLens() == "fxs-settler-lens") {
             this.appendSettlerBanner(loc);
         }
         this.appendGeographyPanel(loc);
-        // Trade Route Info
-        if (routeName) {
-            const toolTipRouteInfo = document.createElement("div");
-            toolTipRouteInfo.classList.add("plot-tooltip__trade-route-info");
-            toolTipRouteInfo.innerHTML = routeName;
-            this.container.appendChild(toolTipRouteInfo);
-        }
         // fortifications & environmental effects like snow
         this.appendPlotEffects(plotIndex);
         // civ & settlement panel
@@ -369,6 +374,7 @@ class PlotTooltipType {
         const riverLabel = this.getRiverLabel(loc);
         const continentName = this.getContinentName(loc);
         const distantLandsLabel = this.getDistantLandsLabel(loc);
+        const routeName = this.getRouteName();
         const ttGeo = document.createElement("div");
         ttGeo.classList.value = "text-xs leading-tight text-center";
         // show terrain & biome
@@ -394,6 +400,11 @@ class PlotTooltipType {
             const text = [continentName, distantLandsLabel].map(e => Locale.compose(e));
             tt.setAttribute('data-l10n-id', dotJoin(text));
             ttGeo.appendChild(tt);
+        }
+        if (routeName) {  // road, ferry, trade route info
+            const toolTipRouteInfo = document.createElement("div");
+            toolTipRouteInfo.innerHTML = routeName;
+            ttGeo.appendChild(toolTipRouteInfo);
         }
         this.container.appendChild(ttGeo);
     }
@@ -666,15 +677,16 @@ class PlotTooltipType {
         }
         this.container.appendChild(layout);
     }
-    collectYields(loc, playerID, city) {
+    collectYields(loc, district) {
         this.yieldsFlexbox.classList.value = "plot-tooltip__resourcesFlex";
         this.yieldsFlexbox.innerHTML = '';
         this.totalYields = 0;
+        const localPlayerID = GameContext.localPlayerID;
         const fragment = document.createDocumentFragment();
         // one column per yield type
         const amounts = [];
         GameInfo.Yields.forEach(info => {
-            const amount = GameplayMap.getYield(loc.x, loc.y, info.YieldType, playerID);
+            const amount = GameplayMap.getYield(loc.x, loc.y, info.YieldType, localPlayerID);
             if (amount) {
                 amounts.push(amount);
                 this.totalYields += amount;
@@ -684,7 +696,7 @@ class PlotTooltipType {
         });
         if (!this.totalYields) return;  // no yields to show
         // total yield column
-        const icon = city ? BZ_YIELD_TOTAL_URBAN : BZ_YIELD_TOTAL_RURAL;
+        const icon = district ? BZ_YIELD_TOTAL_URBAN : BZ_YIELD_TOTAL_RURAL;
         amounts.push(this.totalYields);
         const col = this.yieldColumn(icon, this.totalYields, "LOC_YIELD_BZ_TOTAL");
         fragment.appendChild(col);
@@ -772,10 +784,6 @@ class PlotTooltipType {
         districtContainer.appendChild(districtHealth);
         this.container.appendChild(districtContainer);
     }
-    // BZ utility methods
-    buildingsTagged(tag) {
-        return new Set(GameInfo.TypeTags.filter(e => e.Tag == tag).map(e => e.Type));
-    }
     appendUrbanPanel(loc, city, district) {  // includes CITY_CENTER
         const constructibles = this.getConstructibleInfo(loc);
         const buildings = constructibles.filter(e => !e.isExtra);
@@ -796,6 +804,12 @@ class PlotTooltipType {
             } else if (city.isTown) {
                 // rename "City Center" to "Town Center" in towns
                 hexName = "LOC_DISTRICT_BZ_TOWN_CENTER";
+            }
+            // report city connections
+            const conn = getConnections(city);
+            if (conn) {
+                hexRules = Locale.compose("LOC_BZ_CITY_CONNECTIONS",
+                    conn.cities.length, conn.towns.length);
             }
         } else if (buildings.length == 0) {
             // urban tile with canceled production
@@ -1046,6 +1060,9 @@ class PlotTooltipType {
     setWarningCursor(loc) {
         // Adjust cursor between normal and red based on the plot owner's hostility
         if (UI.isCursorLocked()) return;
+        // don't block cursor changes from interface-mode-acquire-tile
+        if (InterfaceMode.getCurrent() == "INTERFACEMODE_ACQUIRE_TILE") return;
+        // determine who controls the hex under the cursor
         const localPlayerID = GameContext.localPlayerID;
         const topUnit = this.getTopUnit(loc);
         let owningPlayerID = GameplayMap.getOwner(loc.x, loc.y);

@@ -7,15 +7,25 @@ along with their civilization and relationship to you.  city-states list
 their unique bonuses.
 
 ## detailed building status
-buildings show whether they are ageless or obsolete, damaged or
+buildings show whether they are Ageless or obsolete, damaged or
 incomplete.  obsolete buildings list when they were built.  the building
-panel shows completed quarters, including names and bonuses for unique
+panel shows completed Quarters, including names and bonuses for unique
 quarters.
 
 ## adjacency bonuses highlighted
-each building shows its bonus yield type as a colored ring around the
-building icon.  the ring glows if the building meets the criteria for
-urban quarters: current, complete, and undamaged.
+each building shows its bonus yield type as a colored ring around
+the building icon: green for food, red for production, yellow for gold,
+blue for science, purple for culture, orange for happiness, teal for
+influence, and colorless for warehouse buildings.  the ring glows if the
+building meets the criteria for a Quarter: complete, undamaged, and from
+the current Age or Ageless.  if both buildings glow, the tile is a
+Quarter.
+
+## settlement connections
+City Center tiles show a summary of connected settlements, listing the
+number of connected cities and towns.  city connections determine where
+towns can send food, and the total connections determine the bonus when
+creating a Hub Town specialization.
 
 ## warning banners
 a red banner highlights enemy territory and units, including hostile
@@ -23,4 +33,9 @@ independents. a bronze banner highlights important tile effects like
 temporary fortifications, floods, and storms.
 
 ## yield totals
-every tile shows the total of all its yields.
+every tile shows the total of all its yields in the rightmost column,
+under a bronze hexagon.
+
+## bug fixes
+the city growth mode now shows cursor feedback during tile selection.
+fixes a bug in the base game.

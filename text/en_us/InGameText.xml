@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Database>
     <EnglishText>
+        <Row Tag="LOC_BZ_CITY_CONNECTIONS">
+            <Text>Connections • {1_Cities}[icon:YIELD_CITIES] {2_Towns}[icon:YIELD_TOWNS]</Text>
+        </Row>
         <Row Tag="LOC_DISTRICT_BZ_CITY_STATE">
             <Text>City-State</Text>
         </Row>
