@@ -15,9 +15,23 @@
         <Criteria id="always">
             <AlwaysMet></AlwaysMet>
         </Criteria>
+        <Criteria all="true" id="yield-banner-enable">
+            <!-- let other mods override the yield banner -->
+            <ModInUse inverse="1">colorful-top-panel</ModInUse>
+        </Criteria>
     </ActionCriteria>
     <ActionGroups>
-        <ActionGroup id="bz-map-trix-ui" scope="game" criteria="always">
+        <ActionGroup id="bz-map-trix-yield-banner" scope="game" criteria="yield-banner-enable">
+            <Properties>
+                <LoadOrder>100</LoadOrder>
+            </Properties>
+            <Actions>
+                <UIScripts>
+                    <Item>ui/diplo-ribbon/bz-panel-yield-banner.js</Item>
+                </UIScripts>
+            </Actions>
+        </ActionGroup>
+        <ActionGroup id="bz-map-trix-tooltip" scope="game" criteria="always">
             <Properties>
                 <LoadOrder>1000</LoadOrder>
             </Properties>
