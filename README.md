@@ -32,9 +32,10 @@ a red banner highlights enemy territory and units, including hostile
 independents. a bronze banner highlights important tile effects like
 temporary fortifications, floods, and storms.
 
-## yield totals
-every tile shows the total of all its yields in the rightmost column,
-under a bronze hexagon.
+## readable yields
+the tooltip adds a column to the yield table with the total yield under
+a hexagon icon.  the yield banner at the top of the screen has clearer
+text, on backgrounds that match the tooltip colors.
 
 ## bug fixes
 the city growth mode now shows cursor feedback during tile selection.
