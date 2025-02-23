@@ -425,9 +425,11 @@ class PlotTooltipType {
         }
     }
     appendSettlementPanel(loc, player, city) {
-        // const name = player.isIndependent ?  this.getCivName(player) : city.name;
         // TODO: settlement stats?
-        const name = city?.name ?? this.getCivName(player);
+        const name = city ?  city.name :  // city or town
+            player.isAlive ?  this.getCivName(player) :  // village
+            null;  // discoveries are owned by a placeholder "World" player
+        if (!name) return;
         this.appendTitleDivider(name);
         this.appendOwnerInfo(loc, player);
     }
