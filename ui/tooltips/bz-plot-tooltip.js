@@ -92,8 +92,14 @@ function layoutConstructibles(layout, constructibles) {
         const notes = dotJoin(c.notes.map(e => Locale.compose(e)));
         if (notes) {
             const ttState = document.createElement("div");
-            ttState.classList.value = "leading-none";
             ttState.style.setProperty("font-size", "85%");
+            if (c.isDamaged) {
+                ttState.classList.value = "leading-tight px-2 rounded-full";
+                ttState.style.setProperty("background-color", BZ_WARNING_AMBER);
+                ttState.style.setProperty("color", BZ_WARNING_BLACK);
+            } else {
+                ttState.classList.value = "leading-none";
+            }
             // ttState.style.setProperty(...DEBUG_GREEN);
             ttState.innerHTML = notes;
             ttConstructible.appendChild(ttState);
@@ -307,7 +313,7 @@ class PlotTooltipType {
             }
             // TODO: save isDamaged and highlight it in bronze
             constructibleInfo.push({
-                info, age, isCurrent, isExtra, isLarge, notes, uniqueTrait
+                info, age, isCurrent, isExtra, isLarge, isDamaged, notes, uniqueTrait
             });
         };
         constructibleInfo.sort((a, b) =>
