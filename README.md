@@ -1,4 +1,4 @@
-# Map Trix
+# Map Trix 1.3.0
 better map tools for Civilization VII
 
 ## tile ownership details

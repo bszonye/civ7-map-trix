@@ -305,6 +305,7 @@ class PlotTooltipType {
                 const ageName = GameInfo.Ages.lookup(info.Age).Name;
                 if (ageName) notes.push(Locale.compose(ageName));
             }
+            // TODO: save isDamaged and highlight it in bronze
             constructibleInfo.push({
                 info, age, isCurrent, isExtra, isLarge, notes, uniqueTrait
             });
