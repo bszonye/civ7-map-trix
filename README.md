@@ -30,7 +30,8 @@ when creating a Hub Town specialization.
 ## warning banners
 a red banner highlights enemy territory and units, including hostile
 independents. a bronze banner highlights important tile effects like
-temporary fortifications, floods, and storms.
+temporary fortifications, floods, and storms.  damaged buildings show
+their status in a yellow warning bubble.
 
 ## readable yields
 the tooltip adds a column to the yield table with the **total yield**
