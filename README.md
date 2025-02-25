@@ -41,3 +41,13 @@ clearer text, on backgrounds that match the tooltip colors.
 ## bug fixes
 the city growth mode now shows cursor feedback during tile selection.
 fixes a bug in the base game.
+
+## compatibility with other mods
+known interactions:
+
+- **Sukritact's Simple UI Adjustments: compatible.**  when both mods are
+  installed, the Map Trix tooltip replaces Sukritact's version.
+- **zhekoff's Colorful Top Panel: compatible.**  when both mods are
+  installed, zhekoff's yield banner replaces the Map Trix version.
+- **TCS Improved Plot Tooltip: incompatible.**  both mods enhance the
+  same feature in different ways.
