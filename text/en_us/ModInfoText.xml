@@ -2,7 +2,7 @@
 <Database>
     <EnglishText>
         <Row Tag="LOC_MOD_BZ_MAP_TRIX_NAME">
-            <Text>Map Trix</Text>
+            <Text>Map Trix 1.3.0</Text>
         </Row>
         <Row Tag="LOC_MOD_BZ_MAP_TRIX_DESCRIPTION">
             <Text>better map tools</Text>

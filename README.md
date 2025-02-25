@@ -1,4 +1,4 @@
-# Map Trix
+# Map Trix 1.3.0
 better map tools for Civilization VII
 
 ## tile ownership details
@@ -30,7 +30,8 @@ when creating a Hub Town specialization.
 ## warning banners
 a red banner highlights enemy territory and units, including hostile
 independents. a bronze banner highlights important tile effects like
-temporary fortifications, floods, and storms.
+temporary fortifications, floods, and storms.  damaged buildings show
+their status in a yellow warning bubble.
 
 ## readable yields
 the tooltip adds a column to the yield table with the **total yield**
@@ -40,3 +41,13 @@ clearer text, on backgrounds that match the tooltip colors.
 ## bug fixes
 the city growth mode now shows cursor feedback during tile selection.
 fixes a bug in the base game.
+
+## compatibility with other mods
+known interactions:
+
+- **Sukritact's Simple UI Adjustments: compatible.**  when both mods are
+  installed, the Map Trix tooltip replaces Sukritact's version.
+- **zhekoff's Colorful Top Panel: compatible.**  when both mods are
+  installed, zhekoff's yield banner replaces the Map Trix version.
+- **TCS Improved Plot Tooltip: incompatible.**  both mods enhance the
+  same feature in different ways.

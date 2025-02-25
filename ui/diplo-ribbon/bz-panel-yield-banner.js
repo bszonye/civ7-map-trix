@@ -1,5 +1,6 @@
 import { PanelYieldBanner } from '/base-standard/ui/diplo-ribbon/panel-yield-banner.js';
 
+// TODO: experiment with border/margin per request
 const BZ_STYLE = document.createElement('style');
 BZ_STYLE.textContent = `
 .panel-yield__top-bar-content .text-yield-gold,
@@ -10,7 +11,6 @@ BZ_STYLE.textContent = `
 .panel-yield__top-bar-content .text-yield-cities {
     color: #c2c4cc;  /* text-accent-2 */
     border-radius: 0.777rem / 50%;
-    border-color: white;
     padding-left: 0.1111111111rem;
     padding-right: 0.5555555556rem;
     transition: color 0.25s cubic-bezier(0.215, 0.61, 0.355, 1);

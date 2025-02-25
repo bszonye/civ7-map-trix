@@ -92,8 +92,14 @@ function layoutConstructibles(layout, constructibles) {
         const notes = dotJoin(c.notes.map(e => Locale.compose(e)));
         if (notes) {
             const ttState = document.createElement("div");
-            ttState.classList.value = "leading-none";
             ttState.style.setProperty("font-size", "85%");
+            if (c.isDamaged) {
+                ttState.classList.value = "leading-tight px-2 rounded-full";
+                ttState.style.setProperty("background-color", BZ_WARNING_AMBER);
+                ttState.style.setProperty("color", BZ_WARNING_BLACK);
+            } else {
+                ttState.classList.value = "leading-none";
+            }
             // ttState.style.setProperty(...DEBUG_GREEN);
             ttState.innerHTML = notes;
             ttConstructible.appendChild(ttState);
@@ -305,8 +311,9 @@ class PlotTooltipType {
                 const ageName = GameInfo.Ages.lookup(info.Age).Name;
                 if (ageName) notes.push(Locale.compose(ageName));
             }
+            // TODO: save isDamaged and highlight it in bronze
             constructibleInfo.push({
-                info, age, isCurrent, isExtra, isLarge, notes, uniqueTrait
+                info, age, isCurrent, isExtra, isLarge, isDamaged, notes, uniqueTrait
             });
         };
         constructibleInfo.sort((a, b) =>
@@ -425,9 +432,11 @@ class PlotTooltipType {
         }
     }
     appendSettlementPanel(loc, player, city) {
-        // const name = player.isIndependent ?  this.getCivName(player) : city.name;
         // TODO: settlement stats?
-        const name = city?.name ?? this.getCivName(player);
+        const name = city ?  city.name :  // city or town
+            player.isAlive ?  this.getCivName(player) :  // village
+            null;  // discoveries are owned by a placeholder "World" player
+        if (!name) return;
         this.appendTitleDivider(name);
         this.appendOwnerInfo(loc, player);
     }
