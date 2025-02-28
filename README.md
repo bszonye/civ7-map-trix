@@ -51,3 +51,11 @@ known interactions:
   installed, zhekoff's yield banner replaces the Map Trix version.
 - **TCS Improved Plot Tooltip: incompatible.**  both mods enhance the
   same feature in different ways.
+
+## localization
+supported languages:
+
+- Italian (translated by leonardfactory)
+- Korean (translated by Hotsolidinfill)
+
+thank you for your help!
