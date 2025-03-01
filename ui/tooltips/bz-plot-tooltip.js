@@ -441,7 +441,7 @@ class PlotTooltipType {
         }
         if (routeName) {  // road, ferry, trade route info
             const ttRouteInfo = document.createElement("div");
-            ttRouteInfo.classList.value = "px-2 rounded-full";
+            ttRouteInfo.classList.value = "px-2 rounded-full mt-0\\.5 mb-1";
             ttRouteInfo.style.setProperty("background-color", BZ_WARNING_BRONZE);
             ttRouteInfo.innerHTML = routeName;
             ttGeo.appendChild(ttRouteInfo);
