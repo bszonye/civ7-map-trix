@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Database>
+    <LocalizedText>
+        <Row Tag="LOC_BZ_CITY_CONNECTIONS" Language="it_IT">
+            <Text>Connessioni • {1_cities}[icon:YIELD_CITIES] {2_towns}[icon:YIELD_TOWNS]</Text>
+        </Row>
+        <Row Tag="LOC_DISTRICT_BZ_CITY_STATE" Language="it_IT">
+            <Text>Città-Stato</Text>
+        </Row>
+        <Row Tag="LOC_DISTRICT_BZ_DISCOVERY" Language="it_IT">
+            <Text>Scoperta</Text>
+        </Row>
+        <Row Tag="LOC_DISTRICT_BZ_INDEPENDENT" Language="it_IT">
+            <Text>Indipendente</Text>
+        </Row>
+        <Row Tag="LOC_DISTRICT_BZ_SPECIALISTS" Language="it_IT">
+            <Text>Specialisti [icon:CITY_SPECIAL_BASE] {1_number}/{2_maximum}</Text>
+        </Row>
+        <Row Tag="LOC_DISTRICT_BZ_TOWN_CENTER" Language="it_IT">
+            <Text>Centro Cittadino</Text>
+        </Row>
+        <Row Tag="LOC_DISTRICT_BZ_URBAN_DISTRICT" Language="it_IT">
+            <Text>Distretto</Text>
+        </Row>
+        <Row Tag="LOC_DISTRICT_BZ_URBAN_QUARTER" Language="it_IT">
+            <Text>Quartiere</Text>
+        </Row>
+        <Row Tag="LOC_DISTRICT_BZ_URBAN_VACANT" Language="it_IT">
+            <Text>Distretto Vacante</Text>
+        </Row>
+        <Row Tag="LOC_DISTRICT_BZ_UNDEVELOPED" Language="it_IT">
+            <Text>Non Sviluppato</Text>
+        </Row>
+        <Row Tag="LOC_INDEPENDENT_BZ_RELATIONSHIP_TRIBUTARY" Language="it_IT">
+            <Text>Tributario</Text>
+        </Row>
+        <Row Tag="LOC_LEADER_BZ_PEOPLE_NAME" Language="it_IT">
+            <Text>Popolo di {1_name}</Text>
+        </Row>
+        <Row Tag="LOC_STATE_BZ_OBSOLETE" Language="it_IT">
+            <Text>Obsoleto</Text>
+        </Row>
+        <Row Tag="LOC_STATE_BZ_UNIQUE" Language="it_IT">
+            <Text>Unico</Text>
+        </Row>
+        <Row Tag="LOC_YIELD_BZ_TOTAL" Language="it_IT">
+            <Text>Resa Totale</Text>
+        </Row>
+    </LocalizedText>
+</Database>

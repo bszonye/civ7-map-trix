@@ -2,7 +2,7 @@
 <Database>
     <EnglishText>
         <Row Tag="LOC_BZ_CITY_CONNECTIONS">
-            <Text>Connections • {1_Cities}[icon:YIELD_CITIES] {2_Towns}[icon:YIELD_TOWNS]</Text>
+            <Text>Connections • {1_cities}[icon:YIELD_CITIES] {2_towns}[icon:YIELD_TOWNS]</Text>
         </Row>
         <Row Tag="LOC_DISTRICT_BZ_CITY_STATE">
             <Text>City-State</Text>
@@ -12,6 +12,9 @@
         </Row>
         <Row Tag="LOC_DISTRICT_BZ_INDEPENDENT">
             <Text>Independent</Text>
+        </Row>
+        <Row Tag="LOC_DISTRICT_BZ_SPECIALISTS">
+                <Text>Specialists [icon:CITY_SPECIAL_BASE] {1_number}/{2_maximum}</Text>
         </Row>
         <Row Tag="LOC_DISTRICT_BZ_TOWN_CENTER">
             <Text>Town Center</Text>
@@ -32,7 +35,7 @@
             <Text>Tributary</Text>
         </Row>
         <Row Tag="LOC_LEADER_BZ_PEOPLE_NAME">
-            <Text>{1_Name} People</Text>
+            <Text>{1_name} People</Text>
         </Row>
         <Row Tag="LOC_STATE_BZ_OBSOLETE">
             <Text>Obsolete</Text>

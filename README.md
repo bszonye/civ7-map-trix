@@ -1,4 +1,4 @@
-# Map Trix 1.3.0
+# Map Trix 1.4.0
 better map tools for Civilization VII
 
 ## tile ownership details
@@ -6,20 +6,19 @@ claimed tiles show which settlement they belong to and who owns it,
 along with their civilization and relationship to you.  city-states list
 their unique bonuses.
 
-## detailed building status
-buildings show whether they are Ageless or obsolete, damaged or
-incomplete.  obsolete buildings list when they were built.  the building
-panel shows completed Quarters, including names and bonuses for unique
-quarters.
+## district and building details
+urban tiles show whether they are districts, quarters, or unique
+quarters.  buildings show whether they are ageless, obsolete, damaged,
+or in progress.  districts with specialists show their current and
+maximum number.
 
 ## adjacency bonuses highlighted
 each building shows its bonus yield type as a colored ring around the
 building icon: **green** for food, **red** for production, **yellow**
 for gold, **blue** for science, **purple** for culture, **orange** for
 happiness, **teal** for influence, and colorless for warehouse
-buildings.  the ring **glows** if the building meets the criteria for a
-Quarter: complete, undamaged, and from the current Age or Ageless.  if
-both buildings glow, the tile is a Quarter.
+buildings.  the ring **glows** if the building meets the all the
+criteria for a quarter.
 
 ## settlement connections
 City Center tiles show a summary of **connected settlements,** listing
@@ -51,3 +50,11 @@ known interactions:
   installed, zhekoff's yield banner replaces the Map Trix version.
 - **TCS Improved Plot Tooltip: incompatible.**  both mods enhance the
   same feature in different ways.
+
+## localization
+supported languages:
+
+- Italian (translated by leonardfactory)
+- Korean (translated by Hotsolidinfill)
+
+thank you for your help!

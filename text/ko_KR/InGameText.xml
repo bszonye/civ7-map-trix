@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Database>
+    <LocalizedText>
+        <Replace Tag="LOC_BZ_CITY_CONNECTIONS" Language="ko_KR">
+            <Text>연결된 정착지 • {1_cities}[icon:YIELD_CITIES] {2_towns}[icon:YIELD_TOWNS]</Text>
+        </Replace>
+        <Replace Tag="LOC_DISTRICT_BZ_CITY_STATE" Language="ko_KR">
+            <Text>도시 국가</Text>
+        </Replace>
+        <Replace Tag="LOC_DISTRICT_BZ_DISCOVERY" Language="ko_KR">
+            <Text>발견물</Text>
+        </Replace>
+        <Replace Tag="LOC_DISTRICT_BZ_INDEPENDENT" Language="ko_KR">
+            <Text>독립 세력</Text>
+        </Replace>
+        <Row Tag="LOC_DISTRICT_BZ_SPECIALISTS" Language="ko_KR">
+            <Text>전문가 [icon:CITY_SPECIAL_BASE] {1_number}/{2_maximum}</Text>
+        </Row>
+        <Replace Tag="LOC_DISTRICT_BZ_TOWN_CENTER" Language="ko_KR">
+            <Text>도심부</Text>
+        </Replace>
+        <Replace Tag="LOC_DISTRICT_BZ_URBAN_DISTRICT" Language="ko_KR">
+            <Text>시가지</Text>
+        </Replace>
+        <Replace Tag="LOC_DISTRICT_BZ_URBAN_QUARTER" Language="ko_KR">
+            <Text>구역</Text>
+        </Replace>
+        <Replace Tag="LOC_DISTRICT_BZ_URBAN_VACANT" Language="ko_KR">
+            <Text>빈 시가지</Text>
+        </Replace>
+        <Replace Tag="LOC_DISTRICT_BZ_UNDEVELOPED" Language="ko_KR">
+            <Text>미개발</Text>
+        </Replace>
+        <Replace Tag="LOC_INDEPENDENT_BZ_RELATIONSHIP_TRIBUTARY" Language="ko_KR">
+            <Text>종속국</Text>
+        </Replace>
+        <Replace Tag="LOC_LEADER_BZ_PEOPLE_NAME" Language="ko_KR">
+            <Text>{1_name} 민족</Text>
+        </Replace>
+        <Replace Tag="LOC_STATE_BZ_OBSOLETE" Language="ko_KR">
+            <Text>구시대</Text>
+        </Replace>
+        <Replace Tag="LOC_STATE_BZ_UNIQUE" Language="ko_KR">
+            <Text>특유</Text>
+        </Replace>
+        <Replace Tag="LOC_YIELD_BZ_TOTAL" Language="ko_KR">
+            <Text>총 생산량</Text>
+        </Replace>
+    </LocalizedText>
+</Database>
