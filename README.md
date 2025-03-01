@@ -56,5 +56,6 @@ supported languages:
 
 - Italian (translated by leonardfactory)
 - Korean (translated by Hotsolidinfill)
+- Russian (translated by Webrok)
 
-thank you for your help!
+thank you all for your help!
