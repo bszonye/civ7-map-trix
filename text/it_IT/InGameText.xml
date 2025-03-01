@@ -13,6 +13,9 @@
         <Row Tag="LOC_DISTRICT_BZ_INDEPENDENT" Language="it_IT">
             <Text>Indipendente</Text>
         </Row>
+        <Row Tag="LOC_DISTRICT_BZ_SPECIALISTS" Language="it_IT">
+            <Text>Specialisti [icon:CITY_SPECIAL_BASE] {1_number}/{2_maximum}</Text>
+        </Row>
         <Row Tag="LOC_DISTRICT_BZ_TOWN_CENTER" Language="it_IT">
             <Text>Centro Cittadino</Text>
         </Row>

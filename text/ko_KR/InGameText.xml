@@ -13,6 +13,9 @@
         <Replace Tag="LOC_DISTRICT_BZ_INDEPENDENT" Language="ko_KR">
             <Text>독립 세력</Text>
         </Replace>
+        <Row Tag="LOC_DISTRICT_BZ_SPECIALISTS" Language="ko_KR">
+            <Text>전문가 [icon:CITY_SPECIAL_BASE] {1_number}/{2_maximum}</Text>
+        </Row>
         <Replace Tag="LOC_DISTRICT_BZ_TOWN_CENTER" Language="ko_KR">
             <Text>도심부</Text>
         </Replace>
