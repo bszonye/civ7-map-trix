@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Database>
+    <LocalizedText>
+        <Row Tag="LOC_BZ_CITY_CONNECTIONS" Language="ru_RU">
+            <Text>Соединения • {1_cities}[icon:YIELD_CITIES] {2_towns}[icon:YIELD_TOWNS]</Text>
+        </Row>
+        <Row Tag="LOC_DISTRICT_BZ_CITY_STATE" Language="ru_RU">
+            <Text>Город-государство</Text>
+        </Row>
+        <Row Tag="LOC_DISTRICT_BZ_DISCOVERY" Language="ru_RU">
+            <Text>Открытие</Text>
+        </Row>
+        <Row Tag="LOC_DISTRICT_BZ_INDEPENDENT" Language="ru_RU">
+            <Text>Независимые</Text>
+        </Row>
+        <Row Tag="LOC_DISTRICT_BZ_SPECIALISTS" Language="ru_RU">
+                <Text>Специалисты [icon:CITY_SPECIAL_BASE] {1_number}/{2_maximum}</Text>
+        </Row>
+        <Row Tag="LOC_DISTRICT_BZ_TOWN_CENTER" Language="ru_RU">
+            <Text>Центр Города </Text>
+        </Row>
+        <Row Tag="LOC_DISTRICT_BZ_URBAN_DISTRICT" Language="ru_RU">
+            <Text>Район</Text>
+        </Row>
+        <Row Tag="LOC_DISTRICT_BZ_URBAN_QUARTER" Language="ru_RU">
+            <Text>Квартал</Text>
+        </Row>
+        <Row Tag="LOC_DISTRICT_BZ_URBAN_VACANT" Language="ru_RU">
+            <Text>Свободный Район</Text>
+        </Row>
+        <Row Tag="LOC_DISTRICT_BZ_UNDEVELOPED" Language="ru_RU">
+            <Text>Не Обрабатывается</Text>
+        </Row>
+        <Row Tag="LOC_INDEPENDENT_BZ_RELATIONSHIP_TRIBUTARY" Language="ru_RU">
+            <Text>Вассал</Text>
+        </Row>
+        <Row Tag="LOC_LEADER_BZ_PEOPLE_NAME" Language="ru_RU">
+            <Text>{1_name}</Text>
+        </Row>
+        <Row Tag="LOC_STATE_BZ_OBSOLETE" Language="ru_RU">
+            <Text>Устарело</Text>
+        </Row>
+        <Row Tag="LOC_STATE_BZ_UNIQUE" Language="ru_RU">
+            <Text>Уникальное</Text>
+        </Row>
+        <Row Tag="LOC_YIELD_BZ_TOTAL" Language="ru_RU">
+            <Text>Общий Доход</Text>
+        </Row>
+    </LocalizedText>
+</Database>
