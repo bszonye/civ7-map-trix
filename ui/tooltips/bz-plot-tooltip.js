@@ -481,8 +481,8 @@ class PlotTooltipType {
             }
             // TODO: anything else to add?
             if (stats.length) {
-                const statsStyle = ["leading-snug", "mb-1"];
-                layoutNotes(this.container, stats, statsStyle);
+                const statStyle = ["leading-snug", "mb-1"];
+                layoutNotes(this.container, stats, statStyle);
             }
         }
     }
@@ -900,8 +900,8 @@ class PlotTooltipType {
         layoutConstructibles(layout, constructibles);
         // show additional notes
         if (hexNotes.length) {
-            const notesStyle = ["leading-snug", "my-0\\.5"];
-            layoutNotes(layout, hexNotes, notesStyle);
+            const noteStyle = ["leading-snug", "my-0\\.5"];
+            layoutNotes(layout, hexNotes, noteStyle);
         }
         // add to tooltip
         this.container.appendChild(layout);
