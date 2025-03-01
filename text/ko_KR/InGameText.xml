@@ -2,7 +2,7 @@
 <Database>
     <LocalizedText>
         <Replace Tag="LOC_BZ_CITY_CONNECTIONS" Language="ko_KR">
-            <Text>연결된 정착지 • {1_Cities}[icon:YIELD_CITIES] {2_Towns}[icon:YIELD_TOWNS]</Text>
+            <Text>연결된 정착지 • {1_cities}[icon:YIELD_CITIES] {2_towns}[icon:YIELD_TOWNS]</Text>
         </Replace>
         <Replace Tag="LOC_DISTRICT_BZ_CITY_STATE" Language="ko_KR">
             <Text>도시 국가</Text>
@@ -32,7 +32,7 @@
             <Text>종속국</Text>
         </Replace>
         <Replace Tag="LOC_LEADER_BZ_PEOPLE_NAME" Language="ko_KR">
-            <Text>{1_Name} 민족</Text>
+            <Text>{1_name} 민족</Text>
         </Replace>
         <Replace Tag="LOC_STATE_BZ_OBSOLETE" Language="ko_KR">
             <Text>구시대</Text>

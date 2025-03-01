@@ -79,13 +79,28 @@ function getConnections(city) {
     const cities = conns.filter(t => !t.isTown);
     return { cities, towns };
 }
+function getSpecialists(loc, city) {
+    if (city.isTown) return null;  // no specialists in towns
+    const maximum = city.Workers?.getCityWorkerCap();
+    if (!maximum) return null;
+    const plotIndex = GameplayMap.getIndexFromLocation(loc);
+    const plot = city.Workers.GetAllPlacementInfo().find(p => p.PlotIndex == plotIndex);
+    if (!plot) return null;
+    const workers = plot?.NumWorkers;
+    if (!workers) return null;  // hide 0/X specialists
+    return { workers, maximum };
+}
 // lay out a column of constructibles and their construction notes
 function layoutConstructibles(layout, constructibles) {
+    const ttList = document.createElement("div");
+    ttList.classList.value = "text-xs leading-tight";
+    let bottom;  // last entry will set bottom margin
     for (const c of constructibles) {
+        bottom = "mb-0";  // default
         const ttConstructible = document.createElement("div");
-        ttConstructible.classList.value = "flex flex-col items-center text-xs mt-1";
+        ttConstructible.classList.value = "flex flex-col items-center mt-1";
         const ttName = document.createElement("div");
-        ttName.classList.value = "font-title uppercase leading-tight text-accent-2";
+        ttName.classList.value = "font-title uppercase text-accent-2";
         // ttName.style.setProperty(...DEBUG_RED);
         ttName.setAttribute("data-l10n-id", c.info.Name);
         ttConstructible.appendChild(ttName);
@@ -94,18 +109,21 @@ function layoutConstructibles(layout, constructibles) {
             const ttState = document.createElement("div");
             ttState.style.setProperty("font-size", "85%");
             if (c.isDamaged) {
-                ttState.classList.value = "leading-tight px-2 rounded-full";
+                ttState.classList.value = "px-2 rounded-full";
                 ttState.style.setProperty("background-color", BZ_WARNING_AMBER);
                 ttState.style.setProperty("color", BZ_WARNING_BLACK);
             } else {
                 ttState.classList.value = "leading-none";
+                bottom = "mb-1";
             }
             // ttState.style.setProperty(...DEBUG_GREEN);
             ttState.innerHTML = notes;
             ttConstructible.appendChild(ttState);
         }
-        layout.appendChild(ttConstructible);
+        if (bottom) ttList.classList.add(bottom);
+        ttList.appendChild(ttConstructible);
     }
+    layout.appendChild(ttList);
 }
 // lay out a paragraph of rules text
 function layoutRules(layout, text, caption=null) {
@@ -126,6 +144,18 @@ function layoutRules(layout, text, caption=null) {
         ttDescription.appendChild(ttLine);
     }
     layout.appendChild(ttDescription);
+}
+function layoutNotes(layout, notes, style=[]) {
+    const ttNotes = document.createElement("div");
+    ttNotes.classList.value = "flex flex-col";
+    if (style.length) ttNotes.classList.add(...style);
+    for (const note of notes) {
+        const ttNote = document.createElement("div");
+        ttNote.classList.value = "text-xs text-center";
+        ttNote.setAttribute("data-l10n-id", note);
+        ttNotes.appendChild(ttNote);
+    }
+    layout.appendChild(ttNotes);
 }
 // split yield modifiers into separate lines to avoid layout bugs
 function splitModifiers(text) {
@@ -207,14 +237,15 @@ class PlotTooltipType {
         if (LensManager.getActiveLens() == "fxs-settler-lens") {
             this.appendSettlerBanner(loc);
         }
-        this.appendGeographyPanel(loc);
+        this.appendGeographySection(loc);
         // fortifications & environmental effects like snow
         this.appendPlotEffects(plotIndex);
         // civ & settlement panel
-        if (player) this.appendSettlementPanel(loc, player, city);
+        const isCenter = (district?.type == DistrictTypes.CITY_CENTER);
+        if (player) this.appendSettlementSection(loc, player, city, isCenter);
         // determine the hex tile type
         // hex tile panel
-        this.appendHexPanel(loc, city, district);
+        this.appendHexSection(loc, city, district);
         // yields panel
         this.container.appendChild(this.yieldsFlexbox);
         // unit info panel
@@ -311,7 +342,6 @@ class PlotTooltipType {
                 const ageName = GameInfo.Ages.lookup(info.Age).Name;
                 if (ageName) notes.push(Locale.compose(ageName));
             }
-            // TODO: save isDamaged and highlight it in bronze
             constructibleInfo.push({
                 info, age, isCurrent, isExtra, isLarge, isDamaged, notes, uniqueTrait
             });
@@ -374,7 +404,7 @@ class PlotTooltipType {
             this.container.appendChild(tt);
         }
     }
-    appendGeographyPanel(loc) {
+    appendGeographySection(loc) {
         // show geographical features
         const terrainLabel = this.getTerrainLabel(loc);
         const biomeLabel = this.getBiomeLabel(loc);
@@ -416,29 +446,45 @@ class PlotTooltipType {
         }
         this.container.appendChild(ttGeo);
     }
-    appendHexPanel(loc, city, district) {
+    appendHexSection(loc, city, district) {
         switch (district?.type) {
             case DistrictTypes.CITY_CENTER:
             case DistrictTypes.URBAN:
-                this.appendUrbanPanel(loc, city, district);
+                this.appendUrbanSection(loc, city, district);
                 break;
             case DistrictTypes.WONDER:
-                this.appendWonderPanel(loc);
+                this.appendWonderSection(loc);
                 break;
             case DistrictTypes.RURAL:
             case DistrictTypes.WILDERNESS:
             default:
-                this.appendRuralPanel(loc, city, district);
+                this.appendRuralSection(loc, city, district);
         }
     }
-    appendSettlementPanel(loc, player, city) {
-        // TODO: settlement stats?
+    appendSettlementSection(loc, player, city, isCenter) {
         const name = city ?  city.name :  // city or town
             player.isAlive ?  this.getCivName(player) :  // village
             null;  // discoveries are owned by a placeholder "World" player
         if (!name) return;
         this.appendTitleDivider(name);
+        // owner info
         this.appendOwnerInfo(loc, player);
+        // show settlement stats when hovering over the center
+        if (isCenter) {
+            const stats = [];
+            // settlement connections
+            const connections = getConnections(city);
+            if (connections) {
+                const connectionsNote = Locale.compose("LOC_BZ_CITY_CONNECTIONS",
+                    connections.cities.length, connections.towns.length);
+                stats.push(connectionsNote);
+            }
+            // TODO: anything else to add?
+            if (stats.length) {
+                const statsStyle = ["leading-snug", "mb-1"];
+                layoutNotes(this.container, stats, statsStyle);
+            }
+        }
     }
     getPlayerName(player) {
         if (player == null) return "";
@@ -794,12 +840,13 @@ class PlotTooltipType {
         districtContainer.appendChild(districtHealth);
         this.container.appendChild(districtContainer);
     }
-    appendUrbanPanel(loc, city, district) {  // includes CITY_CENTER
+    appendUrbanSection(loc, city, district) {  // includes CITY_CENTER
         const constructibles = this.getConstructibleInfo(loc);
         const buildings = constructibles.filter(e => !e.isExtra);
         let hexName = GameInfo.Districts.lookup(district?.type).Name;
         let hexSubtitle;
         let hexRules;
+        let hexNotes = [];
         // set name & description
         if (district.type == DistrictTypes.CITY_CENTER) {
             const player = Players.get(city.owner);
@@ -814,12 +861,6 @@ class PlotTooltipType {
             } else if (city.isTown) {
                 // rename "City Center" to "Town Center" in towns
                 hexName = "LOC_DISTRICT_BZ_TOWN_CENTER";
-            }
-            // report city connections
-            const conn = getConnections(city);
-            if (conn) {
-                hexRules = Locale.compose("LOC_BZ_CITY_CONNECTIONS",
-                    conn.cities.length, conn.towns.length);
             }
         } else if (buildings.length == 0) {
             // urban tile with canceled production
@@ -840,6 +881,13 @@ class PlotTooltipType {
         } else {
             hexName = "LOC_DISTRICT_BZ_URBAN_DISTRICT";
         }
+        // report specialists
+        const specialists = getSpecialists(loc, city);
+        if (specialists) {
+            const specialistsNote = Locale.compose("LOC_DISTRICT_BZ_SPECIALISTS",
+                specialists.workers, specialists.maximum);
+            hexNotes.push(specialistsNote);
+        }
         // title bar
         this.appendTitleDivider(Locale.compose(hexName));
         this.appendDistrictDefense(this.plotCoord);
@@ -850,12 +898,17 @@ class PlotTooltipType {
         if (hexRules) layoutRules(layout, hexRules, hexSubtitle);
         // constructibles
         layoutConstructibles(layout, constructibles);
+        // show additional notes
+        if (hexNotes.length) {
+            const notesStyle = ["leading-snug", "my-0\\.5"];
+            layoutNotes(layout, hexNotes, notesStyle);
+        }
         // add to tooltip
         this.container.appendChild(layout);
         // bottom bar
         this.appendUrbanDivider(buildings.filter(e => !e.isExtra));
     }
-    appendWonderPanel(loc) {
+    appendWonderSection(loc) {
         const constructibles = this.getConstructibleInfo(loc);
         if (constructibles.length != 1) {
             console.error(`expected exactly one wonder, got ${constructibles.length}`);
@@ -877,7 +930,7 @@ class PlotTooltipType {
         this.container.appendChild(layout);
         this.appendIconDivider(wonder.ConstructibleType);
     }
-    appendRuralPanel(loc, city, district) {
+    appendRuralSection(loc, city, district) {
         const constructibles = this.getConstructibleInfo(loc);
         const improvement = constructibles[0]?.info;
         const improvementType = improvement?.ConstructibleType;
@@ -1032,7 +1085,7 @@ class PlotTooltipType {
             slots.push(...[null, null].slice(buildings.length));
         // render the icons
         const layout = document.createElement("div");
-        layout.classList.value = "flex flex-grow relative m-2";
+        layout.classList.value = "flex flex-grow relative my-1 mx-2";
         for (let slot of slots) {
             if (!slot) {
                 // show an empty slot with a transparent yield ring

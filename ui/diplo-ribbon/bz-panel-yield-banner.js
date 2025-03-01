@@ -1,6 +1,5 @@
 import { PanelYieldBanner } from '/base-standard/ui/diplo-ribbon/panel-yield-banner.js';
 
-// TODO: experiment with border/margin per request
 const BZ_STYLE = document.createElement('style');
 BZ_STYLE.textContent = `
 .panel-yield__top-bar-content .text-yield-gold,

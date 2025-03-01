@@ -2,7 +2,7 @@
 <Database>
     <LocalizedText>
         <Row Tag="LOC_BZ_CITY_CONNECTIONS" Language="it_IT">
-            <Text>Connessioni • {1_Cities}[icon:YIELD_CITIES] {2_Towns}[icon:YIELD_TOWNS]</Text>
+            <Text>Connessioni • {1_cities}[icon:YIELD_CITIES] {2_towns}[icon:YIELD_TOWNS]</Text>
         </Row>
         <Row Tag="LOC_DISTRICT_BZ_CITY_STATE" Language="it_IT">
             <Text>Città-Stato</Text>
@@ -32,7 +32,7 @@
             <Text>Tributario</Text>
         </Row>
         <Row Tag="LOC_LEADER_BZ_PEOPLE_NAME" Language="it_IT">
-            <Text>Popolo di {1_Name}</Text>
+            <Text>Popolo di {1_name}</Text>
         </Row>
         <Row Tag="LOC_STATE_BZ_OBSOLETE" Language="it_IT">
             <Text>Obsoleto</Text>
