@@ -65,10 +65,9 @@ const BZ_STYLE = {
     route: { "background-color": BZ_COLOR.silver },  // TODO
     wonder: { "background-color": BZ_COLOR.silver },  // TODO
     // terrain types
-    TERRAIN_HILL: { "background-color": BZ_COLOR.brown, "color": BZ_COLOR.bronze },
-    TERRAIN_MOUNTAIN: { "background-color": BZ_COLOR.brown, "color": BZ_COLOR.bronze },
-    TERRAIN_OCEAN: { "background-color": BZ_COLOR.blue, "color": BZ_COLOR.bronze },
-    TERRAIN_NAVIGABLE_RIVER: { "background-color": BZ_COLOR.blue, "color": BZ_COLOR.bronze },
+    TERRAIN_HILL: { "background-color": BZ_COLOR.brown },
+    TERRAIN_MOUNTAIN: { "background-color": BZ_COLOR.silver },
+    TERRAIN_OCEAN: { "background-color": BZ_COLOR.blue },
     // terrain features
     FEATURE_VOLCANO: BZ_WARNING.amber,
     FEATURE_CLASS_VEGETATED: { "background-color": BZ_COLOR.green },
