@@ -21,30 +21,68 @@ const BZ_VILLAGE_TYPES = ["IMPROVEMENT_VILLAGE", "IMPROVEMENT_ENCAMPMENT"];
 const BZ_YIELD_TOTAL_RURAL = "CITY_RURAL";
 const BZ_YIELD_TOTAL_URBAN = "CITY_URBAN";
 
+// color palette
+const BZ_COLOR = {
+    // game colors
+    silver: "#4c5366",  // = primary
+    bronze: "#e5d2ac",  // = secondary
+    primary: "#4c5366",
+    secondary: "#e5d2ac",
+    accent: "#616266",
+    accent1: "#e5e5e5",
+    accent2: "#c2c4cc",
+    accent3: "#9da0a6",
+    accent4: "#85878c",
+    accent5: "#616266",
+    accent6: "#05070d",
+    // custom colors
+    black: "#000000",
+    red: "#3a0806",  // danger
+    amber: "#cea92f",  // caution
+    brown: "#604639",  // note
+    green: "#335533",  // vegetated
+    blue: "#405580",  // wet
+    // yield types
+    culture: "#bf99e6",  // violet
+    diplomacy: "#99e6bf",  // teal
+    food: "#a6cc33",  // green
+    gold: "#f0c442",  // yellow
+    happiness: "#ff9933",  // orange
+    production: "#a33d29",  // brown
+    science: "#80bfff",  // blue
+};
+const BZ_WARNING = {
+    black: { "background-color": BZ_COLOR.black },
+    red: { "background-color": BZ_COLOR.red },
+    amber: { "background-color": BZ_COLOR.amber, "color": BZ_COLOR.black },
+    brown: { "background-color": BZ_COLOR.brown },
+    green: { "background-color": BZ_COLOR.green },
+    blue: { "background-color": BZ_COLOR.blue },
+}
+const BZ_STYLE = {
+    // TODO
+    route: { "background-color": BZ_COLOR.accent3, "color": BZ_COLOR.black },
+}
+
 // accent colors for building icons
-const BZ_COLOR_BRONZE = "#e5d2ac";  // matches game titles
 const BZ_YIELD_COLOR = {
-    "YIELD_CULTURE": "#bf99e6",  // violet
-    "YIELD_DIPLOMACY": "#99e6bf",  // teal
-    "YIELD_FOOD": "#a6cc33",  // green
-    "YIELD_GOLD": "#f0c442",  // yellow
-    "YIELD_HAPPINESS": "#ff9933",  // orange
-    "YIELD_PRODUCTION": "#a33d29",  // brown
-    "YIELD_SCIENCE": "#80bfff",  // blue
-    null: BZ_COLOR_BRONZE,  //default
+    "YIELD_CULTURE": BZ_COLOR.culture,  // violet
+    "YIELD_DIPLOMACY": BZ_COLOR.diplomacy,  // teal
+    "YIELD_FOOD": BZ_COLOR.food,  // green
+    "YIELD_GOLD": BZ_COLOR.gold,  // yellow
+    "YIELD_HAPPINESS": BZ_COLOR.happiness,  // orange
+    "YIELD_PRODUCTION": BZ_COLOR.production,  // brown
+    "YIELD_SCIENCE": BZ_COLOR.science,  // blue
+    null: BZ_COLOR.bronze,  //default
 }
 
 // background colors for box placement debugging
-const DEBUG_GRAY = ["background-color", "rgba(141, 151, 166, 0.5)"];
-const DEBUG_RED = ["background-color", "rgba(150, 57, 57, .35)"];
-const DEBUG_GREEN = ["background-color", "rgba(57, 150, 57, .35)"];
-const DEBUG_BLUE = ["background-color", "rgba(57, 57, 150, .35)"];
-
-// accent colors for warning banners
-const BZ_WARNING_BLACK = "#000000";
-const BZ_WARNING_RED = "#3a0806";  // danger
-const BZ_WARNING_AMBER = "#cea92f";  // caution
-const BZ_WARNING_BRONZE = "#604639";  // note
+const _BZ_DEBUG = {
+    gray: { "background-color": "rgba(141, 151, 166, 0.5)" },
+    red: { "background-color": "rgba(150, 57, 57, .35)" },
+    green: { "background-color": "rgba(57, 150, 57, .35)" },
+    blue: { "background-color": "rgba(57, 57, 150, .35)" },
+}
 
 // box metrics for warning banners
 const BZ_BORDER_WIDTH = "0.1111111111rem";
@@ -101,7 +139,7 @@ function layoutConstructibles(layout, constructibles) {
         ttConstructible.classList.value = "flex flex-col items-center mt-1";
         const ttName = document.createElement("div");
         ttName.classList.value = "font-title uppercase text-accent-2";
-        // ttName.style.setProperty(...DEBUG_RED);
+        // setStyle(ttName, _BZ_DEBUG.red);
         ttName.setAttribute("data-l10n-id", c.info.Name);
         ttConstructible.appendChild(ttName);
         const notes = dotJoin(c.notes.map(e => Locale.compose(e)));
@@ -109,14 +147,12 @@ function layoutConstructibles(layout, constructibles) {
             const ttState = document.createElement("div");
             ttState.style.setProperty("font-size", "85%");
             if (c.isDamaged) {
-                ttState.classList.value = "px-2 rounded-full";
-                ttState.style.setProperty("background-color", BZ_WARNING_AMBER);
-                ttState.style.setProperty("color", BZ_WARNING_BLACK);
+                setCapsuleStyle(ttState, BZ_WARNING.amber);
             } else {
                 ttState.classList.value = "leading-none";
                 bottom = "mb-1";
             }
-            // ttState.style.setProperty(...DEBUG_GREEN);
+            // setStyle(ttName, _BZ_DEBUG.green);
             ttState.innerHTML = notes;
             ttConstructible.appendChild(ttState);
         }
@@ -135,7 +171,7 @@ function layoutRules(layout, text, caption=null) {
     }
     const ttDescription = document.createElement("div");
     ttDescription.classList.value = "flex flex-col my-1";
-    // ttDescription.style.setProperty(...DEBUG_GRAY);
+    // setStyle(ttName, _BZ_DEBUG.gray);
     const description = splitModifiers(Locale.compose(text));
     for (const line of description) {
         const ttLine = document.createElement("div");
@@ -156,6 +192,23 @@ function layoutNotes(layout, notes, style=[]) {
         ttNotes.appendChild(ttNote);
     }
     layout.appendChild(ttNotes);
+}
+function setStyle(element, style) {
+    if (!element || !style) return;
+    for (const [property, value] of Object.entries(style)) {
+        element.style.setProperty(property, value);
+    }
+}
+function setBannerStyle(element, style=BZ_WARNING.red) {
+    element.style.setProperty("margin-left", BZ_SIDE_MARGIN);
+    element.style.setProperty("margin-right", BZ_SIDE_MARGIN);
+    element.style.setProperty("padding-left", BZ_SIDE_PADDING);
+    element.style.setProperty("padding-right", BZ_SIDE_PADDING);
+    setStyle(element, style);
+}
+function setCapsuleStyle(element, style=BZ_WARNING.brown) {
+    element.classList.value = "px-2 rounded-full";
+    setStyle(element, style);
 }
 // split yield modifiers into separate lines to avoid layout bugs
 function splitModifiers(text) {
@@ -373,8 +426,7 @@ class PlotTooltipType {
         }
         // Show why we can't settle here
         let warning;
-        let color = BZ_WARNING_AMBER;
-        let bgcolor = BZ_WARNING_RED;
+        let warningStyle = BZ_WARNING.red;
         if (!GameplayMap.isPlotInAdvancedStartRegion(GameContext.localPlayerID, loc.x, loc.y) && !localPlayerAdvancedStart?.getPlacementComplete()) {
             warning = Locale.compose("LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_FAR");
         }
@@ -387,19 +439,17 @@ class PlotTooltipType {
             }
         }
         else if (!GameplayMap.isFreshWater(loc.x, loc.y)) {
-            color = BZ_WARNING_BLACK;
-            bgcolor = BZ_WARNING_AMBER;
+            warningStyle = BZ_WARNING.amber;
             warning = Locale.compose("LOC_PLOT_TOOLTIP_NO_FRESH_WATER");
         }
         if (warning) {
             const tt = document.createElement("div");
             tt.classList.value = "plot-tooltip__settler-tooltip pb-2";
-            this.setWarningBannerStyle(tt, bgcolor);
             tt.style.setProperty("margin-top", BZ_TOP_MARGIN);
             tt.style.setProperty("margin-bottom", BZ_TOP_PADDING);
             tt.style.setProperty("padding-top", BZ_TOP_PADDING);
             tt.style.setProperty("padding-bottom", BZ_TOP_PADDING);
-            tt.style.setProperty("color", color);
+            setBannerStyle(tt, warningStyle);
             tt.setAttribute('data-l10n-id', warning);
             this.container.appendChild(tt);
         }
@@ -423,11 +473,7 @@ class PlotTooltipType {
             terrainLabel;
         ttTerrain.setAttribute('data-l10n-id', title);
         ttGeo.appendChild(ttTerrain);
-        if (featureLabel) {
-            const tt = document.createElement("div");
-            tt.setAttribute('data-l10n-id', featureLabel);
-            ttGeo.appendChild(tt);
-        }
+        if (featureLabel) ttGeo.appendChild(featureLabel);
         if (riverLabel) {
             const tt = document.createElement("div");
             tt.setAttribute('data-l10n-id', riverLabel);
@@ -441,8 +487,8 @@ class PlotTooltipType {
         }
         if (routeName) {  // road, ferry, trade route info
             const ttRouteInfo = document.createElement("div");
-            ttRouteInfo.classList.value = "px-2 rounded-full mt-0\\.5 mb-1";
-            ttRouteInfo.style.setProperty("background-color", BZ_WARNING_BRONZE);
+            setCapsuleStyle(ttRouteInfo, BZ_STYLE.route);
+            ttRouteInfo.classList.add("mt-0\\.5", "mb-1");
             ttRouteInfo.innerHTML = routeName;
             ttGeo.appendChild(ttRouteInfo);
         }
@@ -617,7 +663,7 @@ class PlotTooltipType {
             if (!effectInfo) return;
             const tt = document.createElement("div");
             tt.classList.value = "text-center";
-            this.setWarningBannerStyle(tt, BZ_WARNING_BRONZE);
+            setBannerStyle(tt, BZ_WARNING.brown);
             tt.setAttribute('data-l10n-id', effectInfo.Name);
             this.container.appendChild(tt);
         }
@@ -648,7 +694,7 @@ class PlotTooltipType {
             this.isEnemy = relationship.isEnemy;
             if (relationship.isEnemy) {
                 layout.classList.add("py-1");
-                this.setWarningBannerStyle(layout);
+                setBannerStyle(layout);
             }
         }
         // show name & relationship
@@ -692,17 +738,27 @@ class PlotTooltipType {
         let label = '';
         const featureType = GameplayMap.getFeatureType(loc.x, loc.y);
         const feature = GameInfo.Features.lookup(featureType);
-        if (feature && !feature.Tooltip) {  // BZ
-            label = feature.Name;
-        }
+        if (!feature) return null;
+        const tt = document.createElement("div");
+        if (feature && !feature.Tooltip) label = feature.Name;
         if (GameplayMap.isVolcano(loc.x, loc.y)) {
             const active = GameplayMap.isVolcanoActive(loc.x, loc.y);
             const volcanoStatus = (active) ? 'LOC_VOLCANO_ACTIVE' : 'LOC_VOLCANO_NOT_ACTIVE';
             const volcanoName = GameplayMap.getVolcanoName(loc.x, loc.y);
             const volcanoDetailsKey = (volcanoName) ? 'LOC_UI_NAMED_VOLCANO_DETAILS' : 'LOC_UI_VOLCANO_DETAILS';
             label = Locale.compose(volcanoDetailsKey, label, volcanoStatus, volcanoName);
+        } else {
+            const BZ_FEATURE_STYLE = {  // TODO: move this?
+                // FEATURE_CLASS_AQUATIC: BZ_WARNING.blue,  // reefs
+                FEATURE_CLASS_FLOODPLAIN: BZ_WARNING.brown,
+                FEATURE_CLASS_VEGETATED: BZ_WARNING.green,
+                FEATURE_CLASS_WET: BZ_WARNING.blue,
+            }
+            const style = BZ_FEATURE_STYLE[feature.FeatureClassType];
+            if (style) setCapsuleStyle(tt, style);
         }
-        return label;
+        tt.setAttribute('data-l10n-id', label);
+        return tt;
     }
     appendUnitInfo(loc) {
         const localPlayerID = GameContext.localObserverID;
@@ -730,7 +786,7 @@ class PlotTooltipType {
             this.isEnemy = relationship.isEnemy;
             if (relationship.isEnemy) {
                 layout.classList.add("py-1");
-                this.setWarningBannerStyle(layout);
+                setBannerStyle(layout);
             }
         }
         this.container.appendChild(layout);
@@ -792,13 +848,6 @@ class PlotTooltipType {
         ttIndividualYieldFlex.appendChild(ttIndividualYieldValues);
         return ttIndividualYieldFlex;
     }
-    setWarningBannerStyle(element, color=BZ_WARNING_RED) {
-        element.style.setProperty("margin-left", BZ_SIDE_MARGIN);
-        element.style.setProperty("margin-right", BZ_SIDE_MARGIN);
-        element.style.setProperty("padding-left", BZ_SIDE_PADDING);
-        element.style.setProperty("padding-right", BZ_SIDE_PADDING);
-        element.style.setProperty("background-color", color);
-    }
     appendDistrictDefense(loc) {
         const districtID = MapCities.getDistrict(loc.x, loc.y);
         if (!districtID) return;
@@ -810,8 +859,8 @@ class PlotTooltipType {
             const conquerorText = Locale.compose("{1_Term} {2_Subject}", "LOC_PLOT_TOOLTIP_CONQUEROR", conquerorName);
             const ttConqueror = document.createElement("div");
             ttConqueror.classList.value = "text-xs leading-tight text-center";
-            ttConqueror.style.setProperty("color", BZ_WARNING_AMBER);
-            this.setWarningBannerStyle(ttConqueror);
+            ttConqueror.style.setProperty("color", BZ_WARNING.amber);
+            setBannerStyle(ttConqueror);
             ttConqueror.innerHTML = conquerorText;
             this.container.appendChild(ttConqueror);
         }
@@ -828,7 +877,7 @@ class PlotTooltipType {
         }
         const districtContainer = document.createElement("div");
         districtContainer.classList.add("plot-tooltip__district-container");
-        this.setWarningBannerStyle(districtContainer);  // fix margins
+        setBannerStyle(districtContainer);  // fix margins
         const districtTitle = document.createElement("div");
         districtTitle.classList.add("plot-tooltip__district-title", "plot-tooltip__lineThree");
         districtTitle.innerHTML = isUnderSiege ? Locale.compose("LOC_PLOT_TOOLTIP_UNDER_SIEGE") : Locale.compose("LOC_PLOT_TOOLTIP_HEALING_DISTRICT");
@@ -1185,7 +1234,7 @@ class PlotTooltipType {
         const layout = document.createElement("div");
         // layout.classList.add("plot-tooltip__debug-flexbox");
         layout.classList.value = "flex flex-col";
-        this.setWarningBannerStyle(layout);
+        setBannerStyle(layout);
         this.container.appendChild(layout);
         const playerID = GameplayMap.getOwner(this.plotCoord.x, this.plotCoord.y);
         const currHp = Players.Districts.get(playerID)?.getDistrictHealth(this.plotCoord);
