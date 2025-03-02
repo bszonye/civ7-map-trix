@@ -40,8 +40,8 @@ const BZ_COLOR = {
     red: "#3a0806",  // danger
     amber: "#cea92f",  // caution
     brown: "#604639",  // note
-    green: "#335533",  // vegetated
-    blue: "#405580",  // wet
+    green: "#445533",  // vegetated
+    blue: "#335577",  // wet
     // yield types
     culture: "#bf99e6",  // violet
     diplomacy: "#99e6bf",  // teal
@@ -52,16 +52,27 @@ const BZ_COLOR = {
     science: "#80bfff",  // blue
 };
 const BZ_WARNING = {
+    primary: { "background-color": BZ_COLOR.primary },
+    secondary: { "background-color": BZ_COLOR.secondary, "color": BZ_COLOR.black },
     black: { "background-color": BZ_COLOR.black },
     red: { "background-color": BZ_COLOR.red },
     amber: { "background-color": BZ_COLOR.amber, "color": BZ_COLOR.black },
     brown: { "background-color": BZ_COLOR.brown },
-    green: { "background-color": BZ_COLOR.green },
-    blue: { "background-color": BZ_COLOR.blue },
 }
 const BZ_STYLE = {
-    // TODO
-    route: { "background-color": BZ_COLOR.accent3, "color": BZ_COLOR.black },
+    // TODO: choose colors
+    river: { "background-color": BZ_COLOR.blue },
+    route: { "background-color": BZ_COLOR.silver },  // TODO
+    wonder: { "background-color": BZ_COLOR.silver },  // TODO
+    // terrain types
+    TERRAIN_HILL: { "background-color": BZ_COLOR.brown, "color": BZ_COLOR.bronze },
+    TERRAIN_MOUNTAIN: { "background-color": BZ_COLOR.brown, "color": BZ_COLOR.bronze },
+    TERRAIN_OCEAN: { "background-color": BZ_COLOR.blue, "color": BZ_COLOR.bronze },
+    TERRAIN_NAVIGABLE_RIVER: { "background-color": BZ_COLOR.blue, "color": BZ_COLOR.bronze },
+    // terrain features
+    FEATURE_VOLCANO: BZ_WARNING.amber,
+    FEATURE_CLASS_VEGETATED: { "background-color": BZ_COLOR.green },
+    FEATURE_CLASS_WET: { "background-color": BZ_COLOR.blue },
 }
 
 // accent colors for building icons
@@ -74,14 +85,6 @@ const BZ_YIELD_COLOR = {
     "YIELD_PRODUCTION": BZ_COLOR.production,  // brown
     "YIELD_SCIENCE": BZ_COLOR.science,  // blue
     null: BZ_COLOR.bronze,  //default
-}
-
-// background colors for box placement debugging
-const _BZ_DEBUG = {
-    gray: { "background-color": "rgba(141, 151, 166, 0.5)" },
-    red: { "background-color": "rgba(150, 57, 57, .35)" },
-    green: { "background-color": "rgba(57, 150, 57, .35)" },
-    blue: { "background-color": "rgba(57, 57, 150, .35)" },
 }
 
 // box metrics for warning banners
@@ -139,7 +142,6 @@ function layoutConstructibles(layout, constructibles) {
         ttConstructible.classList.value = "flex flex-col items-center mt-1";
         const ttName = document.createElement("div");
         ttName.classList.value = "font-title uppercase text-accent-2";
-        // setStyle(ttName, _BZ_DEBUG.red);
         ttName.setAttribute("data-l10n-id", c.info.Name);
         ttConstructible.appendChild(ttName);
         const notes = dotJoin(c.notes.map(e => Locale.compose(e)));
@@ -152,7 +154,6 @@ function layoutConstructibles(layout, constructibles) {
                 ttState.classList.value = "leading-none";
                 bottom = "mb-1";
             }
-            // setStyle(ttName, _BZ_DEBUG.green);
             ttState.innerHTML = notes;
             ttConstructible.appendChild(ttState);
         }
@@ -171,7 +172,6 @@ function layoutRules(layout, text, caption=null) {
     }
     const ttDescription = document.createElement("div");
     ttDescription.classList.value = "flex flex-col my-1";
-    // setStyle(ttName, _BZ_DEBUG.gray);
     const description = splitModifiers(Locale.compose(text));
     for (const line of description) {
         const ttLine = document.createElement("div");
@@ -199,15 +199,17 @@ function setStyle(element, style) {
         element.style.setProperty(property, value);
     }
 }
-function setBannerStyle(element, style=BZ_WARNING.red) {
+function setBannerStyle(element, style=BZ_WARNING.red, ...classes) {
+    if (classes.length) element.classList.add(...classes);
     element.style.setProperty("margin-left", BZ_SIDE_MARGIN);
     element.style.setProperty("margin-right", BZ_SIDE_MARGIN);
     element.style.setProperty("padding-left", BZ_SIDE_PADDING);
     element.style.setProperty("padding-right", BZ_SIDE_PADDING);
     setStyle(element, style);
 }
-function setCapsuleStyle(element, style=BZ_WARNING.brown) {
-    element.classList.value = "px-2 rounded-full";
+function setCapsuleStyle(element, style, ...classes) {
+    element.classList.add("px-2", "rounded-full");
+    if (classes.length) element.classList.add(...classes);
     setStyle(element, style);
 }
 // split yield modifiers into separate lines to avoid layout bugs
@@ -294,8 +296,7 @@ class PlotTooltipType {
         // fortifications & environmental effects like snow
         this.appendPlotEffects(plotIndex);
         // civ & settlement panel
-        const isCenter = (district?.type == DistrictTypes.CITY_CENTER);
-        if (player) this.appendSettlementSection(loc, player, city, isCenter);
+        if (player) this.appendSettlementSection(loc, player, city);
         // determine the hex tile type
         // hex tile panel
         this.appendHexSection(loc, city, district);
@@ -468,15 +469,29 @@ class PlotTooltipType {
         // show terrain & biome
         const ttTerrain = document.createElement("div");
         ttTerrain.classList.value = "text-secondary font-title uppercase";
+        setCapsuleStyle(ttTerrain, terrainLabel.style, "my-0\\.5");
         const title = biomeLabel ?
-            Locale.compose("{1_TerrainName} {2_BiomeName}", terrainLabel, biomeLabel) :
-            terrainLabel;
+            Locale.compose("{1_TerrainName} {2_BiomeName}", terrainLabel.text, biomeLabel) :
+            terrainLabel.text;
         ttTerrain.setAttribute('data-l10n-id', title);
         ttGeo.appendChild(ttTerrain);
-        if (featureLabel) ttGeo.appendChild(featureLabel);
+        if (featureLabel) {
+            const tt = document.createElement("div");
+            setCapsuleStyle(tt, featureLabel.style, "my-0\\.5");
+            tt.setAttribute('data-l10n-id', featureLabel.text);
+            ttGeo.appendChild(tt);
+            if (featureLabel.tooltip) layoutRules(ttGeo, featureLabel.tooltip);
+        }
         if (riverLabel) {
             const tt = document.createElement("div");
+            setCapsuleStyle(tt, BZ_STYLE.river, "my-0\\.5");
             tt.setAttribute('data-l10n-id', riverLabel);
+            ttGeo.appendChild(tt);
+        }
+        if (routeName) {  // road, ferry, trade route info
+            const tt = document.createElement("div");
+            setCapsuleStyle(tt, BZ_STYLE.route, "my-0\\.5");
+            tt.innerHTML = routeName;
             ttGeo.appendChild(tt);
         }
         if (continentName) {
@@ -484,13 +499,6 @@ class PlotTooltipType {
             const text = [continentName, distantLandsLabel].map(e => Locale.compose(e));
             tt.setAttribute('data-l10n-id', dotJoin(text));
             ttGeo.appendChild(tt);
-        }
-        if (routeName) {  // road, ferry, trade route info
-            const ttRouteInfo = document.createElement("div");
-            setCapsuleStyle(ttRouteInfo, BZ_STYLE.route);
-            ttRouteInfo.classList.add("mt-0\\.5", "mb-1");
-            ttRouteInfo.innerHTML = routeName;
-            ttGeo.appendChild(ttRouteInfo);
         }
         this.container.appendChild(ttGeo);
     }
@@ -509,7 +517,7 @@ class PlotTooltipType {
                 this.appendRuralSection(loc, city, district);
         }
     }
-    appendSettlementSection(loc, player, city, isCenter) {
+    appendSettlementSection(loc, player, city) {
         const name = city ?  city.name :  // city or town
             player.isAlive ?  this.getCivName(player) :  // village
             null;  // discoveries are owned by a placeholder "World" player
@@ -518,7 +526,7 @@ class PlotTooltipType {
         // owner info
         this.appendOwnerInfo(loc, player);
         // show settlement stats when hovering over the center
-        if (isCenter) {
+        if (loc.x == city.location.x && loc.y == city.location.y) {
             const stats = [];
             // settlement connections
             const connections = getConnections(city);
@@ -582,41 +590,25 @@ class PlotTooltipType {
     getTerrainLabel(loc) {
         const terrainType = GameplayMap.getTerrainType(loc.x, loc.y);
         const terrain = GameInfo.Terrains.lookup(terrainType);
-        if (terrain) {
-            if (this.isShowingDebug) {
-                // despite being "coast" this is a check for a lake
-                if (terrain.TerrainType == "TERRAIN_COAST" && GameplayMap.isLake(loc.x, loc.y)) {
-                    return Locale.compose('{1_Name} ({2_Value})', "LOC_TERRAIN_LAKE_NAME", terrainType.toString());
-                }
-                return Locale.compose('{1_Name} ({2_Value})', terrain.Name, terrainType.toString());
-            }
-            else {
-                // despite being "coast" this is a check for a lake
-                if (terrain.TerrainType == "TERRAIN_COAST" && GameplayMap.isLake(loc.x, loc.y)) {
-                    return "LOC_TERRAIN_LAKE_NAME";
-                }
-                return terrain.Name;
-            }
+        let text = terrain?.Name ?? ""
+        let style = BZ_STYLE[terrain.TerrainType];
+        if (!text) return { text, style };
+        if (terrain.TerrainType == "TERRAIN_COAST" && GameplayMap.isLake(loc.x, loc.y)) {
+            text = "LOC_TERRAIN_LAKE_NAME";
         }
-        else {
-            return "";
+        if (this.isShowingDebug) {
+            text = Locale.compose('{1_Name} ({2_Value})', text, terrainType.toString());
         }
+        return { text, style };
     }
     getBiomeLabel(loc) {
         const biomeType = GameplayMap.getBiomeType(loc.x, loc.y);
         const biome = GameInfo.Biomes.lookup(biomeType);
         // Do not show a label if marine biome.
-        if (biome && biome.BiomeType != "BIOME_MARINE") {
-            if (this.isShowingDebug) {
-                return Locale.compose('{1_Name} ({2_Value})', biome.Name, biomeType.toString());
-            }
-            else {
-                return biome.Name;
-            }
-        }
-        else {
-            return "";
-        }
+        if (!biome || biome.BiomeType == "BIOME_MARINE") return "";
+        return this.isShowingDebug ?
+            Locale.compose('{1_Name} ({2_Value})', biome.Name, biomeType.toString()) :
+            biome.Name;
     }
     getResource() {
         if (this.plotCoord) {
@@ -642,30 +634,39 @@ class PlotTooltipType {
     }
     appendPlotEffects(plotIndex) {
         // TODO: customize banner color to effect types?
-        // PLOTEFFECT_BURNED
-        // PLOTEFFECT_DIGSITE_NAME
-        // PLOTEFFECT_FLOODED
-        // PLOTEFFECT_IS_BURNING_NAME
-        // PLOTEFFECT_PLAGUE_NAME
-        // PLOTEFFECT_RADIOACTIVE_FALLOUT_NAME
-        // PLOTEFFECT_SAND
-        // PLOTEFFECT_SNOW_LIGHT
-        // PLOTEFFECT_SNOW_MEDIUM
-        // PLOTEFFECT_SNOW_HEAVY
-        // PLOTEFFECT_STONE_TRAP_NAME
-        // PLOTEFFECT_UNIT_FORTIFICATIONS
         const plotEffects = MapPlotEffects.getPlotEffects(plotIndex);
-        if (!plotEffects) return;
+        if (!plotEffects || !plotEffects.length) return;
         const localPlayerID = GameContext.localPlayerID;
+        const effectList = [];
+        const bannerList = [];
         for (const item of plotEffects) {
             if (item.onlyVisibleToOwner && item.owner != localPlayerID) continue;
             const effectInfo = GameInfo.PlotEffects.lookup(item.effectType);
             if (!effectInfo) return;
-            const tt = document.createElement("div");
-            tt.classList.value = "text-center";
-            setBannerStyle(tt, BZ_WARNING.brown);
-            tt.setAttribute('data-l10n-id', effectInfo.Name);
-            this.container.appendChild(tt);
+            if (effectInfo.Damage || effectInfo.Defense) {
+                const tt = document.createElement("div");
+                tt.classList.value = "text-xs leading-normal text-center my-0\\.5";
+                tt.setAttribute('data-l10n-id', effectInfo.Name);
+                const style = effectInfo.Damage ? BZ_WARNING.red : BZ_WARNING.brown;
+                setBannerStyle(tt, style);
+                bannerList.push(tt);
+            } else {
+                effectList.push(effectInfo.Name);
+            }
+        }
+        if (effectList.length) {
+            const ttEffects = document.createElement("div");
+            ttEffects.classList.value = "text-xs leading-tight text-center";
+            for (const effect of effectList) {
+                const tt = document.createElement("div");
+                // setCapsuleStyle(tt, BZ_WARNING.primary, "my-0\\.5");
+                tt.setAttribute('data-l10n-id', effect);
+                ttEffects.appendChild(tt);
+            }
+            this.container.appendChild(ttEffects);
+        }
+        for (const banner of bannerList) {
+            this.container.appendChild(banner);
         }
     }
     getTopUnit(loc) {
@@ -735,30 +736,21 @@ class PlotTooltipType {
             "LOC_RESOURCE_GENERAL_TYPE_DISTANT_LANDS" : "";
     }
     getFeatureLabel(loc) {
-        let label = '';
         const featureType = GameplayMap.getFeatureType(loc.x, loc.y);
         const feature = GameInfo.Features.lookup(featureType);
         if (!feature) return null;
-        const tt = document.createElement("div");
-        if (feature && !feature.Tooltip) label = feature.Name;
+        let text = feature.Name;
+        let style = BZ_STYLE[feature.Tooltip ? "wonder" : feature.FeatureClassType];
         if (GameplayMap.isVolcano(loc.x, loc.y)) {
             const active = GameplayMap.isVolcanoActive(loc.x, loc.y);
             const volcanoStatus = (active) ? 'LOC_VOLCANO_ACTIVE' : 'LOC_VOLCANO_NOT_ACTIVE';
             const volcanoName = GameplayMap.getVolcanoName(loc.x, loc.y);
             const volcanoDetailsKey = (volcanoName) ? 'LOC_UI_NAMED_VOLCANO_DETAILS' : 'LOC_UI_VOLCANO_DETAILS';
-            label = Locale.compose(volcanoDetailsKey, label, volcanoStatus, volcanoName);
-        } else {
-            const BZ_FEATURE_STYLE = {  // TODO: move this?
-                // FEATURE_CLASS_AQUATIC: BZ_WARNING.blue,  // reefs
-                FEATURE_CLASS_FLOODPLAIN: BZ_WARNING.brown,
-                FEATURE_CLASS_VEGETATED: BZ_WARNING.green,
-                FEATURE_CLASS_WET: BZ_WARNING.blue,
-            }
-            const style = BZ_FEATURE_STYLE[feature.FeatureClassType];
-            if (style) setCapsuleStyle(tt, style);
+            text = Locale.compose(volcanoDetailsKey, text, volcanoStatus, volcanoName);
+            // only highlight active volcanoes
+            if (!active) style = undefined;
         }
-        tt.setAttribute('data-l10n-id', label);
-        return tt;
+        return { text, style };
     }
     appendUnitInfo(loc) {
         const localPlayerID = GameContext.localObserverID;
