@@ -11,6 +11,14 @@ import DistrictHealthManager from '/base-standard/ui/district/district-health-ma
 import LensManager from '/core/ui/lenses/lens-manager.js';
 import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
 
+// additional CSS definitions
+const BZ_HEAD_STYLE = document.createElement('style');
+BZ_HEAD_STYLE.textContent = `
+/* fixes text-center paragraphs with icons in the text */
+.bz-tooltip .text-center p { width: 100% }
+`
+document.head.appendChild(BZ_HEAD_STYLE);
+
 // horizontal list separator
 const BZ_DOT_DIVIDER = Locale.compose("LOC_PLOT_DIVIDER_DOT");
 
@@ -35,23 +43,27 @@ const BZ_COLOR = {
     accent4: "#85878c",
     accent5: "#616266",
     accent6: "#05070d",
-    // custom colors
+    // alert colors
     black: "#000000",
     red: "#3a0806",  // danger
     amber: "#cea92f",  // caution
     brown: "#604639",  // note
-    green: "#445533",  // vegetated
-    blue: "#335577",  // wet
+    // geographic colors
+    hill: "#604639",  // note
+    ocean: "#204060",  // wet
+    vegetated: "#445533",  // vegetated
+    wet: "#335577",  // wet
+    route: "#9f8060",  // road, ferry, railroad (TODO)
     // yield types
     culture: "#bf99e6",  // violet
     diplomacy: "#99e6bf",  // teal
-    food: "#a6cc33",  // green
+    food: "#a6cc33",  // vegetated
     gold: "#f0c442",  // yellow
     happiness: "#ff9933",  // orange
     production: "#a33d29",  // brown
     science: "#80bfff",  // blue
 };
-const BZ_WARNING = {
+const BZ_ALERT = {
     primary: { "background-color": BZ_COLOR.primary },
     secondary: { "background-color": BZ_COLOR.secondary, "color": BZ_COLOR.black },
     black: { "background-color": BZ_COLOR.black },
@@ -61,17 +73,17 @@ const BZ_WARNING = {
 }
 const BZ_STYLE = {
     // TODO: choose colors
-    river: { "background-color": BZ_COLOR.blue },
-    route: { "background-color": BZ_COLOR.silver },  // TODO
+    river: { "background-color": BZ_COLOR.wet },
+    route: { "background-color": BZ_COLOR.route, "color": BZ_COLOR.black },
     wonder: { "background-color": BZ_COLOR.silver },  // TODO
     // terrain types
-    TERRAIN_HILL: { "background-color": BZ_COLOR.brown },
+    TERRAIN_HILL: { "background-color": BZ_COLOR.hill },
     TERRAIN_MOUNTAIN: { "background-color": BZ_COLOR.silver },
-    TERRAIN_OCEAN: { "background-color": BZ_COLOR.blue },
+    TERRAIN_OCEAN: { "background-color": BZ_COLOR.ocean },
     // terrain features
-    FEATURE_VOLCANO: BZ_WARNING.amber,
-    FEATURE_CLASS_VEGETATED: { "background-color": BZ_COLOR.green },
-    FEATURE_CLASS_WET: { "background-color": BZ_COLOR.blue },
+    FEATURE_VOLCANO: BZ_ALERT.amber,
+    FEATURE_CLASS_VEGETATED: { "background-color": BZ_COLOR.vegetated },
+    FEATURE_CLASS_WET: { "background-color": BZ_COLOR.wet },
 }
 
 // accent colors for building icons
@@ -90,8 +102,9 @@ const BZ_YIELD_COLOR = {
 const BZ_BORDER_WIDTH = "0.1111111111rem";
 const BZ_SIDE_MARGIN = `calc(${BZ_BORDER_WIDTH} - var(--padding-left-right))`;
 const BZ_SIDE_PADDING = `calc(var(--padding-left-right) - ${BZ_BORDER_WIDTH})`;
-const BZ_TOP_MARGIN = `calc(${BZ_BORDER_WIDTH} - var(--padding-top-bottom))`;
-const BZ_TOP_PADDING = `calc(var(--padding-top-bottom) - ${BZ_BORDER_WIDTH})`;
+// TODO: use these to format title banners
+const _BZ_TOP_MARGIN = `calc(${BZ_BORDER_WIDTH} - var(--padding-top-bottom))`;
+const _BZ_TOP_PADDING = `calc(var(--padding-top-bottom) - ${BZ_BORDER_WIDTH})`;
 
 function adjacencyYield(building) {
     if (!building) return [];
@@ -138,7 +151,7 @@ function layoutConstructibles(layout, constructibles) {
     for (const c of constructibles) {
         bottom = "mb-0";  // default
         const ttConstructible = document.createElement("div");
-        ttConstructible.classList.value = "flex flex-col items-center mt-1";
+        ttConstructible.classList.value = "text-center mt-1";
         const ttName = document.createElement("div");
         ttName.classList.value = "font-title uppercase text-accent-2";
         ttName.setAttribute("data-l10n-id", c.info.Name);
@@ -148,7 +161,7 @@ function layoutConstructibles(layout, constructibles) {
             const ttState = document.createElement("div");
             ttState.style.setProperty("font-size", "85%");
             if (c.isDamaged) {
-                setCapsuleStyle(ttState, BZ_WARNING.amber);
+                setCapsuleStyle(ttState, BZ_ALERT.amber);
             } else {
                 ttState.classList.value = "leading-none";
                 bottom = "mb-1";
@@ -170,19 +183,13 @@ function layoutRules(layout, text, caption=null) {
         layout.appendChild(ttCaption);
     }
     const ttDescription = document.createElement("div");
-    ttDescription.classList.value = "flex flex-col my-1";
-    const description = splitModifiers(Locale.compose(text));
-    for (const line of description) {
-        const ttLine = document.createElement("div");
-        ttLine.classList.value = "text-xs leading-snug text-center";
-        ttLine.setAttribute("data-l10n-id", line);
-        ttDescription.appendChild(ttLine);
-    }
+    ttDescription.classList.value = "text-xs leading-snug text-center w-auto my-1";
+    ttDescription.setAttribute("data-l10n-id", text);
     layout.appendChild(ttDescription);
 }
+// TODO: simplify/remove this
 function layoutNotes(layout, notes, style=[]) {
     const ttNotes = document.createElement("div");
-    ttNotes.classList.value = "flex flex-col";
     if (style.length) ttNotes.classList.add(...style);
     for (const note of notes) {
         const ttNote = document.createElement("div");
@@ -198,7 +205,7 @@ function setStyle(element, style) {
         element.style.setProperty(property, value);
     }
 }
-function setBannerStyle(element, style=BZ_WARNING.red, ...classes) {
+function setBannerStyle(element, style=BZ_ALERT.red, ...classes) {
     if (classes.length) element.classList.add(...classes);
     element.style.setProperty("margin-left", BZ_SIDE_MARGIN);
     element.style.setProperty("margin-right", BZ_SIDE_MARGIN);
@@ -211,26 +218,12 @@ function setCapsuleStyle(element, style, ...classes) {
     if (classes.length) element.classList.add(...classes);
     setStyle(element, style);
 }
-// split yield modifiers into separate lines to avoid layout bugs
-function splitModifiers(text) {
-    // examples:
-    // +10[icon:YIELD_PRODUCTION] Production
-    // +1[icon:YIELD_CULTURE] Culture and[icon:YIELD_GOLD] Gold
-    // +1[icon:YIELD_CULTURE] Culture,[icon:YIELD_GOLD] Gold,[icon:YIELD_SCIENCE] and
-    const iconWords = "(?:\\S*\\[icon:\\w+\\]\\S*)+";
-    const modPhrase = `(?:${iconWords}\\s+\\S+)`;
-    const modList = `(?:${modPhrase}(?:(?<![.;])\\s+${modPhrase})*)`
-    const modPattern = new RegExp(`\\s*(${modList})\\s+`, "u");
-    const lines = text.split(modPattern).filter(t => t);
-    return lines;
-}
-
 class PlotTooltipType {
     constructor() {
         this.plotCoord = null;
         this.isShowingDebug = false;
         this.tooltip = document.createElement('fxs-tooltip');
-        this.tooltip.classList.value = "plot-tooltip max-w-96 text-xs leading-tight";
+        this.tooltip.classList.value = "plot-tooltip bz-tooltip max-w-96 text-xs leading-tight";
         this.container = document.createElement('div');
         this.tooltip.appendChild(this.container);
         this.yieldsFlexbox = document.createElement('div');
@@ -287,22 +280,17 @@ class PlotTooltipType {
         const district = districtID ? Districts.get(districtID) : null;
         // collect yields first, to inform panel layouts
         this.collectYields(loc, district);
-        // Top Section
-        if (LensManager.getActiveLens() == "fxs-settler-lens") {
-            this.appendSettlerBanner(loc);
-        }
-        this.appendGeographySection(loc);
-        // fortifications & environmental effects like snow
-        this.appendPlotEffects(plotIndex);
-        // civ & settlement panel
+        // geography section
+        this.appendGeographySection(loc, plotIndex);
+        // civ & settlement section
         if (player) this.appendSettlementSection(loc, player, city);
-        // determine the hex tile type
-        // hex tile panel
+        // hex tile section
         this.appendHexSection(loc, city, district);
-        // yields panel
+        // yields section
         this.container.appendChild(this.yieldsFlexbox);
-        // unit info panel
+        // unit info section
         this.appendUnitInfo(loc, player);
+        // update UI & cursor
         UI.setPlotLocation(loc.x, loc.y, plotIndex);
         this.setWarningCursor(loc);
         if (this.isShowingDebug) this.appendDebugInfo(loc);
@@ -403,59 +391,9 @@ class PlotTooltipType {
             (b.isExtra ? -1 : b.age) - (a.isExtra ? -1 : a.age));
         return constructibleInfo;
     }
-    appendSettlerBanner(loc) {
-        //Add more details to the tooltip if we are in the settler lens
-        const localPlayer = Players.get(GameContext.localPlayerID);
-        if (!localPlayer) {
-            console.error("plot-tooltip: Attempting to update settler tooltip, but no valid local player!");
-            return;
-        }
-        const localPlayerDiplomacy = localPlayer?.Diplomacy;
-        if (localPlayerDiplomacy === undefined) {
-            console.error("plot-tooltip: Attempting to update settler tooltip, but no valid local player Diplomacy object!");
-            return;
-        }
-        if (GameplayMap.isWater(loc.x, loc.y) || GameplayMap.isImpassable(loc.x, loc.y) || GameplayMap.isNavigableRiver(loc.x, loc.y)) {
-            // Dont't add any extra tooltip to mountains, oceans, or navigable rivers, should be obvious enough w/o them
-            return;
-        }
-        const localPlayerAdvancedStart = localPlayer?.AdvancedStart;
-        if (localPlayerAdvancedStart === undefined) {
-            console.error("plot-tooltip: Attempting to update settler tooltip, but no valid local player advanced start object!");
-            return;
-        }
-        // Show why we can't settle here
-        let warning;
-        let warningStyle = BZ_WARNING.red;
-        if (!GameplayMap.isPlotInAdvancedStartRegion(GameContext.localPlayerID, loc.x, loc.y) && !localPlayerAdvancedStart?.getPlacementComplete()) {
-            warning = Locale.compose("LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_FAR");
-        }
-        else if (!localPlayerDiplomacy.isValidLandClaimLocation(loc, true /*bIgnoreFriendlyUnitRequirement*/)) {
-            if (GameplayMap.isCityWithinMinimumDistance(loc.x, loc.y)) {
-                warning = Locale.compose("LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_CLOSE");
-            }
-            else if (GameplayMap.getResourceType(loc.x, loc.y) != ResourceTypes.NO_RESOURCE) {
-                warning = Locale.compose("LOC_PLOT_TOOLTIP_CANT_SETTLE_RESOURCES");
-            }
-        }
-        else if (!GameplayMap.isFreshWater(loc.x, loc.y)) {
-            warningStyle = BZ_WARNING.amber;
-            warning = Locale.compose("LOC_PLOT_TOOLTIP_NO_FRESH_WATER");
-        }
-        if (warning) {
-            const tt = document.createElement("div");
-            tt.classList.value = "plot-tooltip__settler-tooltip pb-2";
-            tt.style.setProperty("margin-top", BZ_TOP_MARGIN);
-            tt.style.setProperty("margin-bottom", BZ_TOP_PADDING);
-            tt.style.setProperty("padding-top", BZ_TOP_PADDING);
-            tt.style.setProperty("padding-bottom", BZ_TOP_PADDING);
-            setBannerStyle(tt, warningStyle);
-            tt.setAttribute('data-l10n-id', warning);
-            this.container.appendChild(tt);
-        }
-    }
-    appendGeographySection(loc) {
+    appendGeographySection(loc, plotIndex) {
         // show geographical features
+        const effects = this.getPlotEffects(plotIndex);
         const terrainLabel = this.getTerrainLabel(loc);
         const biomeLabel = this.getBiomeLabel(loc);
         const featureLabel = this.getFeatureLabel(loc);
@@ -463,17 +401,28 @@ class PlotTooltipType {
         const continentName = this.getContinentName(loc);
         const distantLandsLabel = this.getDistantLandsLabel(loc);
         const routeName = this.getRouteName();
-        const ttGeo = document.createElement("div");
-        ttGeo.classList.value = "text-xs leading-tight text-center";
-        // show terrain & biome
+        // alert banners: settler warnings, damaging & defense effects
+        const banners = [];
+        banners.push(...this.getSettlerBanner(loc));
+        banners.push(...effects.banners);
+        // TODO: make these flush with the top of the panel?
+        for (const banner of banners) {
+            this.container.appendChild(banner);
+        }
+        // tooltip title: terrain & biome
+        const ttTitle = document.createElement("div");
+        ttTitle.classList.value = "text-secondary font-title text-sm leading-tight uppercase text-center";
         const ttTerrain = document.createElement("div");
-        ttTerrain.classList.value = "text-secondary font-title uppercase";
         setCapsuleStyle(ttTerrain, terrainLabel.style, "my-0\\.5");
         const title = biomeLabel ?
             Locale.compose("{1_TerrainName} {2_BiomeName}", terrainLabel.text, biomeLabel) :
             terrainLabel.text;
         ttTerrain.setAttribute('data-l10n-id', title);
-        ttGeo.appendChild(ttTerrain);
+        ttTitle.appendChild(ttTerrain);
+        this.container.appendChild(ttTitle);
+        // other geographical info
+        const ttGeo = document.createElement("div");
+        ttGeo.classList.value = "text-xs leading-tight text-center";
         if (featureLabel) {
             const tt = document.createElement("div");
             setCapsuleStyle(tt, featureLabel.style, "my-0\\.5");
@@ -493,8 +442,21 @@ class PlotTooltipType {
             tt.innerHTML = routeName;
             ttGeo.appendChild(tt);
         }
+        if (effects.text.length) {
+            const ttEffects = document.createElement("div");
+            ttEffects.classList.value = "text-xs leading-tight text-center";
+            for (const effect of effects.text) {
+                const tt = document.createElement("div");
+                // setCapsuleStyle(tt, BZ_ALERT.primary, "my-0\\.5");
+                tt.setAttribute('data-l10n-id', effect);
+                ttEffects.appendChild(tt);
+            }
+            ttGeo.appendChild(ttEffects);
+        }
+        // continent + distant lands tag
         if (continentName) {
             const tt = document.createElement("div");
+            tt.classList.value = "text-xs leading-tight text-center";
             const text = [continentName, distantLandsLabel].map(e => Locale.compose(e));
             tt.setAttribute('data-l10n-id', dotJoin(text));
             ttGeo.appendChild(tt);
@@ -631,13 +593,11 @@ class PlotTooltipType {
         }
         return returnString;
     }
-    appendPlotEffects(plotIndex) {
-        // TODO: customize banner color to effect types?
+    getPlotEffects(plotIndex) {
+        const text = [];
+        const banners = [];
         const plotEffects = MapPlotEffects.getPlotEffects(plotIndex);
-        if (!plotEffects || !plotEffects.length) return;
         const localPlayerID = GameContext.localPlayerID;
-        const effectList = [];
-        const bannerList = [];
         for (const item of plotEffects) {
             if (item.onlyVisibleToOwner && item.owner != localPlayerID) continue;
             const effectInfo = GameInfo.PlotEffects.lookup(item.effectType);
@@ -646,27 +606,61 @@ class PlotTooltipType {
                 const tt = document.createElement("div");
                 tt.classList.value = "text-xs leading-normal text-center my-0\\.5";
                 tt.setAttribute('data-l10n-id', effectInfo.Name);
-                const style = effectInfo.Damage ? BZ_WARNING.red : BZ_WARNING.brown;
+                const style = effectInfo.Damage ? BZ_ALERT.red : BZ_ALERT.brown;
                 setBannerStyle(tt, style);
-                bannerList.push(tt);
+                banners.push(tt);
             } else {
-                effectList.push(effectInfo.Name);
+                text.push(effectInfo.Name);
             }
         }
-        if (effectList.length) {
-            const ttEffects = document.createElement("div");
-            ttEffects.classList.value = "text-xs leading-tight text-center";
-            for (const effect of effectList) {
-                const tt = document.createElement("div");
-                // setCapsuleStyle(tt, BZ_WARNING.primary, "my-0\\.5");
-                tt.setAttribute('data-l10n-id', effect);
-                ttEffects.appendChild(tt);
+        return { text, banners };
+    }
+    getSettlerBanner(loc) {
+        const banners = [];
+        if (LensManager.getActiveLens() != "fxs-settler-lens") return banners;
+        //Add more details to the tooltip if we are in the settler lens
+        const localPlayer = Players.get(GameContext.localPlayerID);
+        if (!localPlayer) {
+            console.error("plot-tooltip: Attempting to update settler tooltip, but no valid local player!");
+            return banners;
+        }
+        const localPlayerDiplomacy = localPlayer?.Diplomacy;
+        if (localPlayerDiplomacy === undefined) {
+            console.error("plot-tooltip: Attempting to update settler tooltip, but no valid local player Diplomacy object!");
+            return banners;
+        }
+        if (GameplayMap.isWater(loc.x, loc.y) || GameplayMap.isImpassable(loc.x, loc.y) || GameplayMap.isNavigableRiver(loc.x, loc.y)) {
+            // Dont't add any extra tooltip to mountains, oceans, or navigable rivers, should be obvious enough w/o them
+            return banners;
+        }
+        const localPlayerAdvancedStart = localPlayer?.AdvancedStart;
+        if (localPlayerAdvancedStart === undefined) {
+            console.error("plot-tooltip: Attempting to update settler tooltip, but no valid local player advanced start object!");
+            return banners;
+        }
+        // Show why we can't settle here
+        let warning;
+        let warningStyle = BZ_ALERT.red;
+        if (!GameplayMap.isPlotInAdvancedStartRegion(GameContext.localPlayerID, loc.x, loc.y) && !localPlayerAdvancedStart?.getPlacementComplete()) {
+            warning = "LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_FAR";
+        } else if (!localPlayerDiplomacy.isValidLandClaimLocation(loc, true /*bIgnoreFriendlyUnitRequirement*/)) {
+            if (GameplayMap.isCityWithinMinimumDistance(loc.x, loc.y)) {
+                warning = "LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_CLOSE";
+            } else if (GameplayMap.getResourceType(loc.x, loc.y) != ResourceTypes.NO_RESOURCE) {
+                warning = "LOC_PLOT_TOOLTIP_CANT_SETTLE_RESOURCES";
             }
-            this.container.appendChild(ttEffects);
+        } else if (!GameplayMap.isFreshWater(loc.x, loc.y)) {
+            warningStyle = BZ_ALERT.amber;
+            warning = "LOC_PLOT_TOOLTIP_NO_FRESH_WATER";
         }
-        for (const banner of bannerList) {
-            this.container.appendChild(banner);
+        if (warning) {
+            const tt = document.createElement("div");
+            tt.classList.value = "text-xs leading-normal text-center";
+            setBannerStyle(tt, warningStyle);
+            tt.setAttribute('data-l10n-id', warning);
+            banners.push(tt);
         }
+        return banners;
     }
     getTopUnit(loc) {
         let plotUnits = MapUnits.getUnits(loc.x, loc.y);
@@ -850,7 +844,7 @@ class PlotTooltipType {
             const conquerorText = Locale.compose("{1_Term} {2_Subject}", "LOC_PLOT_TOOLTIP_CONQUEROR", conquerorName);
             const ttConqueror = document.createElement("div");
             ttConqueror.classList.value = "text-xs leading-tight text-center";
-            ttConqueror.style.setProperty("color", BZ_WARNING.amber);
+            ttConqueror.style.setProperty("color", BZ_ALERT.amber);
             setBannerStyle(ttConqueror);
             ttConqueror.innerHTML = conquerorText;
             this.container.appendChild(ttConqueror);
@@ -935,7 +929,7 @@ class PlotTooltipType {
         this.appendDistrictDefense(this.plotCoord);
         // panel interior
         const layout = document.createElement("div");
-        layout.classList.value = "flex flex-col items-center max-w-80";
+        layout.classList.value = "text-center max-w-80";
         // show rules for city-states and unique quarters
         if (hexRules) layoutRules(layout, hexRules, hexSubtitle);
         // constructibles
@@ -960,7 +954,7 @@ class PlotTooltipType {
         const notes = constructibles[0]?.notes;
         this.appendTitleDivider(Locale.compose(wonder.Name));
         const layout = document.createElement("div");
-        layout.classList.add("flex", "flex-col", "items-center", "max-w-80");
+        layout.classList.value = "text-center max-w-80";
         if (notes) {
             const ttState = document.createElement("div");
             ttState.classList.value = "leading-none";
@@ -1022,7 +1016,7 @@ class PlotTooltipType {
         if (hexName) this.appendTitleDivider(Locale.compose(hexName));
         // panel interior
         const layout = document.createElement("div");
-        layout.classList.add("flex", "flex-col", "items-center", "max-w-80");
+        layout.classList.value = "max-w-80";
         // optional description
         if (hexRules) layoutRules(layout, hexRules);
         // constructibles
