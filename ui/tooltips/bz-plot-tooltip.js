@@ -65,7 +65,7 @@ const BZ_COLOR = {
     ocean: "#204060",  // Open Ocean terrain
     vegetated: "#445533",  // Vegetated features
     wet: "#335577",  // Wet features
-    route: "#9f8060",  // Road, Ferry, Railroad (TODO)
+    route: "#ccbbaa",  // Road, Ferry, Railroad (TODO)
     // yield types
     culture: "#bf99e6",  // violet
     diplomacy: "#99e6bf",  // teal
@@ -207,7 +207,7 @@ function layoutRules(layout, text, caption=null) {
         layout.appendChild(ttCaption);
     }
     const ttDescription = document.createElement("div");
-    ttDescription.classList.value = "text-xs leading-snug text-center w-64 my-1";
+    ttDescription.classList.value = "text-xs leading-snug text-center max-w-60 my-1";
     ttDescription.setAttribute("data-l10n-id", text);
     layout.appendChild(ttDescription);
 }
