@@ -11,11 +11,23 @@ import DistrictHealthManager from '/base-standard/ui/district/district-health-ma
 import LensManager from '/core/ui/lenses/lens-manager.js';
 import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
 
+// box metrics for warning banners
+const BZ_BORDER_WIDTH = "0.1111111111rem";  // tooltip main border
+
 // additional CSS definitions
 const BZ_HEAD_STYLE = document.createElement('style');
 BZ_HEAD_STYLE.textContent = `
-/* fixes text-center paragraphs with icons in the text */
+/* fix text-center paragraphs with icons in the text */
 .bz-tooltip .text-center p { width: 100% }
+.tooltip.plot-tooltip.bz-tooltip .tooltip__content {
+    padding-top: 0rem;
+}
+.bz-banner {
+    margin-left: calc(${BZ_BORDER_WIDTH} - var(--padding-left-right));
+    margin-right: calc(${BZ_BORDER_WIDTH} - var(--padding-left-right));
+    padding-left: calc(var(--padding-left-right) - ${BZ_BORDER_WIDTH});
+    padding-right: calc(var(--padding-left-right) - ${BZ_BORDER_WIDTH});
+}
 `
 document.head.appendChild(BZ_HEAD_STYLE);
 
@@ -49,11 +61,11 @@ const BZ_COLOR = {
     amber: "#cea92f",  // caution
     brown: "#604639",  // note
     // geographic colors
-    hill: "#604639",  // note
-    ocean: "#204060",  // wet
-    vegetated: "#445533",  // vegetated
-    wet: "#335577",  // wet
-    route: "#9f8060",  // road, ferry, railroad (TODO)
+    hill: "#4c5366",  // Rough terrain (TODO)
+    ocean: "#204060",  // Open Ocean terrain
+    vegetated: "#445533",  // Vegetated features
+    wet: "#335577",  // Wet features
+    route: "#9f8060",  // Road, Ferry, Railroad (TODO)
     // yield types
     culture: "#bf99e6",  // violet
     diplomacy: "#99e6bf",  // teal
@@ -68,22 +80,22 @@ const BZ_ALERT = {
     secondary: { "background-color": BZ_COLOR.secondary, "color": BZ_COLOR.black },
     black: { "background-color": BZ_COLOR.black },
     red: { "background-color": BZ_COLOR.red },
+    redAmber: { "background-color": BZ_COLOR.red, "color": BZ_COLOR.amber },
     amber: { "background-color": BZ_COLOR.amber, "color": BZ_COLOR.black },
     brown: { "background-color": BZ_COLOR.brown },
 }
 const BZ_STYLE = {
     // TODO: choose colors
-    river: { "background-color": BZ_COLOR.wet },
     route: { "background-color": BZ_COLOR.route, "color": BZ_COLOR.black },
     wonder: { "background-color": BZ_COLOR.silver },  // TODO
-    // terrain types
+    volcano: BZ_ALERT.amber,
+    // obstacle types
     TERRAIN_HILL: { "background-color": BZ_COLOR.hill },
-    TERRAIN_MOUNTAIN: { "background-color": BZ_COLOR.silver },
     TERRAIN_OCEAN: { "background-color": BZ_COLOR.ocean },
-    // terrain features
-    FEATURE_VOLCANO: BZ_ALERT.amber,
     FEATURE_CLASS_VEGETATED: { "background-color": BZ_COLOR.vegetated },
     FEATURE_CLASS_WET: { "background-color": BZ_COLOR.wet },
+    RIVER_MINOR: { "background-color": BZ_COLOR.wet },
+    RIVER_NAVIGABLE: { "background-color": BZ_COLOR.wet },
 }
 
 // accent colors for building icons
@@ -97,14 +109,6 @@ const BZ_YIELD_COLOR = {
     "YIELD_SCIENCE": BZ_COLOR.science,  // blue
     null: BZ_COLOR.bronze,  //default
 }
-
-// box metrics for warning banners
-const BZ_BORDER_WIDTH = "0.1111111111rem";
-const BZ_SIDE_MARGIN = `calc(${BZ_BORDER_WIDTH} - var(--padding-left-right))`;
-const BZ_SIDE_PADDING = `calc(var(--padding-left-right) - ${BZ_BORDER_WIDTH})`;
-// TODO: use these to format title banners
-const _BZ_TOP_MARGIN = `calc(${BZ_BORDER_WIDTH} - var(--padding-top-bottom))`;
-const _BZ_TOP_PADDING = `calc(var(--padding-top-bottom) - ${BZ_BORDER_WIDTH})`;
 
 function adjacencyYield(building) {
     if (!building) return [];
@@ -122,6 +126,26 @@ function buildingsTagged(tag) {
 function dotJoin(list) {
     // join text with dots after removing empty elements
     return list.filter(e => e).join(" " + BZ_DOT_DIVIDER + " ");
+}
+// get the movement class for a unit (by default, the selected unit)
+function movementClass(unitID=null) {
+    unitID = unitID ?? UI.Player.getHeadSelectedUnit();
+    const unit = unitID && Units.get(unitID);
+    const unitType = unit && GameInfo.Units.lookup(unit?.type);
+    return unitType?.UnitMovementClass ?? "UNIT_MOVEMENT_CLASS_FOOT";
+}
+// get the set of obstacles that end movement for a movement class
+function movementObstacles(mclass) {
+    const features = GameInfo.UnitMovementClassObstacles
+        .filter(o => o.UnitMovementClass == mclass && o.EndsTurn && o.FeatureType)
+        .map(o => o.FeatureType);
+    const rivers = GameInfo.UnitMovementClassObstacles
+        .filter(o => o.UnitMovementClass == mclass && o.EndsTurn && o.RiverType)
+        .map(o => o.RiverType);
+    const terrains = GameInfo.UnitMovementClassObstacles
+        .filter(o => o.UnitMovementClass == mclass && o.EndsTurn && o.TerrainType)
+        .map(o => o.TerrainType);
+    return new Set([...features, ...rivers, ...terrains]);
 }
 function getConnections(city) {
     const ids = city?.getConnectedCities();
@@ -206,11 +230,7 @@ function setStyle(element, style) {
     }
 }
 function setBannerStyle(element, style=BZ_ALERT.red, ...classes) {
-    if (classes.length) element.classList.add(...classes);
-    element.style.setProperty("margin-left", BZ_SIDE_MARGIN);
-    element.style.setProperty("margin-right", BZ_SIDE_MARGIN);
-    element.style.setProperty("padding-left", BZ_SIDE_PADDING);
-    element.style.setProperty("padding-right", BZ_SIDE_PADDING);
+    element.classList.add("bz-banner", ...classes);
     setStyle(element, style);
 }
 function setCapsuleStyle(element, style, ...classes) {
@@ -232,6 +252,8 @@ class PlotTooltipType {
         this.agelessBuildings = buildingsTagged("AGELESS");
         this.extraBuildings = buildingsTagged("IGNORE_DISTRICT_PLACEMENT_CAP");
         this.largeBuildings = buildingsTagged("FULL_TILE");
+        this.movementClass = movementClass();
+        this.obstacles = movementObstacles(this.movementClass);
         Loading.runWhenFinished(() => {
             for (const y of GameInfo.Yields) {
                 const url = UI.getIcon(`${y.YieldType}`, "YIELD");
@@ -268,6 +290,12 @@ class PlotTooltipType {
             return;
         }
         this.isShowingDebug = UI.isDebugPlotInfoVisible();  // Ensure debug status hasn't changed
+        // update unit movement data
+        const mclass = movementClass();
+        if (mclass != this.movementClass) {
+            this.movementClass = mclass;
+            this.obstacles = movementObstacles(this.movementClass);
+        }
         // Obtain names and IDs
         const loc = this.plotCoord;
         const plotIndex = GameplayMap.getIndexFromLocation(loc);
@@ -328,16 +356,6 @@ class PlotTooltipType {
         const divider = document.createElement("div");
         divider.classList.add("plot-tooltip__Divider", "my-2");
         this.container.appendChild(divider);
-    }
-    getContinentName(loc) {
-        const continentType = GameplayMap.getContinentType(loc.x, loc.y);
-        const continent = GameInfo.Continents.lookup(continentType);
-        if (continent && continent.Description) {
-            return continent.Description;
-        }
-        else {
-            return "";
-        }
     }
     getConstructibleInfo(loc) {
         const constructibleInfo = [];
@@ -405,13 +423,15 @@ class PlotTooltipType {
         const banners = [];
         banners.push(...this.getSettlerBanner(loc));
         banners.push(...effects.banners);
-        // TODO: make these flush with the top of the panel?
         for (const banner of banners) {
             this.container.appendChild(banner);
         }
         // tooltip title: terrain & biome
         const ttTitle = document.createElement("div");
         ttTitle.classList.value = "text-secondary font-title text-sm leading-tight uppercase text-center";
+        if (!banners.length) {
+            ttTitle.style.setProperty("padding-top", "var(--padding-top-bottom)");
+        }
         const ttTerrain = document.createElement("div");
         setCapsuleStyle(ttTerrain, terrainLabel.style, "my-0\\.5");
         const title = biomeLabel ?
@@ -432,8 +452,8 @@ class PlotTooltipType {
         }
         if (riverLabel) {
             const tt = document.createElement("div");
-            setCapsuleStyle(tt, BZ_STYLE.river, "my-0\\.5");
-            tt.setAttribute('data-l10n-id', riverLabel);
+            setCapsuleStyle(tt, riverLabel.style, "my-0\\.5");
+            tt.setAttribute('data-l10n-id', riverLabel.text);
             ttGeo.appendChild(tt);
         }
         if (routeName) {  // road, ferry, trade route info
@@ -463,21 +483,6 @@ class PlotTooltipType {
         }
         this.container.appendChild(ttGeo);
     }
-    appendHexSection(loc, city, district) {
-        switch (district?.type) {
-            case DistrictTypes.CITY_CENTER:
-            case DistrictTypes.URBAN:
-                this.appendUrbanSection(loc, city, district);
-                break;
-            case DistrictTypes.WONDER:
-                this.appendWonderSection(loc);
-                break;
-            case DistrictTypes.RURAL:
-            case DistrictTypes.WILDERNESS:
-            default:
-                this.appendRuralSection(loc, city, district);
-        }
-    }
     appendSettlementSection(loc, player, city) {
         const name = city ?  city.name :  // city or town
             player.isAlive ?  this.getCivName(player) :  // village
@@ -501,6 +506,21 @@ class PlotTooltipType {
                 const statStyle = ["leading-snug", "mb-1"];
                 layoutNotes(this.container, stats, statStyle);
             }
+        }
+    }
+    appendHexSection(loc, city, district) {
+        switch (district?.type) {
+            case DistrictTypes.CITY_CENTER:
+            case DistrictTypes.URBAN:
+                this.appendUrbanSection(loc, city, district);
+                break;
+            case DistrictTypes.WONDER:
+                this.appendWonderSection(loc);
+                break;
+            case DistrictTypes.RURAL:
+            case DistrictTypes.WILDERNESS:
+            default:
+                this.appendRuralSection(loc, city, district);
         }
     }
     getPlayerName(player) {
@@ -548,11 +568,17 @@ class PlotTooltipType {
         const name = player.Diplomacy.getRelationshipLevelName(localPlayerID);
         return { type: name, isEnemy: false };
     }
+    obstacleStyle(obstacleType, ...fallbackStyles) {
+        if (!this.obstacles.has(obstacleType)) return null;
+        const style = [obstacleType, ...fallbackStyles].find(s => s in BZ_STYLE);
+        if (style) return BZ_STYLE[style];
+        return BZ_ALERT.amber;
+    }
     getTerrainLabel(loc) {
         const terrainType = GameplayMap.getTerrainType(loc.x, loc.y);
         const terrain = GameInfo.Terrains.lookup(terrainType);
         let text = terrain?.Name ?? ""
-        let style = BZ_STYLE[terrain.TerrainType];
+        let style = this.obstacleStyle(terrain.TerrainType);
         if (!text) return { text, style };
         if (terrain.TerrainType == "TERRAIN_COAST" && GameplayMap.isLake(loc.x, loc.y)) {
             text = "LOC_TERRAIN_LAKE_NAME";
@@ -570,6 +596,56 @@ class PlotTooltipType {
         return this.isShowingDebug ?
             Locale.compose('{1_Name} ({2_Value})', biome.Name, biomeType.toString()) :
             biome.Name;
+    }
+    getFeatureLabel(loc) {
+        const featureType = GameplayMap.getFeatureType(loc.x, loc.y);
+        const feature = GameInfo.Features.lookup(featureType);
+        if (!feature) return null;
+        let text = feature.Name;
+        let style = this.obstacleStyle(feature.FeatureType, feature.FeatureClassType);
+        if (GameplayMap.isVolcano(loc.x, loc.y)) {
+            const active = GameplayMap.isVolcanoActive(loc.x, loc.y);
+            const volcanoStatus = (active) ? 'LOC_VOLCANO_ACTIVE' : 'LOC_VOLCANO_NOT_ACTIVE';
+            const volcanoName = GameplayMap.getVolcanoName(loc.x, loc.y);
+            const volcanoDetailsKey = (volcanoName) ? 'LOC_UI_NAMED_VOLCANO_DETAILS' : 'LOC_UI_VOLCANO_DETAILS';
+            text = Locale.compose(volcanoDetailsKey, text, volcanoStatus, volcanoName);
+            // highlight active volcanoes
+            if (active) style = BZ_STYLE.volcano;
+        }
+        return { text, style };
+    }
+    getRiverLabel(loc) {
+        const riverType = GameplayMap.getRiverType(loc.x, loc.y);
+        if (riverType == RiverTypes.NO_RIVER) return null;
+        let text = GameplayMap.getRiverName(loc.x, loc.y);
+        let style;
+        switch (riverType) {
+            case RiverTypes.RIVER_MINOR:
+                if (!text) text = "LOC_MINOR_RIVER_NAME";
+                style = this.obstacleStyle("RIVER_MINOR");
+                break;
+            case RiverTypes.RIVER_NAVIGABLE:
+                if (!text) text = "LOC_NAVIGABLE_RIVER_NAME";
+                style = this.obstacleStyle("RIVER_NAVIGABLE");
+                break;
+        }
+        if (!text) return null;
+        return { text, style };
+    }
+    getContinentName(loc) {
+        const continentType = GameplayMap.getContinentType(loc.x, loc.y);
+        const continent = GameInfo.Continents.lookup(continentType);
+        if (continent && continent.Description) {
+            return continent.Description;
+        }
+        else {
+            return "";
+        }
+    }
+    getDistantLandsLabel(loc) {
+        const localPlayer = Players.get(GameContext.localPlayerID);
+        return localPlayer?.isDistantLands(loc) ?
+            "LOC_RESOURCE_GENERAL_TYPE_DISTANT_LANDS" : "";
     }
     getResource() {
         if (this.plotCoord) {
@@ -655,7 +731,7 @@ class PlotTooltipType {
         }
         if (warning) {
             const tt = document.createElement("div");
-            tt.classList.value = "text-xs leading-normal text-center";
+            tt.classList.value = "text-xs leading-normal text-center my-0\\.5";
             setBannerStyle(tt, warningStyle);
             tt.setAttribute('data-l10n-id', warning);
             banners.push(tt);
@@ -702,48 +778,6 @@ class PlotTooltipType {
         ttCiv.setAttribute('data-l10n-id', civName);
         layout.appendChild(ttCiv);
         this.container.appendChild(layout);
-    }
-    getRiverLabel(loc) {
-        const riverType = GameplayMap.getRiverType(loc.x, loc.y);
-        if (riverType != RiverTypes.NO_RIVER) {
-            let riverNameLabel = GameplayMap.getRiverName(loc.x, loc.y);
-            if (!riverNameLabel) {
-                switch (riverType) {
-                    case RiverTypes.RIVER_MINOR:
-                        riverNameLabel = "LOC_MINOR_RIVER_NAME";
-                        break;
-                    case RiverTypes.RIVER_NAVIGABLE:
-                        riverNameLabel = "LOC_NAVIGABLE_RIVER_NAME";
-                        break;
-                }
-            }
-            return riverNameLabel;
-        }
-        else {
-            return "";
-        }
-    }
-    getDistantLandsLabel(loc) {
-        const localPlayer = Players.get(GameContext.localPlayerID);
-        return localPlayer?.isDistantLands(loc) ?
-            "LOC_RESOURCE_GENERAL_TYPE_DISTANT_LANDS" : "";
-    }
-    getFeatureLabel(loc) {
-        const featureType = GameplayMap.getFeatureType(loc.x, loc.y);
-        const feature = GameInfo.Features.lookup(featureType);
-        if (!feature) return null;
-        let text = feature.Name;
-        let style = BZ_STYLE[feature.Tooltip ? "wonder" : feature.FeatureClassType];
-        if (GameplayMap.isVolcano(loc.x, loc.y)) {
-            const active = GameplayMap.isVolcanoActive(loc.x, loc.y);
-            const volcanoStatus = (active) ? 'LOC_VOLCANO_ACTIVE' : 'LOC_VOLCANO_NOT_ACTIVE';
-            const volcanoName = GameplayMap.getVolcanoName(loc.x, loc.y);
-            const volcanoDetailsKey = (volcanoName) ? 'LOC_UI_NAMED_VOLCANO_DETAILS' : 'LOC_UI_VOLCANO_DETAILS';
-            text = Locale.compose(volcanoDetailsKey, text, volcanoStatus, volcanoName);
-            // only highlight active volcanoes
-            if (!active) style = undefined;
-        }
-        return { text, style };
     }
     appendUnitInfo(loc) {
         const localPlayerID = GameContext.localObserverID;
@@ -844,8 +878,7 @@ class PlotTooltipType {
             const conquerorText = Locale.compose("{1_Term} {2_Subject}", "LOC_PLOT_TOOLTIP_CONQUEROR", conquerorName);
             const ttConqueror = document.createElement("div");
             ttConqueror.classList.value = "text-xs leading-tight text-center";
-            ttConqueror.style.setProperty("color", BZ_ALERT.amber);
-            setBannerStyle(ttConqueror);
+            setBannerStyle(ttConqueror, BZ_ALERT.redAmber);
             ttConqueror.innerHTML = conquerorText;
             this.container.appendChild(ttConqueror);
         }
@@ -861,17 +894,14 @@ class PlotTooltipType {
             return;
         }
         const districtContainer = document.createElement("div");
-        districtContainer.classList.add("plot-tooltip__district-container");
-        setBannerStyle(districtContainer);  // fix margins
+        districtContainer.classList.value = "text-xs leading-tight text-center";
+        setBannerStyle(districtContainer);
         const districtTitle = document.createElement("div");
-        districtTitle.classList.add("plot-tooltip__district-title", "plot-tooltip__lineThree");
-        districtTitle.innerHTML = isUnderSiege ? Locale.compose("LOC_PLOT_TOOLTIP_UNDER_SIEGE") : Locale.compose("LOC_PLOT_TOOLTIP_HEALING_DISTRICT");
+        districtTitle.setAttribute("data-l10n-id", isUnderSiege ?
+            "LOC_PLOT_TOOLTIP_UNDER_SIEGE" : "LOC_PLOT_TOOLTIP_HEALING_DISTRICT");
         const districtHealth = document.createElement("div");
-        districtHealth.classList.add("plot-tooltip__district-health");
-        const healthCaption = document.createElement("div");
-        healthCaption.classList.add("plot-tooltip__health-caption", "plot-tooltip__lineThree");
-        healthCaption.innerHTML = currentHealth + '/' + maxHealth;
-        districtHealth.appendChild(healthCaption);
+        setStyle(districtHealth, BZ_ALERT.redAmber);
+        districtHealth.innerHTML = currentHealth + '/' + maxHealth;
         districtContainer.appendChild(districtTitle);
         districtContainer.appendChild(districtHealth);
         this.container.appendChild(districtContainer);
