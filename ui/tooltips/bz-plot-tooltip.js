@@ -85,19 +85,16 @@ const BZ_ALERT = {
     brown: { "background-color": BZ_COLOR.brown },
 }
 const BZ_STYLE = {
-    // TODO: choose colors
     route: { "background-color": BZ_COLOR.route, "color": BZ_COLOR.black },
-    wonder: { "background-color": BZ_COLOR.silver },  // TODO
     volcano: BZ_ALERT.amber,
     // obstacle types
-    TERRAIN_HILL: { "background-color": BZ_COLOR.hill },
-    TERRAIN_OCEAN: { "background-color": BZ_COLOR.ocean },
+    TERRAIN_HILL: { "background-color": BZ_COLOR.hill, "color": BZ_COLOR.accent2 },
+    TERRAIN_OCEAN: {},  // don't need to highlight this
     FEATURE_CLASS_VEGETATED: { "background-color": BZ_COLOR.vegetated },
     FEATURE_CLASS_WET: { "background-color": BZ_COLOR.wet },
     RIVER_MINOR: { "background-color": BZ_COLOR.wet },
     RIVER_NAVIGABLE: { "background-color": BZ_COLOR.wet },
 }
-
 // accent colors for building icons
 const BZ_YIELD_COLOR = {
     "YIELD_CULTURE": BZ_COLOR.culture,  // violet
@@ -131,11 +128,14 @@ function dotJoin(list) {
 function movementClass(unitID=null) {
     unitID = unitID ?? UI.Player.getHeadSelectedUnit();
     const unit = unitID && Units.get(unitID);
-    const unitType = unit && GameInfo.Units.lookup(unit?.type);
+    const unitType = unit && GameInfo.Units.lookup(unit.type);
     return unitType?.UnitMovementClass ?? "UNIT_MOVEMENT_CLASS_FOOT";
 }
 // get the set of obstacles that end movement for a movement class
+const BZ_OBSTACLES = {};  // cache
 function movementObstacles(mclass) {
+    if (!mclass) mclass = movementClass();
+    if (mclass in BZ_OBSTACLES) return BZ_OBSTACLES[mclass];
     const features = GameInfo.UnitMovementClassObstacles
         .filter(o => o.UnitMovementClass == mclass && o.EndsTurn && o.FeatureType)
         .map(o => o.FeatureType);
@@ -145,7 +145,7 @@ function movementObstacles(mclass) {
     const terrains = GameInfo.UnitMovementClassObstacles
         .filter(o => o.UnitMovementClass == mclass && o.EndsTurn && o.TerrainType)
         .map(o => o.TerrainType);
-    return new Set([...features, ...rivers, ...terrains]);
+    return BZ_OBSTACLES[mclass] = new Set([...features, ...rivers, ...terrains]);
 }
 function getConnections(city) {
     const ids = city?.getConnectedCities();
@@ -207,7 +207,7 @@ function layoutRules(layout, text, caption=null) {
         layout.appendChild(ttCaption);
     }
     const ttDescription = document.createElement("div");
-    ttDescription.classList.value = "text-xs leading-snug text-center w-auto my-1";
+    ttDescription.classList.value = "text-xs leading-snug text-center w-64 my-1";
     ttDescription.setAttribute("data-l10n-id", text);
     layout.appendChild(ttDescription);
 }
@@ -252,8 +252,7 @@ class PlotTooltipType {
         this.agelessBuildings = buildingsTagged("AGELESS");
         this.extraBuildings = buildingsTagged("IGNORE_DISTRICT_PLACEMENT_CAP");
         this.largeBuildings = buildingsTagged("FULL_TILE");
-        this.movementClass = movementClass();
-        this.obstacles = movementObstacles(this.movementClass);
+        this.obstacles = movementObstacles();
         Loading.runWhenFinished(() => {
             for (const y of GameInfo.Yields) {
                 const url = UI.getIcon(`${y.YieldType}`, "YIELD");
@@ -290,12 +289,6 @@ class PlotTooltipType {
             return;
         }
         this.isShowingDebug = UI.isDebugPlotInfoVisible();  // Ensure debug status hasn't changed
-        // update unit movement data
-        const mclass = movementClass();
-        if (mclass != this.movementClass) {
-            this.movementClass = mclass;
-            this.obstacles = movementObstacles(this.movementClass);
-        }
         // Obtain names and IDs
         const loc = this.plotCoord;
         const plotIndex = GameplayMap.getIndexFromLocation(loc);
@@ -306,6 +299,8 @@ class PlotTooltipType {
         const player = Players.get(playerID);
         const city = cityID ? Cities.get(cityID) : null;
         const district = districtID ? Districts.get(districtID) : null;
+        // update unit movement data
+        this.obstacles = movementObstacles();
         // collect yields first, to inform panel layouts
         this.collectYields(loc, district);
         // geography section
@@ -492,7 +487,7 @@ class PlotTooltipType {
         // owner info
         this.appendOwnerInfo(loc, player);
         // show settlement stats when hovering over the center
-        if (loc.x == city.location.x && loc.y == city.location.y) {
+        if (city && city.location.x == loc.x && city.location.y == loc.y) {
             const stats = [];
             // settlement connections
             const connections = getConnections(city);
@@ -720,10 +715,10 @@ class PlotTooltipType {
         if (!GameplayMap.isPlotInAdvancedStartRegion(GameContext.localPlayerID, loc.x, loc.y) && !localPlayerAdvancedStart?.getPlacementComplete()) {
             warning = "LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_FAR";
         } else if (!localPlayerDiplomacy.isValidLandClaimLocation(loc, true /*bIgnoreFriendlyUnitRequirement*/)) {
-            if (GameplayMap.isCityWithinMinimumDistance(loc.x, loc.y)) {
-                warning = "LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_CLOSE";
-            } else if (GameplayMap.getResourceType(loc.x, loc.y) != ResourceTypes.NO_RESOURCE) {
+            if (GameplayMap.getResourceType(loc.x, loc.y) != ResourceTypes.NO_RESOURCE) {
                 warning = "LOC_PLOT_TOOLTIP_CANT_SETTLE_RESOURCES";
+            } else {  // if (GameplayMap.isCityWithinMinimumDistance(loc.x, loc.y)) {
+                warning = "LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_CLOSE";
             }
         } else if (!GameplayMap.isFreshWater(loc.x, loc.y)) {
             warningStyle = BZ_ALERT.amber;
