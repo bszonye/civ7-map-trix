@@ -137,24 +137,23 @@ function adjacencyYield(building) {
     const yieldSet = new Set(adjYields.map(ay => ay.YieldType));
     return [...yieldSet];
 }
-function buildingsTagged(tag) {
-    return new Set(GameInfo.TypeTags.filter(e => e.Tag == tag).map(e => e.Type));
-}
 function dotJoin(list) {
     // join text with dots after removing empty elements
     return list.filter(e => e).join(" " + BZ_DOT_DIVIDER + " ");
 }
-// get the movement class for a unit (by default, the selected unit)
-function movementClass(unitID=null) {
-    unitID = unitID ?? UI.Player.getHeadSelectedUnit();
-    const unit = unitID && Units.get(unitID);
-    const unitType = unit && GameInfo.Units.lookup(unit.type);
-    return unitType?.UnitMovementClass ?? "UNIT_MOVEMENT_CLASS_FOOT";
+function gatherBuildingsTagged(tag) {
+    return new Set(GameInfo.TypeTags.filter(e => e.Tag == tag).map(e => e.Type));
 }
 // get the set of obstacles that end movement for a movement class
 const BZ_OBSTACLES = {};  // cache
-function movementObstacles(mclass) {
-    if (!mclass) mclass = movementClass();
+function gatherMovementObstacles(mclass) {
+    if (!mclass) {
+        // get the movement class for the selected unit
+        const unitID = UI.Player.getHeadSelectedUnit();
+        const unit = unitID && Units.get(unitID);
+        const unitType = unit && GameInfo.Units.lookup(unit.type);
+        mclass = unitType?.UnitMovementClass ?? "UNIT_MOVEMENT_CLASS_FOOT";
+    }
     if (mclass in BZ_OBSTACLES) return BZ_OBSTACLES[mclass];
     const obstacles = new Set();
     for (const o of GameInfo.UnitMovementClassObstacles) {
@@ -186,37 +185,6 @@ function getSpecialists(loc, city) {
     if (!workers) return null;  // hide 0/X specialists
     return { workers, maximum };
 }
-// lay out a column of constructibles and their construction notes
-function layoutConstructibles(layout, constructibles) {
-    const ttList = document.createElement("div");
-    ttList.classList.value = "text-xs leading-tight";
-    let bottom;  // last entry will set bottom margin
-    for (const c of constructibles) {
-        bottom = "mb-0";  // default
-        const ttConstructible = document.createElement("div");
-        ttConstructible.classList.value = "my-0\\.5";
-        const ttName = document.createElement("div");
-        ttName.classList.value = "font-title uppercase text-accent-2";
-        ttName.setAttribute("data-l10n-id", c.info.Name);
-        ttConstructible.appendChild(ttName);
-        const notes = dotJoin(c.notes.map(e => Locale.compose(e)));
-        if (notes) {
-            const ttState = document.createElement("div");
-            ttState.style.setProperty("font-size", "85%");
-            if (c.isDamaged) {
-                setCapsuleStyle(ttState, BZ_ALERT.amber);
-            } else {
-                ttState.classList.value = "leading-none";
-                bottom = "mb-1";
-            }
-            ttState.innerHTML = notes;
-            ttConstructible.appendChild(ttState);
-        }
-        if (bottom) ttList.classList.add(bottom);
-        ttList.appendChild(ttConstructible);
-    }
-    layout.appendChild(ttList);
-}
 function setStyle(element, style) {
     if (!element || !style) return;
     for (const [property, value] of Object.entries(style)) {
@@ -244,10 +212,10 @@ class PlotTooltipType {
         this.yieldsFlexbox = document.createElement('div');
         this.totalYields = 0;
         this.isEnemy = false;  // is the plot held by an enemy?
-        this.agelessBuildings = buildingsTagged("AGELESS");
-        this.extraBuildings = buildingsTagged("IGNORE_DISTRICT_PLACEMENT_CAP");
-        this.largeBuildings = buildingsTagged("FULL_TILE");
-        this.obstacles = movementObstacles();
+        this.agelessBuildings = gatherBuildingsTagged("AGELESS");
+        this.extraBuildings = gatherBuildingsTagged("IGNORE_DISTRICT_PLACEMENT_CAP");
+        this.largeBuildings = gatherBuildingsTagged("FULL_TILE");
+        this.obstacles = gatherMovementObstacles();
         Loading.runWhenFinished(() => {
             for (const y of GameInfo.Yields) {
                 const url = UI.getIcon(`${y.YieldType}`, "YIELD");
@@ -295,7 +263,7 @@ class PlotTooltipType {
         const city = cityID ? Cities.get(cityID) : null;
         const district = districtID ? Districts.get(districtID) : null;
         // update unit movement data
-        this.obstacles = movementObstacles();
+        this.obstacles = gatherMovementObstacles();
         // collect yields first, to inform panel layouts
         this.collectYields(loc, district);
         // geography section
@@ -346,6 +314,37 @@ class PlotTooltipType {
         const divider = document.createElement("div");
         divider.classList.add("plot-tooltip__Divider", "my-2");
         this.container.appendChild(divider);
+    }
+    // lay out a column of constructibles and their construction notes
+    appendConstructibles(constructibles) {
+        const ttList = document.createElement("div");
+        ttList.classList.value = "text-xs leading-tight";
+        let bottom;  // last entry will set bottom margin
+        for (const c of constructibles) {
+            bottom = "mb-0";  // default
+            const ttConstructible = document.createElement("div");
+            ttConstructible.classList.value = "my-0\\.5";
+            const ttName = document.createElement("div");
+            ttName.classList.value = "font-title uppercase text-accent-2";
+            ttName.setAttribute("data-l10n-id", c.info.Name);
+            ttConstructible.appendChild(ttName);
+            const notes = dotJoin(c.notes.map(e => Locale.compose(e)));
+            if (notes) {
+                const ttState = document.createElement("div");
+                ttState.style.setProperty("font-size", "85%");
+                if (c.isDamaged) {
+                    setCapsuleStyle(ttState, BZ_ALERT.amber);
+                } else {
+                    ttState.classList.value = "leading-none";
+                    bottom = "mb-1";
+                }
+                ttState.innerHTML = notes;
+                ttConstructible.appendChild(ttState);
+            }
+            if (bottom) ttList.classList.add(bottom);
+            ttList.appendChild(ttConstructible);
+        }
+        this.container.appendChild(ttList);
     }
     // lay out paragraphs of rules text
     appendRules(text, ...styles) {
@@ -969,7 +968,7 @@ class PlotTooltipType {
             this.appendRules([hexRules], "text-xs leading-snug my-0\\.5");  // TODO: whitespace
         }
         // constructibles
-        layoutConstructibles(this.container, constructibles);
+        this.appendConstructibles(constructibles);
         // show additional notes
         if (hexNotes.length) {
             this.appendRules(hexNotes, "text-xs leading-snug my-0\\.5");  // TODO: whitespace
@@ -1051,11 +1050,8 @@ class PlotTooltipType {
         if (hexRules) {
             this.appendRules([hexRules], "text-xs leading-snug my-0\\.5");  // TODO: whitespace
         }
-        const layout = document.createElement("div");
         // constructibles
-        layoutConstructibles(layout, constructibles);
-        // add to tooltip
-        this.container.appendChild(layout);
+        this.appendConstructibles(constructibles);
         // bottom bar
         if (hexIcon) {
             this.appendIconDivider(hexIcon, resourceIcon);
