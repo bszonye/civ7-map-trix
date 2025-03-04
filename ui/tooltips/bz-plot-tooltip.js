@@ -17,11 +17,12 @@ const BZ_BORDER_WIDTH = "0.1111111111rem";  // tooltip main border
 // additional CSS definitions
 const BZ_HEAD_STYLE = document.createElement('style');
 BZ_HEAD_STYLE.textContent = [
-`.bz-tooltip {
-    /* width: 28.4444444444rem;  /* DEBUG */
-}`,
 `.tooltip.plot-tooltip.bz-tooltip .tooltip__content {
+    /* width: 21.3333333333rem;  /* DEBUG */
     padding-top: 0rem;
+}`,
+`.bz-tooltip {
+    text-align: center;
 }`,
 `.bz-banner {
     margin-left: calc(${BZ_BORDER_WIDTH} - var(--padding-left-right));
@@ -35,17 +36,17 @@ BZ_HEAD_STYLE.textContent = [
 // result also changes with single-line vs multi-line text.  these rules
 // apply the properties in the correct order & scope to work with all
 // combinations (with/without icons, single/multiple lines).
-`.bz-tooltip .bz-rules-container {
+`.bz-tooltip .bz-rules-center {
     width: 100%;
     text-align: center;
     background-color: #00808080;  /* DEBUG */
 }
-.bz-tooltip .bz-rules-center {
+.bz-tooltip .bz-rules-max-width {
     width: 100%;
     max-width: 13.3333333333rem;
     background-color: #00800080;  /* DEBUG */
 }
-.bz-tooltip .bz-rules-center > p {
+.bz-tooltip .bz-rules-center p {
     width: 100%;
     background-color: #80808080;  /* DEBUG */
 }`,
@@ -221,12 +222,12 @@ function layoutConstructibles(layout, constructibles) {
 // lay out paragraphs of rules text
 function layoutRules(layout, text, ...styles) {
     const ttText = document.createElement("div");
-    ttText.classList.add("bz-rules-container");
+    ttText.classList.add("bz-rules-center");
     for (const [i, row] of text.entries()) {
         const ttRow = document.createElement("div");
         const style = styles.at(i) ?? styles.at(-1);
         if (style) ttRow.classList.value = style;
-        ttRow.classList.add("bz-rules-center");
+        ttRow.classList.add("bz-rules-max-width");
         ttRow.setAttribute("data-l10n-id", row);
         ttText.appendChild(ttRow);
     }
@@ -970,8 +971,6 @@ class PlotTooltipType {
         layout.classList.value = "max-w-80";
         // show rules for city-states and unique quarters
         if (hexSubtitle) {
-            // TODO: title formatting
-            // TODO: city-state bonus titles = "font-title text-xs leading-tight uppercase text-center";
             const title = "font-title text-xs leading-tight uppercase";
             const body = "text-xs leading-snug my-0\\.5";  // TODO: whitespace
             layoutRules(this.container, [hexSubtitle, hexRules], title, body);
@@ -1118,27 +1117,25 @@ class PlotTooltipType {
     }
     appendFlexDivider(center, style=null) {
         const layout = document.createElement("div");
-        layout.classList.add("flex", "flex-row", "justify-between", "items-center");
-        layout.classList.add("self-center", "-mx-6", "flex-auto");
+        layout.classList.value = "flex-auto flex justify-between items-center -mx-6";
         if (style) layout.classList.add(style);
         this.container.appendChild(layout);
         // left frame
         const lineLeft = document.createElement("div");
-        lineLeft.classList.add("h-0\\.5", "flex-auto", "min-w-6", "ml-1\\.5");
+        lineLeft.classList.value = "flex-auto h-0\\.5 min-w-6 ml-1\\.5";
         lineLeft.style.setProperty("background-image", "linear-gradient(to left, #8D97A6, rgba(141, 151, 166, 0))");
         layout.appendChild(lineLeft);
         // content
         layout.appendChild(center);
         // right frame
         const lineRight = document.createElement("div");
-        lineRight.classList.add("h-0\\.5", "flex-auto", "min-w-6", "mr-1\\.5");
+        lineRight.classList.value = "flex-auto h-0\\.5 min-w-6 mr-1\\.5";
         lineRight.style.setProperty("background-image", "linear-gradient(to right, #8D97A6, rgba(141, 151, 166, 0))");
         layout.appendChild(lineRight);
     }
     appendTitleDivider(text=BZ_DOT_DIVIDER) {
         const layout = document.createElement("div");
-        layout.classList.add("self-center", "text-center", "mx-3", "max-w-80");
-        layout.classList.add("font-title", "uppercase", "text-sm", "leading-tight");
+        layout.classList.value = "font-title uppercase text-sm mx-3 max-w-80";
         layout.setAttribute("data-l10n-id", text);
         this.appendFlexDivider(layout);
     }
