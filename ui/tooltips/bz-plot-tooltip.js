@@ -393,10 +393,11 @@ class PlotTooltipType {
         const terrainLabel = this.getTerrainLabel(loc);
         const biomeLabel = this.getBiomeLabel(loc);
         const featureLabel = this.getFeatureLabel(loc);
-        const riverLabel = this.getRiverLabel(loc);
+        const river = this.getRiverInfo(loc);
         const continentName = this.getContinentName(loc);
         const distantLandsLabel = this.getDistantLandsLabel(loc);
-        const routeList = this.getRouteList();
+        const routes = this.getRouteList();
+        const hasRoad = routes.length != 0;
         // alert banners: settler warnings, damaging & defense effects
         const banners = [];
         banners.push(...this.getSettlerBanner(loc));
@@ -427,13 +428,16 @@ class PlotTooltipType {
             tt.setAttribute('data-l10n-id', featureLabel.text);
             layout.appendChild(tt);
         }
-        if (riverLabel) routeList.push(riverLabel.text);
-        if (routeList) {
+        if (river) routes.push(river.name);
+        if (routes.length) {
             // road, ferry, river info
             const tt = document.createElement("div");
-            // TODO: don't highlight road over minor river?
-            setCapsuleStyle(tt, riverLabel?.style, "my-0\\.5");
-            tt.innerHTML = dotJoinLocale(routeList);
+            if (hasRoad && river?.type == RiverTypes.RIVER_MINOR) {
+                // roads ignore minor rivers
+            } else if (river) {
+                setCapsuleStyle(tt, river.style, "my-0\\.5");
+            }
+            tt.innerHTML = dotJoinLocale(routes);
             layout.appendChild(tt);
         }
         if (effects.text.length) {
@@ -568,23 +572,23 @@ class PlotTooltipType {
         }
         return { text, style };
     }
-    getRiverLabel(loc) {
+    getRiverInfo(loc) {
         const riverType = GameplayMap.getRiverType(loc.x, loc.y);
         if (riverType == RiverTypes.NO_RIVER) return null;
-        let text = GameplayMap.getRiverName(loc.x, loc.y);
+        let name = GameplayMap.getRiverName(loc.x, loc.y);
         let style;
         switch (riverType) {
             case RiverTypes.RIVER_MINOR:
-                if (!text) text = "LOC_MINOR_RIVER_NAME";
+                if (!name) name = "LOC_MINOR_RIVER_NAME";
                 style = this.obstacleStyle("RIVER_MINOR");
                 break;
             case RiverTypes.RIVER_NAVIGABLE:
-                if (!text) text = "LOC_NAVIGABLE_RIVER_NAME";
+                if (!name) name = "LOC_NAVIGABLE_RIVER_NAME";
                 style = this.obstacleStyle("RIVER_NAVIGABLE");
                 break;
         }
-        if (!text) return null;
-        return { text, style };
+        if (!name) return null;
+        return { name, style, type: riverType };
     }
     getContinentName(loc) {
         const continentType = GameplayMap.getContinentType(loc.x, loc.y);
@@ -637,7 +641,7 @@ class PlotTooltipType {
             return;
         }
         const layout = document.createElement("div");
-        layout.classList.value = "text-xs leading-tight my-1";
+        layout.classList.value = "text-xs leading-tight text-center my-1";
         const playerName = this.getPlayerName(player);
         const relationship = this.getCivRelationship(player);
         const relType = Locale.compose(relationship?.type);
@@ -864,15 +868,13 @@ class PlotTooltipType {
         const wonder = constructibles[0]?.info;
         const notes = constructibles[0]?.notes;
         this.appendTitleDivider(Locale.compose(wonder.Name));
-        const layout = document.createElement("div");
         if (notes) {
             const ttState = document.createElement("div");
             ttState.classList.value = "leading-none";
             ttState.style.setProperty("font-size", "85%");
             ttState.innerHTML = dotJoinLocale(notes);
-            layout.appendChild(ttState);
+            this.container.appendChild(ttState);
         }
-        this.container.appendChild(layout);
         this.appendRules([wonder.Tooltip], "text-xs leading-snug my-0\\.5");  // TODO: whitespace
         this.appendIconDivider(wonder.ConstructibleType);
     }
@@ -1152,10 +1154,10 @@ class PlotTooltipType {
             this.isEnemy = false;
             return;
         }
-        // show unit panel
+        // show unit section
         this.appendDivider();
         const layout = document.createElement("div");
-        layout.classList.add("plot-tooltip__unitInfo");
+        layout.classList.value = "text-xs leading-tight text-center";
         const unitName = topUnit.name;
         const civName = this.getCivName(owner);
         const relationship = this.getCivRelationship(owner);
