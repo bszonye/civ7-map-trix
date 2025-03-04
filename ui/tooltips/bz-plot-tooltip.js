@@ -16,19 +16,40 @@ const BZ_BORDER_WIDTH = "0.1111111111rem";  // tooltip main border
 
 // additional CSS definitions
 const BZ_HEAD_STYLE = document.createElement('style');
-BZ_HEAD_STYLE.textContent = `
-/* fix text-center paragraphs with icons in the text */
-.bz-tooltip .text-center p { width: 100% }
-.tooltip.plot-tooltip.bz-tooltip .tooltip__content {
+BZ_HEAD_STYLE.textContent = [
+`.bz-tooltip {
+    /* width: 28.4444444444rem;  /* DEBUG */
+}`,
+`.tooltip.plot-tooltip.bz-tooltip .tooltip__content {
     padding-top: 0rem;
-}
-.bz-banner {
+}`,
+`.bz-banner {
     margin-left: calc(${BZ_BORDER_WIDTH} - var(--padding-left-right));
     margin-right: calc(${BZ_BORDER_WIDTH} - var(--padding-left-right));
     padding-left: calc(var(--padding-left-right) - ${BZ_BORDER_WIDTH});
     padding-right: calc(var(--padding-left-right) - ${BZ_BORDER_WIDTH});
+}`,
+// centers blocks of rules text with max-w-60 equivalent
+// IMPORTANT: Locale.stylize wraps text in an extra <p> element when it
+// contains icons, which interferes with text-align and max-width.  the
+// result also changes with single-line vs multi-line text.  these rules
+// apply the properties in the correct order & scope to work with all
+// combinations (with/without icons, single/multiple lines).
+`.bz-tooltip .bz-rules-container {
+    width: 100%;
+    text-align: center;
+    background-color: #00808080;  /* DEBUG */
 }
-`
+.bz-tooltip .bz-rules-center {
+    width: 100%;
+    max-width: 13.3333333333rem;
+    background-color: #00800080;  /* DEBUG */
+}
+.bz-tooltip .bz-rules-center > p {
+    width: 100%;
+    background-color: #80808080;  /* DEBUG */
+}`,
+].join();
 document.head.appendChild(BZ_HEAD_STYLE);
 
 // horizontal list separator
@@ -136,16 +157,15 @@ const BZ_OBSTACLES = {};  // cache
 function movementObstacles(mclass) {
     if (!mclass) mclass = movementClass();
     if (mclass in BZ_OBSTACLES) return BZ_OBSTACLES[mclass];
-    const features = GameInfo.UnitMovementClassObstacles
-        .filter(o => o.UnitMovementClass == mclass && o.EndsTurn && o.FeatureType)
-        .map(o => o.FeatureType);
-    const rivers = GameInfo.UnitMovementClassObstacles
-        .filter(o => o.UnitMovementClass == mclass && o.EndsTurn && o.RiverType)
-        .map(o => o.RiverType);
-    const terrains = GameInfo.UnitMovementClassObstacles
-        .filter(o => o.UnitMovementClass == mclass && o.EndsTurn && o.TerrainType)
-        .map(o => o.TerrainType);
-    return BZ_OBSTACLES[mclass] = new Set([...features, ...rivers, ...terrains]);
+    const obstacles = new Set();
+    for (const o of GameInfo.UnitMovementClassObstacles) {
+        if (!o.EndsTurn || o.UnitMovementClass != mclass) continue;
+        if (o.FeatureType) obstacles.add(o.FeatureType);
+        if (o.RiverType) obstacles.add(o.RiverType);
+        if (o.TerrainType) obstacles.add(o.TerrainType);
+    }
+    // set the cache and return it
+    return BZ_OBSTACLES[mclass] = obstacles;
 }
 function getConnections(city) {
     const ids = city?.getConnectedCities();
@@ -175,7 +195,7 @@ function layoutConstructibles(layout, constructibles) {
     for (const c of constructibles) {
         bottom = "mb-0";  // default
         const ttConstructible = document.createElement("div");
-        ttConstructible.classList.value = "text-center mt-1";
+        ttConstructible.classList.value = "my-0\\.5";
         const ttName = document.createElement("div");
         ttName.classList.value = "font-title uppercase text-accent-2";
         ttName.setAttribute("data-l10n-id", c.info.Name);
@@ -198,30 +218,19 @@ function layoutConstructibles(layout, constructibles) {
     }
     layout.appendChild(ttList);
 }
-// lay out a paragraph of rules text
-function layoutRules(layout, text, caption=null) {
-    if (caption) {
-        const ttCaption = document.createElement("div");
-        ttCaption.classList.value = "font-title text-xs leading-tight uppercase text-center";
-        ttCaption.setAttribute('data-l10n-id', caption);
-        layout.appendChild(ttCaption);
+// lay out paragraphs of rules text
+function layoutRules(layout, text, ...styles) {
+    const ttText = document.createElement("div");
+    ttText.classList.add("bz-rules-container");
+    for (const [i, row] of text.entries()) {
+        const ttRow = document.createElement("div");
+        const style = styles.at(i) ?? styles.at(-1);
+        if (style) ttRow.classList.value = style;
+        ttRow.classList.add("bz-rules-center");
+        ttRow.setAttribute("data-l10n-id", row);
+        ttText.appendChild(ttRow);
     }
-    const ttDescription = document.createElement("div");
-    ttDescription.classList.value = "text-xs leading-snug text-center max-w-60 my-1";
-    ttDescription.setAttribute("data-l10n-id", text);
-    layout.appendChild(ttDescription);
-}
-// TODO: simplify/remove this
-function layoutNotes(layout, notes, style=[]) {
-    const ttNotes = document.createElement("div");
-    if (style.length) ttNotes.classList.add(...style);
-    for (const note of notes) {
-        const ttNote = document.createElement("div");
-        ttNote.classList.value = "text-xs text-center";
-        ttNote.setAttribute("data-l10n-id", note);
-        ttNotes.appendChild(ttNote);
-    }
-    layout.appendChild(ttNotes);
+    layout.appendChild(ttText);
 }
 function setStyle(element, style) {
     if (!element || !style) return;
@@ -234,6 +243,7 @@ function setBannerStyle(element, style=BZ_ALERT.red, ...classes) {
     setStyle(element, style);
 }
 function setCapsuleStyle(element, style, ...classes) {
+    if (!style) return;
     element.classList.add("px-2", "rounded-full");
     if (classes.length) element.classList.add(...classes);
     setStyle(element, style);
@@ -423,7 +433,7 @@ class PlotTooltipType {
         }
         // tooltip title: terrain & biome
         const ttTitle = document.createElement("div");
-        ttTitle.classList.value = "text-secondary font-title text-sm leading-tight uppercase text-center";
+        ttTitle.classList.value = "text-secondary font-title text-sm leading-tight uppercase";
         if (!banners.length) {
             ttTitle.style.setProperty("padding-top", "var(--padding-top-bottom)");
         }
@@ -437,13 +447,15 @@ class PlotTooltipType {
         this.container.appendChild(ttTitle);
         // other geographical info
         const ttGeo = document.createElement("div");
-        ttGeo.classList.value = "text-xs leading-tight text-center";
+        ttGeo.classList.value = "text-xs leading-tight";
         if (featureLabel) {
             const tt = document.createElement("div");
             setCapsuleStyle(tt, featureLabel.style, "my-0\\.5");
             tt.setAttribute('data-l10n-id', featureLabel.text);
             ttGeo.appendChild(tt);
-            if (featureLabel.tooltip) layoutRules(ttGeo, featureLabel.tooltip);
+            if (featureLabel.tooltip) {
+                layoutRules(ttGeo, [featureLabel.tooltip], "text-xs leading-snug my-0\\.5");  // TODO: whitespace
+            }
         }
         if (riverLabel) {
             const tt = document.createElement("div");
@@ -459,7 +471,7 @@ class PlotTooltipType {
         }
         if (effects.text.length) {
             const ttEffects = document.createElement("div");
-            ttEffects.classList.value = "text-xs leading-tight text-center";
+            ttEffects.classList.value = "text-xs leading-tight";
             for (const effect of effects.text) {
                 const tt = document.createElement("div");
                 // setCapsuleStyle(tt, BZ_ALERT.primary, "my-0\\.5");
@@ -471,7 +483,7 @@ class PlotTooltipType {
         // continent + distant lands tag
         if (continentName) {
             const tt = document.createElement("div");
-            tt.classList.value = "text-xs leading-tight text-center";
+            tt.classList.value = "text-xs leading-tight";
             const text = [continentName, distantLandsLabel].map(e => Locale.compose(e));
             tt.setAttribute('data-l10n-id', dotJoin(text));
             ttGeo.appendChild(tt);
@@ -498,8 +510,7 @@ class PlotTooltipType {
             }
             // TODO: anything else to add?
             if (stats.length) {
-                const statStyle = ["leading-snug", "mb-1"];
-                layoutNotes(this.container, stats, statStyle);
+                layoutRules(this.container, stats, "text-xs leading-snug my-0\\.5");  // TODO: whitespace
             }
         }
     }
@@ -675,7 +686,7 @@ class PlotTooltipType {
             if (!effectInfo) return;
             if (effectInfo.Damage || effectInfo.Defense) {
                 const tt = document.createElement("div");
-                tt.classList.value = "text-xs leading-normal text-center my-0\\.5";
+                tt.classList.value = "text-xs leading-normal my-0\\.5";
                 tt.setAttribute('data-l10n-id', effectInfo.Name);
                 const style = effectInfo.Damage ? BZ_ALERT.red : BZ_ALERT.brown;
                 setBannerStyle(tt, style);
@@ -726,7 +737,7 @@ class PlotTooltipType {
         }
         if (warning) {
             const tt = document.createElement("div");
-            tt.classList.value = "text-xs leading-normal text-center my-0\\.5";
+            tt.classList.value = "text-xs leading-normal my-0\\.5";
             setBannerStyle(tt, warningStyle);
             tt.setAttribute('data-l10n-id', warning);
             banners.push(tt);
@@ -764,12 +775,12 @@ class PlotTooltipType {
         }
         // show name & relationship
         const ttPlayer = document.createElement("div");
-        ttPlayer.classList.value = "text-xs leading-tight text-center";
+        ttPlayer.classList.value = "text-xs leading-tight";
         ttPlayer.innerHTML = dotJoin([playerName, relType]);
         layout.appendChild(ttPlayer);
         // show full civ name
         const ttCiv = document.createElement("div");
-        ttCiv.classList.value = "text-xs leading-tight text-center";
+        ttCiv.classList.value = "text-xs leading-tight";
         ttCiv.setAttribute('data-l10n-id', civName);
         layout.appendChild(ttCiv);
         this.container.appendChild(layout);
@@ -872,7 +883,7 @@ class PlotTooltipType {
             const conquerorName = this.getCivName(conqueror, true);
             const conquerorText = Locale.compose("{1_Term} {2_Subject}", "LOC_PLOT_TOOLTIP_CONQUEROR", conquerorName);
             const ttConqueror = document.createElement("div");
-            ttConqueror.classList.value = "text-xs leading-tight text-center";
+            ttConqueror.classList.value = "text-xs leading-tight";
             setBannerStyle(ttConqueror, BZ_ALERT.redAmber);
             ttConqueror.innerHTML = conquerorText;
             this.container.appendChild(ttConqueror);
@@ -889,7 +900,7 @@ class PlotTooltipType {
             return;
         }
         const districtContainer = document.createElement("div");
-        districtContainer.classList.value = "text-xs leading-tight text-center";
+        districtContainer.classList.value = "text-xs leading-tight";
         setBannerStyle(districtContainer);
         const districtTitle = document.createElement("div");
         districtTitle.setAttribute("data-l10n-id", isUnderSiege ?
@@ -904,6 +915,8 @@ class PlotTooltipType {
     appendUrbanSection(loc, city, district) {  // includes CITY_CENTER
         const constructibles = this.getConstructibleInfo(loc);
         const buildings = constructibles.filter(e => !e.isExtra);
+        const quarterOK = buildings.reduce((a, b) =>
+            a + (b.isCurrent ? b.isLarge ? 2 : 1 : 0), 0);
         let hexName = GameInfo.Districts.lookup(district?.type).Name;
         let hexSubtitle;
         let hexRules;
@@ -926,7 +939,7 @@ class PlotTooltipType {
         } else if (buildings.length == 0) {
             // urban tile with canceled production
             hexName = "LOC_DISTRICT_BZ_URBAN_VACANT";
-        } else if (buildings.length >= 2 && buildings.every(b => b.isCurrent)) {
+        } else if (quarterOK >= 2) {
             const unique = buildings[0].uniqueTrait;
             if (buildings.every(b => b.uniqueTrait = unique)) {
                 const uq = GameInfo.UniqueQuarters.find(e => e.TraitType == unique);
@@ -954,15 +967,22 @@ class PlotTooltipType {
         this.appendDistrictDefense(this.plotCoord);
         // panel interior
         const layout = document.createElement("div");
-        layout.classList.value = "text-center max-w-80";
+        layout.classList.value = "max-w-80";
         // show rules for city-states and unique quarters
-        if (hexRules) layoutRules(layout, hexRules, hexSubtitle);
+        if (hexSubtitle) {
+            // TODO: title formatting
+            // TODO: city-state bonus titles = "font-title text-xs leading-tight uppercase text-center";
+            const title = "font-title text-xs leading-tight uppercase";
+            const body = "text-xs leading-snug my-0\\.5";  // TODO: whitespace
+            layoutRules(this.container, [hexSubtitle, hexRules], title, body);
+        } else if (hexRules) {
+            layoutRules(this.container, [hexRules], "text-xs leading-snug my-0\\.5");  // TODO: whitespace
+        }
         // constructibles
         layoutConstructibles(layout, constructibles);
         // show additional notes
         if (hexNotes.length) {
-            const noteStyle = ["leading-snug", "my-0\\.5"];
-            layoutNotes(layout, hexNotes, noteStyle);
+            layoutRules(layout, hexNotes, "text-xs leading-snug my-0\\.5");  // TODO: whitespace
         }
         // add to tooltip
         this.container.appendChild(layout);
@@ -979,7 +999,7 @@ class PlotTooltipType {
         const notes = constructibles[0]?.notes;
         this.appendTitleDivider(Locale.compose(wonder.Name));
         const layout = document.createElement("div");
-        layout.classList.value = "text-center max-w-80";
+        layout.classList.value = "max-w-80";
         if (notes) {
             const ttState = document.createElement("div");
             ttState.classList.value = "leading-none";
@@ -987,7 +1007,7 @@ class PlotTooltipType {
             ttState.innerHTML = dotJoin(notes.map(e => Locale.compose(e)));
             layout.appendChild(ttState);
         }
-        layoutRules(layout, wonder.Tooltip);
+        layoutRules(layout, [wonder.Tooltip], "text-xs leading-snug my-0\\.5");  // TODO: whitespace
         this.container.appendChild(layout);
         this.appendIconDivider(wonder.ConstructibleType);
     }
@@ -1043,7 +1063,9 @@ class PlotTooltipType {
         const layout = document.createElement("div");
         layout.classList.value = "max-w-80";
         // optional description
-        if (hexRules) layoutRules(layout, hexRules);
+        if (hexRules) {
+            layoutRules(layout, [hexRules], "text-xs leading-snug my-0\\.5");  // TODO: whitespace
+        }
         // constructibles
         layoutConstructibles(layout, constructibles);
         // add to tooltip
@@ -1118,7 +1140,7 @@ class PlotTooltipType {
         layout.classList.add("self-center", "text-center", "mx-3", "max-w-80");
         layout.classList.add("font-title", "uppercase", "text-sm", "leading-tight");
         layout.setAttribute("data-l10n-id", text);
-        this.appendFlexDivider(layout, "mt-1");
+        this.appendFlexDivider(layout);
     }
     appendIconDivider(icon, overlay=null) {
         // icon divider with optional overlay
