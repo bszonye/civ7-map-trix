@@ -412,7 +412,7 @@ class PlotTooltipType {
             ttTitle.style.setProperty("padding-top", "var(--padding-top-bottom)");
         }
         const ttTerrain = document.createElement("div");
-        setCapsuleStyle(ttTerrain, terrainLabel.style, "my-0\\.5");
+        if (!hasRoad) setCapsuleStyle(ttTerrain, terrainLabel.style, "my-0\\.5");
         const title = biomeLabel ?
             Locale.compose("{1_TerrainName} {2_BiomeName}", terrainLabel.text, biomeLabel) :
             terrainLabel.text;
@@ -424,7 +424,7 @@ class PlotTooltipType {
         layout.classList.value = "text-xs leading-tight text-center";
         if (featureLabel) {
             const tt = document.createElement("div");
-            setCapsuleStyle(tt, featureLabel.style, "my-0\\.5");
+            if (!hasRoad) setCapsuleStyle(tt, featureLabel.style, "my-0\\.5");
             tt.setAttribute('data-l10n-id', featureLabel.text);
             layout.appendChild(tt);
         }
