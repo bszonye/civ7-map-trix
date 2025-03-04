@@ -18,13 +18,11 @@ const BZ_BORDER_WIDTH = "0.1111111111rem";  // tooltip main border
 const BZ_HEAD_STYLE = document.createElement('style');
 BZ_HEAD_STYLE.textContent = [
 `.tooltip.plot-tooltip.bz-tooltip .tooltip__content {
-    width: 21.3333333333rem;  /* DEBUG */
+    /* width: 21.3333333333rem;  /* DEBUG */
     padding-top: 0rem;
 }`,
-`.bz-tooltip {
-    text-align: center;
-}`,
 `.bz-banner {
+    text-align: center;
     margin-left: calc(${BZ_BORDER_WIDTH} - var(--padding-left-right));
     margin-right: calc(${BZ_BORDER_WIDTH} - var(--padding-left-right));
     padding-left: calc(var(--padding-left-right) - ${BZ_BORDER_WIDTH});
