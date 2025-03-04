@@ -21,6 +21,12 @@ BZ_HEAD_STYLE.textContent = [
     /* width: 21.3333333333rem;  /* DEBUG */
     padding-top: 0rem;
 }`,
+`.bz-tooltip > div > div > div {
+    background-color: #80808040;
+}`,
+`.bz-tooltip > div > div > div > div {
+    background-color: #00808080;
+}`,
 `.bz-banner {
     text-align: center;
     margin-left: calc(${BZ_BORDER_WIDTH} - var(--padding-left-right));
@@ -103,6 +109,7 @@ const BZ_ALERT = {
     redAmber: { "background-color": BZ_COLOR.red, "color": BZ_COLOR.amber },
     amber: { "background-color": BZ_COLOR.amber, "color": BZ_COLOR.black },
     brown: { "background-color": BZ_COLOR.brown },
+    DEBUG: { "background-color": "#80808080" },
 }
 const BZ_STYLE = {
     route: { "background-color": BZ_COLOR.route, "color": BZ_COLOR.black },
@@ -407,7 +414,7 @@ class PlotTooltipType {
         }
         // tooltip title: terrain & biome
         const ttTitle = document.createElement("div");
-        ttTitle.classList.value = "text-secondary font-title text-sm leading-tight uppercase";
+        ttTitle.classList.value = "text-secondary font-title text-sm leading-tight uppercase text-center";
         if (!banners.length) {
             ttTitle.style.setProperty("padding-top", "var(--padding-top-bottom)");
         }
@@ -421,7 +428,7 @@ class PlotTooltipType {
         this.container.appendChild(ttTitle);
         // other geographical info
         const layout = document.createElement("div");
-        layout.classList.value = "text-xs leading-tight text-center";
+        layout.classList.value = "text-xs leading-tight text-center my-1";
         if (featureLabel) {
             const tt = document.createElement("div");
             if (!hasRoad) setCapsuleStyle(tt, featureLabel.style, "my-0\\.5");
@@ -630,7 +637,7 @@ class PlotTooltipType {
         }
         // TODO: anything else to add?
         if (stats.length) {
-            this.appendRules(stats, "text-xs leading-snug my-0\\.5");  // TODO: whitespace
+            this.appendRules(stats, "mb-1");
         }
     }
     appendOwnerInfo(loc, player) {
@@ -732,7 +739,6 @@ class PlotTooltipType {
         let hexName = GameInfo.Districts.lookup(district?.type).Name;
         let hexSubtitle;
         let hexRules;
-        let hexNotes = [];
         // set name & description
         if (district.type == DistrictTypes.CITY_CENTER) {
             const player = Players.get(city.owner);
@@ -767,30 +773,27 @@ class PlotTooltipType {
         } else {
             hexName = "LOC_DISTRICT_BZ_URBAN_DISTRICT";
         }
-        // report specialists
-        const specialists = getSpecialists(loc, city);
-        if (specialists) {
-            const specialistsNote = Locale.compose("LOC_DISTRICT_BZ_SPECIALISTS",
-                specialists.workers, specialists.maximum);
-            hexNotes.push(specialistsNote);
-        }
         // title bar
         this.appendTitleDivider(Locale.compose(hexName));
         this.appendDistrictDefense(this.plotCoord);
         // panel interior
         // show rules for city-states and unique quarters
-        if (hexSubtitle) {
-            const title = "font-title text-xs leading-tight uppercase";
-            const body = "text-xs leading-snug my-0\\.5";  // TODO: whitespace
-            this.appendRules([hexSubtitle, hexRules], title, body);
-        } else if (hexRules) {
-            this.appendRules([hexRules], "text-xs leading-snug my-0\\.5");  // TODO: whitespace
+        if (hexRules) {
+            const title = "font-title leading-tight uppercase";
+            if (hexSubtitle) {
+                this.appendRules([hexSubtitle, hexRules], title);
+            } else {
+                this.appendRules([hexRules]);
+            }
         }
         // constructibles
         this.appendConstructibles(constructibles);
-        // show additional notes
-        if (hexNotes.length) {
-            this.appendRules(hexNotes, "text-xs leading-snug my-0\\.5");  // TODO: whitespace
+        // report specialists
+        const specialists = getSpecialists(loc, city);
+        if (specialists) {
+            const text = Locale.compose("LOC_DISTRICT_BZ_SPECIALISTS",
+                specialists.workers, specialists.maximum);
+            this.appendRules([text], "mb-1");
         }
         // bottom bar
         this.appendUrbanDivider(buildings.filter(e => !e.isExtra));
@@ -846,7 +849,7 @@ class PlotTooltipType {
         // panel interior
         // optional description
         if (hexRules) {
-            this.appendRules([hexRules], "text-xs leading-snug my-0\\.5");  // TODO: whitespace
+            this.appendRules([hexRules]);
         }
         // constructibles
         this.appendConstructibles(constructibles);
@@ -875,7 +878,7 @@ class PlotTooltipType {
             ttState.innerHTML = dotJoinLocale(notes);
             this.container.appendChild(ttState);
         }
-        this.appendRules([wonder.Tooltip], "text-xs leading-snug my-0\\.5");  // TODO: whitespace
+        this.appendRules([wonder.Tooltip]);
         this.appendIconDivider(wonder.ConstructibleType);
     }
     getResource() {
@@ -940,10 +943,8 @@ class PlotTooltipType {
     // lay out a column of constructibles and their construction notes
     appendConstructibles(constructibles) {
         const ttList = document.createElement("div");
-        ttList.classList.value = "text-xs leading-tight";
-        let bottom;  // last entry will set bottom margin
+        ttList.classList.value = "text-xs leading-tight text-center my-1";
         for (const c of constructibles) {
-            bottom = "mb-0";  // default
             const ttConstructible = document.createElement("div");
             ttConstructible.classList.value = "my-0\\.5";
             const ttName = document.createElement("div");
@@ -958,26 +959,23 @@ class PlotTooltipType {
                     setCapsuleStyle(ttState, BZ_ALERT.amber);
                 } else {
                     ttState.classList.value = "leading-none";
-                    bottom = "mb-1";
                 }
                 ttState.innerHTML = notes;
                 ttConstructible.appendChild(ttState);
             }
-            // TODO: remove this hack if possible
-            if (bottom) ttList.classList.add(bottom);
             ttList.appendChild(ttConstructible);
         }
         this.container.appendChild(ttList);
     }
     // lay out paragraphs of rules text
-    appendRules(text, ...styles) {
+    appendRules(text, style="my-1", title=null) {
         // text with icons is squirrelly, only format it at top level!
         const ttText = document.createElement("div");
+        ttText.classList.value = style;
         ttText.classList.add("bz-rules-center");
         for (const [i, row] of text.entries()) {
             const ttRow = document.createElement("div");
-            const style = styles.at(i) ?? styles.at(-1);
-            if (style) ttRow.classList.value = style;
+            ttRow.classList.value = (i == 0 && title) || "text-xs leading-snug";
             ttRow.classList.add("bz-rules-max-width");
             ttRow.setAttribute("data-l10n-id", row);
             ttText.appendChild(ttRow);
@@ -1049,7 +1047,7 @@ class PlotTooltipType {
             slots.push(...[null, null].slice(buildings.length));
         // render the icons
         const layout = document.createElement("div");
-        layout.classList.value = "flex flex-grow relative my-1 mx-2";
+        layout.classList.value = "flex flex-grow relative mx-2";
         for (let slot of slots) {
             if (!slot) {
                 // show an empty slot with a transparent yield ring
