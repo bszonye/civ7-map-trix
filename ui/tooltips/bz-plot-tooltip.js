@@ -15,18 +15,21 @@ import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
 const BZ_BORDER_WIDTH = "0.1111111111rem";  // tooltip main border
 
 // additional CSS definitions
-// TODO: replace leading-tight with leading-snug?
 const BZ_HEAD_STYLE = document.createElement('style');
 BZ_HEAD_STYLE.textContent = [
 `.tooltip.plot-tooltip.bz-tooltip .tooltip__content {
     /* width: 21.3333333333rem;  /* DEBUG */
     padding-top: 0rem;
 }`,
+// debug highlighting for content boxes
 `.bz-tooltip > div > div > div {
-    /* background-color: #80808040;  /* DEBUG */
+    background-color: #80808040;  /* DEBUG */
 }`,
 `.bz-tooltip > div > div > div > div {
-    /* background-color: #00808080;  /* DEBUG */
+    background-color: #00808080;  /* DEBUG */
+}`,
+`.bz-tooltip > div > div > div > div p {
+    background-color: #808080c0;  /* DEBUG */
 }`,
 `.bz-banner {
     text-align: center;
@@ -417,7 +420,7 @@ class PlotTooltipType {
         }
         // tooltip title: terrain & biome
         const ttTitle = document.createElement("div");
-        ttTitle.classList.value = "text-secondary font-title text-sm leading-tight uppercase text-center";
+        ttTitle.classList.value = "text-secondary font-title text-sm leading-snug uppercase text-center";
         if (!banners.length) {
             ttTitle.style.setProperty("padding-top", "var(--padding-top-bottom)");
         }
@@ -431,7 +434,7 @@ class PlotTooltipType {
         this.container.appendChild(ttTitle);
         // other geographical info
         const layout = document.createElement("div");
-        layout.classList.value = "text-xs leading-tight text-center mb-2";
+        layout.classList.value = "text-xs leading-snug text-center mb-2";
         if (featureLabel) {
             const tt = document.createElement("div");
             if (!hasRoad) setCapsuleStyle(tt, featureLabel.style, "my-0\\.5");
@@ -654,7 +657,7 @@ class PlotTooltipType {
             return;
         }
         const layout = document.createElement("div");
-        layout.classList.value = "text-xs leading-tight text-center mb-2";
+        layout.classList.value = "text-xs leading-snug text-center mb-2";
         const playerName = this.getPlayerName(player);
         const relationship = this.getCivRelationship(player);
         const relType = Locale.compose(relationship?.type);
@@ -786,7 +789,7 @@ class PlotTooltipType {
         // panel interior
         // show rules for city-states and unique quarters
         if (hexRules) {
-            const title = "font-title leading-tight uppercase";
+            const title = "font-title leading-snug uppercase";
             if (hexSubtitle) {
                 this.appendRules([hexSubtitle, hexRules], title);
             } else {
@@ -954,7 +957,7 @@ class PlotTooltipType {
     // lay out a column of constructibles and their construction notes
     appendConstructibles(constructibles) {
         const ttList = document.createElement("div");
-        ttList.classList.value = "text-xs leading-tight text-center mb-2";
+        ttList.classList.value = "text-xs leading-snug text-center mb-2";
         for (const c of constructibles) {
             const ttConstructible = document.createElement("div");
             ttConstructible.classList.value = "mb-0\\.5";
@@ -1002,7 +1005,7 @@ class PlotTooltipType {
             const conquerorName = this.getCivName(conqueror, true);
             const conquerorText = Locale.compose("{1_Term} {2_Subject}", "LOC_PLOT_TOOLTIP_CONQUEROR", conquerorName);
             const ttConqueror = document.createElement("div");
-            ttConqueror.classList.value = "text-xs leading-tight";
+            ttConqueror.classList.value = "text-xs leading-snug";
             setBannerStyle(ttConqueror, BZ_ALERT.redAmber);
             ttConqueror.innerHTML = conquerorText;
             this.container.appendChild(ttConqueror);
@@ -1019,7 +1022,7 @@ class PlotTooltipType {
             return;
         }
         const districtContainer = document.createElement("div");
-        districtContainer.classList.value = "text-xs leading-tight";
+        districtContainer.classList.value = "text-xs leading-snug";
         setBannerStyle(districtContainer);
         const districtTitle = document.createElement("div");
         districtTitle.setAttribute("data-l10n-id", isUnderSiege ?
@@ -1165,7 +1168,7 @@ class PlotTooltipType {
         // show unit section
         this.appendDivider();
         const layout = document.createElement("div");
-        layout.classList.value = "text-xs leading-tight text-center";
+        layout.classList.value = "text-xs leading-snug text-center";
         const unitName = topUnit.name;
         const civName = this.getCivName(owner);
         const relationship = this.getCivRelationship(owner);
