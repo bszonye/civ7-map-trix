@@ -448,8 +448,7 @@ class PlotTooltipType {
         // continent + distant lands tag
         if (continentName) {
             const tt = document.createElement("div");
-            const text = [continentName, distantLandsLabel].map(e => Locale.compose(e));
-            tt.setAttribute('data-l10n-id', dotJoin(text));
+            tt.innerHTML = dotJoinLocale([continentName, distantLandsLabel]);
             layout.appendChild(tt);
         }
         this.container.appendChild(layout);
@@ -870,7 +869,7 @@ class PlotTooltipType {
             const ttState = document.createElement("div");
             ttState.classList.value = "leading-none";
             ttState.style.setProperty("font-size", "85%");
-            ttState.innerHTML = dotJoin(notes.map(e => Locale.compose(e)));
+            ttState.innerHTML = dotJoinLocale(notes);
             layout.appendChild(ttState);
         }
         this.container.appendChild(layout);
@@ -949,7 +948,7 @@ class PlotTooltipType {
             ttName.classList.value = "font-title uppercase text-accent-2";
             ttName.setAttribute("data-l10n-id", c.info.Name);
             ttConstructible.appendChild(ttName);
-            const notes = dotJoin(c.notes.map(e => Locale.compose(e)));
+            const notes = dotJoinLocale(c.notes);
             if (notes) {
                 const ttState = document.createElement("div");
                 ttState.style.setProperty("font-size", "85%");
@@ -1161,7 +1160,7 @@ class PlotTooltipType {
         const civName = this.getCivName(owner);
         const relationship = this.getCivRelationship(owner);
         const unitInfo = [unitName, civName, relationship?.type];
-        layout.innerHTML = dotJoin(unitInfo.map(e => Locale.compose(e)));
+        layout.innerHTML = dotJoinLocale(unitInfo);
         if (relationship) {
             this.isEnemy = relationship.isEnemy;
             if (relationship.isEnemy) {
