@@ -602,7 +602,8 @@ class PlotTooltipType {
     getDistantLandsLabel(loc) {
         const localPlayer = Players.get(GameContext.localPlayerID);
         return localPlayer?.isDistantLands(loc) ?
-            "LOC_RESOURCE_GENERAL_TYPE_DISTANT_LANDS" : "";
+            "LOC_RESOURCE_GENERAL_TYPE_DISTANT_LANDS" :
+            "LOC_BZ_HEMISPHERE_HOMELANDS";
     }
     getRouteName() {
         const routeType = GameplayMap.getRouteType(this.plotCoord.x, this.plotCoord.y);

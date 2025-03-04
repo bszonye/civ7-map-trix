@@ -4,6 +4,9 @@
         <Row Tag="LOC_BZ_CITY_CONNECTIONS" Language="it_IT">
             <Text>Connessioni • {1_cities}[icon:YIELD_CITIES] {2_towns}[icon:YIELD_TOWNS]</Text>
         </Row>
+        <Row Tag="LOC_BZ_HEMISPHERE_HOMELANDS">
+            <Text>Terra d'Origine</Text>
+        </Row>
         <Row Tag="LOC_DISTRICT_BZ_CITY_STATE" Language="it_IT">
             <Text>Città-Stato</Text>
         </Row>

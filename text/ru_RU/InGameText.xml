@@ -4,6 +4,9 @@
         <Row Tag="LOC_BZ_CITY_CONNECTIONS" Language="ru_RU">
             <Text>Соединения • {1_cities}[icon:YIELD_CITIES] {2_towns}[icon:YIELD_TOWNS]</Text>
         </Row>
+        <Row Tag="LOC_BZ_HEMISPHERE_HOMELANDS">
+            <Text>Родина</Text>
+        </Row>
         <Row Tag="LOC_DISTRICT_BZ_CITY_STATE" Language="ru_RU">
             <Text>Город-государство</Text>
         </Row>
