@@ -22,10 +22,10 @@ BZ_HEAD_STYLE.textContent = [
     padding-top: 0rem;
 }`,
 `.bz-tooltip > div > div > div {
-    background-color: #80808040;
+    /* background-color: #80808040;  /* DEBUG */
 }`,
 `.bz-tooltip > div > div > div > div {
-    background-color: #00808080;
+    /* background-color: #00808080;  /* DEBUG */
 }`,
 `.bz-banner {
     text-align: center;
@@ -637,7 +637,7 @@ class PlotTooltipType {
         }
         // TODO: anything else to add?
         if (stats.length) {
-            this.appendRules(stats, "mb-1");
+            this.appendRules(stats);
         }
     }
     appendOwnerInfo(loc, player) {
@@ -648,7 +648,7 @@ class PlotTooltipType {
             return;
         }
         const layout = document.createElement("div");
-        layout.classList.value = "text-xs leading-tight text-center my-1";
+        layout.classList.value = "text-xs leading-tight text-center mb-1";
         const playerName = this.getPlayerName(player);
         const relationship = this.getCivRelationship(player);
         const relType = Locale.compose(relationship?.type);
@@ -793,7 +793,7 @@ class PlotTooltipType {
         if (specialists) {
             const text = Locale.compose("LOC_DISTRICT_BZ_SPECIALISTS",
                 specialists.workers, specialists.maximum);
-            this.appendRules([text], "mb-1");
+            this.appendRules([text]);
         }
         // bottom bar
         this.appendUrbanDivider(buildings.filter(e => !e.isExtra));
@@ -943,10 +943,10 @@ class PlotTooltipType {
     // lay out a column of constructibles and their construction notes
     appendConstructibles(constructibles) {
         const ttList = document.createElement("div");
-        ttList.classList.value = "text-xs leading-tight text-center my-1";
+        ttList.classList.value = "text-xs leading-tight text-center mb-1";
         for (const c of constructibles) {
             const ttConstructible = document.createElement("div");
-            ttConstructible.classList.value = "my-0\\.5";
+            ttConstructible.classList.value = "mb-0\\.5";
             const ttName = document.createElement("div");
             ttName.classList.value = "font-title uppercase text-accent-2";
             ttName.setAttribute("data-l10n-id", c.info.Name);
@@ -968,11 +968,10 @@ class PlotTooltipType {
         this.container.appendChild(ttList);
     }
     // lay out paragraphs of rules text
-    appendRules(text, style="my-1", title=null) {
+    appendRules(text, title=null) {
         // text with icons is squirrelly, only format it at top level!
         const ttText = document.createElement("div");
-        ttText.classList.value = style;
-        ttText.classList.add("bz-rules-center");
+        ttText.classList.value = "bz-rules-center mb-1";
         for (const [i, row] of text.entries()) {
             const ttRow = document.createElement("div");
             ttRow.classList.value = (i == 0 && title) || "text-xs leading-snug";
@@ -1026,15 +1025,15 @@ class PlotTooltipType {
         if (!icon.startsWith("url(")) icon = UI.getIconCSS(icon);
         if (overlay && !overlay.startsWith("url(")) overlay = UI.getIconCSS(overlay);
         const layout = document.createElement("div");
-        layout.classList.add("flex-grow", "relative", "my-1");
+        layout.classList.add("flex-grow", "relative");
         const base = document.createElement("div");
-        base.classList.add("bg-contain", "bg-center", "size-12", "mx-3");
+        base.classList.value = "bg-contain bg-center size-12 mx-3";
         base.style.backgroundImage = icon;
         layout.appendChild(base);
         if (overlay) {
             const over = document.createElement("div");
-            over.classList.add("bg-contain", "bg-center", "size-9", "mx-3");
-            over.classList.add("absolute", "top-1\\.5", "left-1\\.5");
+            over.classList.value =
+                "bg-contain bg-center size-9 mx-3 absolute top-1\\.5 left-1\\.5";
             over.style.backgroundImage = overlay;
             layout.appendChild(over);
         }
