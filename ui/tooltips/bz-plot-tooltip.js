@@ -85,7 +85,7 @@ const BZ_COLOR = {
     ocean: "#204060",  // Open Ocean terrain
     vegetated: "#445533",  // Vegetated features
     wet: "#335577",  // Wet features
-    route: "#ccbbaa",  // Road, Ferry, Railroad (TODO)
+    route: "#ccbbaa",  // Road, Ferry, Railroad (TODO: retire?)
     // yield types
     culture: "#bf99e6",  // violet
     diplomacy: "#99e6bf",  // teal
@@ -140,6 +140,9 @@ function adjacencyYield(building) {
 function dotJoin(list) {
     // join text with dots after removing empty elements
     return list.filter(e => e).join(" " + BZ_DOT_DIVIDER + " ");
+}
+function dotJoinLocale(list) {
+    return dotJoin(list.map(s => Locale.compose(s)));
 }
 function gatherBuildingsTagged(tag) {
     return new Set(GameInfo.TypeTags.filter(e => e.Tag == tag).map(e => e.Type));
@@ -393,7 +396,7 @@ class PlotTooltipType {
         const riverLabel = this.getRiverLabel(loc);
         const continentName = this.getContinentName(loc);
         const distantLandsLabel = this.getDistantLandsLabel(loc);
-        const routeName = this.getRouteName();
+        const routeList = this.getRouteList();
         // alert banners: settler warnings, damaging & defense effects
         const banners = [];
         banners.push(...this.getSettlerBanner(loc));
@@ -424,24 +427,19 @@ class PlotTooltipType {
             tt.setAttribute('data-l10n-id', featureLabel.text);
             layout.appendChild(tt);
         }
-        if (riverLabel) {
+        if (riverLabel) routeList.push(riverLabel.text);
+        if (routeList) {
+            // road, ferry, river info
             const tt = document.createElement("div");
-            setCapsuleStyle(tt, riverLabel.style, "my-0\\.5");
-            tt.setAttribute('data-l10n-id', riverLabel.text);
-            layout.appendChild(tt);
-        }
-        if (routeName) {
-            // road, ferry, trade route info
-            const tt = document.createElement("div");
-            setCapsuleStyle(tt, BZ_STYLE.route, "my-0\\.5");
-            tt.innerHTML = routeName;
+            // TODO: don't highlight road over minor river?
+            setCapsuleStyle(tt, riverLabel?.style, "my-0\\.5");
+            tt.innerHTML = dotJoinLocale(routeList);
             layout.appendChild(tt);
         }
         if (effects.text.length) {
             const ttEffects = document.createElement("div");
             for (const effect of effects.text) {
                 const tt = document.createElement("div");
-                // setCapsuleStyle(tt, BZ_ALERT.primary, "my-0\\.5");
                 tt.setAttribute('data-l10n-id', effect);
                 ttEffects.appendChild(tt);
             }
@@ -592,12 +590,8 @@ class PlotTooltipType {
     getContinentName(loc) {
         const continentType = GameplayMap.getContinentType(loc.x, loc.y);
         const continent = GameInfo.Continents.lookup(continentType);
-        if (continent && continent.Description) {
-            return continent.Description;
-        }
-        else {
-            return "";
-        }
+        if (!continent?.Description) return null;
+        return continent.Description;
     }
     getDistantLandsLabel(loc) {
         const localPlayer = Players.get(GameContext.localPlayerID);
@@ -605,20 +599,13 @@ class PlotTooltipType {
             "LOC_RESOURCE_GENERAL_TYPE_DISTANT_LANDS" :
             "LOC_BZ_HEMISPHERE_HOMELANDS";
     }
-    getRouteName() {
+    getRouteList() {
         const routeType = GameplayMap.getRouteType(this.plotCoord.x, this.plotCoord.y);
         const route = GameInfo.Routes.lookup(routeType);
-        const isFerry = GameplayMap.isFerry(this.plotCoord.x, this.plotCoord.y);
-        let returnString = "";
-        if (route) {
-            if (isFerry) {
-                returnString = Locale.compose(route.Name) + " " + Locale.compose("LOC_PLOT_DIVIDER_DOT") + " " + Locale.compose("LOC_NAVIGABLE_RIVER_FERRY");
-            }
-            else {
-                returnString = Locale.compose(route.Name);
-            }
-        }
-        return returnString;
+        if (!route) return [];
+        return GameplayMap.isFerry(this.plotCoord.x, this.plotCoord.y) ?
+            [route.Name, "LOC_NAVIGABLE_RIVER_FERRY"] :
+            [route.Name];
     }
     appendSettlementSection(loc, player, city) {
         const name = city ?  city.name :  // city or town
