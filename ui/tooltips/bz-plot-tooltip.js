@@ -18,7 +18,7 @@ const BZ_BORDER_WIDTH = "0.1111111111rem";  // tooltip main border
 const BZ_HEAD_STYLE = document.createElement('style');
 BZ_HEAD_STYLE.textContent = [
 `.tooltip.plot-tooltip.bz-tooltip .tooltip__content {
-    /* width: 21.3333333333rem;  /* DEBUG */
+    width: 21.3333333333rem;  /* DEBUG */
     padding-top: 0rem;
 }`,
 `.bz-tooltip {
@@ -50,7 +50,7 @@ BZ_HEAD_STYLE.textContent = [
     width: 100%;
     background-color: #80808080;  /* DEBUG */
 }`,
-].join();
+].join('\n');
 document.head.appendChild(BZ_HEAD_STYLE);
 
 // horizontal list separator
@@ -219,20 +219,6 @@ function layoutConstructibles(layout, constructibles) {
     }
     layout.appendChild(ttList);
 }
-// lay out paragraphs of rules text
-function layoutRules(layout, text, ...styles) {
-    const ttText = document.createElement("div");
-    ttText.classList.add("bz-rules-center");
-    for (const [i, row] of text.entries()) {
-        const ttRow = document.createElement("div");
-        const style = styles.at(i) ?? styles.at(-1);
-        if (style) ttRow.classList.value = style;
-        ttRow.classList.add("bz-rules-max-width");
-        ttRow.setAttribute("data-l10n-id", row);
-        ttText.appendChild(ttRow);
-    }
-    layout.appendChild(ttText);
-}
 function setStyle(element, style) {
     if (!element || !style) return;
     for (const [property, value] of Object.entries(style)) {
@@ -254,7 +240,7 @@ class PlotTooltipType {
         this.plotCoord = null;
         this.isShowingDebug = false;
         this.tooltip = document.createElement('fxs-tooltip');
-        this.tooltip.classList.value = "plot-tooltip bz-tooltip max-w-96 text-xs leading-tight";
+        this.tooltip.classList.value = "bz-tooltip plot-tooltip max-w-96";
         this.container = document.createElement('div');
         this.tooltip.appendChild(this.container);
         this.yieldsFlexbox = document.createElement('div');
@@ -363,6 +349,21 @@ class PlotTooltipType {
         divider.classList.add("plot-tooltip__Divider", "my-2");
         this.container.appendChild(divider);
     }
+    // lay out paragraphs of rules text
+    appendRules(text, ...styles) {
+        // text with icons is squirrelly, only format it at top level!
+        const ttText = document.createElement("div");
+        ttText.classList.add("bz-rules-center");
+        for (const [i, row] of text.entries()) {
+            const ttRow = document.createElement("div");
+            const style = styles.at(i) ?? styles.at(-1);
+            if (style) ttRow.classList.value = style;
+            ttRow.classList.add("bz-rules-max-width");
+            ttRow.setAttribute("data-l10n-id", row);
+            ttText.appendChild(ttRow);
+        }
+        this.container.appendChild(ttText);
+    }
     getConstructibleInfo(loc) {
         const constructibleInfo = [];
         const constructibles = MapConstructibles.getHiddenFilteredConstructibles(loc.x, loc.y);
@@ -454,9 +455,6 @@ class PlotTooltipType {
             setCapsuleStyle(tt, featureLabel.style, "my-0\\.5");
             tt.setAttribute('data-l10n-id', featureLabel.text);
             ttGeo.appendChild(tt);
-            if (featureLabel.tooltip) {
-                layoutRules(ttGeo, [featureLabel.tooltip], "text-xs leading-snug my-0\\.5");  // TODO: whitespace
-            }
         }
         if (riverLabel) {
             const tt = document.createElement("div");
@@ -499,20 +497,19 @@ class PlotTooltipType {
         this.appendTitleDivider(name);
         // owner info
         this.appendOwnerInfo(loc, player);
-        // show settlement stats when hovering over the center
-        if (city && city.location.x == loc.x && city.location.y == loc.y) {
-            const stats = [];
-            // settlement connections
-            const connections = getConnections(city);
-            if (connections) {
-                const connectionsNote = Locale.compose("LOC_BZ_CITY_CONNECTIONS",
-                    connections.cities.length, connections.towns.length);
-                stats.push(connectionsNote);
-            }
-            // TODO: anything else to add?
-            if (stats.length) {
-                layoutRules(this.container, stats, "text-xs leading-snug my-0\\.5");  // TODO: whitespace
-            }
+        // settlement stats (only show at the city center)
+        if (!city || city.location.x != loc.x || city.location.y != loc.y) return;
+        const stats = [];
+        // settlement connections
+        const connections = getConnections(city);
+        if (connections) {
+            const connectionsNote = Locale.compose("LOC_BZ_CITY_CONNECTIONS",
+                connections.cities.length, connections.towns.length);
+            stats.push(connectionsNote);
+        }
+        // TODO: anything else to add?
+        if (stats.length) {
+            this.appendRules(stats, "text-xs leading-snug my-0\\.5");  // TODO: whitespace
         }
     }
     appendHexSection(loc, city, district) {
@@ -761,7 +758,7 @@ class PlotTooltipType {
             return;
         }
         const layout = document.createElement("div");
-        layout.classList.value = "my-1";
+        layout.classList.value = "text-xs leading-tight my-1";
         const playerName = this.getPlayerName(player);
         const relationship = this.getCivRelationship(player);
         const relType = Locale.compose(relationship?.type);
@@ -776,12 +773,10 @@ class PlotTooltipType {
         }
         // show name & relationship
         const ttPlayer = document.createElement("div");
-        ttPlayer.classList.value = "text-xs leading-tight";
         ttPlayer.innerHTML = dotJoin([playerName, relType]);
         layout.appendChild(ttPlayer);
         // show full civ name
         const ttCiv = document.createElement("div");
-        ttCiv.classList.value = "text-xs leading-tight";
         ttCiv.setAttribute('data-l10n-id', civName);
         layout.appendChild(ttCiv);
         this.container.appendChild(layout);
@@ -967,24 +962,20 @@ class PlotTooltipType {
         this.appendTitleDivider(Locale.compose(hexName));
         this.appendDistrictDefense(this.plotCoord);
         // panel interior
-        const layout = document.createElement("div");
-        layout.classList.value = "max-w-80";
         // show rules for city-states and unique quarters
         if (hexSubtitle) {
             const title = "font-title text-xs leading-tight uppercase";
             const body = "text-xs leading-snug my-0\\.5";  // TODO: whitespace
-            layoutRules(this.container, [hexSubtitle, hexRules], title, body);
+            this.appendRules([hexSubtitle, hexRules], title, body);
         } else if (hexRules) {
-            layoutRules(this.container, [hexRules], "text-xs leading-snug my-0\\.5");  // TODO: whitespace
+            this.appendRules([hexRules], "text-xs leading-snug my-0\\.5");  // TODO: whitespace
         }
         // constructibles
-        layoutConstructibles(layout, constructibles);
+        layoutConstructibles(this.container, constructibles);
         // show additional notes
         if (hexNotes.length) {
-            layoutRules(layout, hexNotes, "text-xs leading-snug my-0\\.5");  // TODO: whitespace
+            this.appendRules(hexNotes, "text-xs leading-snug my-0\\.5");  // TODO: whitespace
         }
-        // add to tooltip
-        this.container.appendChild(layout);
         // bottom bar
         this.appendUrbanDivider(buildings.filter(e => !e.isExtra));
     }
@@ -998,7 +989,6 @@ class PlotTooltipType {
         const notes = constructibles[0]?.notes;
         this.appendTitleDivider(Locale.compose(wonder.Name));
         const layout = document.createElement("div");
-        layout.classList.value = "max-w-80";
         if (notes) {
             const ttState = document.createElement("div");
             ttState.classList.value = "leading-none";
@@ -1006,8 +996,8 @@ class PlotTooltipType {
             ttState.innerHTML = dotJoin(notes.map(e => Locale.compose(e)));
             layout.appendChild(ttState);
         }
-        layoutRules(layout, [wonder.Tooltip], "text-xs leading-snug my-0\\.5");  // TODO: whitespace
         this.container.appendChild(layout);
+        this.appendRules([wonder.Tooltip], "text-xs leading-snug my-0\\.5");  // TODO: whitespace
         this.appendIconDivider(wonder.ConstructibleType);
     }
     appendRuralSection(loc, city, district) {
@@ -1059,12 +1049,11 @@ class PlotTooltipType {
         // title bar
         if (hexName) this.appendTitleDivider(Locale.compose(hexName));
         // panel interior
-        const layout = document.createElement("div");
-        layout.classList.value = "max-w-80";
         // optional description
         if (hexRules) {
-            layoutRules(layout, [hexRules], "text-xs leading-snug my-0\\.5");  // TODO: whitespace
+            this.appendRules([hexRules], "text-xs leading-snug my-0\\.5");  // TODO: whitespace
         }
+        const layout = document.createElement("div");
         // constructibles
         layoutConstructibles(layout, constructibles);
         // add to tooltip
