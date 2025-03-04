@@ -37,16 +37,16 @@ BZ_HEAD_STYLE.textContent = [
 `.bz-tooltip .bz-rules-center {
     width: 100%;
     text-align: center;
-    background-color: #00808080;  /* DEBUG */
+    /* background-color: #00808080;  /* DEBUG */
 }
 .bz-tooltip .bz-rules-max-width {
     width: 100%;
     max-width: 13.3333333333rem;
-    background-color: #00800080;  /* DEBUG */
+    /* background-color: #00800080;  /* DEBUG */
 }
 .bz-tooltip .bz-rules-center p {
     width: 100%;
-    background-color: #80808080;  /* DEBUG */
+    /* background-color: #80808080;  /* DEBUG */
 }`,
 ].join('\n');
 document.head.appendChild(BZ_HEAD_STYLE);
@@ -416,47 +416,45 @@ class PlotTooltipType {
         ttTitle.appendChild(ttTerrain);
         this.container.appendChild(ttTitle);
         // other geographical info
-        const ttGeo = document.createElement("div");
-        ttGeo.classList.value = "text-xs leading-tight";
+        const layout = document.createElement("div");
+        layout.classList.value = "text-xs leading-tight text-center";
         if (featureLabel) {
             const tt = document.createElement("div");
             setCapsuleStyle(tt, featureLabel.style, "my-0\\.5");
             tt.setAttribute('data-l10n-id', featureLabel.text);
-            ttGeo.appendChild(tt);
+            layout.appendChild(tt);
         }
         if (riverLabel) {
             const tt = document.createElement("div");
             setCapsuleStyle(tt, riverLabel.style, "my-0\\.5");
             tt.setAttribute('data-l10n-id', riverLabel.text);
-            ttGeo.appendChild(tt);
+            layout.appendChild(tt);
         }
         if (routeName) {
             // road, ferry, trade route info
             const tt = document.createElement("div");
             setCapsuleStyle(tt, BZ_STYLE.route, "my-0\\.5");
             tt.innerHTML = routeName;
-            ttGeo.appendChild(tt);
+            layout.appendChild(tt);
         }
         if (effects.text.length) {
             const ttEffects = document.createElement("div");
-            ttEffects.classList.value = "text-xs leading-tight";
             for (const effect of effects.text) {
                 const tt = document.createElement("div");
                 // setCapsuleStyle(tt, BZ_ALERT.primary, "my-0\\.5");
                 tt.setAttribute('data-l10n-id', effect);
                 ttEffects.appendChild(tt);
             }
-            ttGeo.appendChild(ttEffects);
+            layout.appendChild(ttEffects);
         }
         // continent + distant lands tag
         if (continentName) {
             const tt = document.createElement("div");
-            tt.classList.value = "text-xs leading-tight";
             const text = [continentName, distantLandsLabel].map(e => Locale.compose(e));
             tt.setAttribute('data-l10n-id', dotJoin(text));
-            ttGeo.appendChild(tt);
+            layout.appendChild(tt);
         }
-        this.container.appendChild(ttGeo);
+        this.container.appendChild(layout);
     }
     getSettlerBanner(loc) {
         const banners = [];
@@ -976,6 +974,7 @@ class PlotTooltipType {
                 ttState.innerHTML = notes;
                 ttConstructible.appendChild(ttState);
             }
+            // TODO: remove this hack if possible
             if (bottom) ttList.classList.add(bottom);
             ttList.appendChild(ttConstructible);
         }
