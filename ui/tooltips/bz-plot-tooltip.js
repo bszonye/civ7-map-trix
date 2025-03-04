@@ -185,6 +185,51 @@ function getSpecialists(loc, city) {
     if (!workers) return null;  // hide 0/X specialists
     return { workers, maximum };
 }
+function getTopUnit(loc) {
+    let plotUnits = MapUnits.getUnits(loc.x, loc.y);
+    if (plotUnits && plotUnits.length > 0) {
+        const topUnit = Units.get(plotUnits[0]);
+        return topUnit;
+    }
+    return null;
+}
+function getVillageIcon(loc) {
+    const villages = {
+        "MILITARISTIC": [
+            "IMPROVEMENT_HILLFORT",
+            "IMPROVEMENT_KASBAH",
+            "IMPROVEMENT_SHORE_BATTERY",
+        ],
+        "CULTURAL": [
+            "IMPROVEMENT_MEGALITH",
+            "IMPROVEMENT_STONE_HEAD",
+            "IMPROVEMENT_OPEN_AIR_MUSEUM",
+        ],
+        "ECONOMIC": [
+            "IMPROVEMENT_SOUQ",
+            "IMPROVEMENT_TRADING_FACTORY",
+            "IMPROVEMENT_ENTREPOT",
+        ],
+        "SCIENTIFIC": [
+            "IMPROVEMENT_ZIGGURAT",
+            "IMPROVEMENT_MONASTERY",
+            "IMPROVEMENT_INSTITUTE",
+        ]
+    };
+    // get the minor civ type
+    const playerID = GameplayMap.getOwner(loc.x, loc.y);
+    const player = Players.get(playerID);
+    let ctype = "MILITARISTIC";  // default
+    GameInfo.Independents.forEach(i => {
+        if (player.civilizationAdjective == i.CityStateName) ctype = i.CityStateType;
+    });
+    // get the current age
+    const age = GameInfo.Ages.lookup(Game.age).ChronologyIndex;
+    // select an icon
+    const icons = villages[ctype ?? "MILITARISTIC"];
+    const icon = icons[Math.min(age, icons.length-1)];
+    return icon;
+}
 function setStyle(element, style) {
     if (!element || !style) return;
     for (const [property, value] of Object.entries(style)) {
@@ -240,6 +285,35 @@ class PlotTooltipType {
         this.plotCoord = plotCoord; // May be cleaner to recompute in update but at cost of computing 2nd time.
         return true;
     }
+    isBlank() {
+        if (this.plotCoord == null) {
+            return true;
+        }
+        const localPlayerID = GameContext.localPlayerID;
+        const revealedState = GameplayMap.getRevealedState(localPlayerID, this.plotCoord.x, this.plotCoord.y);
+        if (revealedState == RevealedStates.HIDDEN) {
+            return true;
+        }
+        // If a unit is selected, check if over our own unit an enemy unit and prevent the plot tooltip from displaying.
+        const selectedUnitID = UI.Player.getHeadSelectedUnit();
+        if (selectedUnitID && ComponentID.isValid(selectedUnitID)) {
+            const plotUnits = MapUnits.getUnits(this.plotCoord.x, this.plotCoord.y);
+            if (plotUnits.length > 0) {
+                // Hovering over your selected unit; don't show the plot tooltip
+                if (plotUnits.find(e => ComponentID.isMatch(e, selectedUnitID))) {
+                    return true;
+                }
+                let args = {};
+                args.X = this.plotCoord.x;
+                args.Y = this.plotCoord.y;
+                let combatType = Game.Combat.testAttackInto(selectedUnitID, args);
+                if (combatType != CombatTypes.NO_COMBAT) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
     reset() {
         this.container.innerHTML = '';
         this.yieldsFlexbox.innerHTML = '';
@@ -275,143 +349,40 @@ class PlotTooltipType {
         // yields section
         this.container.appendChild(this.yieldsFlexbox);
         // unit info section
-        this.appendUnitInfo(loc, player);
+        this.appendUnitSection(loc, player);
         // update UI & cursor
         UI.setPlotLocation(loc.x, loc.y, plotIndex);
         this.setWarningCursor(loc);
         if (this.isShowingDebug) this.appendDebugInfo(loc);
-    }
-    isBlank() {
-        if (this.plotCoord == null) {
-            return true;
-        }
-        const localPlayerID = GameContext.localPlayerID;
-        const revealedState = GameplayMap.getRevealedState(localPlayerID, this.plotCoord.x, this.plotCoord.y);
-        if (revealedState == RevealedStates.HIDDEN) {
-            return true;
-        }
-        // If a unit is selected, check if over our own unit an enemy unit and prevent the plot tooltip from displaying.
-        const selectedUnitID = UI.Player.getHeadSelectedUnit();
-        if (selectedUnitID && ComponentID.isValid(selectedUnitID)) {
-            const plotUnits = MapUnits.getUnits(this.plotCoord.x, this.plotCoord.y);
-            if (plotUnits.length > 0) {
-                // Hovering over your selected unit; don't show the plot tooltip
-                if (plotUnits.find(e => ComponentID.isMatch(e, selectedUnitID))) {
-                    return true;
-                }
-                let args = {};
-                args.X = this.plotCoord.x;
-                args.Y = this.plotCoord.y;
-                let combatType = Game.Combat.testAttackInto(selectedUnitID, args);
-                if (combatType != CombatTypes.NO_COMBAT) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
     appendDivider() {
         const divider = document.createElement("div");
         divider.classList.add("plot-tooltip__Divider", "my-2");
         this.container.appendChild(divider);
     }
-    // lay out a column of constructibles and their construction notes
-    appendConstructibles(constructibles) {
-        const ttList = document.createElement("div");
-        ttList.classList.value = "text-xs leading-tight";
-        let bottom;  // last entry will set bottom margin
-        for (const c of constructibles) {
-            bottom = "mb-0";  // default
-            const ttConstructible = document.createElement("div");
-            ttConstructible.classList.value = "my-0\\.5";
-            const ttName = document.createElement("div");
-            ttName.classList.value = "font-title uppercase text-accent-2";
-            ttName.setAttribute("data-l10n-id", c.info.Name);
-            ttConstructible.appendChild(ttName);
-            const notes = dotJoin(c.notes.map(e => Locale.compose(e)));
-            if (notes) {
-                const ttState = document.createElement("div");
-                ttState.style.setProperty("font-size", "85%");
-                if (c.isDamaged) {
-                    setCapsuleStyle(ttState, BZ_ALERT.amber);
-                } else {
-                    ttState.classList.value = "leading-none";
-                    bottom = "mb-1";
-                }
-                ttState.innerHTML = notes;
-                ttConstructible.appendChild(ttState);
-            }
-            if (bottom) ttList.classList.add(bottom);
-            ttList.appendChild(ttConstructible);
-        }
-        this.container.appendChild(ttList);
+    appendFlexDivider(center, style=null) {
+        const layout = document.createElement("div");
+        layout.classList.value = "flex-auto flex justify-between items-center -mx-6";
+        if (style) layout.classList.add(style);
+        this.container.appendChild(layout);
+        // left frame
+        const lineLeft = document.createElement("div");
+        lineLeft.classList.value = "flex-auto h-0\\.5 min-w-6 ml-1\\.5";
+        lineLeft.style.setProperty("background-image", "linear-gradient(to left, #8D97A6, rgba(141, 151, 166, 0))");
+        layout.appendChild(lineLeft);
+        // content
+        layout.appendChild(center);
+        // right frame
+        const lineRight = document.createElement("div");
+        lineRight.classList.value = "flex-auto h-0\\.5 min-w-6 mr-1\\.5";
+        lineRight.style.setProperty("background-image", "linear-gradient(to right, #8D97A6, rgba(141, 151, 166, 0))");
+        layout.appendChild(lineRight);
     }
-    // lay out paragraphs of rules text
-    appendRules(text, ...styles) {
-        // text with icons is squirrelly, only format it at top level!
-        const ttText = document.createElement("div");
-        ttText.classList.add("bz-rules-center");
-        for (const [i, row] of text.entries()) {
-            const ttRow = document.createElement("div");
-            const style = styles.at(i) ?? styles.at(-1);
-            if (style) ttRow.classList.value = style;
-            ttRow.classList.add("bz-rules-max-width");
-            ttRow.setAttribute("data-l10n-id", row);
-            ttText.appendChild(ttRow);
-        }
-        this.container.appendChild(ttText);
-    }
-    getConstructibleInfo(loc) {
-        const constructibleInfo = [];
-        const constructibles = MapConstructibles.getHiddenFilteredConstructibles(loc.x, loc.y);
-        for (const constructible of constructibles) {
-            const instance = Constructibles.getByComponentID(constructible);
-            if (!instance || instance.location.x != loc.x || instance.location.y != loc.y) continue;
-            const info = GameInfo.Constructibles.lookup(instance.type);
-            if (!info) continue;
-            const isBuilding = info.ConstructibleClass == "BUILDING";
-            const isWonder = info.ConstructibleClass == "WONDER";
-            const isImprovement = info.ConstructibleClass == "IMPROVEMENT";
-            if (!(isWonder || isBuilding || isImprovement)) {
-                continue;
-            }
-            const notes = [];
-
-            const isComplete = instance.complete;
-            const isDamaged = instance.damaged;
-            const isExtra = this.extraBuildings.has(info.ConstructibleType);
-            const isLarge = this.largeBuildings.has(info.ConstructibleType);
-            const isAgeless = this.agelessBuildings.has(info.ConstructibleType);
-            const currentAge = GameInfo.Ages.lookup(Game.age).ChronologyIndex;
-            const age = isAgeless ? currentAge - 0.5 :
-                GameInfo.Ages.lookup(info.Age ?? "")?.ChronologyIndex ?? 0;
-            const isObsolete = isBuilding && Math.ceil(age) != currentAge;
-            const uniqueTrait =
-                isBuilding ?
-                GameInfo.Buildings.lookup(info.ConstructibleType).TraitType :
-                isImprovement ?
-                GameInfo.Improvements.lookup(info.ConstructibleType).TraitType :
-                null;
-            const isCurrent = isComplete && !isDamaged && !isObsolete && !isExtra;
-
-            if (isDamaged) notes.push("LOC_PLOT_TOOLTIP_DAMAGED");
-            if (!isComplete) notes.push("LOC_PLOT_TOOLTIP_IN_PROGRESS");
-            if (uniqueTrait) {
-                notes.push("LOC_STATE_BZ_UNIQUE");
-            } else if (isAgeless && !isWonder) {
-                notes.push("LOC_UI_PRODUCTION_AGELESS");
-            } else if (isObsolete) {
-                notes.push("LOC_STATE_BZ_OBSOLETE");
-                const ageName = GameInfo.Ages.lookup(info.Age).Name;
-                if (ageName) notes.push(Locale.compose(ageName));
-            }
-            constructibleInfo.push({
-                info, age, isCurrent, isExtra, isLarge, isDamaged, notes, uniqueTrait
-            });
-        };
-        constructibleInfo.sort((a, b) =>
-            (b.isExtra ? -1 : b.age) - (a.isExtra ? -1 : a.age));
-        return constructibleInfo;
+    appendTitleDivider(text=BZ_DOT_DIVIDER) {
+        const layout = document.createElement("div");
+        layout.classList.value = "font-title uppercase text-sm mx-3 max-w-80";
+        layout.setAttribute("data-l10n-id", text);
+        this.appendFlexDivider(layout);
     }
     appendGeographySection(loc, plotIndex) {
         // show geographical features
@@ -459,7 +430,8 @@ class PlotTooltipType {
             tt.setAttribute('data-l10n-id', riverLabel.text);
             ttGeo.appendChild(tt);
         }
-        if (routeName) {  // road, ferry, trade route info
+        if (routeName) {
+            // road, ferry, trade route info
             const tt = document.createElement("div");
             setCapsuleStyle(tt, BZ_STYLE.route, "my-0\\.5");
             tt.innerHTML = routeName;
@@ -486,88 +458,74 @@ class PlotTooltipType {
         }
         this.container.appendChild(ttGeo);
     }
-    appendSettlementSection(loc, player, city) {
-        const name = city ?  city.name :  // city or town
-            player.isAlive ?  this.getCivName(player) :  // village
-            null;  // discoveries are owned by a placeholder "World" player
-        if (!name) return;
-        this.appendTitleDivider(name);
-        // owner info
-        this.appendOwnerInfo(loc, player);
-        // settlement stats (only show at the city center)
-        if (!city || city.location.x != loc.x || city.location.y != loc.y) return;
-        const stats = [];
-        // settlement connections
-        const connections = getConnections(city);
-        if (connections) {
-            const connectionsNote = Locale.compose("LOC_BZ_CITY_CONNECTIONS",
-                connections.cities.length, connections.towns.length);
-            stats.push(connectionsNote);
+    getSettlerBanner(loc) {
+        const banners = [];
+        if (LensManager.getActiveLens() != "fxs-settler-lens") return banners;
+        //Add more details to the tooltip if we are in the settler lens
+        const localPlayer = Players.get(GameContext.localPlayerID);
+        if (!localPlayer) {
+            console.error("plot-tooltip: Attempting to update settler tooltip, but no valid local player!");
+            return banners;
         }
-        // TODO: anything else to add?
-        if (stats.length) {
-            this.appendRules(stats, "text-xs leading-snug my-0\\.5");  // TODO: whitespace
+        const localPlayerDiplomacy = localPlayer?.Diplomacy;
+        if (localPlayerDiplomacy === undefined) {
+            console.error("plot-tooltip: Attempting to update settler tooltip, but no valid local player Diplomacy object!");
+            return banners;
         }
-    }
-    appendHexSection(loc, city, district) {
-        switch (district?.type) {
-            case DistrictTypes.CITY_CENTER:
-            case DistrictTypes.URBAN:
-                this.appendUrbanSection(loc, city, district);
-                break;
-            case DistrictTypes.WONDER:
-                this.appendWonderSection(loc);
-                break;
-            case DistrictTypes.RURAL:
-            case DistrictTypes.WILDERNESS:
-            default:
-                this.appendRuralSection(loc, city, district);
+        if (GameplayMap.isWater(loc.x, loc.y) || GameplayMap.isImpassable(loc.x, loc.y) || GameplayMap.isNavigableRiver(loc.x, loc.y)) {
+            // Dont't add any extra tooltip to mountains, oceans, or navigable rivers, should be obvious enough w/o them
+            return banners;
         }
+        const localPlayerAdvancedStart = localPlayer?.AdvancedStart;
+        if (localPlayerAdvancedStart === undefined) {
+            console.error("plot-tooltip: Attempting to update settler tooltip, but no valid local player advanced start object!");
+            return banners;
+        }
+        // Show why we can't settle here
+        let warning;
+        let warningStyle = BZ_ALERT.red;
+        if (!GameplayMap.isPlotInAdvancedStartRegion(GameContext.localPlayerID, loc.x, loc.y) && !localPlayerAdvancedStart?.getPlacementComplete()) {
+            warning = "LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_FAR";
+        } else if (!localPlayerDiplomacy.isValidLandClaimLocation(loc, true /*bIgnoreFriendlyUnitRequirement*/)) {
+            if (GameplayMap.getResourceType(loc.x, loc.y) != ResourceTypes.NO_RESOURCE) {
+                warning = "LOC_PLOT_TOOLTIP_CANT_SETTLE_RESOURCES";
+            } else {  // if (GameplayMap.isCityWithinMinimumDistance(loc.x, loc.y)) {
+                warning = "LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_CLOSE";
+            }
+        } else if (!GameplayMap.isFreshWater(loc.x, loc.y)) {
+            warningStyle = BZ_ALERT.amber;
+            warning = "LOC_PLOT_TOOLTIP_NO_FRESH_WATER";
+        }
+        if (warning) {
+            const tt = document.createElement("div");
+            tt.classList.value = "text-xs leading-normal my-0\\.5";
+            setBannerStyle(tt, warningStyle);
+            tt.setAttribute('data-l10n-id', warning);
+            banners.push(tt);
+        }
+        return banners;
     }
-    getPlayerName(player) {
-        if (player == null) return "";
-        const name = player.isMinor || player.isIndependent ?
-            Locale.compose("LOC_LEADER_BZ_PEOPLE_NAME", player.name) :
-            Locale.compose(player.name);
-        return name;
-    }
-    getCivName(player, fullName=false) {
-        if (player == null) return "";
-        const civName = fullName || player.isMinor || player.isIndependent ?
-            player.civilizationFullName :  // "Venice"
-            player.civilizationName;  // "Spain"
-        const name = player.isIndependent && fullName ?
-            // add "Village" to the full name of independents
-            Locale.compose("LOC_CIVILIZATION_INDEPENDENT_SINGULAR", civName) :
-            Locale.compose(civName);
-        return name;
-    }
-    getCivRelationship(player) {
+    getPlotEffects(plotIndex) {
+        const text = [];
+        const banners = [];
+        const plotEffects = MapPlotEffects.getPlotEffects(plotIndex);
         const localPlayerID = GameContext.localPlayerID;
-        if (player.id == localPlayerID) {
-            return { type: "LOC_PLOT_TOOLTIP_YOU", isEnemy: false };
+        for (const item of plotEffects) {
+            if (item.onlyVisibleToOwner && item.owner != localPlayerID) continue;
+            const effectInfo = GameInfo.PlotEffects.lookup(item.effectType);
+            if (!effectInfo) return;
+            if (effectInfo.Damage || effectInfo.Defense) {
+                const tt = document.createElement("div");
+                tt.classList.value = "text-xs leading-normal my-0\\.5";
+                tt.setAttribute('data-l10n-id', effectInfo.Name);
+                const style = effectInfo.Damage ? BZ_ALERT.red : BZ_ALERT.brown;
+                setBannerStyle(tt, style);
+                banners.push(tt);
+            } else {
+                text.push(effectInfo.Name);
+            }
         }
-        if (!player.Diplomacy) return null;
-        // is the other player a city-state or village?
-        if (player.isMinor || player.isIndependent) {
-            const isVassal = player.Influence?.hasSuzerain &&
-                player.Influence.getSuzerain() == localPlayerID;
-            const isEnemy = player.Diplomacy?.isAtWarWith(localPlayerID);
-            const name = isVassal ?  "LOC_INDEPENDENT_BZ_RELATIONSHIP_TRIBUTARY" :
-                 isEnemy ?  "LOC_INDEPENDENT_RELATIONSHIP_HOSTILE" :
-                "LOC_INDEPENDENT_RELATIONSHIP_FRIENDLY";
-            return { type: name, isEnemy: isEnemy };
-        }
-        // is the other player at war?
-        if (player.Diplomacy.isAtWarWith(localPlayerID)) {
-            return { type: "LOC_PLAYER_RELATIONSHIP_AT_WAR", isEnemy: true };
-        }
-        // not an enemy
-        if (player.Diplomacy.hasAllied(localPlayerID)) {
-            return { type: "LOC_PLAYER_RELATIONSHIP_ALLIANCE", isEnemy: false };
-        }
-        const name = player.Diplomacy.getRelationshipLevelName(localPlayerID);
-        return { type: name, isEnemy: false };
+        return { text, banners };
     }
     obstacleStyle(obstacleType, ...fallbackStyles) {
         if (!this.obstacles.has(obstacleType)) return null;
@@ -648,13 +606,6 @@ class PlotTooltipType {
         return localPlayer?.isDistantLands(loc) ?
             "LOC_RESOURCE_GENERAL_TYPE_DISTANT_LANDS" : "";
     }
-    getResource() {
-        if (this.plotCoord) {
-            const resourceType = GameplayMap.getResourceType(this.plotCoord.x, this.plotCoord.y);
-            return GameInfo.Resources.lookup(resourceType);
-        }
-        return null;
-    }
     getRouteName() {
         const routeType = GameplayMap.getRouteType(this.plotCoord.x, this.plotCoord.y);
         const route = GameInfo.Routes.lookup(routeType);
@@ -670,82 +621,28 @@ class PlotTooltipType {
         }
         return returnString;
     }
-    getPlotEffects(plotIndex) {
-        const text = [];
-        const banners = [];
-        const plotEffects = MapPlotEffects.getPlotEffects(plotIndex);
-        const localPlayerID = GameContext.localPlayerID;
-        for (const item of plotEffects) {
-            if (item.onlyVisibleToOwner && item.owner != localPlayerID) continue;
-            const effectInfo = GameInfo.PlotEffects.lookup(item.effectType);
-            if (!effectInfo) return;
-            if (effectInfo.Damage || effectInfo.Defense) {
-                const tt = document.createElement("div");
-                tt.classList.value = "text-xs leading-normal my-0\\.5";
-                tt.setAttribute('data-l10n-id', effectInfo.Name);
-                const style = effectInfo.Damage ? BZ_ALERT.red : BZ_ALERT.brown;
-                setBannerStyle(tt, style);
-                banners.push(tt);
-            } else {
-                text.push(effectInfo.Name);
-            }
+    appendSettlementSection(loc, player, city) {
+        const name = city ?  city.name :  // city or town
+            player.isAlive ?  this.getCivName(player) :  // village
+            null;  // discoveries are owned by a placeholder "World" player
+        if (!name) return;
+        this.appendTitleDivider(name);
+        // owner info
+        this.appendOwnerInfo(loc, player);
+        // settlement stats (only show at the city center)
+        if (!city || city.location.x != loc.x || city.location.y != loc.y) return;
+        const stats = [];
+        // settlement connections
+        const connections = getConnections(city);
+        if (connections) {
+            const connectionsNote = Locale.compose("LOC_BZ_CITY_CONNECTIONS",
+                connections.cities.length, connections.towns.length);
+            stats.push(connectionsNote);
         }
-        return { text, banners };
-    }
-    getSettlerBanner(loc) {
-        const banners = [];
-        if (LensManager.getActiveLens() != "fxs-settler-lens") return banners;
-        //Add more details to the tooltip if we are in the settler lens
-        const localPlayer = Players.get(GameContext.localPlayerID);
-        if (!localPlayer) {
-            console.error("plot-tooltip: Attempting to update settler tooltip, but no valid local player!");
-            return banners;
+        // TODO: anything else to add?
+        if (stats.length) {
+            this.appendRules(stats, "text-xs leading-snug my-0\\.5");  // TODO: whitespace
         }
-        const localPlayerDiplomacy = localPlayer?.Diplomacy;
-        if (localPlayerDiplomacy === undefined) {
-            console.error("plot-tooltip: Attempting to update settler tooltip, but no valid local player Diplomacy object!");
-            return banners;
-        }
-        if (GameplayMap.isWater(loc.x, loc.y) || GameplayMap.isImpassable(loc.x, loc.y) || GameplayMap.isNavigableRiver(loc.x, loc.y)) {
-            // Dont't add any extra tooltip to mountains, oceans, or navigable rivers, should be obvious enough w/o them
-            return banners;
-        }
-        const localPlayerAdvancedStart = localPlayer?.AdvancedStart;
-        if (localPlayerAdvancedStart === undefined) {
-            console.error("plot-tooltip: Attempting to update settler tooltip, but no valid local player advanced start object!");
-            return banners;
-        }
-        // Show why we can't settle here
-        let warning;
-        let warningStyle = BZ_ALERT.red;
-        if (!GameplayMap.isPlotInAdvancedStartRegion(GameContext.localPlayerID, loc.x, loc.y) && !localPlayerAdvancedStart?.getPlacementComplete()) {
-            warning = "LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_FAR";
-        } else if (!localPlayerDiplomacy.isValidLandClaimLocation(loc, true /*bIgnoreFriendlyUnitRequirement*/)) {
-            if (GameplayMap.getResourceType(loc.x, loc.y) != ResourceTypes.NO_RESOURCE) {
-                warning = "LOC_PLOT_TOOLTIP_CANT_SETTLE_RESOURCES";
-            } else {  // if (GameplayMap.isCityWithinMinimumDistance(loc.x, loc.y)) {
-                warning = "LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_CLOSE";
-            }
-        } else if (!GameplayMap.isFreshWater(loc.x, loc.y)) {
-            warningStyle = BZ_ALERT.amber;
-            warning = "LOC_PLOT_TOOLTIP_NO_FRESH_WATER";
-        }
-        if (warning) {
-            const tt = document.createElement("div");
-            tt.classList.value = "text-xs leading-normal my-0\\.5";
-            setBannerStyle(tt, warningStyle);
-            tt.setAttribute('data-l10n-id', warning);
-            banners.push(tt);
-        }
-        return banners;
-    }
-    getTopUnit(loc) {
-        let plotUnits = MapUnits.getUnits(loc.x, loc.y);
-        if (plotUnits && plotUnits.length > 0) {
-            const topUnit = Units.get(plotUnits[0]);
-            return topUnit;
-        }
-        return null;
     }
     appendOwnerInfo(loc, player) {
         if (!player || !Players.isAlive(player.id)) return;
@@ -778,134 +675,67 @@ class PlotTooltipType {
         layout.appendChild(ttCiv);
         this.container.appendChild(layout);
     }
-    appendUnitInfo(loc) {
-        const localPlayerID = GameContext.localObserverID;
-        if (GameplayMap.getRevealedState(localPlayerID, loc.x, loc.y) != RevealedStates.VISIBLE) return;
-        // get topmost unit and owner
-        let topUnit = this.getTopUnit(loc);
-        if (!topUnit || !Visibility.isVisible(localPlayerID, topUnit.id)) return;
-        const owner = Players.get(topUnit.owner);
-        if (!owner) return;
-        // friendly unit? clear the enemy flag
-        if (owner.id == localPlayerID) {
-            this.isEnemy = false;
-            return;
-        }
-        // show unit panel
-        this.appendDivider();
-        const layout = document.createElement("div");
-        layout.classList.add("plot-tooltip__unitInfo");
-        const unitName = topUnit.name;
-        const civName = this.getCivName(owner);
-        const relationship = this.getCivRelationship(owner);
-        const unitInfo = [unitName, civName, relationship?.type];
-        layout.innerHTML = dotJoin(unitInfo.map(e => Locale.compose(e)));
-        if (relationship) {
-            this.isEnemy = relationship.isEnemy;
-            if (relationship.isEnemy) {
-                layout.classList.add("py-1");
-                setBannerStyle(layout);
-            }
-        }
-        this.container.appendChild(layout);
+    getPlayerName(player) {
+        if (player == null) return "";
+        const name = player.isMinor || player.isIndependent ?
+            Locale.compose("LOC_LEADER_BZ_PEOPLE_NAME", player.name) :
+            Locale.compose(player.name);
+        return name;
     }
-    collectYields(loc, district) {
-        this.yieldsFlexbox.classList.value = "plot-tooltip__resourcesFlex";
-        this.yieldsFlexbox.innerHTML = '';
-        this.totalYields = 0;
+    getCivName(player, fullName=false) {
+        if (player == null) return "";
+        const civName = fullName || player.isMinor || player.isIndependent ?
+            player.civilizationFullName :  // "Venice"
+            player.civilizationName;  // "Spain"
+        const name = player.isIndependent && fullName ?
+            // add "Village" to the full name of independents
+            Locale.compose("LOC_CIVILIZATION_INDEPENDENT_SINGULAR", civName) :
+            Locale.compose(civName);
+        return name;
+    }
+    getCivRelationship(player) {
         const localPlayerID = GameContext.localPlayerID;
-        const fragment = document.createDocumentFragment();
-        // one column per yield type
-        const amounts = [];
-        GameInfo.Yields.forEach(info => {
-            const amount = GameplayMap.getYield(loc.x, loc.y, info.YieldType, localPlayerID);
-            if (amount) {
-                amounts.push(amount);
-                this.totalYields += amount;
-                const col = this.yieldColumn(info.YieldType, amount, info.Name);
-                fragment.appendChild(col);
-            }
-        });
-        if (!this.totalYields) return;  // no yields to show
-        // total yield column
-        const icon = district ? BZ_YIELD_TOTAL_URBAN : BZ_YIELD_TOTAL_RURAL;
-        amounts.push(this.totalYields);
-        const col = this.yieldColumn(icon, this.totalYields, "LOC_YIELD_BZ_TOTAL");
-        fragment.appendChild(col);
-        // set column width based on number of digits (at least two)
-        const numWidth = (n) => {
-            const frac = n % 1 != 0;
-            // decimal points need a little less room
-            return n.toString().length - (frac ? 0.4 : 0);
-        };
-        const maxWidth = Math.max(2, ...amounts.map(n => numWidth(n)));
-        const yieldWidth = 1 + maxWidth / 3;  // width in rem
-        this.yieldsFlexbox.style.setProperty("--yield-width", `${yieldWidth}rem`);
-        this.yieldsFlexbox.appendChild(fragment);
-    }
-    yieldColumn(icon, amount, name) {
-        const isTotal = name == "LOC_YIELD_BZ_TOTAL";
-        const ttIndividualYieldFlex = document.createElement("div");
-        ttIndividualYieldFlex.classList.add("plot-tooltip__IndividualYieldFlex");
-        if (isTotal) ttIndividualYieldFlex.classList.add("ml-0\\.5");  // extra room
-        const ariaLabel = `${Locale.toNumber(amount)} ${Locale.compose(name)}`;
-        ttIndividualYieldFlex.ariaLabel = ariaLabel;
-        const yieldIconCSS = UI.getIconCSS(icon, "YIELD");
-        const yieldIconShadow = document.createElement("div");
-        yieldIconShadow.classList.add("plot-tooltip__IndividualYieldIcons-Shadow");
-        yieldIconShadow.style.backgroundImage = yieldIconCSS;
-        ttIndividualYieldFlex.appendChild(yieldIconShadow);
-        const yieldIcon = document.createElement("div");
-        yieldIcon.classList.add("plot-tooltip__IndividualYieldIcons");
-        yieldIcon.style.backgroundImage = yieldIconCSS;
-        yieldIconShadow.appendChild(yieldIcon);
-        const ttIndividualYieldValues = document.createElement("div");
-        ttIndividualYieldValues.classList.add("plot-tooltip__IndividualYieldValues", "font-body");
-        if (isTotal) ttIndividualYieldValues.classList.add("text-secondary");
-        ttIndividualYieldValues.textContent = amount.toString();
-        ttIndividualYieldFlex.appendChild(ttIndividualYieldValues);
-        return ttIndividualYieldFlex;
-    }
-    appendDistrictDefense(loc) {
-        const districtID = MapCities.getDistrict(loc.x, loc.y);
-        if (!districtID) return;
-        // occupation status
-        const district = Districts.get(districtID);
-        if (district.owner != district.controllingPlayer) {
-            const conqueror = Players.get(district.controllingPlayer);
-            const conquerorName = this.getCivName(conqueror, true);
-            const conquerorText = Locale.compose("{1_Term} {2_Subject}", "LOC_PLOT_TOOLTIP_CONQUEROR", conquerorName);
-            const ttConqueror = document.createElement("div");
-            ttConqueror.classList.value = "text-xs leading-tight";
-            setBannerStyle(ttConqueror, BZ_ALERT.redAmber);
-            ttConqueror.innerHTML = conquerorText;
-            this.container.appendChild(ttConqueror);
+        if (player.id == localPlayerID) {
+            return { type: "LOC_PLOT_TOOLTIP_YOU", isEnemy: false };
         }
-        // district health
-        const playerID = GameplayMap.getOwner(loc.x, loc.y);
-        const playerDistricts = Players.Districts.get(playerID);
-        if (!playerDistricts) return;
-        // This type is unresolved, is it meant to be number instead?
-        const currentHealth = playerDistricts.getDistrictHealth(loc);
-        const maxHealth = playerDistricts.getDistrictMaxHealth(loc);
-        const isUnderSiege = playerDistricts.getDistrictIsBesieged(loc);
-        if (!DistrictHealthManager.canShowDistrictHealth(currentHealth, maxHealth)) {
-            return;
+        if (!player.Diplomacy) return null;
+        // is the other player a city-state or village?
+        if (player.isMinor || player.isIndependent) {
+            const isVassal = player.Influence?.hasSuzerain &&
+                player.Influence.getSuzerain() == localPlayerID;
+            const isEnemy = player.Diplomacy?.isAtWarWith(localPlayerID);
+            const name = isVassal ?  "LOC_INDEPENDENT_BZ_RELATIONSHIP_TRIBUTARY" :
+                 isEnemy ?  "LOC_INDEPENDENT_RELATIONSHIP_HOSTILE" :
+                "LOC_INDEPENDENT_RELATIONSHIP_FRIENDLY";
+            return { type: name, isEnemy: isEnemy };
         }
-        const districtContainer = document.createElement("div");
-        districtContainer.classList.value = "text-xs leading-tight";
-        setBannerStyle(districtContainer);
-        const districtTitle = document.createElement("div");
-        districtTitle.setAttribute("data-l10n-id", isUnderSiege ?
-            "LOC_PLOT_TOOLTIP_UNDER_SIEGE" : "LOC_PLOT_TOOLTIP_HEALING_DISTRICT");
-        const districtHealth = document.createElement("div");
-        setStyle(districtHealth, BZ_ALERT.redAmber);
-        districtHealth.innerHTML = currentHealth + '/' + maxHealth;
-        districtContainer.appendChild(districtTitle);
-        districtContainer.appendChild(districtHealth);
-        this.container.appendChild(districtContainer);
+        // is the other player at war?
+        if (player.Diplomacy.isAtWarWith(localPlayerID)) {
+            return { type: "LOC_PLAYER_RELATIONSHIP_AT_WAR", isEnemy: true };
+        }
+        // not an enemy
+        if (player.Diplomacy.hasAllied(localPlayerID)) {
+            return { type: "LOC_PLAYER_RELATIONSHIP_ALLIANCE", isEnemy: false };
+        }
+        const name = player.Diplomacy.getRelationshipLevelName(localPlayerID);
+        return { type: name, isEnemy: false };
     }
-    appendUrbanSection(loc, city, district) {  // includes CITY_CENTER
+    appendHexSection(loc, city, district) {
+        switch (district?.type) {
+            case DistrictTypes.CITY_CENTER:
+            case DistrictTypes.URBAN:
+                this.appendUrbanSection(loc, city, district);
+                break;
+            case DistrictTypes.WONDER:
+                this.appendWonderSection(loc);
+                break;
+            case DistrictTypes.RURAL:
+            case DistrictTypes.WILDERNESS:
+            default:
+                this.appendRuralSection(loc, city, district);
+        }
+    }
+    appendUrbanSection(loc, city, district) {
         const constructibles = this.getConstructibleInfo(loc);
         const buildings = constructibles.filter(e => !e.isExtra);
         const quarterOK = buildings.reduce((a, b) =>
@@ -976,27 +806,6 @@ class PlotTooltipType {
         // bottom bar
         this.appendUrbanDivider(buildings.filter(e => !e.isExtra));
     }
-    appendWonderSection(loc) {
-        const constructibles = this.getConstructibleInfo(loc);
-        if (constructibles.length != 1) {
-            console.error(`expected exactly one wonder, got ${constructibles.length}`);
-            if (!constructibles.length) return;
-        }
-        const wonder = constructibles[0]?.info;
-        const notes = constructibles[0]?.notes;
-        this.appendTitleDivider(Locale.compose(wonder.Name));
-        const layout = document.createElement("div");
-        if (notes) {
-            const ttState = document.createElement("div");
-            ttState.classList.value = "leading-none";
-            ttState.style.setProperty("font-size", "85%");
-            ttState.innerHTML = dotJoin(notes.map(e => Locale.compose(e)));
-            layout.appendChild(ttState);
-        }
-        this.container.appendChild(layout);
-        this.appendRules([wonder.Tooltip], "text-xs leading-snug my-0\\.5");  // TODO: whitespace
-        this.appendIconDivider(wonder.ConstructibleType);
-    }
     appendRuralSection(loc, city, district) {
         const constructibles = this.getConstructibleInfo(loc);
         const improvement = constructibles[0]?.info;
@@ -1034,7 +843,7 @@ class PlotTooltipType {
             // encampments and villages get icons based on their unique improvements,
             // appropriate for the age and minor civ type
             hexName = "LOC_DISTRICT_BZ_INDEPENDENT";
-            hexIcon = this.getVillageIcon(loc);
+            hexIcon = getVillageIcon(loc);
         } else if (improvement?.Discovery) {
             // discoveries don't have a standard icon, so let's use this nice map
             hexName = "LOC_DISTRICT_BZ_DISCOVERY";
@@ -1061,66 +870,170 @@ class PlotTooltipType {
             this.appendDivider(resourceIcon);
         }
     }
-    getVillageIcon(loc) {
-        const villages = {
-            "MILITARISTIC": [
-                "IMPROVEMENT_HILLFORT",
-                "IMPROVEMENT_KASBAH",
-                "IMPROVEMENT_SHORE_BATTERY",
-            ],
-            "CULTURAL": [
-                "IMPROVEMENT_MEGALITH",
-                "IMPROVEMENT_STONE_HEAD",
-                "IMPROVEMENT_OPEN_AIR_MUSEUM",
-            ],
-            "ECONOMIC": [
-                "IMPROVEMENT_SOUQ",
-                "IMPROVEMENT_TRADING_FACTORY",
-                "IMPROVEMENT_ENTREPOT",
-            ],
-            "SCIENTIFIC": [
-                "IMPROVEMENT_ZIGGURAT",
-                "IMPROVEMENT_MONASTERY",
-                "IMPROVEMENT_INSTITUTE",
-            ]
-        };
-        // get the minor civ type
-        const playerID = GameplayMap.getOwner(loc.x, loc.y);
-        const player = Players.get(playerID);
-        let ctype = "MILITARISTIC";  // default
-        GameInfo.Independents.forEach(i => {
-            if (player.civilizationAdjective == i.CityStateName) ctype = i.CityStateType;
-        });
-        // get the current age
-        const age = GameInfo.Ages.lookup(Game.age).ChronologyIndex;
-        // select an icon
-        const icons = villages[ctype ?? "MILITARISTIC"];
-        const icon = icons[Math.min(age, icons.length-1)];
-        return icon;
-    }
-    appendFlexDivider(center, style=null) {
+    appendWonderSection(loc) {
+        const constructibles = this.getConstructibleInfo(loc);
+        if (constructibles.length != 1) {
+            console.error(`expected exactly one wonder, got ${constructibles.length}`);
+            if (!constructibles.length) return;
+        }
+        const wonder = constructibles[0]?.info;
+        const notes = constructibles[0]?.notes;
+        this.appendTitleDivider(Locale.compose(wonder.Name));
         const layout = document.createElement("div");
-        layout.classList.value = "flex-auto flex justify-between items-center -mx-6";
-        if (style) layout.classList.add(style);
+        if (notes) {
+            const ttState = document.createElement("div");
+            ttState.classList.value = "leading-none";
+            ttState.style.setProperty("font-size", "85%");
+            ttState.innerHTML = dotJoin(notes.map(e => Locale.compose(e)));
+            layout.appendChild(ttState);
+        }
         this.container.appendChild(layout);
-        // left frame
-        const lineLeft = document.createElement("div");
-        lineLeft.classList.value = "flex-auto h-0\\.5 min-w-6 ml-1\\.5";
-        lineLeft.style.setProperty("background-image", "linear-gradient(to left, #8D97A6, rgba(141, 151, 166, 0))");
-        layout.appendChild(lineLeft);
-        // content
-        layout.appendChild(center);
-        // right frame
-        const lineRight = document.createElement("div");
-        lineRight.classList.value = "flex-auto h-0\\.5 min-w-6 mr-1\\.5";
-        lineRight.style.setProperty("background-image", "linear-gradient(to right, #8D97A6, rgba(141, 151, 166, 0))");
-        layout.appendChild(lineRight);
+        this.appendRules([wonder.Tooltip], "text-xs leading-snug my-0\\.5");  // TODO: whitespace
+        this.appendIconDivider(wonder.ConstructibleType);
     }
-    appendTitleDivider(text=BZ_DOT_DIVIDER) {
-        const layout = document.createElement("div");
-        layout.classList.value = "font-title uppercase text-sm mx-3 max-w-80";
-        layout.setAttribute("data-l10n-id", text);
-        this.appendFlexDivider(layout);
+    getResource() {
+        if (this.plotCoord) {
+            const resourceType = GameplayMap.getResourceType(this.plotCoord.x, this.plotCoord.y);
+            return GameInfo.Resources.lookup(resourceType);
+        }
+        return null;
+    }
+    getConstructibleInfo(loc) {
+        const constructibleInfo = [];
+        const constructibles = MapConstructibles.getHiddenFilteredConstructibles(loc.x, loc.y);
+        for (const constructible of constructibles) {
+            const instance = Constructibles.getByComponentID(constructible);
+            if (!instance || instance.location.x != loc.x || instance.location.y != loc.y) continue;
+            const info = GameInfo.Constructibles.lookup(instance.type);
+            if (!info) continue;
+            const isBuilding = info.ConstructibleClass == "BUILDING";
+            const isWonder = info.ConstructibleClass == "WONDER";
+            const isImprovement = info.ConstructibleClass == "IMPROVEMENT";
+            if (!(isWonder || isBuilding || isImprovement)) {
+                continue;
+            }
+            const notes = [];
+
+            const isComplete = instance.complete;
+            const isDamaged = instance.damaged;
+            const isExtra = this.extraBuildings.has(info.ConstructibleType);
+            const isLarge = this.largeBuildings.has(info.ConstructibleType);
+            const isAgeless = this.agelessBuildings.has(info.ConstructibleType);
+            const currentAge = GameInfo.Ages.lookup(Game.age).ChronologyIndex;
+            const age = isAgeless ? currentAge - 0.5 :
+                GameInfo.Ages.lookup(info.Age ?? "")?.ChronologyIndex ?? 0;
+            const isObsolete = isBuilding && Math.ceil(age) != currentAge;
+            const uniqueTrait =
+                isBuilding ?
+                GameInfo.Buildings.lookup(info.ConstructibleType).TraitType :
+                isImprovement ?
+                GameInfo.Improvements.lookup(info.ConstructibleType).TraitType :
+                null;
+            const isCurrent = isComplete && !isDamaged && !isObsolete && !isExtra;
+
+            if (isDamaged) notes.push("LOC_PLOT_TOOLTIP_DAMAGED");
+            if (!isComplete) notes.push("LOC_PLOT_TOOLTIP_IN_PROGRESS");
+            if (uniqueTrait) {
+                notes.push("LOC_STATE_BZ_UNIQUE");
+            } else if (isAgeless && !isWonder) {
+                notes.push("LOC_UI_PRODUCTION_AGELESS");
+            } else if (isObsolete) {
+                notes.push("LOC_STATE_BZ_OBSOLETE");
+                const ageName = GameInfo.Ages.lookup(info.Age).Name;
+                if (ageName) notes.push(Locale.compose(ageName));
+            }
+            constructibleInfo.push({
+                info, age, isCurrent, isExtra, isLarge, isDamaged, notes, uniqueTrait
+            });
+        };
+        constructibleInfo.sort((a, b) =>
+            (b.isExtra ? -1 : b.age) - (a.isExtra ? -1 : a.age));
+        return constructibleInfo;
+    }
+    // lay out a column of constructibles and their construction notes
+    appendConstructibles(constructibles) {
+        const ttList = document.createElement("div");
+        ttList.classList.value = "text-xs leading-tight";
+        let bottom;  // last entry will set bottom margin
+        for (const c of constructibles) {
+            bottom = "mb-0";  // default
+            const ttConstructible = document.createElement("div");
+            ttConstructible.classList.value = "my-0\\.5";
+            const ttName = document.createElement("div");
+            ttName.classList.value = "font-title uppercase text-accent-2";
+            ttName.setAttribute("data-l10n-id", c.info.Name);
+            ttConstructible.appendChild(ttName);
+            const notes = dotJoin(c.notes.map(e => Locale.compose(e)));
+            if (notes) {
+                const ttState = document.createElement("div");
+                ttState.style.setProperty("font-size", "85%");
+                if (c.isDamaged) {
+                    setCapsuleStyle(ttState, BZ_ALERT.amber);
+                } else {
+                    ttState.classList.value = "leading-none";
+                    bottom = "mb-1";
+                }
+                ttState.innerHTML = notes;
+                ttConstructible.appendChild(ttState);
+            }
+            if (bottom) ttList.classList.add(bottom);
+            ttList.appendChild(ttConstructible);
+        }
+        this.container.appendChild(ttList);
+    }
+    // lay out paragraphs of rules text
+    appendRules(text, ...styles) {
+        // text with icons is squirrelly, only format it at top level!
+        const ttText = document.createElement("div");
+        ttText.classList.add("bz-rules-center");
+        for (const [i, row] of text.entries()) {
+            const ttRow = document.createElement("div");
+            const style = styles.at(i) ?? styles.at(-1);
+            if (style) ttRow.classList.value = style;
+            ttRow.classList.add("bz-rules-max-width");
+            ttRow.setAttribute("data-l10n-id", row);
+            ttText.appendChild(ttRow);
+        }
+        this.container.appendChild(ttText);
+    }
+    appendDistrictDefense(loc) {
+        const districtID = MapCities.getDistrict(loc.x, loc.y);
+        if (!districtID) return;
+        // occupation status
+        const district = Districts.get(districtID);
+        if (district.owner != district.controllingPlayer) {
+            const conqueror = Players.get(district.controllingPlayer);
+            const conquerorName = this.getCivName(conqueror, true);
+            const conquerorText = Locale.compose("{1_Term} {2_Subject}", "LOC_PLOT_TOOLTIP_CONQUEROR", conquerorName);
+            const ttConqueror = document.createElement("div");
+            ttConqueror.classList.value = "text-xs leading-tight";
+            setBannerStyle(ttConqueror, BZ_ALERT.redAmber);
+            ttConqueror.innerHTML = conquerorText;
+            this.container.appendChild(ttConqueror);
+        }
+        // district health
+        const playerID = GameplayMap.getOwner(loc.x, loc.y);
+        const playerDistricts = Players.Districts.get(playerID);
+        if (!playerDistricts) return;
+        // This type is unresolved, is it meant to be number instead?
+        const currentHealth = playerDistricts.getDistrictHealth(loc);
+        const maxHealth = playerDistricts.getDistrictMaxHealth(loc);
+        const isUnderSiege = playerDistricts.getDistrictIsBesieged(loc);
+        if (!DistrictHealthManager.canShowDistrictHealth(currentHealth, maxHealth)) {
+            return;
+        }
+        const districtContainer = document.createElement("div");
+        districtContainer.classList.value = "text-xs leading-tight";
+        setBannerStyle(districtContainer);
+        const districtTitle = document.createElement("div");
+        districtTitle.setAttribute("data-l10n-id", isUnderSiege ?
+            "LOC_PLOT_TOOLTIP_UNDER_SIEGE" : "LOC_PLOT_TOOLTIP_HEALING_DISTRICT");
+        const districtHealth = document.createElement("div");
+        setStyle(districtHealth, BZ_ALERT.redAmber);
+        districtHealth.innerHTML = currentHealth + '/' + maxHealth;
+        districtContainer.appendChild(districtTitle);
+        districtContainer.appendChild(districtHealth);
+        this.container.appendChild(districtContainer);
     }
     appendIconDivider(icon, overlay=null) {
         // icon divider with optional overlay
@@ -1183,6 +1096,94 @@ class PlotTooltipType {
         }
         this.appendFlexDivider(layout);
     }
+    collectYields(loc, district) {
+        this.yieldsFlexbox.classList.value = "plot-tooltip__resourcesFlex";
+        this.yieldsFlexbox.innerHTML = '';
+        this.totalYields = 0;
+        const localPlayerID = GameContext.localPlayerID;
+        const fragment = document.createDocumentFragment();
+        // one column per yield type
+        const amounts = [];
+        GameInfo.Yields.forEach(info => {
+            const amount = GameplayMap.getYield(loc.x, loc.y, info.YieldType, localPlayerID);
+            if (amount) {
+                amounts.push(amount);
+                this.totalYields += amount;
+                const col = this.yieldColumn(info.YieldType, amount, info.Name);
+                fragment.appendChild(col);
+            }
+        });
+        if (!this.totalYields) return;  // no yields to show
+        // total yield column
+        const icon = district ? BZ_YIELD_TOTAL_URBAN : BZ_YIELD_TOTAL_RURAL;
+        amounts.push(this.totalYields);
+        const col = this.yieldColumn(icon, this.totalYields, "LOC_YIELD_BZ_TOTAL");
+        fragment.appendChild(col);
+        // set column width based on number of digits (at least two)
+        const numWidth = (n) => {
+            const frac = n % 1 != 0;
+            // decimal points need a little less room
+            return n.toString().length - (frac ? 0.4 : 0);
+        };
+        const maxWidth = Math.max(2, ...amounts.map(n => numWidth(n)));
+        const yieldWidth = 1 + maxWidth / 3;  // width in rem
+        this.yieldsFlexbox.style.setProperty("--yield-width", `${yieldWidth}rem`);
+        this.yieldsFlexbox.appendChild(fragment);
+    }
+    yieldColumn(icon, amount, name) {
+        const isTotal = name == "LOC_YIELD_BZ_TOTAL";
+        const ttIndividualYieldFlex = document.createElement("div");
+        ttIndividualYieldFlex.classList.add("plot-tooltip__IndividualYieldFlex");
+        if (isTotal) ttIndividualYieldFlex.classList.add("ml-0\\.5");  // extra room
+        const ariaLabel = `${Locale.toNumber(amount)} ${Locale.compose(name)}`;
+        ttIndividualYieldFlex.ariaLabel = ariaLabel;
+        const yieldIconCSS = UI.getIconCSS(icon, "YIELD");
+        const yieldIconShadow = document.createElement("div");
+        yieldIconShadow.classList.add("plot-tooltip__IndividualYieldIcons-Shadow");
+        yieldIconShadow.style.backgroundImage = yieldIconCSS;
+        ttIndividualYieldFlex.appendChild(yieldIconShadow);
+        const yieldIcon = document.createElement("div");
+        yieldIcon.classList.add("plot-tooltip__IndividualYieldIcons");
+        yieldIcon.style.backgroundImage = yieldIconCSS;
+        yieldIconShadow.appendChild(yieldIcon);
+        const ttIndividualYieldValues = document.createElement("div");
+        ttIndividualYieldValues.classList.add("plot-tooltip__IndividualYieldValues", "font-body");
+        if (isTotal) ttIndividualYieldValues.classList.add("text-secondary");
+        ttIndividualYieldValues.textContent = amount.toString();
+        ttIndividualYieldFlex.appendChild(ttIndividualYieldValues);
+        return ttIndividualYieldFlex;
+    }
+    appendUnitSection(loc) {
+        const localPlayerID = GameContext.localObserverID;
+        if (GameplayMap.getRevealedState(localPlayerID, loc.x, loc.y) != RevealedStates.VISIBLE) return;
+        // get topmost unit and owner
+        let topUnit = getTopUnit(loc);
+        if (!topUnit || !Visibility.isVisible(localPlayerID, topUnit.id)) return;
+        const owner = Players.get(topUnit.owner);
+        if (!owner) return;
+        // friendly unit? clear the enemy flag
+        if (owner.id == localPlayerID) {
+            this.isEnemy = false;
+            return;
+        }
+        // show unit panel
+        this.appendDivider();
+        const layout = document.createElement("div");
+        layout.classList.add("plot-tooltip__unitInfo");
+        const unitName = topUnit.name;
+        const civName = this.getCivName(owner);
+        const relationship = this.getCivRelationship(owner);
+        const unitInfo = [unitName, civName, relationship?.type];
+        layout.innerHTML = dotJoin(unitInfo.map(e => Locale.compose(e)));
+        if (relationship) {
+            this.isEnemy = relationship.isEnemy;
+            if (relationship.isEnemy) {
+                layout.classList.add("py-1");
+                setBannerStyle(layout);
+            }
+        }
+        this.container.appendChild(layout);
+    }
     setWarningCursor(loc) {
         // Adjust cursor between normal and red based on the plot owner's hostility
         if (UI.isCursorLocked()) return;
@@ -1190,7 +1191,7 @@ class PlotTooltipType {
         if (InterfaceMode.getCurrent() == "INTERFACEMODE_ACQUIRE_TILE") return;
         // determine who controls the hex under the cursor
         const localPlayerID = GameContext.localPlayerID;
-        const topUnit = this.getTopUnit(loc);
+        const topUnit = getTopUnit(loc);
         let owningPlayerID = GameplayMap.getOwner(loc.x, loc.y);
         // if there's a unit on the plot, that player overrides the tile's owner
         if (topUnit) {
@@ -1285,7 +1286,7 @@ class PlotTooltipType {
             }
         }
     }
-    }
+}
 TooltipManager.registerPlotType('plot', PlotTooltipPriority.LOW, new PlotTooltipType());
 
 //# sourceMappingURL=file:///base-standard/ui/tooltips/plot-tooltip.js.map
