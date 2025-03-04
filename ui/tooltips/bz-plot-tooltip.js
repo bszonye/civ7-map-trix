@@ -15,6 +15,7 @@ import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
 const BZ_BORDER_WIDTH = "0.1111111111rem";  // tooltip main border
 
 // additional CSS definitions
+// TODO: replace leading-tight with leading-snug?
 const BZ_HEAD_STYLE = document.createElement('style');
 BZ_HEAD_STYLE.textContent = [
 `.tooltip.plot-tooltip.bz-tooltip .tooltip__content {
@@ -117,6 +118,8 @@ const BZ_STYLE = {
     // obstacle types
     TERRAIN_HILL: { "background-color": BZ_COLOR.hill, "color": BZ_COLOR.accent2 },
     TERRAIN_OCEAN: {},  // don't need to highlight this
+    // TODO: highlight features by type, not class
+    // TODO: include mangroves in the "wet" group
     FEATURE_CLASS_VEGETATED: { "background-color": BZ_COLOR.vegetated },
     FEATURE_CLASS_WET: { "background-color": BZ_COLOR.wet },
     RIVER_MINOR: { "background-color": BZ_COLOR.wet },
@@ -428,7 +431,7 @@ class PlotTooltipType {
         this.container.appendChild(ttTitle);
         // other geographical info
         const layout = document.createElement("div");
-        layout.classList.value = "text-xs leading-tight text-center my-1";
+        layout.classList.value = "text-xs leading-tight text-center mb-1";
         if (featureLabel) {
             const tt = document.createElement("div");
             if (!hasRoad) setCapsuleStyle(tt, featureLabel.style, "my-0\\.5");
@@ -567,6 +570,9 @@ class PlotTooltipType {
         const feature = GameInfo.Features.lookup(featureType);
         if (!feature) return null;
         let text = feature.Name;
+        // TODO: look up specific feature types instead of classes
+        // TODO: highlight mangroves in blue, like bogs
+        // TODO: set default highlight to vegetated green
         let style = this.obstacleStyle(feature.FeatureType, feature.FeatureClassType);
         if (GameplayMap.isVolcano(loc.x, loc.y)) {
             const active = GameplayMap.isVolcanoActive(loc.x, loc.y);
