@@ -431,7 +431,7 @@ class PlotTooltipType {
         this.container.appendChild(ttTitle);
         // other geographical info
         const layout = document.createElement("div");
-        layout.classList.value = "text-xs leading-tight text-center mb-1";
+        layout.classList.value = "text-xs leading-tight text-center mb-2";
         if (featureLabel) {
             const tt = document.createElement("div");
             if (!hasRoad) setCapsuleStyle(tt, featureLabel.style, "my-0\\.5");
@@ -654,7 +654,7 @@ class PlotTooltipType {
             return;
         }
         const layout = document.createElement("div");
-        layout.classList.value = "text-xs leading-tight text-center mb-1";
+        layout.classList.value = "text-xs leading-tight text-center mb-2";
         const playerName = this.getPlayerName(player);
         const relationship = this.getCivRelationship(player);
         const relType = Locale.compose(relationship?.type);
@@ -728,13 +728,14 @@ class PlotTooltipType {
             case DistrictTypes.URBAN:
                 this.appendUrbanSection(loc, city, district);
                 break;
-            case DistrictTypes.WONDER:
-                this.appendWonderSection(loc);
-                break;
             case DistrictTypes.RURAL:
             case DistrictTypes.WILDERNESS:
             default:
                 this.appendRuralSection(loc, city, district);
+                break;
+            case DistrictTypes.WONDER:
+                this.appendWonderSection(loc);
+                break;
         }
     }
     appendUrbanSection(loc, city, district) {
@@ -792,6 +793,8 @@ class PlotTooltipType {
                 this.appendRules([hexRules]);
             }
         }
+        // religion
+        // TODO: report religion (urban or majority)
         // constructibles
         this.appendConstructibles(constructibles);
         // report specialists
@@ -857,6 +860,8 @@ class PlotTooltipType {
         if (hexRules) {
             this.appendRules([hexRules]);
         }
+        // religion
+        // TODO: report religion (rural or majority)
         // constructibles
         this.appendConstructibles(constructibles);
         // bottom bar
@@ -949,7 +954,7 @@ class PlotTooltipType {
     // lay out a column of constructibles and their construction notes
     appendConstructibles(constructibles) {
         const ttList = document.createElement("div");
-        ttList.classList.value = "text-xs leading-tight text-center mb-1";
+        ttList.classList.value = "text-xs leading-tight text-center mb-2";
         for (const c of constructibles) {
             const ttConstructible = document.createElement("div");
             ttConstructible.classList.value = "mb-0\\.5";
@@ -974,13 +979,13 @@ class PlotTooltipType {
         this.container.appendChild(ttList);
     }
     // lay out paragraphs of rules text
-    appendRules(text, title=null) {
+    appendRules(text, titleStyle=null) {
         // text with icons is squirrelly, only format it at top level!
         const ttText = document.createElement("div");
-        ttText.classList.value = "bz-rules-center mb-1";
+        ttText.classList.value = "bz-rules-center mb-2";
         for (const [i, row] of text.entries()) {
             const ttRow = document.createElement("div");
-            ttRow.classList.value = (i == 0 && title) || "text-xs leading-snug";
+            ttRow.classList.value = (i == 0 && titleStyle) || "text-xs leading-snug";
             ttRow.classList.add("bz-rules-max-width");
             ttRow.setAttribute("data-l10n-id", row);
             ttText.appendChild(ttRow);
