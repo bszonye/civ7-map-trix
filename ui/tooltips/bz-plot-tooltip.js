@@ -19,17 +19,17 @@ const BZ_HEAD_STYLE = document.createElement('style');
 BZ_HEAD_STYLE.textContent = [
 `.tooltip.plot-tooltip.bz-tooltip .tooltip__content {
     /* width: 21.3333333333rem;  /* DEBUG */
-    padding-top: 0rem;
+    padding-top: ${BZ_BORDER_WIDTH};
 }`,
 // debug highlighting for content boxes
 `.bz-tooltip > div > div > div {
-    background-color: #80808040;  /* DEBUG */
+    /* background-color: #80808040;  /* DEBUG */
 }`,
 `.bz-tooltip > div > div > div > div {
-    background-color: #00c0c080;  /* DEBUG */
+    /* background-color: #00c0c080;  /* DEBUG */
 }`,
 `.bz-tooltip > div > div > div > div p {
-    background-color: #808080c0;  /* DEBUG */
+    /* background-color: #808080c0;  /* DEBUG */
 }`,
 `.bz-banner {
     text-align: center;
@@ -110,7 +110,6 @@ const BZ_ALERT = {
     secondary: { "background-color": BZ_COLOR.secondary, "color": BZ_COLOR.black },
     black: { "background-color": BZ_COLOR.black },
     red: { "background-color": BZ_COLOR.red },
-    redAmber: { "background-color": BZ_COLOR.red, "color": BZ_COLOR.amber },
     amber: { "background-color": BZ_COLOR.amber, "color": BZ_COLOR.black },
     brown: { "background-color": BZ_COLOR.brown },
     DEBUG: { "background-color": "#80808080" },
@@ -510,7 +509,7 @@ class PlotTooltipType {
         }
         if (warning) {
             const tt = document.createElement("div");
-            tt.classList.value = "text-xs leading-normal my-0\\.5";
+            tt.classList.value = "text-xs leading-normal mb-1";
             setBannerStyle(tt, warningStyle);
             tt.setAttribute('data-l10n-id', warning);
             banners.push(tt);
@@ -528,7 +527,7 @@ class PlotTooltipType {
             if (!effectInfo) return;
             if (effectInfo.Damage || effectInfo.Defense) {
                 const tt = document.createElement("div");
-                tt.classList.value = "text-xs leading-normal my-0\\.5";
+                tt.classList.value = "text-xs leading-normal mb-1";
                 tt.setAttribute('data-l10n-id', effectInfo.Name);
                 const style = effectInfo.Damage ? BZ_ALERT.red : BZ_ALERT.brown;
                 setBannerStyle(tt, style);
@@ -997,15 +996,15 @@ class PlotTooltipType {
         if (!districtID) return;
         // occupation status
         const district = Districts.get(districtID);
+        const info = [];
         if (district.owner != district.controllingPlayer) {
             const conqueror = Players.get(district.controllingPlayer);
             const conquerorName = this.getCivName(conqueror, true);
             const conquerorText = Locale.compose("{1_Term} {2_Subject}", "LOC_PLOT_TOOLTIP_CONQUEROR", conquerorName);
             const ttConqueror = document.createElement("div");
-            ttConqueror.classList.value = "text-xs leading-snug";
-            setBannerStyle(ttConqueror, BZ_ALERT.redAmber);
+            setBannerStyle(ttConqueror, { color: BZ_COLOR.amber });
             ttConqueror.innerHTML = conquerorText;
-            this.container.appendChild(ttConqueror);
+            info.push(ttConqueror);
         }
         // district health
         const playerID = GameplayMap.getOwner(loc.x, loc.y);
@@ -1015,21 +1014,25 @@ class PlotTooltipType {
         const currentHealth = playerDistricts.getDistrictHealth(loc);
         const maxHealth = playerDistricts.getDistrictMaxHealth(loc);
         const isUnderSiege = playerDistricts.getDistrictIsBesieged(loc);
-        if (!DistrictHealthManager.canShowDistrictHealth(currentHealth, maxHealth)) {
-            return;
+        if (DistrictHealthManager.canShowDistrictHealth(currentHealth, maxHealth)) {
+            // under siege or healing
+            const ttStatus = document.createElement("div");
+            ttStatus.setAttribute("data-l10n-id", isUnderSiege ?
+                "LOC_PLOT_TOOLTIP_UNDER_SIEGE" : "LOC_PLOT_TOOLTIP_HEALING_DISTRICT");
+            info.push(ttStatus);
+            // current health
+            const ttHealth = document.createElement("div");
+            setStyle(ttHealth, { color: BZ_COLOR.amber });
+            ttHealth.innerHTML = currentHealth + '/' + maxHealth;
+            info.push(ttHealth);
         }
-        const districtContainer = document.createElement("div");
-        districtContainer.classList.value = "text-xs leading-snug";
-        setBannerStyle(districtContainer);
-        const districtTitle = document.createElement("div");
-        districtTitle.setAttribute("data-l10n-id", isUnderSiege ?
-            "LOC_PLOT_TOOLTIP_UNDER_SIEGE" : "LOC_PLOT_TOOLTIP_HEALING_DISTRICT");
-        const districtHealth = document.createElement("div");
-        setStyle(districtHealth, BZ_ALERT.redAmber);
-        districtHealth.innerHTML = currentHealth + '/' + maxHealth;
-        districtContainer.appendChild(districtTitle);
-        districtContainer.appendChild(districtHealth);
-        this.container.appendChild(districtContainer);
+        if (info.length) {
+            const ttDefense = document.createElement("div");
+            ttDefense.classList.value = "text-xs leading-snug mb-1 py-1";
+            setBannerStyle(ttDefense);
+            for (const row of info) ttDefense.appendChild(row);
+            this.container.appendChild(ttDefense);
+        }
     }
     appendIconDivider(icon, overlay=null) {
         // icon divider with optional overlay
