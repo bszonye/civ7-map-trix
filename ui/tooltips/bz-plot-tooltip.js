@@ -177,11 +177,19 @@ function gatherMovementObstacles(mclass) {
 }
 function getConnections(city) {
     const ids = city?.getConnectedCities();
-    const total = ids?.length;
-    if (!total) return null;
-    const conns = ids.map(id => Cities.get(id));
-    const towns = conns.filter(t => t.isTown);
-    const cities = conns.filter(t => !t.isTown);
+    let towns = [];
+    let cities = [];
+    for (const id of ids) {
+        const conn = Cities.get(id);
+        if (!conn) {
+            console.warn(`bz-plot-tooltip: empty connection id=${JSON.stringify(id)}`);
+        } else if (conn.isTown) {
+            towns.push(conn);
+        } else {
+            cities.push(conn);
+        }
+    }
+    if (towns.length + cities.length == 0) return null;
     return { cities, towns };
 }
 function getReligionInfo(id) {
@@ -547,6 +555,7 @@ class PlotTooltipType {
         const text = [];
         const banners = [];
         const plotEffects = MapPlotEffects.getPlotEffects(plotIndex);
+        if (!plotEffects) return { text, banners };
         const localPlayerID = GameContext.localPlayerID;
         for (const item of plotEffects) {
             if (item.onlyVisibleToOwner && item.owner != localPlayerID) continue;
