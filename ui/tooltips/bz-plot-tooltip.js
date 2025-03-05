@@ -190,14 +190,12 @@ function getReligionInfo(id) {
     let religion = GameInfo.Religions.lookup(id);
     const icon = `[icon:${religion.ReligionType}]`;
     let name = religion.Name;
-    if (religion.RequiresCustomName) {
-        // find custom religion name
-        for (const playerID of Players.getAliveMajorIds()) {
-            const religion = Players.get(playerID)?.Religion;
-            if (religion?.getReligionType() != id) continue;
-            name = religion.getReligionName();
-            break;
-        }
+    // find custom religion name, if any
+    for (const player of Players.getEverAlive()) {
+        const religion = player.Religion;
+        if (religion?.getReligionType() != id) continue;
+        name = religion.getReligionName();
+        break;
     }
     return { name, icon };
 }
