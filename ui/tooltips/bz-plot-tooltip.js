@@ -185,6 +185,41 @@ function getConnections(city) {
     const cities = conns.filter(t => !t.isTown);
     return { cities, towns };
 }
+function getReligionInfo(id) {
+    // find a matching player religion, to get custom names
+    let religion = GameInfo.Religions.lookup(id);
+    const icon = `[icon:${religion.ReligionType}]`;
+    let name = religion.Name;
+    if (religion.RequiresCustomName) {
+        // find custom religion name
+        for (const playerID of Players.getAliveMajorIds()) {
+            const religion = Players.get(playerID)?.Religion;
+            if (religion?.getReligionType() != id) continue;
+            name = religion.getReligionName();
+            break;
+        }
+    }
+    return { name, icon };
+}
+function getReligions(city) {
+    const religion = city?.Religion;
+    if (!religion) return null;
+    const list = [];
+    // TODO: localize new strings
+    if (religion.majorityReligion != -1) {
+        const info = getReligionInfo(religion.majorityReligion);
+        list.push(Locale.compose("LOC_BZ_RELIGION_MAJORITY", info.icon, info.name));
+    }
+    if (religion.urbanReligion != religion.majorityReligion) {
+        const info = getReligionInfo(religion.urbanReligion);
+        list.push(Locale.compose("LOC_BZ_RELIGION_URBAN", info.icon, info.name));
+    }
+    if (religion.ruralReligion != religion.majorityReligion) {
+        const info = getReligionInfo(religion.ruralReligion);
+        list.push(Locale.compose("LOC_BZ_RELIGION_RURAL", info.icon, info.name));
+    }
+    return list.length ? list : null;
+}
 function getSpecialists(loc, city) {
     if (city.isTown) return null;  // no specialists in towns
     const maximum = city.Workers?.getCityWorkerCap();
@@ -636,7 +671,11 @@ class PlotTooltipType {
                 connections.cities.length, connections.towns.length);
             stats.push(connectionsNote);
         }
-        // TODO: religion (urban, rural, majority)
+        // religion
+        const religions = getReligions(city);
+        if (religions) {
+            stats.push(...religions);
+        }
         // TODO: anything else to add?
         if (stats.length) {
             this.appendRules(stats, "-mt-1 mb-2");  // tighten space above icon

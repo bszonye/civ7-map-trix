@@ -7,6 +7,15 @@
         <Row Tag="LOC_BZ_HEMISPHERE_HOMELANDS">
             <Text>Homelands</Text>
         </Row>
+        <Row Tag="LOC_BZ_RELIGION_URBAN">
+            <Text>Urban {1_icon} {2_name}</Text>
+        </Row>
+        <Row Tag="LOC_BZ_RELIGION_RURAL">
+            <Text>Rural {1_icon} {2_name}</Text>
+        </Row>
+        <Row Tag="LOC_BZ_RELIGION_MAJORITY">
+            <Text>Majority {1_icon} {2_name}</Text>
+        </Row>
         <Row Tag="LOC_DISTRICT_BZ_CITY_STATE">
             <Text>City-State</Text>
         </Row>
