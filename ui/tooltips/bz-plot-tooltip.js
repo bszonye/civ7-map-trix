@@ -23,13 +23,13 @@ BZ_HEAD_STYLE.textContent = [
 }`,
 // debug highlighting for content boxes
 `.bz-tooltip > div > div > div {
-    background-color: #80808040;  /* DEBUG */
+    /* background-color: #80808040;  /* DEBUG */
 }`,
 `.bz-tooltip > div > div > div > div {
-    background-color: #00808080;  /* DEBUG */
+    /* background-color: #00c0c080;  /* DEBUG */
 }`,
 `.bz-tooltip > div > div > div > div p {
-    background-color: #808080c0;  /* DEBUG */
+    /* background-color: #808080c0;  /* DEBUG */
 }`,
 `.bz-banner {
     text-align: center;
@@ -960,7 +960,6 @@ class PlotTooltipType {
         ttList.classList.value = "text-xs leading-snug text-center mb-2";
         for (const c of constructibles) {
             const ttConstructible = document.createElement("div");
-            ttConstructible.classList.value = "mb-0\\.5";
             const ttName = document.createElement("div");
             ttName.classList.value = "font-title uppercase text-accent-2";
             ttName.setAttribute("data-l10n-id", c.info.Name);
@@ -970,9 +969,9 @@ class PlotTooltipType {
                 const ttState = document.createElement("div");
                 ttState.style.setProperty("font-size", "85%");
                 if (c.isDamaged) {
-                    setCapsuleStyle(ttState, BZ_ALERT.amber);
+                    setCapsuleStyle(ttState, BZ_ALERT.amber, "mb-0\\.5");
                 } else {
-                    ttState.classList.value = "leading-none";
+                    ttState.classList.value = "-mt-1";
                 }
                 ttState.innerHTML = notes;
                 ttConstructible.appendChild(ttState);
@@ -1041,17 +1040,17 @@ class PlotTooltipType {
         const layout = document.createElement("div");
         layout.classList.add("flex-grow", "relative");
         const base = document.createElement("div");
-        base.classList.value = "bg-contain bg-center size-12 mx-3";
+        const iconStyle = "bg-contain bg-center -my-1 mx-3";  // tight vertical
+        base.classList.value = `${iconStyle} size-12`;
         base.style.backgroundImage = icon;
         layout.appendChild(base);
         if (overlay) {
             const over = document.createElement("div");
-            over.classList.value =
-                "bg-contain bg-center size-9 mx-3 absolute top-1\\.5 left-1\\.5";
+            over.classList.value = `${iconStyle} size-9 absolute top-1\\.5 left-1\\.5`;
             over.style.backgroundImage = overlay;
             layout.appendChild(over);
         }
-        this.appendFlexDivider(layout);
+        this.appendFlexDivider(layout, "mb-2");
     }
     appendUrbanDivider(buildings) {
         // there are at least two building slots (unless one is large)
@@ -1065,7 +1064,7 @@ class PlotTooltipType {
             if (!slot) {
                 // show an empty slot with a transparent yield ring
                 const ttFrame = document.createElement("div");
-                ttFrame.classList.value = "border-2 rounded-full my-1 mx-1\\.5";
+                ttFrame.classList.value = "border-2 rounded-full mx-1\\.5";
                 ttFrame.style.setProperty("border-color", "rgba(0, 0, 0, 0)");
                 const ttIcon = document.createElement("div");
                 ttIcon.classList.value = "bg-contain bg-center size-12";
@@ -1081,7 +1080,7 @@ class PlotTooltipType {
             const glowColor = BZ_YIELD_COLOR[yields[1] ?? yields[0] ?? null];
             // ring the slot with an appropriate color for the yield
             const ttFrame = document.createElement("div");
-            ttFrame.classList.value = "border-2 rounded-full my-1 mx-1\\.5";
+            ttFrame.classList.value = "border-2 rounded-full mx-1\\.5";
             ttFrame.style.setProperty("border-color", slotColor);
             // also glow if the building is fully operational
             if (slot.isCurrent) ttFrame.style.setProperty(
@@ -1093,7 +1092,7 @@ class PlotTooltipType {
             ttFrame.appendChild(ttIcon);
             layout.appendChild(ttFrame);
         }
-        this.appendFlexDivider(layout);
+        this.appendFlexDivider(layout, "mb-2");
     }
     collectYields(loc, district) {
         this.yieldsFlexbox.classList.value = "plot-tooltip__resourcesFlex";
