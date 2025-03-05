@@ -2,7 +2,7 @@
 <Database>
     <LocalizedText>
         <Row Tag="LOC_MOD_BZ_MAP_TRIX_NAME" Language="ko_KR">
-            <Text>Map Trix 1.4.0</Text>
+            <Text>Map Trix 1.5.0</Text>
         </Row>
         <Row Tag="LOC_MOD_BZ_MAP_TRIX_DESCRIPTION" Language="ko_KR">
             <Text>지도 툴팁 개선</Text>

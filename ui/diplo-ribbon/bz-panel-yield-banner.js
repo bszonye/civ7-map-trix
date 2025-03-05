@@ -1,7 +1,7 @@
 import { PanelYieldBanner } from '/base-standard/ui/diplo-ribbon/panel-yield-banner.js';
 
-const BZ_STYLE = document.createElement('style');
-BZ_STYLE.textContent = `
+const BZ_HEAD_STYLE = document.createElement('style');
+BZ_HEAD_STYLE.textContent = `
 .panel-yield__top-bar-content .text-yield-gold,
 .panel-yield__top-bar-content .text-yield-influence,
 .panel-yield__top-bar-content .text-yield-science,
@@ -60,7 +60,7 @@ BZ_STYLE.textContent = `
     background-color: #e5d2acaa;
 }
 `;
-document.head.appendChild(BZ_STYLE);
+document.head.appendChild(BZ_HEAD_STYLE);
 
 // add missing style for settlement count
 const YieldBarEntry_render = PanelYieldBanner.prototype.render;
