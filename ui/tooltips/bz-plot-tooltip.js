@@ -91,8 +91,7 @@ const BZ_COLOR = {
     amber: "#cea92f",  // caution
     brown: "#604639",  // note
     // geographic colors
-    hill: "#4c5366",  // Rough terrain (TODO)
-    ocean: "#204060",  // Open Ocean terrain
+    hill: "#604639",  // Rough terrain
     vegetated: "#445533",  // Vegetated features
     wet: "#335577",  // Wet features
     // yield types
@@ -116,7 +115,7 @@ const BZ_ALERT = {
 const BZ_STYLE = {
     volcano: BZ_ALERT.amber,
     // obstacle types
-    TERRAIN_HILL: { "background-color": BZ_COLOR.hill, "color": BZ_COLOR.accent2 },
+    TERRAIN_HILL: { "background-color": BZ_COLOR.hill },
     TERRAIN_OCEAN: {},  // don't need to highlight this
     FEATURE_CLASS_VEGETATED: { "background-color": BZ_COLOR.vegetated },
     FEATURE_CLASS_WET: { "background-color": BZ_COLOR.wet },
@@ -203,7 +202,6 @@ function getReligions(city) {
     const religion = city?.Religion;
     if (!religion) return null;
     const list = [];
-    // TODO: localize new strings
     if (religion.majorityReligion != -1) {
         const info = getReligionInfo(religion.majorityReligion);
         list.push(Locale.compose("LOC_BZ_RELIGION_MAJORITY", info.icon, info.name));
