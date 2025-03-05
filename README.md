@@ -23,10 +23,10 @@ about connected settlements and local religions.
 ## buildings
 everything constructible goes here: buildings, improvements, and
 wonders.  city-states, unique quarters, and wonders show their names and
-special abilities here.  buildings show their yield types as colored
-rings around the building icons:  **green** for food, **yellow** for
-gold, and so on.  a glowing ring means that a building is complete and
-up-to-date, and two glowing buildings make a Quarter.
+special abilities.  buildings show their yield types as colored rings
+around the building icons:  **green** for food, **yellow** for gold, and
+so on.  a glowing ring means that a building is complete and up-to-date,
+and two glowing buildings make a Quarter.
 
 ## yields
 the last column shows the total of all yields under a bronze hexagon.
