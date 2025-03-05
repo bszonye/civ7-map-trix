@@ -7,6 +7,15 @@
         <Row Tag="LOC_BZ_HEMISPHERE_HOMELANDS">
             <Text>고향</Text>
         </Row>
+        <Row Tag="LOC_BZ_RELIGION_MAJORITY">
+            <Text>대다수 {1_icon} {2_name}</Text>
+        </Row>
+        <Row Tag="LOC_BZ_RELIGION_RURAL">
+            <Text>교외 {1_icon} {2_name}</Text>
+        </Row>
+        <Row Tag="LOC_BZ_RELIGION_URBAN">
+            <Text>시가지 {1_icon} {2_name}</Text>
+        </Row>
         <Replace Tag="LOC_DISTRICT_BZ_CITY_STATE" Language="ko_KR">
             <Text>도시 국가</Text>
         </Replace>

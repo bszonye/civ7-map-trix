@@ -674,7 +674,6 @@ class PlotTooltipType {
         if (religions) {
             stats.push(...religions);
         }
-        // TODO: anything else to add?
         if (stats.length) {
             this.appendRules(stats, "-mt-1 mb-2");  // tighten space above icon
         }
