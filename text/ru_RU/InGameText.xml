@@ -11,7 +11,7 @@
             <Text>Преобладает {1_icon} {2_name}</Text>
         </Row>
         <Row Tag="LOC_BZ_RELIGION_RURAL" Language="ru_RU">
-            <Text>Cельский {1_icon} {2_name}</Text>
+            <Text>Сельский {1_icon} {2_name}</Text>
         </Row>
         <Row Tag="LOC_BZ_RELIGION_URBAN" Language="ru_RU">
             <Text>Городской {1_icon} {2_name}</Text>
