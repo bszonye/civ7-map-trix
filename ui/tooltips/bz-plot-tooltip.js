@@ -23,13 +23,13 @@ BZ_HEAD_STYLE.textContent = [
 }`,
 // debug highlighting for content boxes
 `.bz-tooltip > div > div > div {
-    /* background-color: #80808040;  /* DEBUG */
+    background-color: #80808040;  /* DEBUG */
 }`,
 `.bz-tooltip > div > div > div > div {
-    /* background-color: #00c0c080;  /* DEBUG */
+    background-color: #00c0c080;  /* DEBUG */
 }`,
 `.bz-tooltip > div > div > div > div p {
-    /* background-color: #808080c0;  /* DEBUG */
+    background-color: #808080c0;  /* DEBUG */
 }`,
 `.bz-banner {
     text-align: center;
@@ -420,7 +420,7 @@ class PlotTooltipType {
         }
         // tooltip title: terrain & biome
         const ttTitle = document.createElement("div");
-        ttTitle.classList.value = "text-secondary font-title text-sm leading-snug uppercase text-center";
+        ttTitle.classList.value = "text-secondary font-title uppercase text-sm leading-snug text-center";
         if (!banners.length) {
             ttTitle.style.setProperty("padding-top", "var(--padding-top-bottom)");
         }
@@ -646,7 +646,7 @@ class PlotTooltipType {
         }
         // TODO: anything else to add?
         if (stats.length) {
-            this.appendRules(stats);
+            this.appendRules(stats, "-mt-1 mb-2");  // tighten space above icon
         }
     }
     appendOwnerInfo(loc, player) {
@@ -789,12 +789,9 @@ class PlotTooltipType {
         // panel interior
         // show rules for city-states and unique quarters
         if (hexRules) {
-            const title = "font-title leading-snug uppercase";
-            if (hexSubtitle) {
-                this.appendRules([hexSubtitle, hexRules], title);
-            } else {
-                this.appendRules([hexRules]);
-            }
+            const title = "font-title uppercase text-xs leading-snug";
+            if (hexSubtitle) this.appendRules([hexSubtitle], '', title);
+            this.appendRules([hexRules]);
         }
         // religion
         // TODO: report religion (urban or majority)
@@ -805,7 +802,7 @@ class PlotTooltipType {
         if (specialists) {
             const text = Locale.compose("LOC_DISTRICT_BZ_SPECIALISTS",
                 specialists.workers, specialists.maximum);
-            this.appendRules([text]);
+            this.appendRules([text], "-mt-1 mb-2");  // tighten space above icon
         }
         // bottom bar
         this.appendUrbanDivider(buildings.filter(e => !e.isExtra));
@@ -961,7 +958,7 @@ class PlotTooltipType {
         for (const c of constructibles) {
             const ttConstructible = document.createElement("div");
             const ttName = document.createElement("div");
-            ttName.classList.value = "font-title uppercase text-accent-2";
+            ttName.classList.value = "text-accent-2 font-title uppercase";
             ttName.setAttribute("data-l10n-id", c.info.Name);
             ttConstructible.appendChild(ttName);
             const notes = dotJoinLocale(c.notes);
@@ -981,13 +978,14 @@ class PlotTooltipType {
         this.container.appendChild(ttList);
     }
     // lay out paragraphs of rules text
-    appendRules(text, titleStyle=null) {
+    appendRules(text, listStyle=null, rowStyle=null) {
         // text with icons is squirrelly, only format it at top level!
         const ttText = document.createElement("div");
-        ttText.classList.value = "bz-rules-center mb-2";
-        for (const [i, row] of text.entries()) {
+        ttText.classList.value = listStyle ?? "mb-2";
+        ttText.classList.add("bz-rules-center");
+        for (const row of text) {
             const ttRow = document.createElement("div");
-            ttRow.classList.value = (i == 0 && titleStyle) || "text-xs leading-snug";
+            ttRow.classList.value = rowStyle ?? "text-xs leading-snug";
             ttRow.classList.add("bz-rules-max-width");
             ttRow.setAttribute("data-l10n-id", row);
             ttText.appendChild(ttRow);
