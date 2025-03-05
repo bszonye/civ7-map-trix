@@ -95,7 +95,6 @@ const BZ_COLOR = {
     ocean: "#204060",  // Open Ocean terrain
     vegetated: "#445533",  // Vegetated features
     wet: "#335577",  // Wet features
-    route: "#ccbbaa",  // Road, Ferry, Railroad (TODO: retire?)
     // yield types
     culture: "#bf99e6",  // violet
     diplomacy: "#99e6bf",  // teal
@@ -115,13 +114,10 @@ const BZ_ALERT = {
     DEBUG: { "background-color": "#80808080" },
 }
 const BZ_STYLE = {
-    route: { "background-color": BZ_COLOR.route, "color": BZ_COLOR.black },
     volcano: BZ_ALERT.amber,
     // obstacle types
     TERRAIN_HILL: { "background-color": BZ_COLOR.hill, "color": BZ_COLOR.accent2 },
     TERRAIN_OCEAN: {},  // don't need to highlight this
-    // TODO: highlight features by type, not class
-    // TODO: include mangroves in the "wet" group
     FEATURE_CLASS_VEGETATED: { "background-color": BZ_COLOR.vegetated },
     FEATURE_CLASS_WET: { "background-color": BZ_COLOR.wet },
     RIVER_MINOR: { "background-color": BZ_COLOR.wet },
@@ -572,9 +568,6 @@ class PlotTooltipType {
         const feature = GameInfo.Features.lookup(featureType);
         if (!feature) return null;
         let text = feature.Name;
-        // TODO: look up specific feature types instead of classes
-        // TODO: highlight mangroves in blue, like bogs
-        // TODO: set default highlight to vegetated green
         let style = this.obstacleStyle(feature.FeatureType, feature.FeatureClassType);
         if (GameplayMap.isVolcano(loc.x, loc.y)) {
             const active = GameplayMap.isVolcanoActive(loc.x, loc.y);
@@ -643,6 +636,7 @@ class PlotTooltipType {
                 connections.cities.length, connections.towns.length);
             stats.push(connectionsNote);
         }
+        // TODO: religion (urban, rural, majority)
         // TODO: anything else to add?
         if (stats.length) {
             this.appendRules(stats, "-mt-1 mb-2");  // tighten space above icon
@@ -793,7 +787,6 @@ class PlotTooltipType {
             this.appendRules([hexRules]);
         }
         // religion
-        // TODO: report religion (urban or majority)
         // constructibles
         this.appendConstructibles(constructibles);
         // report specialists
@@ -860,7 +853,6 @@ class PlotTooltipType {
             this.appendRules([hexRules]);
         }
         // religion
-        // TODO: report religion (rural or majority)
         // constructibles
         this.appendConstructibles(constructibles);
         // bottom bar
@@ -952,6 +944,7 @@ class PlotTooltipType {
     }
     // lay out a column of constructibles and their construction notes
     appendConstructibles(constructibles) {
+        if (!constructibles?.length) return;
         const ttList = document.createElement("div");
         ttList.classList.value = "text-xs leading-snug text-center mb-2";
         for (const c of constructibles) {
