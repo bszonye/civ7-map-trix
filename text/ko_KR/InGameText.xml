@@ -4,16 +4,16 @@
         <Replace Tag="LOC_BZ_CITY_CONNECTIONS" Language="ko_KR">
             <Text>연결된 정착지 • {1_cities}[icon:YIELD_CITIES] {2_towns}[icon:YIELD_TOWNS]</Text>
         </Replace>
-        <Row Tag="LOC_BZ_HEMISPHERE_HOMELANDS">
+        <Row Tag="LOC_BZ_HEMISPHERE_HOMELANDS" Language="ko_KR">
             <Text>고향</Text>
         </Row>
-        <Row Tag="LOC_BZ_RELIGION_MAJORITY">
+        <Row Tag="LOC_BZ_RELIGION_MAJORITY" Language="ko_KR">
             <Text>대다수 {1_icon} {2_name}</Text>
         </Row>
-        <Row Tag="LOC_BZ_RELIGION_RURAL">
+        <Row Tag="LOC_BZ_RELIGION_RURAL" Language="ko_KR">
             <Text>교외 {1_icon} {2_name}</Text>
         </Row>
-        <Row Tag="LOC_BZ_RELIGION_URBAN">
+        <Row Tag="LOC_BZ_RELIGION_URBAN" Language="ko_KR">
             <Text>시가지 {1_icon} {2_name}</Text>
         </Row>
         <Replace Tag="LOC_DISTRICT_BZ_CITY_STATE" Language="ko_KR">
