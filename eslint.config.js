@@ -8,7 +8,7 @@ export default [
             "no-unused-vars": [
                 "warn",
                 {
-                    "varsIgnorePattern": "DEBUG",
+                    "varsIgnorePattern": "^_",
                     "argsIgnorePattern": "^_",
                 }
             ]

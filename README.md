@@ -1,45 +1,35 @@
-# Map Trix 1.4.0
+# Map Trix 1.5.0
 better map tools for Civilization VII
 
-## tile ownership details
-claimed tiles show which settlement they belong to and who owns it,
-along with their civilization and relationship to you.  city-states list
-their unique bonuses.
+## spot important map details
+Map Trix shows you what you're pointing at:
 
-## district and building details
-urban tiles show whether they are districts, quarters, or unique
-quarters.  buildings show whether they are ageless, obsolete, damaged,
-or in progress.  districts with specialists show their current and
-maximum number.
+- geography
+- cities and towns
+- buildings, improvements, and wonders
+- resources and yields
+- rival units
 
-## adjacency bonuses highlighted
-each building shows its bonus yield type as a colored ring around the
-building icon: **green** for food, **red** for production, **yellow**
-for gold, **blue** for science, **purple** for culture, **orange** for
-happiness, **teal** for influence, and colorless for warehouse
-buildings.  the ring **glows** if the building meets the all the
-criteria for a quarter.
+## geography
+the top of the tooltip describes the land, with emphasis on hazards and
+obstacles.  color highlights warn you of fortifications, damaging
+effects, and terrain features that can stop your movement.
 
-## settlement connections
-City Center tiles show a summary of **connected settlements,** listing
-the number of connected cities and towns.  city connections determine
-where towns can send food, and the total connections determine the bonus
-when creating a Hub Town specialization.
+## civilization
+see which settlement claims each tile, who owns it, and their atttitude
+toward you.  hover over the city center to see additional information
+about connected settlements, religion, and fresh water.
 
-## warning banners
-a red banner highlights enemy territory and units, including hostile
-independents. a bronze banner highlights important tile effects like
-temporary fortifications, floods, and storms.  damaged buildings show
-their status in a yellow warning bubble.
+## buildings
+everything constructible goes here: buildings, improvements, and
+wonders.  city-states, unique quarters, and wonders show their names and
+special abilities.  buildings show their yield types as colored rings
+around the building icons:  **green** for food, **yellow** for gold, and
+so on.  a glowing ring means that a building is complete and up-to-date,
+and two glowing buildings make a Quarter.
 
-## readable yields
-the tooltip adds a column to the yield table with the **total yield**
-under a hexagon icon.  the yield banner at the top of the screen has
-clearer text, on backgrounds that match the tooltip colors.
-
-## bug fixes
-the city growth mode now shows cursor feedback during tile selection.
-fixes a bug in the base game.
+## yields
+the last column shows the total of all yields under a bronze hexagon.
 
 ## compatibility with other mods
 known interactions:
@@ -56,5 +46,6 @@ supported languages:
 
 - Italian (translated by leonardfactory)
 - Korean (translated by Hotsolidinfill)
+- Russian (translated by Webrok)
 
-thank you for your help!
+thank you all for your help!
