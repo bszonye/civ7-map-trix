@@ -881,6 +881,8 @@ class PlotTooltipType {
         // get the panel icon and adjust the title if necessary
         if (!improvement) {
             // no improvements, no icon
+            // TODO: show required improvement?
+            // TODO: District_FreeConstructibles (base-standard/data/districts.xml)
             hexIcon = null;
         } else if (BZ_VILLAGE_TYPES.includes(improvementType)) {
             // encampments and villages get icons based on their unique improvements,
@@ -925,7 +927,7 @@ class PlotTooltipType {
         this.appendTitleDivider(Locale.compose(wonder.Name));
         if (notes) {
             const ttState = document.createElement("div");
-            ttState.classList.value = "leading-none";
+            ttState.classList.value = "text-xs leading-none text-center";
             ttState.style.setProperty("font-size", "85%");
             ttState.innerHTML = dotJoinLocale(notes);
             this.container.appendChild(ttState);
