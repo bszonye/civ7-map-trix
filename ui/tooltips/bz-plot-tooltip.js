@@ -94,6 +94,7 @@ const BZ_COLOR = {
     hill: "#604639",  // Rough terrain
     vegetated: "#445533",  // Vegetated features
     wet: "#335577",  // Wet features
+    road: "#ccbbaa",  // Roads & Railroads
     // yield types
     culture: "#bf99e6",  // violet
     diplomacy: "#99e6bf",  // teal
@@ -113,6 +114,7 @@ const BZ_ALERT = {
     DEBUG: { "background-color": "#80808080" },
 }
 const BZ_STYLE = {
+    road: { "background-color": BZ_COLOR.road, "color": BZ_COLOR.black },
     volcano: BZ_ALERT.amber,
     // obstacle types
     TERRAIN_HILL: { "background-color": BZ_COLOR.hill },
@@ -310,7 +312,7 @@ class PlotTooltipType {
         this.agelessBuildings = gatherBuildingsTagged("AGELESS");
         this.extraBuildings = gatherBuildingsTagged("IGNORE_DISTRICT_PLACEMENT_CAP");
         this.largeBuildings = gatherBuildingsTagged("FULL_TILE");
-        this.obstacles = gatherMovementObstacles();
+        this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
         Loading.runWhenFinished(() => {
             for (const y of GameInfo.Yields) {
                 const url = UI.getIcon(`${y.YieldType}`, "YIELD");
@@ -387,7 +389,7 @@ class PlotTooltipType {
         const city = cityID ? Cities.get(cityID) : null;
         const district = districtID ? Districts.get(districtID) : null;
         // update unit movement data
-        this.obstacles = gatherMovementObstacles();
+        this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
         // collect yields first, to inform panel layouts
         this.collectYields(loc, district);
         // geography section
@@ -459,7 +461,7 @@ class PlotTooltipType {
             ttTitle.style.setProperty("padding-top", "var(--padding-top-bottom)");
         }
         const ttTerrain = document.createElement("div");
-        if (!hasRoad) setCapsuleStyle(ttTerrain, terrainLabel.style, "my-0\\.5");
+        setCapsuleStyle(ttTerrain, terrainLabel.style, "my-0\\.5");
         const title = biomeLabel ?
             Locale.compose("{1_TerrainName} {2_BiomeName}", terrainLabel.text, biomeLabel) :
             terrainLabel.text;
@@ -471,7 +473,7 @@ class PlotTooltipType {
         layout.classList.value = "text-xs leading-snug text-center mb-2";
         if (featureLabel) {
             const tt = document.createElement("div");
-            if (!hasRoad) setCapsuleStyle(tt, featureLabel.style, "my-0\\.5");
+            setCapsuleStyle(tt, featureLabel.style, "my-0\\.5");
             tt.setAttribute('data-l10n-id', featureLabel.text);
             layout.appendChild(tt);
         }
@@ -479,11 +481,12 @@ class PlotTooltipType {
         if (routes.length) {
             // road, ferry, river info
             const tt = document.createElement("div");
-            if (hasRoad && river?.type == RiverTypes.RIVER_MINOR) {
-                // roads ignore minor rivers
-            } else if (river) {
-                setCapsuleStyle(tt, river.style, "my-0\\.5");
-            }
+            // highlight priority: navigable rivers, roads, other rivers
+            const routeStyle =
+                river?.type == RiverTypes.RIVER_NAVIGABLE ? river.style :
+                hasRoad ? BZ_STYLE.road :
+                river.style;
+            setCapsuleStyle(tt, routeStyle, "my-0\\.5");
             tt.innerHTML = dotJoinLocale(routes);
             layout.appendChild(tt);
         }
