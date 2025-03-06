@@ -815,11 +815,11 @@ class PlotTooltipType {
             if (buildings.every(b => b.uniqueTrait = unique)) {
                 const uq = GameInfo.UniqueQuarters.find(e => e.TraitType == unique);
                 hexName = uq.Name;
-                // UQs don't have .Tooltip but they all have parallel
+                // UQs don't have .Tooltip but most have parallel
                 // LOC_QUARTER_XXX_DESCRIPTION and
                 // LOC_QUARTER_XXX_TOOLTIP localization strings
                 const tooltip = uq.Description.replace("_DESCRIPTION", "_TOOLTIP");
-                hexRules = Locale.compose(tooltip) ?? uq.Description;
+                hexRules = Locale.keyExists(tooltip) ? tooltip : uq.Description;
             } else {
                 hexName = "LOC_DISTRICT_BZ_URBAN_QUARTER";
             }
