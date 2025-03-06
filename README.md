@@ -4,10 +4,10 @@ better map tools for Civilization VII
 ## spot important map details
 Map Trix shows you what you're pointing at:
 
-- geography and movement
-- civilizations, cities, and towns
-- buildings and other improvements
-- total yields
+- geography
+- cities and towns
+- buildings, improvements, and wonders
+- resources and yields
 - rival units
 
 ## geography
