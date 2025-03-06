@@ -586,9 +586,9 @@ class PlotTooltipType {
     getTerrainLabel(loc) {
         const terrainType = GameplayMap.getTerrainType(loc.x, loc.y);
         const terrain = GameInfo.Terrains.lookup(terrainType);
-        let text = terrain?.Name ?? ""
-        let style = this.obstacleStyle(terrain.TerrainType);
-        if (!text) return { text, style };
+        if (!terrain) return { text: "", style: null };
+        let text = terrain.Name;
+        const style = this.obstacleStyle(terrain.TerrainType);
         if (terrain.TerrainType == "TERRAIN_COAST" && GameplayMap.isLake(loc.x, loc.y)) {
             text = "LOC_TERRAIN_LAKE_NAME";
         }
