@@ -184,7 +184,7 @@ function getConnections(city) {
     for (const id of ids) {
         const conn = Cities.get(id);
         if (!conn) {
-            console.warn(`bz-plot-tooltip: stale connection id=${JSON.stringify(id)}`);
+            console.warn(`bz-plot-tooltip: stale connection=${JSON.stringify(id)}`);
         } else if (conn.isTown) {
             towns.push(conn);
         } else {
@@ -374,7 +374,7 @@ class PlotTooltipType {
     }
     update() {
         if (this.plotCoord == null) {
-            console.error("Tooltip was unable to read plot values due to a coordinate error.");
+            console.error("plot-tooltip: cannot read plot values (coordinate error)");
             return;
         }
         this.isShowingDebug = UI.isDebugPlotInfoVisible();  // Ensure debug status hasn't changed
@@ -917,7 +917,7 @@ class PlotTooltipType {
     appendWonderSection(loc) {
         const constructibles = this.getConstructibleInfo(loc);
         if (constructibles.length != 1) {
-            console.error(`expected exactly one wonder, got ${constructibles.length}`);
+            console.warn(`bz-plot-tooltip: expected exactly one wonder, not ${constructibles.length}`);
             if (!constructibles.length) return;
         }
         const wonder = constructibles[0]?.info;
