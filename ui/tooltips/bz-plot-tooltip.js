@@ -684,6 +684,10 @@ class PlotTooltipType {
         if (religions) {
             stats.push(...religions);
         }
+        // fresh water
+        if (!GameplayMap.isFreshWater(city.location.x, city.location.y)) {
+            stats.push(["LOC_BZ_PLOTKEY_NO_FRESHWATER"]);
+        }
         if (stats.length) {
             this.appendRules(stats, "-mt-1 mb-2");  // tighten space above icon
         }
