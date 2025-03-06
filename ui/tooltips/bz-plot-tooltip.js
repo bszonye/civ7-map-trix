@@ -184,7 +184,7 @@ function getConnections(city) {
     for (const id of ids) {
         const conn = Cities.get(id);
         if (!conn) {
-            console.warn(`bz-plot-tooltip: empty connection id=${JSON.stringify(id)}`);
+            console.warn(`bz-plot-tooltip: stale connection id=${JSON.stringify(id)}`);
         } else if (conn.isTown) {
             towns.push(conn);
         } else {
