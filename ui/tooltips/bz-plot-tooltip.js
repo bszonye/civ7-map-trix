@@ -325,6 +325,7 @@ class PlotTooltipType {
         this.feature = null;
         this.riverType = null;
         this.resourceType = null;
+        this.yields = [];
         this.totalYields = 0;
         this.isEnemy = false;  // is the plot held by an enemy?
         this.agelessBuildings = gatherBuildingsTagged("AGELESS");
@@ -392,7 +393,7 @@ class PlotTooltipType {
         this.feature = null;
         this.river = null;
         this.resourceType = null;
-        this.yields = null;
+        this.yields = [];
         this.totalYields = 0;
         this.isEnemy = false;
     }
@@ -994,7 +995,7 @@ class PlotTooltipType {
             resourceIcon = hexResource.ResourceType;
         } else if (district?.type) {
             hexName = GameInfo.Districts.lookup(district?.type).Name;
-        } else if (!improvement && this.totalYields == 0) {
+        } else if (!improvement && !this.totalYields) {
             return;  // nothing to show and nothing to follow
         } else if (city) {
             hexName = "LOC_DISTRICT_BZ_UNDEVELOPED";
