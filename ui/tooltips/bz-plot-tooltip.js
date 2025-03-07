@@ -1084,9 +1084,8 @@ class PlotTooltipType {
             console.warn(`bz-plot-tooltip: expected exactly one wonder, not ${this.constructibles.length}`);
             if (!this.constructibles.length) return;
         }
-        const wonder = this.constructibles[0].info;
         const notes = this.constructibles[0].notes;
-        this.appendTitleDivider(Locale.compose(wonder.Name));
+        this.appendTitleDivider(Locale.compose(this.wonder.Name));
         if (notes) {
             const ttState = document.createElement("div");
             ttState.classList.value = "text-xs leading-none text-center";
@@ -1094,8 +1093,8 @@ class PlotTooltipType {
             ttState.innerHTML = dotJoinLocale(notes);
             this.container.appendChild(ttState);
         }
-        this.appendRules([wonder.Tooltip]);
-        this.appendIconDivider(wonder.ConstructibleType);
+        this.appendRules([this.wonder.Tooltip]);
+        this.appendIconDivider(this.wonder.ConstructibleType);
     }
     // lay out a column of constructibles and their construction notes
     appendConstructibles() {
