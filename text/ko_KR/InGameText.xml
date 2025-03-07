@@ -7,6 +7,9 @@
         <Row Tag="LOC_BZ_HEMISPHERE_HOMELANDS" Language="ko_KR">
             <Text>고향</Text>
         </Row>
+        <Row Tag="LOC_BZ_IMPROVEMENT_FOR_TILE" Language="ko_KR">
+            <Text>TODO {1_icon} {2_name}</Text>
+        </Row>
         <Row Tag="LOC_BZ_PLOTKEY_NO_FRESHWATER" Language="ko_KR">
             <Text>도시에 담수 없음</Text>
         </Row>

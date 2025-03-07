@@ -7,6 +7,9 @@
         <Row Tag="LOC_BZ_HEMISPHERE_HOMELANDS" Language="it_IT">
             <Text>Terra d'Origine</Text>
         </Row>
+        <Row Tag="LOC_BZ_IMPROVEMENT_FOR_TILE" Language="it_IT">
+            <Text>TODO {1_icon} {2_name}</Text>
+        </Row>
         <Row Tag="LOC_BZ_PLOTKEY_NO_FRESHWATER" Language="it_IT">
             <Text>Assenza di Acqua Potabile</Text>
         </Row>

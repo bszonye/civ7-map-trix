@@ -7,6 +7,9 @@
         <Row Tag="LOC_BZ_HEMISPHERE_HOMELANDS">
             <Text>Homelands</Text>
         </Row>
+        <Row Tag="LOC_BZ_IMPROVEMENT_FOR_TILE">
+            <Text>Supports {1_icon} {2_name}</Text>
+        </Row>
         <Row Tag="LOC_BZ_PLOTKEY_NO_FRESHWATER">
             <Text>No Fresh Water</Text>
         </Row>

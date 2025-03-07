@@ -186,13 +186,13 @@ function gatherSupportedImprovements() {
         support[key] = {
             constructible: row.ConstructibleType,
             priority: row.Priority,
-            tier: row.Tier,
         };
-        console.warn(`TRIX ${key}=${JSON.stringify(support[key])}`);
     }
+    return support;
 }
 function getConnections(city) {
     const ids = city?.getConnectedCities();
+    if (!ids) return null;
     let towns = [];
     let cities = [];
     for (const id of ids) {
@@ -323,8 +323,12 @@ class PlotTooltipType {
         this.terrain = null;
         this.biome = null;
         this.feature = null;
-        this.riverType = null;
-        this.resourceType = null;
+        this.river = null;
+        this.resource = null;
+        this.constructibles = [];
+        this.buildings = [];  // omits walls
+        this.improvement = null;
+        this.wonder = null;
         this.yields = [];
         this.totalYields = 0;
         this.isEnemy = false;  // is the plot held by an enemy?
@@ -392,7 +396,11 @@ class PlotTooltipType {
         this.biome = null;
         this.feature = null;
         this.river = null;
-        this.resourceType = null;
+        this.resource = null;
+        this.constructibles = [];
+        this.buildings = [];
+        this.improvement = null;
+        this.wonder = null;
         this.yields = [];
         this.totalYields = 0;
         this.isEnemy = false;
@@ -416,7 +424,7 @@ class PlotTooltipType {
         // update unit movement data
         this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
         // initialize geography & yield properties
-        this.collectGeoTypes(loc);
+        this.collectGeography(loc);
         this.collectConstructibles(loc);
         this.collectYields(loc, district);
         // geography section
@@ -435,7 +443,7 @@ class PlotTooltipType {
         if (this.isShowingDebug) this.appendDebugInfo(loc);
     }
     // data modeling methods
-    collectGeoTypes(loc) {
+    collectGeography(loc) {
         const terrainType = GameplayMap.getTerrainType(loc.x, loc.y);
         this.terrain = GameInfo.Terrains.lookup(terrainType);
         const biomeType = GameplayMap.getBiomeType(loc.x, loc.y);
@@ -464,7 +472,7 @@ class PlotTooltipType {
                 break;
         }
         const resourceType = GameplayMap.getResourceType(loc.x, loc.y);
-        this.resourceType = GameInfo.Resources.lookup(resourceType);
+        this.resource = GameInfo.Resources.lookup(resourceType);
     }
     collectConstructibles(loc) {
         this.constructibles = [];
@@ -510,12 +518,43 @@ class PlotTooltipType {
                 const ageName = GameInfo.Ages.lookup(info.Age).Name;
                 if (ageName) notes.push(Locale.compose(ageName));
             }
-            this.constructibles.push({
+            const row = {
                 info, age, isCurrent, isExtra, isLarge, isDamaged, notes, uniqueTrait
-            });
+            };
+            this.constructibles.push(row);
+            if (isBuilding && !isExtra) this.buildings.push(row);
+            if (isImprovement) this.improvement = row.info;
+            if (isWonder) this.wonder = row.info;
         };
-        this.constructibles.sort((a, b) =>
-            (b.isExtra ? -1 : b.age) - (a.isExtra ? -1 : a.age));
+        if (constructibles.length) {
+            // sort buildings by age, walls last
+            const ageSort = (a, b) =>
+                (b.isExtra ? -1 : b.age) - (a.isExtra ? -1 : a.age);
+            this.constructibles.sort(ageSort);
+            this.buildings.sort(ageSort);
+        } else {
+            // empty tile: get appropriate improvement
+            // TODO: review and test this
+            // TODO: update locale strings
+            const geography = [
+                this.terrain?.TerrainType,
+                this.biome?.BiomeType,
+                this.feature?.FeatureType,
+                this.river?.RiverType,
+                this.resource?.ResourceType,
+            ].filter(e => e);
+            let itype;
+            let priority;
+            for (const trait of geography) {
+                const support = this.supportedImprovements[trait];
+                if (!support) continue;
+                if (!priority || support.priority < priority) {
+                    itype = support.constructible;
+                    priority = support.priority;
+                }
+            }
+            if (itype) this.improvement = GameInfo.Constructibles.lookup(itype);
+        }
     }
     collectYields(loc, district) {
         this.yields = [];
@@ -665,7 +704,7 @@ class PlotTooltipType {
         if (!GameplayMap.isPlotInAdvancedStartRegion(GameContext.localPlayerID, loc.x, loc.y) && !localPlayerAdvancedStart?.getPlacementComplete()) {
             warning = "LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_FAR";
         } else if (!localPlayerDiplomacy.isValidLandClaimLocation(loc, true /*bIgnoreFriendlyUnitRequirement*/)) {
-            if (this.resourceType) {
+            if (this.resource) {
                 warning = "LOC_PLOT_TOOLTIP_CANT_SETTLE_RESOURCES";
             } else {  // if (GameplayMap.isCityWithinMinimumDistance(loc.x, loc.y)) {
                 warning = "LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_CLOSE";
@@ -821,10 +860,11 @@ class PlotTooltipType {
     }
     appendOwnerInfo(loc, player) {
         if (!player || !Players.isAlive(player.id)) return;
-        // TODO: simplify this check? what's the point of it?
+        // TODO: simplify this check? why is it here?
         const filteredConstructibles = MapConstructibles.getHiddenFilteredConstructibles(loc.x, loc.y);
         const constructibles = MapConstructibles.getConstructibles(loc.x, loc.y);
-        if (filteredConstructibles.length == 0 && filteredConstructibles.length != constructibles.length) {
+        if (constructibles.length && !filteredConstructibles.length) {
+            console.warn(`TRIX constructibles=${JSON.stringify(constructibles)}`);
             return;
         }
         const layout = document.createElement("div");
@@ -913,8 +953,7 @@ class PlotTooltipType {
         }
     }
     appendUrbanSection(loc, city, district) {
-        const buildings = this.constructibles.filter(e => !e.isExtra);
-        const quarterOK = buildings.reduce((a, b) =>
+        const quarterOK = this.buildings.reduce((a, b) =>
             a + (b.isCurrent ? b.isLarge ? 2 : 1 : 0), 0);
         let hexName = GameInfo.Districts.lookup(district?.type).Name;
         let hexSubtitle;
@@ -934,12 +973,12 @@ class PlotTooltipType {
                 // rename "City Center" to "Town Center" in towns
                 hexName = "LOC_DISTRICT_BZ_TOWN_CENTER";
             }
-        } else if (buildings.length == 0) {
+        } else if (this.buildings.length == 0) {
             // urban tile with canceled production
             hexName = "LOC_DISTRICT_BZ_URBAN_VACANT";
         } else if (quarterOK >= 2) {
-            const unique = buildings[0].uniqueTrait;
-            if (buildings.every(b => b.uniqueTrait = unique)) {
+            const unique = this.buildings[0].uniqueTrait;
+            if (this.buildings.every(b => b.uniqueTrait = unique)) {
                 const uq = GameInfo.UniqueQuarters.find(e => e.TraitType == unique);
                 hexName = uq.Name;
                 // UQs don't have .Tooltip but most have parallel
@@ -963,7 +1002,6 @@ class PlotTooltipType {
             if (hexSubtitle) this.appendRules([hexSubtitle], '', title);
             this.appendRules([hexRules]);
         }
-        // religion
         // constructibles
         this.appendConstructibles();
         // report specialists
@@ -974,17 +1012,17 @@ class PlotTooltipType {
             this.appendRules([text], "-mt-1 mb-2");  // tighten space above icon
         }
         // bottom bar
-        this.appendUrbanDivider(buildings.filter(e => !e.isExtra));
+        this.appendUrbanDivider();
     }
     appendRuralSection(loc, city, district) {
-        const improvement = this.constructibles[0]?.info;
-        const improvementType = improvement?.ConstructibleType;
+        const hasImprovement = this.improvement && this.constructibles.length != 0;
+        const improvementType = this.improvement?.ConstructibleType;
         let hexName;
         let hexRules = [];
         let hexIcon;
         let resourceIcon;
         // special tile types: natural wonder, resource
-        const hexResource = this.resourceType;
+        const hexResource = this.resource;
         // set name & description
         if (this.feature && this.feature.Tooltip) {
             hexName = this.feature.Name;
@@ -995,7 +1033,7 @@ class PlotTooltipType {
             resourceIcon = hexResource.ResourceType;
         } else if (district?.type) {
             hexName = GameInfo.Districts.lookup(district?.type).Name;
-        } else if (!improvement && !this.totalYields) {
+        } else if (!hasImprovement && !this.totalYields) {
             return;  // nothing to show and nothing to follow
         } else if (city) {
             hexName = "LOC_DISTRICT_BZ_UNDEVELOPED";
@@ -1003,17 +1041,22 @@ class PlotTooltipType {
             hexName = GameInfo.Districts.lookup(DistrictTypes.WILDERNESS).Name;
         }
         // get the panel icon and adjust the title if necessary
-        if (!improvement) {
+        if (!hasImprovement) {
             // no icon, but show supported improvement
             hexIcon = null;
-            // TODO: show supported improvement
-            hexRules.push(`Supports [icon:IMPROVEMENT_MINE] Mine`);
+            if (this.improvement) {
+                const plan = Locale.compose(
+                    "LOC_BZ_IMPROVEMENT_FOR_TILE",
+                    `[icon:${improvementType}]`,
+                    Locale.compose(this.improvement.Name));
+                hexRules.push(plan);
+            }
         } else if (BZ_VILLAGE_TYPES.includes(improvementType)) {
             // encampments and villages get icons based on their unique improvements,
             // appropriate for the age and minor civ type
             hexName = "LOC_DISTRICT_BZ_INDEPENDENT";
             hexIcon = getVillageIcon(loc);
-        } else if (improvement?.Discovery) {
+        } else if (this.improvement?.Discovery) {
             // discoveries don't have a standard icon, so let's use this nice map
             hexName = "LOC_DISTRICT_BZ_DISCOVERY";
             hexIcon = "url('blp:tech_cartography')";
@@ -1041,8 +1084,8 @@ class PlotTooltipType {
             console.warn(`bz-plot-tooltip: expected exactly one wonder, not ${this.constructibles.length}`);
             if (!this.constructibles.length) return;
         }
-        const wonder = this.constructibles[0]?.info;
-        const notes = this.constructibles[0]?.notes;
+        const wonder = this.constructibles[0].info;
+        const notes = this.constructibles[0].notes;
         this.appendTitleDivider(Locale.compose(wonder.Name));
         if (notes) {
             const ttState = document.createElement("div");
@@ -1158,11 +1201,11 @@ class PlotTooltipType {
         }
         this.appendFlexDivider(layout, "mb-2");
     }
-    appendUrbanDivider(buildings) {
+    appendUrbanDivider() {
         // there are at least two building slots (unless one is large)
-        const slots = [...buildings];
-        if (slots.length < 2 && !buildings[0]?.isLarge)
-            slots.push(...[null, null].slice(buildings.length));
+        const slots = [...this.buildings];
+        if (slots.length < 2 && !this.buildings[0]?.isLarge)
+            slots.push(...[null, null].slice(this.buildings.length));
         // render the icons
         const layout = document.createElement("div");
         layout.classList.value = "flex flex-grow relative mx-2";
