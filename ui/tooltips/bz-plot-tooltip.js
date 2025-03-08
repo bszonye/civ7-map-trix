@@ -22,14 +22,14 @@ BZ_HEAD_STYLE.textContent = [
     padding-top: ${BZ_BORDER_WIDTH};
 }`,
 // debug highlighting for content boxes
-`.bz-tooltip > div > div > div {
-    /* background-color: #80808040;  /* DEBUG */
+`.bz-tooltip.bz-debug > div > div > div {
+    background-color: #80808040;  /* DEBUG */
 }`,
-`.bz-tooltip > div > div > div > div {
-    /* background-color: #00c0c080;  /* DEBUG */
+`.bz-tooltip.bz-debug > div > div > div > div {
+    background-color: #00c0c080;  /* DEBUG */
 }`,
-`.bz-tooltip > div > div > div > div p {
-    /* background-color: #808080c0;  /* DEBUG */
+`.bz-tooltip.bz-debug > div > div > div > div p {
+    background-color: #808080c0;  /* DEBUG */
 }`,
 `.bz-banner {
     text-align: center;
@@ -337,6 +337,8 @@ class PlotTooltipType {
     constructor() {
         this.plotCoord = null;
         this.isShowingDebug = false;
+        this.modCtrl = false;
+        this.modShift = false;
         // document root
         this.tooltip = document.createElement('fxs-tooltip');
         this.tooltip.classList.value = "bz-tooltip plot-tooltip max-w-96";
@@ -383,6 +385,15 @@ class PlotTooltipType {
         return this.tooltip;
     }
     isUpdateNeeded(plotCoord) {
+        // allow Ctrl and Shift modifiers to change tooltip
+        const modCtrl = Input.isCtrlDown();
+        const modShift = Input.isShiftDown();
+        if (modCtrl != this.modCtrl || modShift != this.modShift) {
+            this.modCtrl = modCtrl;
+            this.modShift = modShift;
+            return true;
+        }
+
         // Check if the plot location has changed, if not return early, otherwise cache it and rebuild.
         if (this.plotCoord != null) {
             if (plotCoord.x == this.plotCoord.x && plotCoord.y == this.plotCoord.y) {
@@ -441,8 +452,13 @@ class PlotTooltipType {
             console.error("plot-tooltip: cannot read plot values (coordinate error)");
             return;
         }
-        // update debug info flag
-        this.isShowingDebug = UI.isDebugPlotInfoVisible();
+        // show debug info on Ctrl modifier or UI config setting
+        this.isShowingDebug = this.modCtrl || UI.isDebugPlotInfoVisible();
+        if (this.isShowingDebug && this.modShift) {
+            this.tooltip.classList.add("bz-debug");
+        } else {
+            this.tooltip.classList.remove("bz-debug");
+        }
         // update player and civilization info
         this.player = Players.get(GameContext.localPlayerID);
         this.civilization = GameInfo.Civilizations.lookup(this.player.civilizationType);

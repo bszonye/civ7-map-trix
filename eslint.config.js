@@ -26,6 +26,7 @@ export default [
                 GameInfo: "readonly",
                 GameplayMap: "readonly",
                 IndependentRelationship: "readonly",
+                Input: "readonly",
                 Loading: "readonly",
                 Locale: "readonly",
                 MapCities: "readonly",
