@@ -452,9 +452,9 @@ class PlotTooltipType {
             console.error("plot-tooltip: cannot read plot values (coordinate error)");
             return;
         }
-        // show debug info on Ctrl modifier or UI config setting
-        this.isShowingDebug = this.modCtrl || UI.isDebugPlotInfoVisible();
-        if (this.isShowingDebug && this.modShift) {
+        // show debug info if enabled + extra info when Ctrl is held
+        this.isShowingDebug = UI.isDebugPlotInfoVisible();
+        if (this.isShowingDebug && this.modCtrl) {
             this.tooltip.classList.add("bz-debug");
         } else {
             this.tooltip.classList.remove("bz-debug");
