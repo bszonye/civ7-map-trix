@@ -8,7 +8,7 @@
             <Text>Homelands</Text>
         </Row>
         <Row Tag="LOC_BZ_IMPROVEMENT_FOR_TILE">
-            <Text>Allows {1_icon} {2_name}</Text>
+            <Text>Permits {1_icon} {2_name}</Text>
         </Row>
         <Row Tag="LOC_BZ_IMPROVEMENT_FOR_RESOURCE">
             <Text>Requires {1_icon} {2_name}</Text>
