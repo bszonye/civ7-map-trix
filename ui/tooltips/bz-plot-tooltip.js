@@ -1089,7 +1089,9 @@ class PlotTooltipType {
             const icon = `[icon:${this.development.ConstructibleType}]`;
             const name = this.development.Name;
             const plan = Locale.compose(text, icon, name);
-            this.appendRules([plan]);
+            if (this.resource || city?.owner == this.player.id) {
+                this.appendRules([plan]);
+            }
         }
         // constructibles
         this.appendConstructibles();
@@ -1102,13 +1104,12 @@ class PlotTooltipType {
     }
     appendWonderSection(_loc) {
         if (!this.wonder) return;
-        const notes = this.constructibles[0].notes;
         this.appendTitleDivider(Locale.compose(this.wonder.info.Name));
-        if (notes) {
+        if (this.wonder.notes) {
             const ttState = document.createElement("div");
             ttState.classList.value = "text-xs leading-none text-center";
             ttState.style.setProperty("font-size", "85%");
-            ttState.innerHTML = dotJoinLocale(notes);
+            ttState.innerHTML = dotJoinLocale(this.wonder.notes);
             this.container.appendChild(ttState);
         }
         this.appendRules([this.wonder.info.Tooltip]);
