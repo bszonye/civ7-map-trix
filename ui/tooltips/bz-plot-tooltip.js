@@ -167,10 +167,10 @@ function gatherCivTraits(civType) {
     // set the cache and return it
     return BZ_CIV_TRAITS[civType] = new Set(traits);
 }
-// get the geographic rules for rural work (farms, mines, quarries, etc)
-const BZ_WORK_RULES = {};  // cache
-function gatherWorkRules(civType) {
-    if (civType in BZ_WORK_RULES) return BZ_WORK_RULES[civType];
+// get the geographic rules for rural expansions (new improvements)
+const BZ_EXPANSION_RULES = {};  // cache
+function gatherExpansionRules(civType) {
+    if (civType in BZ_EXPANSION_RULES) return BZ_EXPANSION_RULES[civType];
     const traits = gatherCivTraits(civType);
     const support = {};
     for (const row of GameInfo.District_FreeConstructibles) {
@@ -188,7 +188,7 @@ function gatherWorkRules(civType) {
         };
     }
     // set the cache and return it
-    return BZ_WORK_RULES[civType] = support;
+    return BZ_EXPANSION_RULES[civType] = support;
 }
 // get the set of obstacles that end movement for a movement class
 const BZ_OBSTACLES = {};  // cache
@@ -345,7 +345,7 @@ class PlotTooltipType {
         // player-dependent info (may change with hotseat mode)
         this.player = Players.get(GameContext.localPlayerID);
         this.civilization = GameInfo.Civilizations.lookup(this.player.civilizationType);
-        this.workRules = gatherWorkRules(this.civilization.CivilizationType);
+        this.expansionRules = gatherExpansionRules(this.civilization.CivilizationType);
         // geography
         this.terrain = null;
         this.biome = null;
@@ -353,11 +353,11 @@ class PlotTooltipType {
         this.river = null;
         this.resource = null;
         // constructibles
-        this.workType = null;  // rural work type (farm, mine, etc)
         this.constructibles = [];
         this.buildings = [];  // omits walls
         this.improvement = null;
         this.wonder = null;
+        this.expansion = null;  // improvement type for rural expansion
         // yields
         this.yields = [];
         this.totalYields = 0;
@@ -427,11 +427,11 @@ class PlotTooltipType {
         this.feature = null;
         this.river = null;
         this.resource = null;
-        this.workType = null;  // rural work type (farm, mine, etc)
         this.constructibles = [];
         this.buildings = [];
         this.improvement = null;
         this.wonder = null;
+        this.expansion = null;  // improvement type for rural expansion
         this.yields = [];
         this.totalYields = 0;
         this.isEnemy = false;
@@ -441,11 +441,12 @@ class PlotTooltipType {
             console.error("plot-tooltip: cannot read plot values (coordinate error)");
             return;
         }
-        this.isShowingDebug = UI.isDebugPlotInfoVisible();  // Ensure debug status hasn't changed
+        // update debug info flag
+        this.isShowingDebug = UI.isDebugPlotInfoVisible();
         // update player and civilization info
         this.player = Players.get(GameContext.localPlayerID);
         this.civilization = GameInfo.Civilizations.lookup(this.player.civilizationType);
-        this.workRules = gatherWorkRules(this.civilization.CivilizationType);
+        this.expansionRules = gatherExpansionRules(this.civilization.CivilizationType);
         // Obtain names and IDs
         const loc = this.plotCoord;
         const plotIndex = GameplayMap.getIndexFromLocation(loc);
@@ -572,7 +573,7 @@ class PlotTooltipType {
                 console.warn(`bz-plot-tooltip: expected 1 constructible, not ${n}`);
             }
         } else if (n == 0) {
-            // empty tile: get rural work type (farm, mine, quarry, etc)
+            // empty tile: get rural expansion type
             // TODO: update locale strings
             const geography = [
                 this.terrain?.TerrainType,
@@ -583,11 +584,11 @@ class PlotTooltipType {
             ].filter(e => e);
             let imp;  // best matching improvement
             for (const trait of geography) {
-                const match = this.workRules[trait];
+                const match = this.expansionRules[trait];
                 if (!match) continue;
                 if (!imp || match.priority < imp.priority) imp = match;
             }
-            if (imp) this.workType = GameInfo.Constructibles.lookup(imp.constructible);
+            if (imp) this.expansion = GameInfo.Constructibles.lookup(imp.constructible);
         }
     }
     collectYields(loc, district) {
@@ -1095,13 +1096,13 @@ class PlotTooltipType {
         if (hexRules.length) {
             this.appendRules(hexRules);
         }
-        // improvement guide for undeveloped tiles
-        if (this.workType) {
+        // expansion type for undeveloped tiles
+        if (this.expansion) {
             const text = this.resource ?
                 "LOC_BZ_IMPROVEMENT_FOR_RESOURCE" :
                 "LOC_BZ_IMPROVEMENT_FOR_TILE";
-            const icon = `[icon:${this.workType.ConstructibleType}]`;
-            const name = this.workType.Name;
+            const icon = `[icon:${this.expansion.ConstructibleType}]`;
+            const name = this.expansion.Name;
             const plan = Locale.compose(text, icon, name);
             if (this.resource || city?.owner == this.player.id) {
                 this.appendRules([plan]);
