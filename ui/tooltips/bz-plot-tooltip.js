@@ -156,6 +156,31 @@ function dotJoinLocale(list) {
 function gatherBuildingsTagged(tag) {
     return new Set(GameInfo.TypeTags.filter(e => e.Tag == tag).map(e => e.Type));
 }
+function gatherCivTraits(civ) {
+    if (!civ) return null;
+    const traits = (GameInfo.CivilizationTraits
+        .filter(trait => trait.CivilizationType == civ.CivilizationType)
+        .map(trait => trait.TraitType));
+    return new Set(traits);
+}
+function gatherImprovementRules(traits) {
+    const support = {};
+    for (const row of GameInfo.District_FreeConstructibles) {
+        const imp = GameInfo.Improvements.lookup(row.ConstructibleType);
+        // unique improvement: check against player traits
+        if (imp.TraitType && !traits?.has(imp.TraitType)) continue;
+        // get the geographic selector (TERRAIN_HILL, RIVER_MINOR, etc)
+        const key = (row.ResourceType || row.RiverType ||
+            row.FeatureType || row.TerrainType || row.BiomeType);
+        if (!key) continue;
+        // collect the matching improvement type and priority
+        support[key] = {
+            constructible: row.ConstructibleType,
+            priority: row.Priority,
+        };
+    }
+    return support;
+}
 // get the set of obstacles that end movement for a movement class
 const BZ_OBSTACLES = {};  // cache
 function gatherMovementObstacles(mclass) {
@@ -176,19 +201,6 @@ function gatherMovementObstacles(mclass) {
     }
     // set the cache and return it
     return BZ_OBSTACLES[mclass] = obstacles;
-}
-function gatherSupportedImprovements() {
-    const support = {};
-    for (const row of GameInfo.District_FreeConstructibles) {
-        const key = (row.ResourceType || row.RiverType ||
-            row.FeatureType || row.TerrainType || row.BiomeType);
-        if (!key) continue;
-        support[key] = {
-            constructible: row.ConstructibleType,
-            priority: row.Priority,
-        };
-    }
-    return support;
 }
 function getConnections(city) {
     const ids = city?.getConnectedCities();
@@ -320,6 +332,8 @@ class PlotTooltipType {
         this.tooltip.classList.value = "bz-tooltip plot-tooltip max-w-96";
         this.container = document.createElement('div');
         this.tooltip.appendChild(this.container);
+        this.player = Players.get(GameContext.localPlayerID);
+        this.civilization = GameInfo.Civilizations.lookup(this.player.civilizationType);
         this.terrain = null;
         this.biome = null;
         this.feature = null;
@@ -329,6 +343,7 @@ class PlotTooltipType {
         this.buildings = [];  // omits walls
         this.improvement = null;
         this.wonder = null;
+        this.development = null;  // potential improvement
         this.yields = [];
         this.totalYields = 0;
         this.isEnemy = false;  // is the plot held by an enemy?
@@ -336,7 +351,8 @@ class PlotTooltipType {
         this.extraBuildings = gatherBuildingsTagged("IGNORE_DISTRICT_PLACEMENT_CAP");
         this.largeBuildings = gatherBuildingsTagged("FULL_TILE");
         this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
-        this.supportedImprovements = gatherSupportedImprovements();
+        this.civTraits = gatherCivTraits(this.civilization);
+        this.improvementRules = gatherImprovementRules(this.civTraits);
         Loading.runWhenFinished(() => {
             for (const y of GameInfo.Yields) {
                 const url = UI.getIcon(`${y.YieldType}`, "YIELD");
@@ -365,8 +381,7 @@ class PlotTooltipType {
         if (this.plotCoord == null) {
             return true;
         }
-        const localPlayerID = GameContext.localPlayerID;
-        const revealedState = GameplayMap.getRevealedState(localPlayerID, this.plotCoord.x, this.plotCoord.y);
+        const revealedState = GameplayMap.getRevealedState(this.player.id, this.plotCoord.x, this.plotCoord.y);
         if (revealedState == RevealedStates.HIDDEN) {
             return true;
         }
@@ -401,6 +416,7 @@ class PlotTooltipType {
         this.buildings = [];
         this.improvement = null;
         this.wonder = null;
+        this.development = null;  // potential improvement
         this.yields = [];
         this.totalYields = 0;
         this.isEnemy = false;
@@ -523,19 +539,24 @@ class PlotTooltipType {
             };
             this.constructibles.push(row);
             if (isBuilding && !isExtra) this.buildings.push(row);
-            if (isImprovement) this.improvement = row.info;
-            if (isWonder) this.wonder = row.info;
+            if (isImprovement) this.improvement = row;
+            if (isWonder) this.wonder = row;
         };
-        if (constructibles.length) {
+        const n = this.constructibles.length;
+        if (n > 1) {
             // sort buildings by age, walls last
             const ageSort = (a, b) =>
                 (b.isExtra ? -1 : b.age) - (a.isExtra ? -1 : a.age);
             this.constructibles.sort(ageSort);
             this.buildings.sort(ageSort);
-        } else {
+            if (this.wonder || this.improvement) {  // should only be one
+                console.warn(`bz-plot-tooltip: expected 1 constructible, not ${n}`);
+            }
+        } else if (n == 0) {
             // empty tile: get appropriate improvement
             // TODO: review and test this
             // TODO: update locale strings
+            // TODO: omit basic recommendations outside claimed tiles?
             const geography = [
                 this.terrain?.TerrainType,
                 this.biome?.BiomeType,
@@ -543,26 +564,23 @@ class PlotTooltipType {
                 this.river?.RiverType,
                 this.resource?.ResourceType,
             ].filter(e => e);
-            let itype;
-            let priority;
+            let imp;  // best matching improvement
             for (const trait of geography) {
-                const support = this.supportedImprovements[trait];
-                if (!support) continue;
-                if (!priority || support.priority < priority) {
-                    itype = support.constructible;
-                    priority = support.priority;
-                }
+                const match = this.improvementRules[trait];
+                if (!match) continue;
+                if (!imp || match.priority < imp.priority) imp = match;
             }
-            if (itype) this.improvement = GameInfo.Constructibles.lookup(itype);
+            if (imp) {
+                this.development = GameInfo.Constructibles.lookup(imp.constructible);
+            }
         }
     }
     collectYields(loc, district) {
         this.yields = [];
         this.totalYields = 0;
-        const localPlayerID = GameContext.localPlayerID;
         // one column per yield type
         GameInfo.Yields.forEach(info => {
-            const value = GameplayMap.getYield(loc.x, loc.y, info.YieldType, localPlayerID);
+            const value = GameplayMap.getYield(loc.x, loc.y, info.YieldType, this.player.id);
             if (value) {
                 const column = { name: info.Name, type: info.YieldType, value };
                 this.yields.push(column);
@@ -679,12 +697,11 @@ class PlotTooltipType {
         const banners = [];
         if (LensManager.getActiveLens() != "fxs-settler-lens") return banners;
         //Add more details to the tooltip if we are in the settler lens
-        const localPlayer = Players.get(GameContext.localPlayerID);
-        if (!localPlayer) {
+        if (!this.player) {
             console.error("plot-tooltip: Attempting to update settler tooltip, but no valid local player!");
             return banners;
         }
-        const localPlayerDiplomacy = localPlayer?.Diplomacy;
+        const localPlayerDiplomacy = this.player.Diplomacy;
         if (localPlayerDiplomacy === undefined) {
             console.error("plot-tooltip: Attempting to update settler tooltip, but no valid local player Diplomacy object!");
             return banners;
@@ -693,7 +710,7 @@ class PlotTooltipType {
             // Dont't add any extra tooltip to mountains, oceans, or navigable rivers, should be obvious enough w/o them
             return banners;
         }
-        const localPlayerAdvancedStart = localPlayer?.AdvancedStart;
+        const localPlayerAdvancedStart = this.player.AdvancedStart;
         if (localPlayerAdvancedStart === undefined) {
             console.error("plot-tooltip: Attempting to update settler tooltip, but no valid local player advanced start object!");
             return banners;
@@ -814,8 +831,7 @@ class PlotTooltipType {
         return continent.Description;
     }
     getDistantLandsLabel(loc) {
-        const localPlayer = Players.get(GameContext.localPlayerID);
-        return localPlayer?.isDistantLands(loc) ?
+        return this.player.isDistantLands(loc) ?
             "LOC_RESOURCE_GENERAL_TYPE_DISTANT_LANDS" :
             "LOC_BZ_HEMISPHERE_HOMELANDS";
     }
@@ -1015,49 +1031,44 @@ class PlotTooltipType {
         this.appendUrbanDivider();
     }
     appendRuralSection(loc, city, district) {
-        const hasImprovement = this.improvement && this.constructibles.length != 0;
-        const improvementType = this.improvement?.ConstructibleType;
+        const improvementType = this.improvement?.info.ConstructibleType;
         let hexName;
         let hexRules = [];
         let hexIcon;
         let resourceIcon;
-        // special tile types: natural wonder, resource
-        const hexResource = this.resource;
         // set name & description
-        if (this.feature && this.feature.Tooltip) {
+        if (this.feature?.Tooltip) {
+            // natural wonder
             hexName = this.feature.Name;
             hexRules.push(this.feature.Tooltip);
-        } else if (hexResource) {
-            hexName = hexResource.Name;
-            hexRules.push(hexResource.Tooltip);
-            resourceIcon = hexResource.ResourceType;
+        } else if (this.resource) {
+            // resource
+            hexName = this.resource.Name;
+            hexRules.push(this.resource.Tooltip);
+            resourceIcon = this.resource.ResourceType;
         } else if (district?.type) {
+            // rural
             hexName = GameInfo.Districts.lookup(district?.type).Name;
-        } else if (!hasImprovement && !this.totalYields) {
-            return;  // nothing to show and nothing to follow
+        } else if (!improvementType && !this.totalYields) {
+            // nothing more to see here
+            return;
         } else if (city) {
+            // claimed but undeveloped
             hexName = "LOC_DISTRICT_BZ_UNDEVELOPED";
         } else {
+            // unclaimed wilderness
             hexName = GameInfo.Districts.lookup(DistrictTypes.WILDERNESS).Name;
         }
         // get the panel icon and adjust the title if necessary
-        if (!hasImprovement) {
-            // no icon, but show supported improvement
+        if (!improvementType) {
             hexIcon = null;
-            if (this.improvement) {
-                const plan = Locale.compose(
-                    "LOC_BZ_IMPROVEMENT_FOR_TILE",
-                    `[icon:${improvementType}]`,
-                    Locale.compose(this.improvement.Name));
-                hexRules.push(plan);
-            }
         } else if (BZ_VILLAGE_TYPES.includes(improvementType)) {
-            // encampments and villages get icons based on their unique improvements,
-            // appropriate for the age and minor civ type
+            // villages and encampments get icons based on their unique
+            // improvements, appropriate for the age and minor civ type
             hexName = "LOC_DISTRICT_BZ_INDEPENDENT";
             hexIcon = getVillageIcon(loc);
-        } else if (this.improvement?.Discovery) {
-            // discoveries don't have a standard icon, so let's use this nice map
+        } else if (this.improvement?.info.Discovery) {
+            // discoveries don't have an icon, but here's a nice map
             hexName = "LOC_DISTRICT_BZ_DISCOVERY";
             hexIcon = "url('blp:tech_cartography')";
         } else {
@@ -1070,6 +1081,16 @@ class PlotTooltipType {
         if (hexRules.length) {
             this.appendRules(hexRules);
         }
+        // potential rural development
+        if (this.development) {
+            const text = this.resource ?
+                "LOC_BZ_IMPROVEMENT_FOR_RESOURCE" :
+                "LOC_BZ_IMPROVEMENT_FOR_TILE";
+            const icon = `[icon:${this.development.ConstructibleType}]`;
+            const name = this.development.Name;
+            const plan = Locale.compose(text, icon, name);
+            this.appendRules([plan]);
+        }
         // constructibles
         this.appendConstructibles();
         // bottom bar
@@ -1080,12 +1101,9 @@ class PlotTooltipType {
         }
     }
     appendWonderSection(_loc) {
-        if (this.constructibles.length != 1) {
-            console.warn(`bz-plot-tooltip: expected exactly one wonder, not ${this.constructibles.length}`);
-            if (!this.constructibles.length) return;
-        }
+        if (!this.wonder) return;
         const notes = this.constructibles[0].notes;
-        this.appendTitleDivider(Locale.compose(this.wonder.Name));
+        this.appendTitleDivider(Locale.compose(this.wonder.info.Name));
         if (notes) {
             const ttState = document.createElement("div");
             ttState.classList.value = "text-xs leading-none text-center";
@@ -1093,8 +1111,8 @@ class PlotTooltipType {
             ttState.innerHTML = dotJoinLocale(notes);
             this.container.appendChild(ttState);
         }
-        this.appendRules([this.wonder.Tooltip]);
-        this.appendIconDivider(this.wonder.ConstructibleType);
+        this.appendRules([this.wonder.info.Tooltip]);
+        this.appendIconDivider(this.wonder.info.ConstructibleType);
     }
     // lay out a column of constructibles and their construction notes
     appendConstructibles() {
@@ -1354,9 +1372,8 @@ class PlotTooltipType {
                 if (topUnit?.hasHiddenVisibility) {
                     hasHiddenUnit = true;
                 }
-                const localPlayer = Players.get(localPlayerID);
-                if (localPlayer) {
-                    const localPlayerDiplomacy = localPlayer.Diplomacy;
+                if (this.player) {
+                    const localPlayerDiplomacy = this.player.Diplomacy;
                     if (localPlayerDiplomacy) {
                         if (localPlayerDiplomacy.isAtWarWith(owningPlayerID) && !hasHiddenUnit) {
                             this.isEnemy = true;
@@ -1401,9 +1418,8 @@ class PlotTooltipType {
         ttDebugPlotIndex.classList.add("plot-tooltip__coordinate-text");
         ttDebugPlotIndex.innerHTML = Locale.compose("LOC_PLOT_TOOLTIP_INDEX") + `: ${plotIndex}`;
         layout.appendChild(ttDebugPlotIndex);
-        const localPlayer = Players.get(GameContext.localPlayerID);
-        if (localPlayer != null) {
-            if (localPlayer.isDistantLands(this.plotCoord)) {
+        if (this.player != null) {
+            if (this.player.isDistantLands(this.plotCoord)) {
                 const ttDebugPlotTag = document.createElement("div");
                 ttDebugPlotTag.classList.add("plot-tooltip__coordinate-text");
                 ttDebugPlotTag.innerHTML = Locale.compose("LOC_PLOT_TOOLTIP_HEMISPHERE_WEST");

@@ -10,6 +10,9 @@
         <Row Tag="LOC_BZ_IMPROVEMENT_FOR_TILE" Language="ru_RU">
             <Text>TODO {1_icon} {2_name}</Text>
         </Row>
+        <Row Tag="LOC_BZ_IMPROVEMENT_FOR_RESOURCE" Language="ru_RU">
+            <Text>TODO {1_icon} {2_name}</Text>
+        </Row>
         <Row Tag="LOC_BZ_PLOTKEY_NO_FRESHWATER" Language="ru_RU">
             <Text>Нет Пресная вода</Text>
         </Row>
