@@ -574,7 +574,6 @@ class PlotTooltipType {
             }
         } else if (n == 0) {
             // empty tile: get rural expansion type
-            // TODO: update locale strings
             const geography = [
                 this.terrain?.TerrainType,
                 this.biome?.BiomeType,
