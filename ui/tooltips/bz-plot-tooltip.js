@@ -235,10 +235,9 @@ function getReligionInfo(id) {
     const icon = `[icon:${religion.ReligionType}]`;
     let name = religion.Name;
     // find custom religion name, if any
-    for (const owner of Players.getEverAlive()) {
-        const religion = owner.Religion;
-        if (religion?.getReligionType() != id) continue;
-        name = religion.getReligionName();
+    for (const founder of Players.getEverAlive()) {
+        if (founder.Religion?.getReligionType() != id) continue;
+        name = founder.Religion.getReligionName();
         break;
     }
     return { name, icon };
@@ -280,7 +279,7 @@ function getTopUnit(loc) {
     }
     return null;
 }
-function getVillageIcon(loc) {
+function getVillageIcon(owner, age) {
     const villages = {
         "MILITARISTIC": [
             "IMPROVEMENT_HILLFORT",
@@ -304,17 +303,14 @@ function getVillageIcon(loc) {
         ]
     };
     // get the minor civ type
-    const ownerID = GameplayMap.getOwner(loc.x, loc.y);
-    const owner = Players.get(ownerID);
     let ctype = "MILITARISTIC";  // default
     GameInfo.Independents.forEach(i => {
         if (owner.civilizationAdjective == i.CityStateName) ctype = i.CityStateType;
     });
-    // get the current age
-    const age = GameInfo.Ages.lookup(Game.age).ChronologyIndex;
     // select an icon
     const icons = villages[ctype ?? "MILITARISTIC"];
-    const icon = icons[Math.min(age, icons.length-1)];
+    const index = age?.ChronologyIndex ?? 0;
+    const icon = icons.at(index) ?? icons.at(-1);
     return icon;
 }
 function setStyle(element, style) {
@@ -336,6 +332,7 @@ function setCapsuleStyle(element, style, ...classes) {
 class PlotTooltipType {
     constructor() {
         this.plotCoord = null;
+        this.plotIndex = null;
         this.isShowingDebug = false;
         this.modCtrl = false;
         this.modShift = false;
@@ -346,14 +343,21 @@ class PlotTooltipType {
         this.tooltip.appendChild(this.container);
         // player-dependent info (may change with hotseat mode)
         this.player = Players.get(GameContext.localPlayerID);
-        this.civilization = GameInfo.Civilizations.lookup(this.player.civilizationType);
-        this.expansionRules = gatherExpansionRules(this.civilization.CivilizationType);
-        // geography
+        this.playerCiv = GameInfo.Civilizations.lookup(this.player.civilizationType);
+        this.expansionRules = gatherExpansionRules(this.playerCiv.CivilizationType);
+        // selection-dependent info
+        this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
+        // world
+        this.age = null;
         this.terrain = null;
         this.biome = null;
         this.feature = null;
         this.river = null;
         this.resource = null;
+        // ownership
+        this.owner = null;
+        this.city = null;
+        this.district = null;
         // constructibles
         this.constructibles = [];
         this.buildings = [];  // omits walls
@@ -369,7 +373,6 @@ class PlotTooltipType {
         this.agelessBuildings = gatherBuildingsTagged("AGELESS");
         this.extraBuildings = gatherBuildingsTagged("IGNORE_DISTRICT_PLACEMENT_CAP");
         this.largeBuildings = gatherBuildingsTagged("FULL_TILE");
-        this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
         Loading.runWhenFinished(() => {
             for (const y of GameInfo.Yields) {
                 const url = UI.getIcon(`${y.YieldType}`, "YIELD");
@@ -432,19 +435,36 @@ class PlotTooltipType {
         return false;
     }
     reset() {
+        this.plotIndex = null;
+        // document root
         this.container.innerHTML = '';
+        // player-dependent info (may change with hotseat mode)
+        this.player = Players.get(GameContext.localPlayerID);
+        this.playerCiv = GameInfo.Civilizations.lookup(this.player.civilizationType);
+        this.expansionRules = gatherExpansionRules(this.playerCiv.CivilizationType);
+        // selection-dependent info
+        this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
+        // world
+        this.age = null;
         this.terrain = null;
         this.biome = null;
         this.feature = null;
         this.river = null;
         this.resource = null;
+        // ownership
+        this.owner = null;
+        this.city = null;
+        this.district = null;
+        // constructibles
         this.constructibles = [];
         this.buildings = [];
         this.improvement = null;
         this.wonder = null;
         this.expansion = null;  // improvement type for rural expansion
+        // yields
         this.yields = [];
         this.totalYields = 0;
+        // cursor modifier
         this.isEnemy = false;
     }
     update() {
@@ -452,6 +472,7 @@ class PlotTooltipType {
             console.error("plot-tooltip: cannot read plot values (coordinate error)");
             return;
         }
+        this.plotIndex = GameplayMap.getIndexFromLocation(this.plotCoord);
         // show debug info if enabled + extra info when Ctrl is held
         this.isShowingDebug = UI.isDebugPlotInfoVisible();
         if (this.isShowingDebug && this.modCtrl) {
@@ -459,43 +480,37 @@ class PlotTooltipType {
         } else {
             this.tooltip.classList.remove("bz-debug");
         }
+        this.model();
+        this.render();
+        UI.setPlotLocation(this.plotCoord.x, this.plotCoord.y, this.plotIndex);
+        this.setWarningCursor(this.plotCoord);
+    }
+    model() {
+        const loc = this.plotCoord;
         // update player and civilization info
         this.player = Players.get(GameContext.localPlayerID);
-        this.civilization = GameInfo.Civilizations.lookup(this.player.civilizationType);
-        this.expansionRules = gatherExpansionRules(this.civilization.CivilizationType);
-        // Obtain names and IDs
-        const loc = this.plotCoord;
-        const plotIndex = GameplayMap.getIndexFromLocation(loc);
-        const ownerID = GameplayMap.getOwner(loc.x, loc.y);
-        const cityID = GameplayMap.getOwningCityFromXY(loc.x, loc.y);
-        const districtID = MapCities.getDistrict(loc.x, loc.y);
-        // owner, city, district objects
-        const owner = Players.get(ownerID);
-        const city = cityID ? Cities.get(cityID) : null;
-        const district = districtID ? Districts.get(districtID) : null;
-        // update unit movement data
+        this.playerCiv = GameInfo.Civilizations.lookup(this.player.civilizationType);
+        this.expansionRules = gatherExpansionRules(this.playerCiv.CivilizationType);
+        // update selection-dependent info
+        // (note: currently using "foot" instead of the selected unit)
         this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
-        // initialize geography & yield properties
-        this.collectGeography(loc);
-        this.collectConstructibles(loc);
-        this.collectYields(loc, district);
-        // geography section
-        this.appendGeographySection(loc, plotIndex);
-        // civ & settlement section
-        if (owner) this.appendSettlementSection(loc, owner, city);
-        // hex tile section
-        this.appendHexSection(loc, city, district);
-        // yields section
-        this.appendYields();
-        // unit info section
-        this.appendUnitSection(loc, owner);
-        // update UI & cursor
-        UI.setPlotLocation(loc.x, loc.y, plotIndex);
-        this.setWarningCursor(loc);
-        if (this.isShowingDebug) this.appendDebugInfo(loc);
+        this.modelWorld(loc);
+        this.modelCivilization(loc);
+        this.modelConstructibles(loc);
+        this.modelYields(loc, this.district);
+    }
+    render() {
+        const loc = this.plotCoord;
+        this.renderGeographySection(loc);
+        this.renderSettlementSection(loc);
+        this.renderHexSection(loc);
+        this.renderYields();
+        this.renderUnitSection(loc);
+        if (this.isShowingDebug) this.renderDebugInfo();
     }
     // data modeling methods
-    collectGeography(loc) {
+    modelWorld(loc) {
+        this.age = GameInfo.Ages.lookup(Game.age);
         const terrainType = GameplayMap.getTerrainType(loc.x, loc.y);
         this.terrain = GameInfo.Terrains.lookup(terrainType);
         const biomeType = GameplayMap.getBiomeType(loc.x, loc.y);
@@ -526,7 +541,16 @@ class PlotTooltipType {
         const resourceType = GameplayMap.getResourceType(loc.x, loc.y);
         this.resource = GameInfo.Resources.lookup(resourceType);
     }
-    collectConstructibles(loc) {
+    modelCivilization(loc) {
+        // owner, civ, city, district
+        const ownerID = GameplayMap.getOwner(loc.x, loc.y);
+        this.owner = Players.get(ownerID);
+        const cityID = GameplayMap.getOwningCityFromXY(loc.x, loc.y);
+        this.city = cityID ? Cities.get(cityID) : null;
+        const districtID = MapCities.getDistrict(loc.x, loc.y);
+        this.district = districtID ? Districts.get(districtID) : null;
+    }
+    modelConstructibles(loc) {
         this.constructibles = [];
         const constructibles = MapConstructibles.getHiddenFilteredConstructibles(loc.x, loc.y);
         for (const constructible of constructibles) {
@@ -547,7 +571,7 @@ class PlotTooltipType {
             const isExtra = this.extraBuildings.has(info.ConstructibleType);
             const isLarge = this.largeBuildings.has(info.ConstructibleType);
             const isAgeless = this.agelessBuildings.has(info.ConstructibleType);
-            const currentAge = GameInfo.Ages.lookup(Game.age).ChronologyIndex;
+            const currentAge = this.age.ChronologyIndex;
             const age = isAgeless ? currentAge - 0.5 :
                 GameInfo.Ages.lookup(info.Age ?? "")?.ChronologyIndex ?? 0;
             const isObsolete = isBuilding && Math.ceil(age) != currentAge;
@@ -588,8 +612,24 @@ class PlotTooltipType {
             if (this.wonder || this.improvement) {  // should only be one
                 console.warn(`bz-plot-tooltip: expected 1 constructible, not ${n}`);
             }
-        } else if (n == 0) {
-            // empty tile: get rural expansion type
+        }
+        if (this.improvement) {
+            // set up icons and special district names for improvements
+            const info = this.improvement.info;
+            if (BZ_VILLAGE_TYPES.includes(info.ConstructibleType)) {
+                // villages and encampments get icons based on their unique
+                // improvements, appropriate for the age and minor civ type
+                this.improvement.icon = getVillageIcon(this.owner, this.age);
+                this.improvement.districtName = "LOC_DISTRICT_BZ_INDEPENDENT";
+            } else if (this.improvement?.info.Discovery) {
+                // discoveries don't have an icon, but here's a nice map
+                this.improvement.icon = "url('blp:tech_cartography')";
+                this.improvement.districtName = "LOC_DISTRICT_BZ_DISCOVERY";
+            } else {
+                this.improvement.icon = info.ConstructibleType;
+            }
+        } else if ((this.city || this.resource) && !this.district) {
+            // undeveloped city/resource tile: get rural expansion type
             const geography = [
                 this.terrain?.TerrainType,
                 this.biome?.BiomeType,
@@ -597,16 +637,25 @@ class PlotTooltipType {
                 this.river?.RiverType,
                 this.resource?.ResourceType,
             ].filter(e => e);
-            let imp;  // best matching improvement
+            let best;  // best matching improvement
             for (const trait of geography) {
                 const match = this.expansionRules[trait];
                 if (!match) continue;
-                if (!imp || match.priority < imp.priority) imp = match;
+                if (!best || match.priority < best.priority) best = match;
             }
-            if (imp) this.expansion = GameInfo.Constructibles.lookup(imp.constructible);
+            if (best) {
+                const info = GameInfo.Constructibles.lookup(best.constructible);
+                const format = (this.resource ?
+                    "LOC_BZ_IMPROVEMENT_FOR_RESOURCE" :
+                    "LOC_BZ_IMPROVEMENT_FOR_TILE");
+                const icon = `[icon:${best.constructible}]`;
+                const name = info.Name;
+                const text = Locale.compose(format, icon, name);
+                this.expansion = { info, format, icon, name, text };
+            }
         }
     }
-    collectYields(loc, district) {
+    modelYields(loc) {
         this.yields = [];
         this.totalYields = 0;
         // one column per yield type
@@ -620,17 +669,17 @@ class PlotTooltipType {
         });
         if (!this.totalYields) return;
         // total yield column
-        const type = BZ_URBAN_TYPES.includes(district?.type) ?
+        const type = BZ_URBAN_TYPES.includes(this.district?.type) ?
             BZ_YIELD_TOTAL_URBAN : BZ_YIELD_TOTAL_RURAL;
         const column = { name: "LOC_YIELD_BZ_TOTAL", type, value: this.totalYields };
         this.yields.push(column);
     }
-    appendDivider() {
+    renderDivider() {
         const divider = document.createElement("div");
         divider.classList.add("plot-tooltip__Divider", "my-2");
         this.container.appendChild(divider);
     }
-    appendFlexDivider(center, style=null) {
+    renderFlexDivider(center, style=null) {
         const layout = document.createElement("div");
         layout.classList.value = "flex-auto flex justify-between items-center -mx-6";
         if (style) layout.classList.add(style);
@@ -648,15 +697,15 @@ class PlotTooltipType {
         lineRight.style.setProperty("background-image", "linear-gradient(to right, #8D97A6, rgba(141, 151, 166, 0))");
         layout.appendChild(lineRight);
     }
-    appendTitleDivider(text=BZ_DOT_DIVIDER) {
+    renderTitleDivider(text=BZ_DOT_DIVIDER) {
         const layout = document.createElement("div");
         layout.classList.value = "font-title uppercase text-sm mx-3 max-w-80";
         layout.setAttribute("data-l10n-id", text);
-        this.appendFlexDivider(layout);
+        this.renderFlexDivider(layout);
     }
-    appendGeographySection(loc, plotIndex) {
+    renderGeographySection(loc) {
         // show geographical features
-        const effects = this.getPlotEffects(plotIndex);
+        const effects = this.getPlotEffects(this.plotIndex);
         const terrainLabel = this.getTerrainLabel(loc);
         const biomeLabel = this.getBiomeLabel(loc);
         const featureLabel = this.getFeatureLabel(loc);
@@ -771,10 +820,10 @@ class PlotTooltipType {
         }
         return banners;
     }
-    getPlotEffects(plotIndex) {
+    getPlotEffects() {
         const text = [];
         const banners = [];
-        const plotEffects = MapPlotEffects.getPlotEffects(plotIndex);
+        const plotEffects = MapPlotEffects.getPlotEffects(this.plotIndex);
         if (!plotEffects) return { text, banners };
         for (const item of plotEffects) {
             if (item.onlyVisibleToOwner && item.owner != this.player.id) continue;
@@ -812,7 +861,7 @@ class PlotTooltipType {
         }
         return { text, style };
     }
-    getBiomeLabel(_loc) {
+    getBiomeLabel() {
         // Do not show a label for marine biome.
         if (!this.biome || this.biome.BiomeType == "BIOME_MARINE") return "";
         let text = this.biome.Name;
@@ -874,39 +923,41 @@ class PlotTooltipType {
             [route.Name, "LOC_NAVIGABLE_RIVER_FERRY"] :
             [route.Name];
     }
-    appendSettlementSection(loc, owner, city) {
-        const name = city ?  city.name :  // city or town
-            owner.isAlive ?  this.getCivName(owner) :  // village
+    renderSettlementSection(loc) {
+        if (!this.owner) return;
+        const name = this.city ?  this.city.name :  // city or town
+            this.owner.isAlive ?  this.getCivName(this.owner) :  // village
             null;  // discoveries are owned by a placeholder "World" player
         if (!name) return;
-        this.appendTitleDivider(name);
+        this.renderTitleDivider(name);
         // owner info
-        this.appendOwnerInfo(loc, owner);
+        this.renderOwnerInfo(loc, this.owner);
         // settlement stats (only show at the city center)
-        if (!city || city.location.x != loc.x || city.location.y != loc.y) return;
+        const center = this.city?.location;
+        if (!center || center.x != loc.x || center.y != loc.y) return;
         const stats = [];
         // settlement connections
-        const connections = getConnections(city);
+        const connections = getConnections(this.city);
         if (connections) {
             const connectionsNote = Locale.compose("LOC_BZ_CITY_CONNECTIONS",
                 connections.cities.length, connections.towns.length);
             stats.push(connectionsNote);
         }
         // religion
-        const religions = getReligions(city);
+        const religions = getReligions(this.city);
         if (religions) {
             stats.push(...religions);
         }
         // fresh water
-        if (!GameplayMap.isFreshWater(city.location.x, city.location.y)) {
+        if (!GameplayMap.isFreshWater(center.x, center.y)) {
             stats.push(["LOC_BZ_PLOTKEY_NO_FRESHWATER"]);
         }
         if (stats.length) {
-            this.appendRules(stats, "-mt-1 mb-2");  // tighten space above icon
+            this.renderRules(stats, "-mt-1 mb-2");  // tighten space above icon
         }
     }
-    appendOwnerInfo(loc, owner) {
-        if (!owner || !Players.isAlive(owner.id)) return;
+    renderOwnerInfo(loc) {
+        if (!this.owner || !Players.isAlive(this.owner.id)) return;
         // TODO: simplify this check? why is it here?
         const filteredConstructibles = MapConstructibles.getHiddenFilteredConstructibles(loc.x, loc.y);
         const constructibles = MapConstructibles.getConstructibles(loc.x, loc.y);
@@ -916,10 +967,10 @@ class PlotTooltipType {
         }
         const layout = document.createElement("div");
         layout.classList.value = "text-xs leading-snug text-center mb-2";
-        const ownerName = this.getPlayerName(owner);
-        const relationship = this.getCivRelationship(owner);
+        const ownerName = this.getOwnerName(this.owner);
+        const relationship = this.getCivRelationship(this.owner);
         const relType = Locale.compose(relationship?.type);
-        const civName = this.getCivName(owner, true);
+        const civName = this.getCivName(this.owner, true);
         // highlight enemy players
         if (relationship) {
             this.isEnemy = relationship.isEnemy;
@@ -938,7 +989,7 @@ class PlotTooltipType {
         layout.appendChild(ttCiv);
         this.container.appendChild(layout);
     }
-    getPlayerName(owner) {
+    getOwnerName(owner) {
         if (owner == null) return "";
         const name = owner.isMinor || owner.isIndependent ?
             Locale.compose("LOC_LEADER_BZ_PEOPLE_NAME", owner.name) :
@@ -982,31 +1033,31 @@ class PlotTooltipType {
         const name = owner.Diplomacy.getRelationshipLevelName(this.player.id);
         return { type: name, isEnemy: false };
     }
-    appendHexSection(loc, city, district) {
-        switch (district?.type) {
+    renderHexSection(loc) {
+        switch (this.district?.type) {
             case DistrictTypes.CITY_CENTER:
             case DistrictTypes.URBAN:
-                this.appendUrbanSection(loc, city, district);
+                this.renderUrbanSection(loc);
                 break;
             case DistrictTypes.RURAL:
             case DistrictTypes.WILDERNESS:
             default:
-                this.appendRuralSection(loc, city, district);
+                this.renderRuralSection();
                 break;
             case DistrictTypes.WONDER:
-                this.appendWonderSection(loc);
+                this.renderWonderSection();
                 break;
         }
     }
-    appendUrbanSection(loc, city, district) {
+    renderUrbanSection(loc) {
         const quarterOK = this.buildings.reduce((a, b) =>
             a + (b.isCurrent ? b.isLarge ? 2 : 1 : 0), 0);
-        let hexName = GameInfo.Districts.lookup(district?.type).Name;
+        let hexName = GameInfo.Districts.lookup(this.district?.type).Name;
         let hexSubtitle;
         let hexRules;
         // set name & description
-        if (district.type == DistrictTypes.CITY_CENTER) {
-            const owner = Players.get(city.owner);
+        if (this.district.type == DistrictTypes.CITY_CENTER) {
+            const owner = Players.get(this.city.owner);
             if (owner.isMinor) {
                 hexName = "LOC_DISTRICT_BZ_CITY_STATE";
                 const bonusType = Game.CityStates.getBonusType(owner.id);
@@ -1015,7 +1066,7 @@ class PlotTooltipType {
                     hexSubtitle = bonus.Name;
                     hexRules = bonus.Description;  // .Tooltip doesn't exist
                 }
-            } else if (city.isTown) {
+            } else if (this.city.isTown) {
                 // rename "City Center" to "Town Center" in towns
                 hexName = "LOC_DISTRICT_BZ_TOWN_CENTER";
             }
@@ -1039,35 +1090,36 @@ class PlotTooltipType {
             hexName = "LOC_DISTRICT_BZ_URBAN_DISTRICT";
         }
         // title bar
-        this.appendTitleDivider(Locale.compose(hexName));
-        this.appendDistrictDefense(this.plotCoord);
+        this.renderTitleDivider(Locale.compose(hexName));
+        this.renderDistrictDefense(this.plotCoord);
         // panel interior
         // show rules for city-states and unique quarters
         if (hexRules) {
             const title = "font-title uppercase text-xs leading-snug";
-            if (hexSubtitle) this.appendRules([hexSubtitle], '', title);
-            this.appendRules([hexRules]);
+            if (hexSubtitle) this.renderRules([hexSubtitle], '', title);
+            this.renderRules([hexRules]);
         }
         // constructibles
-        this.appendConstructibles();
+        this.renderConstructibles();
         // report specialists
-        const specialists = getSpecialists(loc, city);
+        const specialists = getSpecialists(loc, this.city);
         if (specialists) {
             const text = Locale.compose("LOC_DISTRICT_BZ_SPECIALISTS",
                 specialists.workers, specialists.maximum);
-            this.appendRules([text], "-mt-1 mb-2");  // tighten space above icon
+            this.renderRules([text], "-mt-1 mb-2");  // tighten space above icon
         }
         // bottom bar
-        this.appendUrbanDivider();
+        this.renderUrbanDivider();
     }
-    appendRuralSection(loc, city, district) {
-        const improvementType = this.improvement?.info.ConstructibleType;
-        let hexName;
+    renderRuralSection() {
+        let hexName = this.improvement?.districtName;
         let hexRules = [];
-        let hexIcon;
+        let hexIcon = this.improvement?.icon;
         let resourceIcon;
         // set name & description
-        if (this.feature?.Tooltip) {
+        if (hexName) {
+            // set by Village or Discovery special improvements
+        } else if (this.feature?.Tooltip) {
             // natural wonder
             hexName = this.feature.Name;
             hexRules.push(this.feature.Tooltip);
@@ -1076,65 +1128,39 @@ class PlotTooltipType {
             hexName = this.resource.Name;
             hexRules.push(this.resource.Tooltip);
             resourceIcon = this.resource.ResourceType;
-        } else if (district?.type) {
+        } else if (this.district?.type) {
             // rural
-            hexName = GameInfo.Districts.lookup(district?.type).Name;
-        } else if (!improvementType && !this.totalYields) {
+            hexName = GameInfo.Districts.lookup(this.district?.type).Name;
+        } else if (!this.improvement && !this.totalYields) {
             // nothing more to see here
             return;
-        } else if (city) {
+        } else if (this.city) {
             // claimed but undeveloped
             hexName = "LOC_DISTRICT_BZ_UNDEVELOPED";
         } else {
             // unclaimed wilderness
             hexName = GameInfo.Districts.lookup(DistrictTypes.WILDERNESS).Name;
         }
-        // get the panel icon and adjust the title if necessary
-        if (!improvementType) {
-            hexIcon = null;
-        } else if (BZ_VILLAGE_TYPES.includes(improvementType)) {
-            // villages and encampments get icons based on their unique
-            // improvements, appropriate for the age and minor civ type
-            hexName = "LOC_DISTRICT_BZ_INDEPENDENT";
-            hexIcon = getVillageIcon(loc);
-        } else if (this.improvement?.info.Discovery) {
-            // discoveries don't have an icon, but here's a nice map
-            hexName = "LOC_DISTRICT_BZ_DISCOVERY";
-            hexIcon = "url('blp:tech_cartography')";
-        } else {
-            // use the standard icon for the improvement
-            hexIcon = improvementType;
-        }
         // title bar
-        if (hexName) this.appendTitleDivider(Locale.compose(hexName));
+        if (hexName) this.renderTitleDivider(Locale.compose(hexName));
         // optional description
         if (hexRules.length) {
-            this.appendRules(hexRules);
+            this.renderRules(hexRules);
         }
         // expansion type for undeveloped tiles
-        if (this.expansion) {
-            const text = this.resource ?
-                "LOC_BZ_IMPROVEMENT_FOR_RESOURCE" :
-                "LOC_BZ_IMPROVEMENT_FOR_TILE";
-            const icon = `[icon:${this.expansion.ConstructibleType}]`;
-            const name = this.expansion.Name;
-            const plan = Locale.compose(text, icon, name);
-            if (this.resource || city?.owner == this.player.id) {
-                this.appendRules([plan]);
-            }
-        }
+        if (this.expansion) this.renderRules([this.expansion.text]);
         // constructibles
-        this.appendConstructibles();
+        this.renderConstructibles();
         // bottom bar
         if (hexIcon) {
-            this.appendIconDivider(hexIcon, resourceIcon);
+            this.renderIconDivider(hexIcon, resourceIcon);
         } else if (resourceIcon) {
-            this.appendIconDivider(resourceIcon);
+            this.renderIconDivider(resourceIcon);
         }
     }
-    appendWonderSection(_loc) {
+    renderWonderSection() {
         if (!this.wonder) return;
-        this.appendTitleDivider(Locale.compose(this.wonder.info.Name));
+        this.renderTitleDivider(Locale.compose(this.wonder.info.Name));
         if (this.wonder.notes) {
             const ttState = document.createElement("div");
             ttState.classList.value = "text-xs leading-none text-center";
@@ -1142,11 +1168,11 @@ class PlotTooltipType {
             ttState.innerHTML = dotJoinLocale(this.wonder.notes);
             this.container.appendChild(ttState);
         }
-        this.appendRules([this.wonder.info.Tooltip]);
-        this.appendIconDivider(this.wonder.info.ConstructibleType);
+        this.renderRules([this.wonder.info.Tooltip]);
+        this.renderIconDivider(this.wonder.info.ConstructibleType);
     }
     // lay out a column of constructibles and their construction notes
-    appendConstructibles() {
+    renderConstructibles() {
         if (!this.constructibles?.length) return;
         const ttList = document.createElement("div");
         ttList.classList.value = "text-xs leading-snug text-center mb-2";
@@ -1173,7 +1199,7 @@ class PlotTooltipType {
         this.container.appendChild(ttList);
     }
     // lay out paragraphs of rules text
-    appendRules(text, listStyle=null, rowStyle=null) {
+    renderRules(text, listStyle=null, rowStyle=null) {
         // text with icons is squirrelly, only format it at top level!
         const ttText = document.createElement("div");
         ttText.classList.value = listStyle ?? "mb-2";
@@ -1187,14 +1213,12 @@ class PlotTooltipType {
         }
         this.container.appendChild(ttText);
     }
-    appendDistrictDefense(loc) {
-        const districtID = MapCities.getDistrict(loc.x, loc.y);
-        if (!districtID) return;
+    renderDistrictDefense(loc) {
+        if (!this.district) return;
         // occupation status
-        const district = Districts.get(districtID);
         const info = [];
-        if (district.owner != district.controllingPlayer) {
-            const conqueror = Players.get(district.controllingPlayer);
+        if (this.district.owner != this.district.controllingPlayer) {
+            const conqueror = Players.get(this.district.controllingPlayer);
             const conquerorName = this.getCivName(conqueror, true);
             const conquerorText = Locale.compose("{1_Term} {2_Subject}", "LOC_PLOT_TOOLTIP_CONQUEROR", conquerorName);
             const ttConqueror = document.createElement("div");
@@ -1230,7 +1254,7 @@ class PlotTooltipType {
             this.container.appendChild(ttDefense);
         }
     }
-    appendIconDivider(icon, overlay=null) {
+    renderIconDivider(icon, overlay=null) {
         // icon divider with optional overlay
         if (!icon.startsWith("url(")) icon = UI.getIconCSS(icon);
         if (overlay && !overlay.startsWith("url(")) overlay = UI.getIconCSS(overlay);
@@ -1247,9 +1271,9 @@ class PlotTooltipType {
             over.style.backgroundImage = overlay;
             layout.appendChild(over);
         }
-        this.appendFlexDivider(layout, "mb-2");
+        this.renderFlexDivider(layout, "mb-2");
     }
-    appendUrbanDivider() {
+    renderUrbanDivider() {
         // there are at least two building slots (unless one is large)
         const slots = [...this.buildings];
         if (slots.length < 2 && !this.buildings[0]?.isLarge)
@@ -1257,41 +1281,31 @@ class PlotTooltipType {
         // render the icons
         const layout = document.createElement("div");
         layout.classList.value = "flex flex-grow relative mx-2";
-        for (let slot of slots) {
-            if (!slot) {
-                // show an empty slot with a transparent yield ring
-                const ttFrame = document.createElement("div");
-                ttFrame.classList.value = "border-2 rounded-full mx-1\\.5";
-                ttFrame.style.setProperty("border-color", "rgba(0, 0, 0, 0)");
-                const ttIcon = document.createElement("div");
-                ttIcon.classList.value = "bg-contain bg-center size-12";
-                ttIcon.style.backgroundImage = UI.getIconCSS("BUILDING_OPEN");
-                ttFrame.appendChild(ttIcon);
-                layout.appendChild(ttFrame);
-                continue;
-            }
+        for (const slot of slots) {
             // if the building has more than one yield type, like the
             // Palace, use one type for the ring and one for the glow
-            const yields = adjacencyYield(slot.info);
-            const slotColor = BZ_YIELD_COLOR[yields[0] ?? null];
-            const glowColor = BZ_YIELD_COLOR[yields[1] ?? yields[0] ?? null];
+            const yields = adjacencyYield(slot?.info);
+            const slotColor = slot ? BZ_YIELD_COLOR[yields.at(0) ?? null] : "#0000";
+            const glowColor = slot ? BZ_YIELD_COLOR[yields.at(-1) ?? null] : "#0000";
+            const isCurrent = slot?.isCurrent;
+            const icon = slot?.info.ConstructibleType ?? "BUILDING_OPEN";
             // ring the slot with an appropriate color for the yield
             const ttFrame = document.createElement("div");
             ttFrame.classList.value = "border-2 rounded-full mx-1\\.5";
             ttFrame.style.setProperty("border-color", slotColor);
             // also glow if the building is fully operational
-            if (slot.isCurrent) ttFrame.style.setProperty(
+            if (isCurrent) ttFrame.style.setProperty(
                 "box-shadow", `0rem 0rem 0.33333rem 0.16667rem ${glowColor}`);
             // display the icon
             const ttIcon = document.createElement("div");
             ttIcon.classList.value = "bg-contain bg-center size-12";
-            ttIcon.style.backgroundImage = UI.getIconCSS(slot.info.ConstructibleType);
+            ttIcon.style.backgroundImage = UI.getIconCSS(icon);
             ttFrame.appendChild(ttIcon);
             layout.appendChild(ttFrame);
         }
-        this.appendFlexDivider(layout, "mb-2");
+        this.renderFlexDivider(layout, "mb-2");
     }
-    appendYields() {
+    renderYields() {
         if (!this.totalYields) return;  // no yields to show
         const tt = document.createElement('div');
         tt.classList.value = "plot-tooltip__resourcesFlex";
@@ -1333,7 +1347,7 @@ class PlotTooltipType {
         ttIndividualYieldFlex.appendChild(ttIndividualYieldValues);
         return ttIndividualYieldFlex;
     }
-    appendUnitSection(loc) {
+    renderUnitSection(loc) {
         if (GameplayMap.getRevealedState(this.player.id, loc.x, loc.y) != RevealedStates.VISIBLE) return;
         // get topmost unit and owner
         let topUnit = getTopUnit(loc);
@@ -1346,7 +1360,7 @@ class PlotTooltipType {
             return;
         }
         // show unit section
-        this.appendDivider();
+        this.renderDivider();
         const layout = document.createElement("div");
         layout.classList.value = "text-xs leading-snug text-center";
         const unitName = topUnit.name;
@@ -1365,6 +1379,7 @@ class PlotTooltipType {
     }
     setWarningCursor(loc) {
         // Adjust cursor between normal and red based on the plot owner's hostility
+        // TODO: clean up this mess
         if (UI.isCursorLocked()) return;
         // don't block cursor changes from interface-mode-acquire-tile
         if (InterfaceMode.getCurrent() == "INTERFACEMODE_ACQUIRE_TILE") return;
@@ -1418,9 +1433,8 @@ class PlotTooltipType {
             UI.setCursorByType(UIHTMLCursorTypes.Default);
         }
     }
-    appendDebugInfo(loc) {
+    renderDebugInfo() {
         //debug info
-        const plotIndex = GameplayMap.getIndexFromLocation(loc);
         const layout = document.createElement("div");
         // layout.classList.add("plot-tooltip__debug-flexbox");
         layout.classList.value = "flex flex-col";
@@ -1445,7 +1459,7 @@ class PlotTooltipType {
         layout.appendChild(ttDebugPlotCoord);
         const ttDebugPlotIndex = document.createElement("div");
         ttDebugPlotIndex.classList.add("plot-tooltip__coordinate-text");
-        ttDebugPlotIndex.innerHTML = Locale.compose("LOC_PLOT_TOOLTIP_INDEX") + `: ${plotIndex}`;
+        ttDebugPlotIndex.innerHTML = Locale.compose("LOC_PLOT_TOOLTIP_INDEX") + `: ${this.plotIndex}`;
         layout.appendChild(ttDebugPlotIndex);
         if (this.player != null) {
             if (this.player.isDistantLands(this.plotCoord)) {
