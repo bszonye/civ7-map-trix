@@ -1407,46 +1407,37 @@ class PlotTooltipType {
     }
     renderDebugInfo() {
         //debug info
+        const loc = this.plotCoord;
         const layout = document.createElement("div");
-        // layout.classList.add("plot-tooltip__debug-flexbox");
-        layout.classList.value = "flex flex-col";
         setBannerStyle(layout);
+        const ownerID = GameplayMap.getOwner(loc.x, loc.y);
+        const currHp = Players.Districts.get(ownerID)?.getDistrictHealth(loc);
+        const maxHp = Players.Districts.get(ownerID)?.getDistrictMaxHealth(loc);
+        const ttTitle = document.createElement("div");
+        ttTitle.classList.value =
+            "text-secondary font-title uppercase text-xs text-center";
+        let title = Locale.compose("LOC_PLOT_TOOLTIP_DEBUG_TITLE");
+        if (currHp && maxHp) title += ": " + currHp + " / " + maxHp;
+        ttTitle.innerHTML = title;
+        layout.appendChild(ttTitle);
+        const ttPlotCoord = document.createElement("div");
+        ttPlotCoord.classList.add("plot-tooltip__coordinate-text");
+        ttPlotCoord.innerHTML =
+            `${Locale.compose("LOC_PLOT_TOOLTIP_PLOT")}: (${loc.x},${loc.y})`;
+        layout.appendChild(ttPlotCoord);
+        const ttPlotIndex = document.createElement("div");
+        ttPlotIndex.classList.add("plot-tooltip__coordinate-text");
+        ttPlotIndex.innerHTML =
+            `${Locale.compose("LOC_PLOT_TOOLTIP_INDEX")}: ${this.plotIndex}`;
+        layout.appendChild(ttPlotIndex);
+        const hemi = this.player?.isDistantLands(loc) ?
+            "LOC_PLOT_TOOLTIP_HEMISPHERE_WEST" :
+            "LOC_PLOT_TOOLTIP_HEMISPHERE_EAST";
+        const ttPlotTag = document.createElement("div");
+        ttPlotTag.classList.add("plot-tooltip__coordinate-text");
+        ttPlotTag.innerHTML = Locale.compose(hemi);
+        layout.appendChild(ttPlotTag);
         this.container.appendChild(layout);
-        const ownerID = GameplayMap.getOwner(this.plotCoord.x, this.plotCoord.y);
-        const currHp = Players.Districts.get(ownerID)?.getDistrictHealth(this.plotCoord);
-        const maxHp = Players.Districts.get(ownerID)?.getDistrictMaxHealth(this.plotCoord);
-        const ttDebugTitle = document.createElement("div");
-        ttDebugTitle.classList.value = "text-secondary font-title uppercase text-xs text-center";
-        if ((currHp != undefined && currHp != 0) && (maxHp != undefined && maxHp != 0)) {
-            ttDebugTitle.innerHTML = Locale.compose("LOC_PLOT_TOOLTIP_DEBUG_TITLE") + ": " + currHp + " / " + maxHp;
-            layout.appendChild(ttDebugTitle);
-        }
-        else {
-            ttDebugTitle.innerHTML = Locale.compose("LOC_PLOT_TOOLTIP_DEBUG_TITLE") + ":";
-            layout.appendChild(ttDebugTitle);
-        }
-        const ttDebugPlotCoord = document.createElement("div");
-        ttDebugPlotCoord.classList.add("plot-tooltip__coordinate-text");
-        ttDebugPlotCoord.innerHTML = Locale.compose("LOC_PLOT_TOOLTIP_PLOT") + `: (${this.plotCoord.x},${this.plotCoord.y})`;
-        layout.appendChild(ttDebugPlotCoord);
-        const ttDebugPlotIndex = document.createElement("div");
-        ttDebugPlotIndex.classList.add("plot-tooltip__coordinate-text");
-        ttDebugPlotIndex.innerHTML = Locale.compose("LOC_PLOT_TOOLTIP_INDEX") + `: ${this.plotIndex}`;
-        layout.appendChild(ttDebugPlotIndex);
-        if (this.player != null) {
-            if (this.player.isDistantLands(this.plotCoord)) {
-                const ttDebugPlotTag = document.createElement("div");
-                ttDebugPlotTag.classList.add("plot-tooltip__coordinate-text");
-                ttDebugPlotTag.innerHTML = Locale.compose("LOC_PLOT_TOOLTIP_HEMISPHERE_WEST");
-                layout.appendChild(ttDebugPlotTag);
-            }
-            else {
-                const ttDebugPlotTag = document.createElement("div");
-                ttDebugPlotTag.classList.add("plot-tooltip__coordinate-text");
-                ttDebugPlotTag.innerHTML = Locale.compose("LOC_PLOT_TOOLTIP_HEMISPHERE_EAST");
-                layout.appendChild(ttDebugPlotTag);
-            }
-        }
     }
 }
 TooltipManager.registerPlotType('plot', PlotTooltipPriority.LOW, new PlotTooltipType());
