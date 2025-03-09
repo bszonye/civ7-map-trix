@@ -505,12 +505,11 @@ class PlotTooltipType {
         this.modelYields();
     }
     render() {
-        const loc = this.plotCoord;
-        this.renderGeographySection(loc);
-        this.renderSettlementSection(loc);
-        this.renderHexSection(loc);
+        this.renderGeographySection();
+        this.renderSettlementSection();
+        this.renderHexSection();
         this.renderYields();
-        this.renderUnitSection(loc);
+        this.renderUnitSection();
         if (this.isShowingDebug) this.renderDebugInfo();
     }
     // data modeling methods
@@ -721,7 +720,8 @@ class PlotTooltipType {
         layout.setAttribute("data-l10n-id", text);
         this.renderFlexDivider(layout);
     }
-    renderGeographySection(loc) {
+    renderGeographySection() {
+        const loc = this.plotCoord;
         // show geographical features
         const effects = this.getPlotEffects(this.plotIndex);
         const terrainLabel = this.getTerrainLabel(loc);
@@ -941,8 +941,9 @@ class PlotTooltipType {
             [route.Name, "LOC_NAVIGABLE_RIVER_FERRY"] :
             [route.Name];
     }
-    renderSettlementSection(loc) {
+    renderSettlementSection() {
         if (!this.owner) return;
+        const loc = this.plotCoord;
         const name = this.city ?  this.city.name :  // city or town
             this.owner.isAlive ?  this.getCivName(this.owner) :  // village
             null;  // discoveries are owned by a placeholder "World" player
@@ -1048,11 +1049,11 @@ class PlotTooltipType {
         const name = owner.Diplomacy.getRelationshipLevelName(this.player.id);
         return { type: name, isEnemy: false };
     }
-    renderHexSection(loc) {
+    renderHexSection() {
         switch (this.district?.type) {
             case DistrictTypes.CITY_CENTER:
             case DistrictTypes.URBAN:
-                this.renderUrbanSection(loc);
+                this.renderUrbanSection();
                 break;
             case DistrictTypes.RURAL:
             case DistrictTypes.WILDERNESS:
@@ -1064,7 +1065,7 @@ class PlotTooltipType {
                 break;
         }
     }
-    renderUrbanSection(loc) {
+    renderUrbanSection() {
         const quarterOK = this.buildings.reduce((a, b) =>
             a + (b.isCurrent ? b.isLarge ? 2 : 1 : 0), 0);
         let hexName = GameInfo.Districts.lookup(this.district?.type).Name;
@@ -1117,7 +1118,7 @@ class PlotTooltipType {
         // constructibles
         this.renderConstructibles();
         // report specialists
-        const specialists = getSpecialists(loc, this.city);
+        const specialists = getSpecialists(this.plotCoord, this.city);
         if (specialists) {
             const text = Locale.compose("LOC_DISTRICT_BZ_SPECIALISTS",
                 specialists.workers, specialists.maximum);
@@ -1228,9 +1229,10 @@ class PlotTooltipType {
         }
         this.container.appendChild(ttText);
     }
-    renderDistrictDefense(loc) {
+    renderDistrictDefense() {
         if (!this.district) return;
         // occupation status
+        const loc = this.plotCoord;
         const info = [];
         if (this.district.owner != this.district.controllingPlayer) {
             const conqueror = Players.get(this.district.controllingPlayer);
@@ -1363,7 +1365,8 @@ class PlotTooltipType {
         ttIndividualYieldFlex.appendChild(ttIndividualYieldValues);
         return ttIndividualYieldFlex;
     }
-    renderUnitSection(loc) {
+    renderUnitSection() {
+        const loc = this.plotCoord;
         if (GameplayMap.getRevealedState(this.player.id, loc.x, loc.y) != RevealedStates.VISIBLE) return;
         // get topmost unit and owner
         let topUnit = getTopUnit(loc);
@@ -1393,55 +1396,11 @@ class PlotTooltipType {
         }
         this.container.appendChild(layout);
     }
-    setWarningCursor(loc) {
+    setWarningCursor() {
         // Adjust cursor between normal and red based on the plot owner's hostility
-        // TODO: clean up this mess
         if (UI.isCursorLocked()) return;
         // don't block cursor changes from interface-mode-acquire-tile
         if (InterfaceMode.getCurrent() == "INTERFACEMODE_ACQUIRE_TILE") return;
-        // determine who controls the hex under the cursor
-        const topUnit = getTopUnit(loc);
-        let owningPlayerID = GameplayMap.getOwner(loc.x, loc.y);
-        // if there's a unit on the plot, that player overrides the tile's owner
-        if (topUnit) {
-            owningPlayerID = topUnit.owner;
-        }
-        const revealedState = GameplayMap.getRevealedState(this.player.id, loc.x, loc.y);
-        if (Players.isValid(this.player.id) && Players.isValid(owningPlayerID) && (revealedState == RevealedStates.VISIBLE)) {
-            const owningPlayer = Players.get(owningPlayerID);
-            // Is it an independent?
-            if (owningPlayer?.isIndependent) {
-                let independentID = PlayerIds.NO_PLAYER;
-                if (topUnit) {
-                    // We got the player from the unit, so use the unit
-                    independentID = Game.IndependentPowers.getIndependentPlayerIDFromUnit(topUnit.id);
-                }
-                else {
-                    // Get the independent from the plot, can reutrn -1
-                    independentID = Game.IndependentPowers.getIndependentPlayerIDAt(loc.x, loc.y);
-                }
-                if (independentID != PlayerIds.NO_PLAYER) {
-                    const relationship = Game.IndependentPowers.getIndependentRelationship(independentID, this.player.id);
-                    if (relationship == IndependentRelationship.HOSTILE) {
-                        this.isEnemy = true;
-                    }
-                }
-            }
-            else {
-                var hasHiddenUnit = false;
-                if (topUnit?.hasHiddenVisibility) {
-                    hasHiddenUnit = true;
-                }
-                if (this.player) {
-                    const localPlayerDiplomacy = this.player.Diplomacy;
-                    if (localPlayerDiplomacy) {
-                        if (localPlayerDiplomacy.isAtWarWith(owningPlayerID) && !hasHiddenUnit) {
-                            this.isEnemy = true;
-                        }
-                    }
-                }
-            }
-        }
         if (this.isEnemy) {
             UI.setCursorByURL("fs://game/core/ui/cursors/enemy.ani");
         }
