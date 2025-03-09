@@ -1160,9 +1160,7 @@ class PlotTooltipType {
         // title bar
         if (hexName) this.renderTitleDivider(Locale.compose(hexName));
         // optional description
-        if (hexRules.length) {
-            this.renderRules(hexRules);
-        }
+        if (hexRules.length) this.renderRules(hexRules);
         // expansion type for undeveloped tiles
         if (this.expansion) this.renderRules([this.expansion.text]);
         // constructibles
@@ -1397,14 +1395,13 @@ class PlotTooltipType {
         this.container.appendChild(layout);
     }
     setWarningCursor() {
-        // Adjust cursor between normal and red based on the plot owner's hostility
+        // highlight enemy territory & units with a red cursor
         if (UI.isCursorLocked()) return;
         // don't block cursor changes from interface-mode-acquire-tile
         if (InterfaceMode.getCurrent() == "INTERFACEMODE_ACQUIRE_TILE") return;
         if (this.isEnemy) {
             UI.setCursorByURL("fs://game/core/ui/cursors/enemy.ani");
-        }
-        else {
+        } else {
             UI.setCursorByType(UIHTMLCursorTypes.Default);
         }
     }
