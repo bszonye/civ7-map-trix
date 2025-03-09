@@ -492,7 +492,6 @@ class PlotTooltipType {
         this.setWarningCursor(this.plotCoord);
     }
     model() {
-        const loc = this.plotCoord;
         // update player and civilization info
         this.player = Players.get(GameContext.localPlayerID);
         this.playerCiv = GameInfo.Civilizations.lookup(this.player.civilizationType);
@@ -500,10 +499,10 @@ class PlotTooltipType {
         // update selection-dependent info
         // (note: currently using "foot" instead of the selected unit)
         this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
-        this.modelWorld(loc);
-        this.modelCivilization(loc);
-        this.modelConstructibles(loc);
-        this.modelYields(loc, this.district);
+        this.modelWorld();
+        this.modelCivilization();
+        this.modelConstructibles();
+        this.modelYields();
     }
     render() {
         const loc = this.plotCoord;
@@ -515,7 +514,8 @@ class PlotTooltipType {
         if (this.isShowingDebug) this.renderDebugInfo();
     }
     // data modeling methods
-    modelWorld(loc) {
+    modelWorld() {
+        const loc = this.plotCoord;
         this.age = GameInfo.Ages.lookup(Game.age);
         const terrainType = GameplayMap.getTerrainType(loc.x, loc.y);
         this.terrain = GameInfo.Terrains.lookup(terrainType);
@@ -547,8 +547,9 @@ class PlotTooltipType {
         const resourceType = GameplayMap.getResourceType(loc.x, loc.y);
         this.resource = GameInfo.Resources.lookup(resourceType);
     }
-    modelCivilization(loc) {
+    modelCivilization() {
         // owner, civ, city, district
+        const loc = this.plotCoord;
         const ownerID = GameplayMap.getOwner(loc.x, loc.y);
         this.owner = Players.get(ownerID);
         const cityID = GameplayMap.getOwningCityFromXY(loc.x, loc.y);
@@ -560,13 +561,19 @@ class PlotTooltipType {
             this.religions = getReligions(this.city);
         }
     }
-    modelConstructibles(loc) {
+    modelConstructibles() {
+        const loc = this.plotCoord;
         this.constructibles = [];
         const constructibles = MapConstructibles.getHiddenFilteredConstructibles(loc.x, loc.y);
         for (const constructible of constructibles) {
-            const instance = Constructibles.getByComponentID(constructible);
-            if (!instance || instance.location.x != loc.x || instance.location.y != loc.y) continue;
-            const info = GameInfo.Constructibles.lookup(instance.type);
+            const item = Constructibles.getByComponentID(constructible);
+            if (!item) continue;
+            if (item.location.x != loc.x || item.location.y != loc.y) {
+                console.warn(`bz-plot-tooltip: constructible location mismatch`);
+                console.warn(`bz-plot-tooltip: ${JSON.stringify(item)}`);
+                continue;
+            }
+            const info = GameInfo.Constructibles.lookup(item.type);
             if (!info) continue;
             const isBuilding = info.ConstructibleClass == "BUILDING";
             const isWonder = info.ConstructibleClass == "WONDER";
@@ -576,8 +583,8 @@ class PlotTooltipType {
             }
             const notes = [];
 
-            const isComplete = instance.complete;
-            const isDamaged = instance.damaged;
+            const isComplete = item.complete;
+            const isDamaged = item.damaged;
             const isExtra = this.extraBuildings.has(info.ConstructibleType);
             const isLarge = this.largeBuildings.has(info.ConstructibleType);
             const isAgeless = this.agelessBuildings.has(info.ConstructibleType);
@@ -638,8 +645,9 @@ class PlotTooltipType {
             } else {
                 this.improvement.icon = info.ConstructibleType;
             }
-        } else if ((this.city || this.resource) && !this.district) {
-            // undeveloped city/resource tile: get rural expansion type
+        } else if (!this.district &&
+            (this.resource || this.city?.owner == this.player.id)) {
+            // undeveloped resource/city tile: get rural expansion type
             const geography = [
                 this.terrain?.TerrainType,
                 this.biome?.BiomeType,
@@ -665,12 +673,12 @@ class PlotTooltipType {
             }
         }
     }
-    modelYields(loc) {
+    modelYields() {
         this.yields = [];
         this.totalYields = 0;
         // one column per yield type
         GameInfo.Yields.forEach(info => {
-            const value = GameplayMap.getYield(loc.x, loc.y, info.YieldType, this.player.id);
+            const value = GameplayMap.getYield(this.plotCoord.x, this.plotCoord.y, info.YieldType, this.player.id);
             if (value) {
                 const column = { name: info.Name, type: info.YieldType, value };
                 this.yields.push(column);
@@ -968,7 +976,8 @@ class PlotTooltipType {
         const filteredConstructibles = MapConstructibles.getHiddenFilteredConstructibles(loc.x, loc.y);
         const constructibles = MapConstructibles.getConstructibles(loc.x, loc.y);
         if (constructibles.length && !filteredConstructibles.length) {
-            console.warn(`TRIX constructibles=${JSON.stringify(constructibles)}`);
+            console.warn(`bz-plot-tooltip: skipping filtered constructibles`);
+            console.warn(`bz-plot-tooltip: ${JSON.stringify(constructibles)}`);
             return;
         }
         const layout = document.createElement("div");
