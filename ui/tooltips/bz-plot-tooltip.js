@@ -71,6 +71,8 @@ const BZ_URBAN_TYPES = [DistrictTypes.CITY_CENTER, DistrictTypes.URBAN];
 // total yield icons
 const BZ_YIELD_TOTAL_RURAL = "CITY_RURAL";
 const BZ_YIELD_TOTAL_URBAN = "CITY_URBAN";
+// empty building slot
+const BZ_SLOT_EMPTY = "BUILDING_OPEN";
 
 // color palette
 const BZ_COLOR = {
@@ -382,6 +384,10 @@ class PlotTooltipType {
                 const url = UI.getIcon(y, "YIELD");
                 Controls.preloadImage(url, 'plot-tooltip');
             }
+            for (const icon of [BZ_SLOT_EMPTY]) {
+                const url = UI.getIcon(icon);
+                Controls.preloadImage(url, 'plot-tooltip');
+            }
         });
     }
     getHTML() {
@@ -549,6 +555,10 @@ class PlotTooltipType {
         this.city = cityID ? Cities.get(cityID) : null;
         const districtID = MapCities.getDistrict(loc.x, loc.y);
         this.district = districtID ? Districts.get(districtID) : null;
+        this.connections = getConnections(this.city);
+        if (this.age.AgeType == "AGE_EXPLORATION") {
+            this.religions = getReligions(this.city);
+        }
     }
     modelConstructibles(loc) {
         this.constructibles = [];
@@ -937,17 +947,13 @@ class PlotTooltipType {
         if (!center || center.x != loc.x || center.y != loc.y) return;
         const stats = [];
         // settlement connections
-        const connections = getConnections(this.city);
-        if (connections) {
+        if (this.connections) {
             const connectionsNote = Locale.compose("LOC_BZ_CITY_CONNECTIONS",
-                connections.cities.length, connections.towns.length);
+                this.connections.cities.length, this.connections.towns.length);
             stats.push(connectionsNote);
         }
         // religion
-        const religions = getReligions(this.city);
-        if (religions) {
-            stats.push(...religions);
-        }
+        if (this.religions) stats.push(...this.religions);
         // fresh water
         if (!GameplayMap.isFreshWater(center.x, center.y)) {
             stats.push(["LOC_BZ_PLOTKEY_NO_FRESHWATER"]);
@@ -1284,11 +1290,12 @@ class PlotTooltipType {
         for (const slot of slots) {
             // if the building has more than one yield type, like the
             // Palace, use one type for the ring and one for the glow
+            const icon = slot?.info.ConstructibleType ?? BZ_SLOT_EMPTY;
             const yields = adjacencyYield(slot?.info);
-            const slotColor = slot ? BZ_YIELD_COLOR[yields.at(0) ?? null] : "#0000";
-            const glowColor = slot ? BZ_YIELD_COLOR[yields.at(-1) ?? null] : "#0000";
+            const blank = "#0000";
+            const slotColor = slot ? BZ_YIELD_COLOR[yields.at(0) ?? null] : blank;
+            const glowColor = slot ? BZ_YIELD_COLOR[yields.at(-1) ?? null] : blank;
             const isCurrent = slot?.isCurrent;
-            const icon = slot?.info.ConstructibleType ?? "BUILDING_OPEN";
             // ring the slot with an appropriate color for the yield
             const ttFrame = document.createElement("div");
             ttFrame.classList.value = "border-2 rounded-full mx-1\\.5";
