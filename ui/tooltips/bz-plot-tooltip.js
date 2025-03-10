@@ -64,9 +64,10 @@ document.head.appendChild(BZ_HEAD_STYLE);
 // horizontal list separator
 const BZ_DOT_DIVIDER = Locale.compose("LOC_PLOT_DIVIDER_DOT");
 
+// all urban DistrictTypes
+const BZ_URBAN_TYPES = [DistrictTypes.CITY_CENTER, DistrictTypes.URBAN];
 // constructible type for independent settlements
 const BZ_VILLAGE_TYPES = ["IMPROVEMENT_VILLAGE", "IMPROVEMENT_ENCAMPMENT"];
-const BZ_URBAN_TYPES = [DistrictTypes.CITY_CENTER, DistrictTypes.URBAN];
 
 // total yield icons
 const BZ_YIELD_TOTAL_RURAL = "CITY_RURAL";
