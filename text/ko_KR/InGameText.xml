@@ -13,6 +13,9 @@
         <Row Tag="LOC_BZ_IMPROVEMENT_FOR_RESOURCE" Language="ko_KR">
             <Text>건설 필요 {1_icon} {2_name}</Text>
         </Row>
+        <Row Tag="LOC_BZ_IMPROVEMENT_FOR_WAREHOUSE">
+            <Text>(전에 {1_icon} {2_name})</Text>
+        </Row>
         <Row Tag="LOC_BZ_PLOTKEY_NO_FRESHWATER" Language="ko_KR">
             <Text>도시에 담수 없음</Text>
         </Row>

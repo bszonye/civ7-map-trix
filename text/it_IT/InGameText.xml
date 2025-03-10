@@ -13,6 +13,9 @@
         <Row Tag="LOC_BZ_IMPROVEMENT_FOR_RESOURCE" Language="it_IT">
             <Text>Richiede {1_icon} {2_name}</Text>
         </Row>
+        <Row Tag="LOC_BZ_IMPROVEMENT_FOR_WAREHOUSE">
+            <Text>(Era {1_icon} {2_name})</Text>
+        </Row>
         <Row Tag="LOC_BZ_PLOTKEY_NO_FRESHWATER" Language="it_IT">
             <Text>Assenza di Acqua Potabile</Text>
         </Row>
