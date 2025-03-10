@@ -338,6 +338,7 @@ class PlotTooltipType {
         this.isShowingDebug = false;
         this.modCtrl = false;
         this.modShift = false;
+        this.isVerbose = this.modCtrl || this.modShift;
         // document root
         this.tooltip = document.createElement('fxs-tooltip');
         this.tooltip.classList.value = "bz-tooltip plot-tooltip max-w-96";
@@ -360,12 +361,18 @@ class PlotTooltipType {
         this.owner = null;
         this.city = null;
         this.district = null;
+        // settlement stats
+        this.isCityCenter = false;
+        this.connections = null;
+        this.religions = null;
+        this.isFreshWater = null;
         // constructibles
         this.constructibles = [];
         this.buildings = [];  // omits walls
         this.improvement = null;
         this.wonder = null;
         this.expansion = null;  // improvement type for rural expansion
+        this.warehouse = null;  // improvement type for warehouses
         // yields
         this.yields = [];
         this.totalYields = 0;
@@ -400,6 +407,7 @@ class PlotTooltipType {
         if (modCtrl != this.modCtrl || modShift != this.modShift) {
             this.modCtrl = modCtrl;
             this.modShift = modShift;
+            this.isVerbose = this.modCtrl || this.modShift;
             return true;
         }
 
@@ -461,12 +469,18 @@ class PlotTooltipType {
         this.owner = null;
         this.city = null;
         this.district = null;
+        // settlement stats
+        this.isCityCenter = false;
+        this.connections = null;
+        this.religions = null;
+        this.isFreshWater = null;
         // constructibles
         this.constructibles = [];
         this.buildings = [];
         this.improvement = null;
         this.wonder = null;
         this.expansion = null;  // improvement type for rural expansion
+        this.warehouse = null;  // improvement type for warehouses
         // yields
         this.yields = [];
         this.totalYields = 0;
@@ -555,10 +569,21 @@ class PlotTooltipType {
         this.city = cityID ? Cities.get(cityID) : null;
         const districtID = MapCities.getDistrict(loc.x, loc.y);
         this.district = districtID ? Districts.get(districtID) : null;
+        // settlement stats (only on the city center)
+        if (!this.city) return;
+        const center = this.city.location;
+        this.isCityCenter = center.x == loc.x && center.y == loc.y
+        if (!this.isCityCenter) return;
+        // get connected settlements
         this.connections = getConnections(this.city);
+        // get religions (majority, urban, rural)
         if (this.age.AgeType == "AGE_EXPLORATION") {
+            // but only during Exploration, when conversion is possible
+            // (plus custom names stop working in the Modern Age)
             this.religions = getReligions(this.city);
         }
+        // report fresh water supply
+        this.isFreshWater = GameplayMap.isFreshWater(center.x, center.y);
     }
     modelConstructibles() {
         const loc = this.plotCoord;
@@ -644,9 +669,9 @@ class PlotTooltipType {
             } else {
                 this.improvement.icon = info.ConstructibleType;
             }
-        } else if (!this.district &&
-            (this.resource || this.city?.owner == this.player.id)) {
-            // undeveloped resource/city tile: get rural expansion type
+        }
+        // get the improvement type for rural and undeveloped tiles
+        if (this.improvement || !this.district) {
             const geography = [
                 this.terrain?.TerrainType,
                 this.biome?.BiomeType,
@@ -662,13 +687,25 @@ class PlotTooltipType {
             }
             if (best) {
                 const info = GameInfo.Constructibles.lookup(best.constructible);
-                const format = (this.resource ?
-                    "LOC_BZ_IMPROVEMENT_FOR_RESOURCE" :
-                    "LOC_BZ_IMPROVEMENT_FOR_TILE");
+                // TODO: translate LOC_BZ_IMPROVEMENT_FOR_WAREHOUSE
+                const format =
+                    this.improvement ? "LOC_BZ_IMPROVEMENT_FOR_WAREHOUSE" :
+                    this.resource ?  "LOC_BZ_IMPROVEMENT_FOR_RESOURCE" :
+                    "LOC_BZ_IMPROVEMENT_FOR_TILE";
                 const icon = `[icon:${best.constructible}]`;
                 const name = info.Name;
                 const text = Locale.compose(format, icon, name);
-                this.expansion = { info, format, icon, name, text };
+                this.warehouse = { info, format, icon, name, text };
+            }
+        }
+        if (this.warehouse && this.warehouse.name != this.improvement?.info?.Name) {
+            // tile is undeveloped or upgraded to a unique improvement
+            if (this.city?.owner == this.player.id || this.resource || this.isVerbose) {
+                // show the standard improvement type if
+                // - owned by player
+                // - undeveloped resource
+                // - verbose mode
+                this.expansion = this.warehouse;
             }
         }
     }
@@ -943,17 +980,15 @@ class PlotTooltipType {
     }
     renderSettlementSection() {
         if (!this.owner) return;
-        const loc = this.plotCoord;
         const name = this.city ?  this.city.name :  // city or town
             this.owner.isAlive ?  this.getCivName(this.owner) :  // village
             null;  // discoveries are owned by a placeholder "World" player
         if (!name) return;
         this.renderTitleDivider(name);
         // owner info
-        this.renderOwnerInfo(loc, this.owner);
-        // settlement stats (only show at the city center)
-        const center = this.city?.location;
-        if (!center || center.x != loc.x || center.y != loc.y) return;
+        this.renderOwnerInfo();
+        // settlement stats (only at city center or in verbose mode)
+        if (!this.isCityCenter) return;
         const stats = [];
         // settlement connections
         if (this.connections) {
@@ -964,15 +999,15 @@ class PlotTooltipType {
         // religion
         if (this.religions) stats.push(...this.religions);
         // fresh water
-        if (!GameplayMap.isFreshWater(center.x, center.y)) {
-            stats.push(["LOC_BZ_PLOTKEY_NO_FRESHWATER"]);
-        }
+        if (!this.isFreshWater) stats.push(["LOC_BZ_PLOTKEY_NO_FRESHWATER"]);
+        // render
         if (stats.length) {
             this.renderRules(stats, "-mt-1 mb-2");  // tighten space above icon
         }
     }
-    renderOwnerInfo(loc) {
+    renderOwnerInfo() {
         if (!this.owner || !Players.isAlive(this.owner.id)) return;
+        const loc = this.plotCoord;
         // TODO: simplify this check? why is it here?
         const filteredConstructibles = MapConstructibles.getHiddenFilteredConstructibles(loc.x, loc.y);
         const constructibles = MapConstructibles.getConstructibles(loc.x, loc.y);
@@ -1110,7 +1145,7 @@ class PlotTooltipType {
         this.renderDistrictDefense(this.plotCoord);
         // panel interior
         // show rules for city-states and unique quarters
-        if (hexRules) {
+        if (hexRules && this.isVerbose) {
             const title = "font-title uppercase text-xs leading-snug";
             if (hexSubtitle) this.renderRules([hexSubtitle], '', title);
             this.renderRules([hexRules]);
@@ -1142,7 +1177,7 @@ class PlotTooltipType {
         } else if (this.resource) {
             // resource
             hexName = this.resource.Name;
-            hexRules.push(this.resource.Tooltip);
+            if (this.expansion || this.isVerbose) hexRules.push(this.resource.Tooltip);
             resourceIcon = this.resource.ResourceType;
         } else if (this.district?.type) {
             // rural
@@ -1161,8 +1196,6 @@ class PlotTooltipType {
         if (hexName) this.renderTitleDivider(Locale.compose(hexName));
         // optional description
         if (hexRules.length) this.renderRules(hexRules);
-        // expansion type for undeveloped tiles
-        if (this.expansion) this.renderRules([this.expansion.text]);
         // constructibles
         this.renderConstructibles();
         // bottom bar
@@ -1187,7 +1220,7 @@ class PlotTooltipType {
     }
     // lay out a column of constructibles and their construction notes
     renderConstructibles() {
-        if (!this.constructibles?.length) return;
+        if (!this.constructibles.length && !this.expansion) return;
         const ttList = document.createElement("div");
         ttList.classList.value = "text-xs leading-snug text-center mb-2";
         for (const c of this.constructibles) {
@@ -1203,12 +1236,19 @@ class PlotTooltipType {
                 if (c.isDamaged) {
                     setCapsuleStyle(ttState, BZ_ALERT.amber, "mb-0\\.5");
                 } else {
-                    ttState.classList.value = "-mt-1";
+                    ttState.classList.add("-mt-1");
                 }
                 ttState.innerHTML = notes;
                 ttConstructible.appendChild(ttState);
             }
             ttList.appendChild(ttConstructible);
+        }
+        // expansion type for undeveloped & upgraded tiles
+        if (this.expansion) {
+            const tt = document.createElement("div");
+            tt.setAttribute("data-l10n-id", this.expansion.text);
+            if (this.constructibles.length) tt.style.setProperty("font-size", "85%");
+            ttList.appendChild(tt);
         }
         this.container.appendChild(ttList);
     }
