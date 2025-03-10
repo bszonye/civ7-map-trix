@@ -13,7 +13,7 @@
         <Row Tag="LOC_BZ_IMPROVEMENT_FOR_RESOURCE" Language="it_IT">
             <Text>Richiede {1_icon} {2_name}</Text>
         </Row>
-        <Row Tag="LOC_BZ_IMPROVEMENT_FOR_WAREHOUSE">
+        <Row Tag="LOC_BZ_IMPROVEMENT_FOR_WAREHOUSE" Language="it_IT">
             <Text>(Era {1_icon} {2_name})</Text>
         </Row>
         <Row Tag="LOC_BZ_PLOTKEY_NO_FRESHWATER" Language="it_IT">
