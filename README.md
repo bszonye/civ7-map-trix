@@ -1,4 +1,4 @@
-# Map Trix 1.5.1
+# Map Trix 1.6.0
 better map tools for Civilization VII
 
 ## spot important map details
@@ -28,8 +28,18 @@ around the building icons:  **green** for food, **yellow** for gold, and
 so on.  a glowing ring means that a building is complete and up-to-date,
 and two glowing buildings make a Quarter.
 
+## improvements
+undeveloped tiles show which basic improvement type the land supports,
+and resources show which improvements unlock them.  unique improvements
+show which basic improvement they replaced (for warehouse bonuses).
+
 ## yields
 the last column shows the total of all yields under a bronze hexagon.
+
+## verbose mode
+you can hold down Ctrl or Shift to show additional information on some
+tiles, like city-states, unique quarters, resources you've already
+connected, and undeveloped land outside your civilization.
 
 ## compatibility with other mods
 known interactions:
