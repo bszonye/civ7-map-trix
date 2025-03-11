@@ -58,6 +58,17 @@ BZ_HEAD_STYLE.textContent = [
     width: 100%;
     /* background-color: #80808080;  /* DEBUG */
 }`,
+// fix relationship tooltips
+`.tooltip.relationship-tooltip {
+    max-width: 17.7777777778rem;
+}
+.relationship-tooltip__agenda-description {
+    width: 100%;
+    text-align: center;
+}
+.relationship-tooltip__agenda-description > p {
+    width: 100%;
+}`,
 ].join('\n');
 document.head.appendChild(BZ_HEAD_STYLE);
 
