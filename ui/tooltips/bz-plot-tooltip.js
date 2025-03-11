@@ -339,6 +339,7 @@ class PlotTooltipType {
         this.isShowingDebug = false;
         this.modCtrl = false;
         this.modShift = false;
+        // TODO: system option for "always verbose"
         this.isVerbose = this.modCtrl || this.modShift;
         // document root
         this.tooltip = document.createElement('fxs-tooltip');

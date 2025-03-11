@@ -1,3 +1,4 @@
+// TODO: system option to disable this feature
 import { PanelYieldBanner } from '/base-standard/ui/diplo-ribbon/panel-yield-banner.js';
 
 const BZ_HEAD_STYLE = document.createElement('style');
