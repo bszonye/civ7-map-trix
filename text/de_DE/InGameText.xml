@@ -17,7 +17,7 @@
             <Text>(War {1_icon} {2_name})</Text>
         </Row>
         <Row Tag="LOC_BZ_PLOTKEY_NO_FRESHWATER" Language="de_DE">
-            <Text>kKin Süßwasser</Text>
+            <Text>Kein Süßwasser</Text>
         </Row>
         <Row Tag="LOC_BZ_RELIGION_MAJORITY" Language="de_DE">
             <Text>Mehrheit {1_icon} {2_name}</Text>
