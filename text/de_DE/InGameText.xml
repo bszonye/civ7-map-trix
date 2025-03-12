@@ -8,10 +8,10 @@
             <Text>Heimatland</Text>
         </Row>
         <Row Tag="LOC_BZ_IMPROVEMENT_FOR_TILE" Language="de_DE">
-            <Text>Ausbaubar mit {1_icon} {2_name}</Text>
+            <Text>Erlaubt {1_icon} {2_name}</Text>
         </Row>
         <Row Tag="LOC_BZ_IMPROVEMENT_FOR_RESOURCE" Language="de_DE">
-            <Text>Erfordert {1_icon} {2_name}</Text>
+            <Text>Benötigt {1_icon} {2_name}</Text>
         </Row>
         <Row Tag="LOC_BZ_IMPROVEMENT_FOR_WAREHOUSE" Language="de_DE">
             <Text>(War {1_icon} {2_name})</Text>
