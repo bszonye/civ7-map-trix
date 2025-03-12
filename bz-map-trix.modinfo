@@ -52,8 +52,8 @@
         </ActionGroup>
     </ActionGroups>
     <LocalizedText>
-        <File>text/de_DE/ModInfoText.xml</File>
         <File>text/en_us/ModInfoText.xml</File>
+        <File>text/de_DE/ModInfoText.xml</File>
         <File>text/it_IT/ModInfoText.xml</File>
         <File>text/ko_KR/ModInfoText.xml</File>
     </LocalizedText>
