@@ -7,9 +7,9 @@ const MOD_ID = "bz-map-trix";
 
 const bzMapTrixOptions = new class {
     data = {
+        verbose: false,
         relationshipFix: true,
         yieldBanner: true,
-        verbose: false,
     };
     constructor() {
         const modSettings = ModSettings.load(MOD_ID);
@@ -29,18 +29,18 @@ const bzMapTrixOptions = new class {
             document.body.classList.remove("bz-yield-banner");
         }
     }
-    get relationshipFix() {
-        return this.data.relationshipFix;
-    }
-    set relationshipFix(flag) {
-        this.data.relationshipFix = !!flag;
-        this.save();
-    }
     get verbose() {
         return this.data.verbose;
     }
     set verbose(flag) {
         this.data.verbose = !!flag;
+        this.save();
+    }
+    get relationshipFix() {
+        return this.data.relationshipFix;
+    }
+    set relationshipFix(flag) {
+        this.data.relationshipFix = !!flag;
         this.save();
     }
     get yieldBanner() {
@@ -51,25 +51,6 @@ const bzMapTrixOptions = new class {
         this.save();
     }
 };
-const onInitRelationshipFix = (info) => {
-    info.currentValue = bzMapTrixOptions.relationshipFix;
-};
-const onUpdateRelationshipFix = (_info, flag) => {
-    bzMapTrixOptions.relationshipFix = flag;
-};
-Options.addInitCallback(() => {
-    Options.addOption({
-        category: CategoryType.Mods,
-        // @ts-ignore
-        group: MOD_ID.replace(/-/g, '_'),
-        type: OptionType.Checkbox,
-        id: "bz-fix-relationship-tooltips",
-        initListener: onInitRelationshipFix,
-        updateListener: onUpdateRelationshipFix,
-        label: "LOC_OPTIONS_BZ_FIX_RELATIONSHIP_TOOLTIPS",
-        description: "LOC_OPTIONS_BZ_FIX_RELATIONSHIP_TOOLTIPS_DESCRIPTION",
-    });
-});
 const onInitVerbose = (info) => {
     info.currentValue = bzMapTrixOptions.verbose;
 };
@@ -80,13 +61,32 @@ Options.addInitCallback(() => {
     Options.addOption({
         category: CategoryType.Mods,
         // @ts-ignore
-        group: MOD_ID.replace(/-/g, '_'),
+        group: "bz_mods",
         type: OptionType.Checkbox,
-        id: "bz-restyle-yield-banner",
-        initListener: onInitYieldBanner,
-        updateListener: onUpdateYieldBanner,
-        label: "LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER",
-        description: "LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER_DESCRIPTION",
+        id: "bz-map-trix-verbose",
+        initListener: onInitVerbose,
+        updateListener: onUpdateVerbose,
+        label: "LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE",
+        description: "LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE_DESCRIPTION",
+    });
+});
+const onInitRelationshipFix = (info) => {
+    info.currentValue = bzMapTrixOptions.relationshipFix;
+};
+const onUpdateRelationshipFix = (_info, flag) => {
+    bzMapTrixOptions.relationshipFix = flag;
+};
+Options.addInitCallback(() => {
+    Options.addOption({
+        category: CategoryType.Mods,
+        // @ts-ignore
+        group: "bz_mods",
+        type: OptionType.Checkbox,
+        id: "bz-fix-relationship-tooltips",
+        initListener: onInitRelationshipFix,
+        updateListener: onUpdateRelationshipFix,
+        label: "LOC_OPTIONS_BZ_FIX_RELATIONSHIP_TOOLTIPS",
+        description: "LOC_OPTIONS_BZ_FIX_RELATIONSHIP_TOOLTIPS_DESCRIPTION",
     });
 });
 const onInitYieldBanner = (info) => {
@@ -99,13 +99,13 @@ Options.addInitCallback(() => {
     Options.addOption({
         category: CategoryType.Mods,
         // @ts-ignore
-        group: MOD_ID.replace(/-/g, '_'),
+        group: "bz_mods",
         type: OptionType.Checkbox,
-        id: "bz-map-trix-verbose",
-        initListener: onInitVerbose,
-        updateListener: onUpdateVerbose,
-        label: "LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE",
-        description: "LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE_DESCRIPTION",
+        id: "bz-restyle-yield-banner",
+        initListener: onInitYieldBanner,
+        updateListener: onUpdateYieldBanner,
+        label: "LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER",
+        description: "LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER_DESCRIPTION",
     });
 });
 

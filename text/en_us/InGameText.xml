@@ -62,26 +62,26 @@
             <Text>{1_name} People</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_FIX_RELATIONSHIP_TOOLTIPS">
-            <Text>compact relationship tooltips</Text>
+            <Text>fix relationship tooltip width</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_FIX_RELATIONSHIP_TOOLTIPS_DESCRIPTION">
-            <Text>Fixes a formatting bug in relationship tooltips.</Text>
+            <Text>[B]Map Trix:[/B] Fixes a formatting bug that makes relationship tooltips much wider than they should be.</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE">
-            <Text>verbose tooltips</Text>
+            <Text>verbose map tooltips</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE_DESCRIPTION">
-            <Text>Shows extended tooltip information.  When unchecked, you can show verbose information by holding down Ctrl or Shift.</Text>
+            <Text>[B]Map Trix:[/B] Shows extended tooltip information.  When unchecked, you can show verbose information by holding down Ctrl or Shift.</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER">
-            <Text>matching yield banner</Text>
+            <Text>restyle yield banner</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER_DESCRIPTION">
-            <Text>Restyles the top bar to match the tooltips.</Text>
+            <Text>[B]Map Trix:[/B] Restyles the top bar to match the rounded color highlights in trixie's mods.</Text>
         </Row>
-        <Row Tag="LOC_OPTIONS_GROUP_BZ_MAP_TRIX">
-            <Text>Map Trix</Text>
-        </Row>
+        <InsertOrIgnore Tag="LOC_OPTIONS_GROUP_BZ_MODS">
+            <Text>trixie's mods</Text>
+        </InsertOrIgnore>
         <Row Tag="LOC_STATE_BZ_OBSOLETE">
             <Text>Obsolete</Text>
         </Row>
