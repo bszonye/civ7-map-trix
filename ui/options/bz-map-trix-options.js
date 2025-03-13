@@ -51,26 +51,12 @@ const bzMapTrixOptions = new class {
         this.save();
     }
 };
-
 const onInitRelationshipFix = (info) => {
     info.currentValue = bzMapTrixOptions.relationshipFix;
 };
 const onUpdateRelationshipFix = (_info, flag) => {
     bzMapTrixOptions.relationshipFix = flag;
 };
-const onInitVerbose = (info) => {
-    info.currentValue = bzMapTrixOptions.verbose;
-};
-const onUpdateVerbose = (_info, flag) => {
-    bzMapTrixOptions.verbose = flag;
-};
-const onInitYieldBanner = (info) => {
-    info.currentValue = bzMapTrixOptions.yieldBanner;
-};
-const onUpdateYieldBanner = (_info, flag) => {
-    bzMapTrixOptions.yieldBanner = flag;
-};
-
 Options.addInitCallback(() => {
     Options.addOption({
         category: CategoryType.System,
@@ -84,6 +70,12 @@ Options.addInitCallback(() => {
         description: "LOC_OPTIONS_BZ_FIX_RELATIONSHIP_TOOLTIPS_DESCRIPTION",
     });
 });
+const onInitVerbose = (info) => {
+    info.currentValue = bzMapTrixOptions.verbose;
+};
+const onUpdateVerbose = (_info, flag) => {
+    bzMapTrixOptions.verbose = flag;
+};
 Options.addInitCallback(() => {
     Options.addOption({
         category: CategoryType.System,
@@ -97,6 +89,12 @@ Options.addInitCallback(() => {
         description: "LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER_DESCRIPTION",
     });
 });
+const onInitYieldBanner = (info) => {
+    info.currentValue = bzMapTrixOptions.yieldBanner;
+};
+const onUpdateYieldBanner = (_info, flag) => {
+    bzMapTrixOptions.yieldBanner = flag;
+};
 Options.addInitCallback(() => {
     Options.addOption({
         category: CategoryType.System,
