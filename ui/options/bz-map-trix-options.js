@@ -59,7 +59,7 @@ const onUpdateRelationshipFix = (_info, flag) => {
 };
 Options.addInitCallback(() => {
     Options.addOption({
-        category: CategoryType.System,
+        category: CategoryType.Mods,
         // @ts-ignore
         group: MOD_ID.replace(/-/g, '_'),
         type: OptionType.Checkbox,
@@ -78,7 +78,7 @@ const onUpdateVerbose = (_info, flag) => {
 };
 Options.addInitCallback(() => {
     Options.addOption({
-        category: CategoryType.System,
+        category: CategoryType.Mods,
         // @ts-ignore
         group: MOD_ID.replace(/-/g, '_'),
         type: OptionType.Checkbox,
@@ -97,7 +97,7 @@ const onUpdateYieldBanner = (_info, flag) => {
 };
 Options.addInitCallback(() => {
     Options.addOption({
-        category: CategoryType.System,
+        category: CategoryType.Mods,
         // @ts-ignore
         group: MOD_ID.replace(/-/g, '_'),
         type: OptionType.Checkbox,
