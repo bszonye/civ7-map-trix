@@ -61,14 +61,17 @@
         <Row Tag="LOC_LEADER_BZ_PEOPLE_NAME">
             <Text>{1_name} People</Text>
         </Row>
-        <Row Tag="LOC_OPTIONS_GROUP_BZ_MAP_TRIX">
-            <Text>Map Trix</Text>
-        </Row>
         <Row Tag="LOC_OPTIONS_BZ_FIX_RELATIONSHIP_TOOLTIPS">
             <Text>compact relationship tooltips</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_FIX_RELATIONSHIP_TOOLTIPS_DESCRIPTION">
             <Text>Fixes a formatting bug in relationship tooltips.</Text>
+        </Row>
+        <Row Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE">
+            <Text>verbose tooltips</Text>
+        </Row>
+        <Row Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE_DESCRIPTION">
+            <Text>Shows extended tooltip information.  When unchecked, you can show verbose information by holding down Ctrl or Shift.</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER">
             <Text>matching yield banner</Text>
@@ -76,11 +79,8 @@
         <Row Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER_DESCRIPTION">
             <Text>Restyles the top bar to match the tooltips.</Text>
         </Row>
-        <Row Tag="LOC_OPTIONS_BZ_VERBOSE_TOOLTIPS">
-            <Text>verbose tooltips</Text>
-        </Row>
-        <Row Tag="LOC_OPTIONS_BZ_VERBOSE_TOOLTIPS_DESCRIPTION">
-            <Text>Shows extended tooltip information.  When unchecked, you can show verbose information by holding down Ctrl or Shift.</Text>
+        <Row Tag="LOC_OPTIONS_GROUP_BZ_MAP_TRIX">
+            <Text>Map Trix</Text>
         </Row>
         <Row Tag="LOC_STATE_BZ_OBSOLETE">
             <Text>Obsolete</Text>

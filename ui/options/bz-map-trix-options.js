@@ -3,6 +3,8 @@ import { CategoryType } from '/core/ui/options/options-helpers.js';
 import { Options, OptionType } from '/core/ui/options/model-options.js';
 import ModSettings from '/bz-map-trix/ui/options/mod-options-decorator.js';
 
+const MOD_ID = "bz-map-trix";
+
 const bzMapTrixOptions = new class {
     data = {
         relationshipFix: true,
@@ -10,11 +12,11 @@ const bzMapTrixOptions = new class {
         verbose: false,
     };
     constructor() {
-        const modSettings = ModSettings.load("bz-map-trix");
+        const modSettings = ModSettings.load(MOD_ID);
         if (modSettings) this.data = modSettings;
     }
     save() {
-        ModSettings.save("bz-map-trix", this.data);
+        ModSettings.save(MOD_ID, this.data);
         // sync optional styling
         if (this.data.relationshipFix) {
             document.body.classList.add("bz-relationship-fix");
@@ -73,7 +75,7 @@ Options.addInitCallback(() => {
     Options.addOption({
         category: CategoryType.System,
         // @ts-ignore
-        group: 'bz_map_trix',
+        group: MOD_ID.replace(/-/g, '_'),
         type: OptionType.Checkbox,
         id: "bz-fix-relationship-tooltips",
         initListener: onInitRelationshipFix,
@@ -86,7 +88,7 @@ Options.addInitCallback(() => {
     Options.addOption({
         category: CategoryType.System,
         // @ts-ignore
-        group: 'bz_map_trix',
+        group: MOD_ID.replace(/-/g, '_'),
         type: OptionType.Checkbox,
         id: "bz-restyle-yield-banner",
         initListener: onInitYieldBanner,
@@ -99,13 +101,13 @@ Options.addInitCallback(() => {
     Options.addOption({
         category: CategoryType.System,
         // @ts-ignore
-        group: 'bz_map_trix',
+        group: MOD_ID.replace(/-/g, '_'),
         type: OptionType.Checkbox,
         id: "bz-map-trix-verbose",
         initListener: onInitVerbose,
         updateListener: onUpdateVerbose,
-        label: "LOC_OPTIONS_BZ_VERBOSE_TOOLTIPS",
-        description: "LOC_OPTIONS_BZ_VERBOSE_TOOLTIPS_DESCRIPTION",
+        label: "LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE",
+        description: "LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE_DESCRIPTION",
     });
 });
 
