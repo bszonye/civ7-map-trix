@@ -1,14 +1,13 @@
-// TODO: system option to disable this feature
 import { PanelYieldBanner } from '/base-standard/ui/diplo-ribbon/panel-yield-banner.js';
 
 const BZ_HEAD_STYLE = document.createElement('style');
 BZ_HEAD_STYLE.textContent = `
-.panel-yield__top-bar-content .text-yield-gold,
-.panel-yield__top-bar-content .text-yield-influence,
-.panel-yield__top-bar-content .text-yield-science,
-.panel-yield__top-bar-content .text-yield-culture,
-.panel-yield__top-bar-content .text-yield-happiness,
-.panel-yield__top-bar-content .text-yield-cities {
+.bz-yield-banner .panel-yield__top-bar-content .text-yield-gold,
+.bz-yield-banner .panel-yield__top-bar-content .text-yield-influence,
+.bz-yield-banner .panel-yield__top-bar-content .text-yield-science,
+.bz-yield-banner .panel-yield__top-bar-content .text-yield-culture,
+.bz-yield-banner .panel-yield__top-bar-content .text-yield-happiness,
+.bz-yield-banner .panel-yield__top-bar-content .text-yield-cities {
     color: #c2c4cc;  /* text-accent-2 */
     border-radius: 0.777rem / 50%;
     padding-left: 0.1111111111rem;
@@ -16,48 +15,48 @@ BZ_HEAD_STYLE.textContent = `
     transition: color 0.25s cubic-bezier(0.215, 0.61, 0.355, 1);
     transition: background-color 0.25s cubic-bezier(0.215, 0.61, 0.355, 1);
 }
-.panel-yield__top-bar-content .text-yield-gold:hover,
-.panel-yield__top-bar-content .text-yield-influence:hover,
-.panel-yield__top-bar-content .text-yield-science:hover,
-.panel-yield__top-bar-content .text-yield-culture:hover,
-.panel-yield__top-bar-content .text-yield-happiness:hover,
-.panel-yield__top-bar-content .text-yield-cities:hover {
+.bz-yield-banner .panel-yield__top-bar-content .text-yield-gold:hover,
+.bz-yield-banner .panel-yield__top-bar-content .text-yield-influence:hover,
+.bz-yield-banner .panel-yield__top-bar-content .text-yield-science:hover,
+.bz-yield-banner .panel-yield__top-bar-content .text-yield-culture:hover,
+.bz-yield-banner .panel-yield__top-bar-content .text-yield-happiness:hover,
+.bz-yield-banner .panel-yield__top-bar-content .text-yield-cities:hover {
     color: #e5e5e5;  /* text-accent-1 */
 }
-.panel-yield__top-bar-content .text-yield-gold {
+.bz-yield-banner .panel-yield__top-bar-content .text-yield-gold {
     background-color: #f0c44244;
 }
-.panel-yield__top-bar-content .text-yield-gold:hover {
+.bz-yield-banner .panel-yield__top-bar-content .text-yield-gold:hover {
     background-color: #f0c442aa;
 }
-.panel-yield__top-bar-content .text-yield-influence {
+.bz-yield-banner .panel-yield__top-bar-content .text-yield-influence {
     background-color: #99e6bf44;
 }
-.panel-yield__top-bar-content .text-yield-influence:hover {
+.bz-yield-banner .panel-yield__top-bar-content .text-yield-influence:hover {
     background-color: #99e6bfaa;
 }
-.panel-yield__top-bar-content .text-yield-science {
+.bz-yield-banner .panel-yield__top-bar-content .text-yield-science {
     background-color: #80bfff55;
 }
-.panel-yield__top-bar-content .text-yield-science:hover {
+.bz-yield-banner .panel-yield__top-bar-content .text-yield-science:hover {
     background-color: #80bfffaa;
 }
-.panel-yield__top-bar-content .text-yield-culture {
+.bz-yield-banner .panel-yield__top-bar-content .text-yield-culture {
     background-color: #bf99e655;
 }
-.panel-yield__top-bar-content .text-yield-culture:hover {
+.bz-yield-banner .panel-yield__top-bar-content .text-yield-culture:hover {
     background-color: #bf99e6aa;
 }
-.panel-yield__top-bar-content .text-yield-happiness {
+.bz-yield-banner .panel-yield__top-bar-content .text-yield-happiness {
     background-color: #ff993366;
 }
-.panel-yield__top-bar-content .text-yield-happiness:hover {
+.bz-yield-banner .panel-yield__top-bar-content .text-yield-happiness:hover {
     background-color: #ff9933aa;
 }
-.panel-yield__top-bar-content .text-yield-cities {
+.bz-yield-banner .panel-yield__top-bar-content .text-yield-cities {
     background-color: #e5d2ac66;
 }
-.panel-yield__top-bar-content .text-yield-cities:hover {
+.bz-yield-banner .panel-yield__top-bar-content .text-yield-cities:hover {
     background-color: #e5d2acaa;
 }
 `;

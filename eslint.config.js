@@ -44,6 +44,7 @@ export default [
                 Visibility: "readonly",
                 console: "readonly",
                 document: "readonly",
+                localStorage: "readonly",
             }
         }
 

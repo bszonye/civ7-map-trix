@@ -3,6 +3,7 @@
  * @copyright 2022, Firaxis Gmaes
  * @description The tooltips that appear based on the cursor hovering over world plots.
  */
+import bzMapTrixOptions from '/bz-map-trix/ui/options/bz-map-trix-options.js';
 import "/base-standard/ui/tooltips/plot-tooltip.js";
 
 import TooltipManager, { PlotTooltipPriority } from '/core/ui/tooltips/tooltip-manager.js';
@@ -59,18 +60,29 @@ BZ_HEAD_STYLE.textContent = [
     /* background-color: #80808080;  /* DEBUG */
 }`,
 // fix relationship tooltips
-`.tooltip.relationship-tooltip {
+`.bz-relationship-fix .tooltip.relationship-tooltip {
     max-width: 17.7777777778rem;
 }
-.relationship-tooltip__agenda-description {
+.bz-relationship-fix .relationship-tooltip__agenda-description {
     width: 100%;
     text-align: center;
 }
-.relationship-tooltip__agenda-description > p {
+.bz-relationship-fix .relationship-tooltip__agenda-description > p {
     width: 100%;
 }`,
 ].join('\n');
 document.head.appendChild(BZ_HEAD_STYLE);
+// sync optional styling
+if (bzMapTrixOptions.relationshipFix) {
+    document.body.classList.add("bz-relationship-fix");
+} else {
+    document.body.classList.remove("bz-relationship-fix");
+}
+if (bzMapTrixOptions.yieldBanner) {
+    document.body.classList.add("bz-yield-banner");
+} else {
+    document.body.classList.remove("bz-yield-banner");
+}
 
 // horizontal list separator
 const BZ_DOT_DIVIDER = Locale.compose("LOC_PLOT_DIVIDER_DOT");
@@ -350,8 +362,7 @@ class PlotTooltipType {
         this.isShowingDebug = false;
         this.modCtrl = false;
         this.modShift = false;
-        // TODO: system option for "always verbose"
-        this.isVerbose = this.modCtrl || this.modShift;
+        this.isVerbose = this.modCtrl || this.modShift || bzMapTrixOptions.verbose;
         // document root
         this.tooltip = document.createElement('fxs-tooltip');
         this.tooltip.classList.value = "bz-tooltip plot-tooltip max-w-96";
@@ -417,10 +428,11 @@ class PlotTooltipType {
         // allow Ctrl and Shift modifiers to change tooltip
         const modCtrl = Input.isCtrlDown();
         const modShift = Input.isShiftDown();
-        if (modCtrl != this.modCtrl || modShift != this.modShift) {
+        const isVerbose = modCtrl || modShift || bzMapTrixOptions.verbose;
+        if (modCtrl != this.modCtrl || modShift != this.modShift || isVerbose != this.isVerbose) {
             this.modCtrl = modCtrl;
             this.modShift = modShift;
-            this.isVerbose = this.modCtrl || this.modShift;
+            this.isVerbose = isVerbose;
             return true;
         }
 
