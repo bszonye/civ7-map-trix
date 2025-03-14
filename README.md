@@ -1,4 +1,4 @@
-# Map Trix 1.6.0
+# Map Trix 1.7.0
 better map tools for Civilization VII
 
 ## spot important map details
@@ -47,13 +47,16 @@ known interactions:
 - **Sukritact's Simple UI Adjustments: compatible.**  when both mods are
   installed, the Map Trix tooltip replaces Sukritact's version.
 - **zhekoff's Colorful Top Panel: compatible.**  when both mods are
-  installed, zhekoff's yield banner replaces the Map Trix version.
+  installed, Map Trix will restyle the top banner by default.  you can
+  change that by turning off "restyle yield banner" in the Mods tab of
+  the Options screen.
 - **TCS Improved Plot Tooltip: incompatible.**  both mods enhance the
   same feature in different ways.
 
 ## localization
 supported languages:
 
+- German (translated by Chr1Z93)
 - Italian (translated by leonardfactory)
 - Korean (translated by Hotsolidinfill)
 - Russian (translated by Webrok)
