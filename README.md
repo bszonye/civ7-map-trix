@@ -48,7 +48,7 @@ known interactions:
   installed, the Map Trix tooltip replaces Sukritact's version.
 - **zhekoff's Colorful Top Panel: compatible.**  when both mods are
   installed, Map Trix will restyle the top banner by default.  you can
-  change that by turning off "matching yield banner" in system options.
+  change that by turning off "restyle yield banner" in system options.
 - **TCS Improved Plot Tooltip: incompatible.**  both mods enhance the
   same feature in different ways.
 
