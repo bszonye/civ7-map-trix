@@ -1189,6 +1189,7 @@ class PlotTooltipType {
     }
     renderRuralSection() {
         let hexName = this.improvement?.districtName;
+        let hexSubtitle;
         let hexRules = [];
         let hexIcon = this.improvement?.icon;
         let resourceIcon;
@@ -1202,7 +1203,12 @@ class PlotTooltipType {
         } else if (this.resource) {
             // resource
             hexName = this.resource.Name;
-            if (this.expansion || this.isVerbose) hexRules.push(this.resource.Tooltip);
+            if (this.expansion || this.isVerbose) {
+                const rctype = this.resource.ResourceClassType;
+                const rc = rctype && GameInfo.ResourceClasses.lookup(rctype);
+                hexSubtitle = rc?.Name;
+                hexRules.push(this.resource.Tooltip);
+            }
             resourceIcon = this.resource.ResourceType;
         } else if (this.district?.type) {
             // rural
@@ -1220,7 +1226,11 @@ class PlotTooltipType {
         // title bar
         if (hexName) this.renderTitleDivider(Locale.compose(hexName));
         // optional description
-        if (hexRules.length) this.renderRules(hexRules);
+        if (hexRules.length) {
+            const title = "font-title uppercase text-xs leading-snug";
+            if (hexSubtitle) this.renderRules([hexSubtitle], '', title);
+            this.renderRules(hexRules);
+        }
         // constructibles
         this.renderConstructibles();
         // bottom bar
