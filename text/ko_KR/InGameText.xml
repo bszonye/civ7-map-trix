@@ -82,6 +82,21 @@
         <InsertOrIgnore Tag="LOC_OPTIONS_GROUP_BZ_MODS" Language="ko_KR">
             <Text>trixie의 다양한 모드</Text>
         </InsertOrIgnore>
+        <Row Tag="LOC_RESOURCECLASS_BONUS_NAME_BZ" Language="ko_KR">
+            <Text>보너스 자원</Text>
+        </Row>
+        <Row Tag="LOC_RESOURCECLASS_CITY_NAME_BZ" Language="ko_KR">
+            <Text>도시 자원</Text>
+        </Row>
+        <Row Tag="LOC_RESOURCECLASS_EMPIRE_NAME_BZ" Language="ko_KR">
+            <Text>제국 자원</Text>
+        </Row>
+        <Row Tag="LOC_RESOURCECLASS_FACTORY_NAME_BZ" Language="ko_KR">
+            <Text>공장 자원</Text>
+        </Row>
+        <Row Tag="LOC_RESOURCECLASS_TREASURE_NAME_BZ" Language="ko_KR">
+            <Text>보물 자원</Text>
+        </Row>
         <Row Tag="LOC_STATE_BZ_OBSOLETE" Language="ko_KR">
             <Text>구시대</Text>
         </Row>

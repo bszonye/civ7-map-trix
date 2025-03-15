@@ -64,6 +64,21 @@
         <InsertOrIgnore Tag="LOC_OPTIONS_GROUP_BZ_MODS" Language="ru_RU">
             <Text>Моды от Trixie</Text>
         </InsertOrIgnore>
+        <Row Tag="LOC_RESOURCECLASS_BONUS_NAME_BZ" Language="ru_RU">
+            <Text>Бонусный Ресурс</Text>
+        </Row>
+        <Row Tag="LOC_RESOURCECLASS_CITY_NAME_BZ" Language="ru_RU">
+            <Text>Городской Ресурс</Text>
+        </Row>
+        <Row Tag="LOC_RESOURCECLASS_EMPIRE_NAME_BZ" Language="ru_RU">
+            <Text>Имперский Ресурс</Text>
+        </Row>
+        <Row Tag="LOC_RESOURCECLASS_FACTORY_NAME_BZ" Language="ru_RU">
+            <Text>Ресурс Фабрики</Text>
+        </Row>
+        <Row Tag="LOC_RESOURCECLASS_TREASURE_NAME_BZ" Language="ru_RU">
+            <Text>Ресурс Сокровище</Text>
+        </Row>
         <Row Tag="LOC_STATE_BZ_OBSOLETE" Language="ru_RU">
             <Text>Устарело</Text>
         </Row>

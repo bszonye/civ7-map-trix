@@ -1210,7 +1210,11 @@ class PlotTooltipType {
             if (this.expansion || this.isVerbose) {
                 const rctype = this.resource.ResourceClassType;
                 const rc = rctype && GameInfo.ResourceClasses.lookup(rctype);
-                hexSubtitle = rc && Locale.compose("LOC_BZ_RESOURCE_CLASS", rc.Name);
+                if (rc?.Name) {
+                    let rcname = rc.Name + "_BZ";
+                    console.warn(`TRIXIE ${rcname}`);
+                    hexSubtitle = Locale.keyExists(rcname) ? rcname : rc.Name;
+                }
                 hexRules.push(this.resource.Tooltip);
             }
             resourceIcon = this.resource.ResourceType;

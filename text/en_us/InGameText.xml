@@ -28,9 +28,6 @@
         <Row Tag="LOC_BZ_RELIGION_URBAN">
             <Text>Urban {1_icon} {2_name}</Text>
         </Row>
-        <InsertOrIgnore Tag="LOC_BZ_RESOURCE_CLASS">
-            <Text>{1_name} Resource</Text>
-        </InsertOrIgnore>
         <Row Tag="LOC_DISTRICT_BZ_CITY_STATE">
             <Text>City-State</Text>
         </Row>
@@ -85,6 +82,21 @@
         <InsertOrIgnore Tag="LOC_OPTIONS_GROUP_BZ_MODS">
             <Text>trixie's mods</Text>
         </InsertOrIgnore>
+        <Row Tag="LOC_RESOURCECLASS_BONUS_NAME_BZ">
+            <Text>Bonus Resource</Text>
+        </Row>
+        <Row Tag="LOC_RESOURCECLASS_CITY_NAME_BZ">
+            <Text>City Resource</Text>
+        </Row>
+        <Row Tag="LOC_RESOURCECLASS_EMPIRE_NAME_BZ">
+            <Text>Empire Resource</Text>
+        </Row>
+        <Row Tag="LOC_RESOURCECLASS_FACTORY_NAME_BZ">
+            <Text>Factory Resource</Text>
+        </Row>
+        <Row Tag="LOC_RESOURCECLASS_TREASURE_NAME_BZ">
+            <Text>Treasure Resource</Text>
+        </Row>
         <Row Tag="LOC_STATE_BZ_OBSOLETE">
             <Text>Obsolete</Text>
         </Row>
