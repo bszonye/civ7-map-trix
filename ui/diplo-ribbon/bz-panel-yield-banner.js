@@ -34,7 +34,7 @@ BZ_HEAD_STYLE.textContent = `
     background-color: #a6cc33aa;
 }
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-production {
-    background-color: #a33d2944;
+    background-color: #a33d2955;
 }
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-production:hover {
     background-color: #a33d29aa;
@@ -46,7 +46,7 @@ BZ_HEAD_STYLE.textContent = `
     background-color: #f0c442aa;
 }
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-influence {
-    background-color: #99e6bf44;
+    background-color: #99e6bf66;
 }
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-influence:hover {
     background-color: #99e6bfaa;
@@ -58,7 +58,7 @@ BZ_HEAD_STYLE.textContent = `
     background-color: #80bfffaa;
 }
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-culture {
-    background-color: #bf99e655;
+    background-color: #bf99e666;
 }
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-culture:hover {
     background-color: #bf99e6aa;
