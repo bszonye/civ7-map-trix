@@ -28,6 +28,9 @@
         <Row Tag="LOC_BZ_RELIGION_URBAN">
             <Text>Urban {1_icon} {2_name}</Text>
         </Row>
+        <InsertOrIgnore Tag="LOC_BZ_RESOURCE_CLASS">
+            <Text>{1_name} Resource</Text>
+        </InsertOrIgnore>
         <Row Tag="LOC_DISTRICT_BZ_CITY_STATE">
             <Text>City-State</Text>
         </Row>

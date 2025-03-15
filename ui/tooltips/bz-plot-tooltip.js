@@ -39,6 +39,9 @@ BZ_HEAD_STYLE.textContent = [
     padding-left: calc(var(--padding-left-right) - ${BZ_BORDER_WIDTH});
     padding-right: calc(var(--padding-left-right) - ${BZ_BORDER_WIDTH});
 }`,
+`.bz-text-xxs {
+    font-size: 0.7777777778rem;
+}`,
 // centers blocks of rules text with max-w-60 equivalent
 // IMPORTANT: Locale.stylize wraps text in an extra <p> element when it
 // contains icons, which interferes with text-align and max-width.  the
@@ -712,7 +715,6 @@ class PlotTooltipType {
             }
             if (best) {
                 const info = GameInfo.Constructibles.lookup(best.constructible);
-                // TODO: translate LOC_BZ_IMPROVEMENT_FOR_WAREHOUSE
                 const format =
                     this.improvement ? "LOC_BZ_IMPROVEMENT_FOR_WAREHOUSE" :
                     this.resource ?  "LOC_BZ_IMPROVEMENT_FOR_RESOURCE" :
@@ -1129,7 +1131,7 @@ class PlotTooltipType {
         const quarterOK = this.buildings.reduce((a, b) =>
             a + (b.isCurrent ? b.isLarge ? 2 : 1 : 0), 0);
         let hexName = GameInfo.Districts.lookup(this.district?.type).Name;
-        let hexSubtitle;
+        let hexSubhead;
         let hexRules;
         // set name & description
         if (this.district.type == DistrictTypes.CITY_CENTER) {
@@ -1139,7 +1141,7 @@ class PlotTooltipType {
                 const bonusType = Game.CityStates.getBonusType(owner.id);
                 const bonus = GameInfo.CityStateBonuses.find(b => b.$hash == bonusType);
                 if (bonus) {
-                    hexSubtitle = bonus.Name;
+                    hexSubhead = bonus.Name;
                     hexRules = bonus.Description;  // .Tooltip doesn't exist
                 }
             } else if (this.city.isTown) {
@@ -1172,7 +1174,7 @@ class PlotTooltipType {
         // show rules for city-states and unique quarters
         if (hexRules && this.isVerbose) {
             const title = "font-title uppercase text-xs leading-snug";
-            if (hexSubtitle) this.renderRules([hexSubtitle], '', title);
+            if (hexSubhead) this.renderRules([hexSubhead], '', title);
             this.renderRules([hexRules]);
         }
         // constructibles
@@ -1199,14 +1201,16 @@ class PlotTooltipType {
         } else if (this.feature?.Tooltip) {
             // natural wonder
             hexName = this.feature.Name;
-            hexRules.push(this.feature.Tooltip);
+            if (!this.improvement || this.isVerbose) {
+                hexRules.push(this.feature.Tooltip);
+            }
         } else if (this.resource) {
             // resource
             hexName = this.resource.Name;
             if (this.expansion || this.isVerbose) {
                 const rctype = this.resource.ResourceClassType;
                 const rc = rctype && GameInfo.ResourceClasses.lookup(rctype);
-                hexSubtitle = rc?.Name;
+                hexSubtitle = rc && Locale.compose("LOC_BZ_RESOURCE_CLASS", rc.Name);
                 hexRules.push(this.resource.Tooltip);
             }
             resourceIcon = this.resource.ResourceType;
@@ -1227,7 +1231,7 @@ class PlotTooltipType {
         if (hexName) this.renderTitleDivider(Locale.compose(hexName));
         // optional description
         if (hexRules.length) {
-            const title = "font-title uppercase text-xs leading-snug";
+            const title = "bz-text-xxs leading-none mb-2";
             if (hexSubtitle) this.renderRules([hexSubtitle], '', title);
             this.renderRules(hexRules);
         }
@@ -1245,8 +1249,7 @@ class PlotTooltipType {
         this.renderTitleDivider(Locale.compose(this.wonder.info.Name));
         if (this.wonder.notes) {
             const ttState = document.createElement("div");
-            ttState.classList.value = "text-xs leading-none text-center";
-            ttState.style.setProperty("font-size", "85%");
+            ttState.classList.value = "bz-text-xxs leading-none text-center";
             ttState.innerHTML = dotJoinLocale(this.wonder.notes);
             this.container.appendChild(ttState);
         }
@@ -1267,7 +1270,7 @@ class PlotTooltipType {
             const notes = dotJoinLocale(c.notes);
             if (notes) {
                 const ttState = document.createElement("div");
-                ttState.style.setProperty("font-size", "85%");
+                ttState.classList.value = "bz-text-xxs";
                 if (c.isDamaged) {
                     setCapsuleStyle(ttState, BZ_ALERT.amber, "mb-0\\.5");
                 } else {
@@ -1281,8 +1284,8 @@ class PlotTooltipType {
         // expansion type for undeveloped & upgraded tiles
         if (this.expansion) {
             const tt = document.createElement("div");
+            if (this.constructibles.length) tt.classList.value = "bz-text-xxs";
             tt.setAttribute("data-l10n-id", this.expansion.text);
-            if (this.constructibles.length) tt.style.setProperty("font-size", "85%");
             ttList.appendChild(tt);
         }
         this.container.appendChild(ttList);
