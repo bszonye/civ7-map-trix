@@ -1212,10 +1212,21 @@ class PlotTooltipType {
                 const rc = rctype && GameInfo.ResourceClasses.lookup(rctype);
                 if (rc?.Name) {
                     let rcname = rc.Name + "_BZ";
-                    console.warn(`TRIXIE ${rcname}`);
                     hexSubtitle = Locale.keyExists(rcname) ? rcname : rc.Name;
                 }
-                hexRules.push(this.resource.Tooltip);
+                let rules = this.resource.Tooltip;
+                if (rctype == "RESOURCECLASS_FACTORY") {
+                    // remove redundant "Factory Resource." from tooltip
+                    rules = Locale.compose(rules);
+                    const prefix = Locale.compose(hexSubtitle).toUpperCase();
+                    if (prefix && rules.toUpperCase().startsWith(prefix)) {
+                        rules = rules.slice(prefix.length);
+                        rules = rules.replace(/^[,.:。]\s*|[.。]$/g, '');
+                    } else {
+                        console.warn(`bz-plot-tooltip: [${rules}] doesn't start with expected prefix [${prefix}]`);
+                    }
+                }
+                hexRules.push(rules);
             }
             resourceIcon = this.resource.ResourceType;
         } else if (this.district?.type) {
