@@ -82,6 +82,21 @@
         <InsertOrIgnore Tag="LOC_OPTIONS_GROUP_BZ_MODS" Language="de_DE">
             <Text>Trixies mods</Text>
         </InsertOrIgnore>
+        <Row Tag="LOC_RESOURCECLASS_BONUS_NAME_BZ" Language="de_DE">
+            <Text>Bonus-Ressource</Text>
+        </Row>
+        <Row Tag="LOC_RESOURCECLASS_CITY_NAME_BZ" Language="de_DE">
+            <Text>Stadtressource</Text>
+        </Row>
+        <Row Tag="LOC_RESOURCECLASS_EMPIRE_NAME_BZ" Language="de_DE">
+            <Text>Reich-Ressource</Text>
+        </Row>
+        <Row Tag="LOC_RESOURCECLASS_FACTORY_NAME_BZ" Language="de_DE">
+            <Text>Fabrikressource</Text>
+        </Row>
+        <Row Tag="LOC_RESOURCECLASS_TREASURE_NAME_BZ" Language="de_DE">
+            <Text>Schatzressource</Text>
+        </Row>
         <Row Tag="LOC_STATE_BZ_OBSOLETE" Language="de_DE">
             <Text>Veraltet</Text>
         </Row>
