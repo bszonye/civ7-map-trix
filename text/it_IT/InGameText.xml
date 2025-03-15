@@ -62,25 +62,25 @@
             <Text>Popolo di {1_name}</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_FIX_RELATIONSHIP_TOOLTIPS" Language="it_IT">
-            <Text>corregge la larghezza degli strumenti di relazione</Text>
+            <Text>correggi la larghezza dei tooltip sulle relazioni</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_FIX_RELATIONSHIP_TOOLTIPS_DESCRIPTION" Language="it_IT">
-            <Text>[B]Map Trix:[/B] Risolve un errore di formattazione che rende gli strumenti di relazione molto più ampi di quanto dovrebbero essere.</Text>
+            <Text>[B]Map Trix:[/B] Corregge un bug di formattazione che rende i tooltip sulle relazioni molto più larghi di quanto dovrebbero essere.</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE" Language="it_IT">
-            <Text>strumenti mappa dettagliati</Text>
+            <Text>tooltip mappa dettagliati</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE_DESCRIPTION" Language="it_IT">
-            <Text>[B]Map Trix:[/B] Mostra informazioni estese sullo strumento mappa. Se deselezionato, puoi mostrare informazioni dettagliate tenendo premuto Ctrl o Maiusc.</Text>
+            <Text>[B]Map Trix:[/B] Mostra informazioni dettagliate nei tooltip. Se deselezionato, puoi visualizzare informazioni dettagliate tenendo premuto Ctrl o Shift.</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER" Language="it_IT">
-            <Text>ridisegna la barra di rese</Text>
+            <Text>restyling del banner delle rese</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER_DESCRIPTION" Language="it_IT">
-            <Text>[B]Map Trix:[/B] Ridisegna la barra superiore per abbinarla ai colori arrotondati evidenziati nelle mod di Trixie.</Text>
+            <Text>[B]Map Trix:[/B] Modifica lo stile della barra superiore per adattarla agli evidenziamenti arrotondati colorati nelle mod di trixie.</Text>
         </Row>
         <InsertOrIgnore Tag="LOC_OPTIONS_GROUP_BZ_MODS" Language="it_IT">
-            <Text>le mod di Trixie</Text>
+            <Text>mod di Trixie</Text>
         </InsertOrIgnore>
         <Row Tag="LOC_STATE_BZ_OBSOLETE" Language="it_IT">
             <Text>Obsoleto</Text>
@@ -89,7 +89,7 @@
             <Text>Unico</Text>
         </Row>
         <Row Tag="LOC_YIELD_BZ_TOTAL" Language="it_IT">
-            <Text>Resa Totale</Text>
+            <Text>Rese Totali</Text>
         </Row>
     </LocalizedText>
 </Database>
