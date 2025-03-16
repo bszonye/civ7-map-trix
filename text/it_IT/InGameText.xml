@@ -62,22 +62,22 @@
             <Text>Popolo di {1_name}</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_FIX_RELATIONSHIP_TOOLTIPS" Language="it_IT">
-            <Text>correggi la larghezza dei tooltip sulle relazioni</Text>
+            <Text>[B]Map Trix:[/B] correggi la larghezza dei tooltip sulle relazioni</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_FIX_RELATIONSHIP_TOOLTIPS_DESCRIPTION" Language="it_IT">
-            <Text>[B]Map Trix:[/B] Corregge un bug di formattazione che rende i tooltip sulle relazioni molto più larghi di quanto dovrebbero essere.</Text>
+            <Text>Corregge un bug di formattazione che rende i tooltip sulle relazioni molto più larghi di quanto dovrebbero essere.</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE" Language="it_IT">
-            <Text>tooltip mappa dettagliati</Text>
+            <Text>[B]Map Trix:[/B] tooltip mappa dettagliati</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE_DESCRIPTION" Language="it_IT">
-            <Text>[B]Map Trix:[/B] Mostra informazioni dettagliate nei tooltip. Se deselezionato, puoi visualizzare informazioni dettagliate tenendo premuto Ctrl o Shift.</Text>
+            <Text>Mostra informazioni dettagliate nei tooltip. Se deselezionato, puoi visualizzare informazioni dettagliate tenendo premuto Ctrl o Shift.</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER" Language="it_IT">
-            <Text>restyling del banner delle rese</Text>
+            <Text>[B]Map Trix:[/B] restyling del banner delle rese</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER_DESCRIPTION" Language="it_IT">
-            <Text>[B]Map Trix:[/B] Modifica lo stile della barra superiore per adattarla agli evidenziamenti arrotondati colorati nelle mod di trixie.</Text>
+            <Text>Modifica lo stile della barra superiore per adattarla agli evidenziamenti arrotondati colorati nelle mod di trixie.</Text>
         </Row>
         <InsertOrIgnore Tag="LOC_OPTIONS_GROUP_BZ_MODS" Language="it_IT">
             <Text>mod di Trixie</Text>

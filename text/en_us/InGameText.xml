@@ -65,19 +65,19 @@
             <Text>fix relationship tooltip width</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_FIX_RELATIONSHIP_TOOLTIPS_DESCRIPTION">
-            <Text>[B]Map Trix:[/B] Fixes a formatting bug that makes relationship tooltips much wider than they should be.</Text>
+            <Text>Fixes a formatting bug that makes relationship tooltips much wider than they should be.</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE">
-            <Text>verbose map tooltips</Text>
+            <Text>[B]Map Trix:[/B] verbose map tooltips</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE_DESCRIPTION">
-            <Text>[B]Map Trix:[/B] Shows extended tooltip information.  When unchecked, you can show verbose information by holding down Ctrl or Shift.</Text>
+            <Text>Shows extended tooltip information.  When unchecked, you can show verbose information by holding down Ctrl or Shift.</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER">
-            <Text>restyle yield banner</Text>
+            <Text>[B]Map Trix:[/B] restyle yield banner</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER_DESCRIPTION">
-            <Text>[B]Map Trix:[/B] Restyles the top bar to match the rounded color highlights in trixie's mods.</Text>
+            <Text>Restyles the top bar to match the rounded color highlights in trixie's mods.</Text>
         </Row>
         <InsertOrIgnore Tag="LOC_OPTIONS_GROUP_BZ_MODS">
             <Text>trixie's mods</Text>
