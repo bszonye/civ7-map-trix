@@ -1218,6 +1218,10 @@ class PlotTooltipType {
                 if (rctype == "RESOURCECLASS_FACTORY") {
                     // remove redundant "Factory Resource." from tooltip
                     rules = Locale.compose(rules);
+                    // remove pokiehl's stylish resource icon
+                    const stylishIcon = /\s*\[icon:NOTIFICATION_DISCOVER_RESOURCE\]/;
+                    rules = rules.replace(stylishIcon, '');
+                    // remove redundant prefix + punctuation + optional whitespace
                     const prefix = Locale.compose(hexSubtitle).toUpperCase();
                     if (prefix && rules.toUpperCase().startsWith(prefix)) {
                         rules = rules.slice(prefix.length);
