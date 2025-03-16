@@ -62,19 +62,19 @@
             <Text>Popolo di {1_name}</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_FIX_RELATIONSHIP_TOOLTIPS" Language="it_IT">
-            <Text>[B]Map Trix:[/B] correggi la larghezza dei tooltip sulle relazioni</Text>
+            <Text>Map Trix • correggi la larghezza dei tooltip sulle relazioni</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_FIX_RELATIONSHIP_TOOLTIPS_DESCRIPTION" Language="it_IT">
             <Text>Corregge un bug di formattazione che rende i tooltip sulle relazioni molto più larghi di quanto dovrebbero essere.</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE" Language="it_IT">
-            <Text>[B]Map Trix:[/B] tooltip mappa dettagliati</Text>
+            <Text>Map Trix • tooltip mappa dettagliati</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE_DESCRIPTION" Language="it_IT">
             <Text>Mostra informazioni dettagliate nei tooltip. Se deselezionato, puoi visualizzare informazioni dettagliate tenendo premuto Ctrl o Shift.</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER" Language="it_IT">
-            <Text>[B]Map Trix:[/B] restyling del banner delle rese</Text>
+            <Text>Map Trix • restyling del banner delle rese</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER_DESCRIPTION" Language="it_IT">
             <Text>Modifica lo stile della barra superiore per adattarla agli evidenziamenti arrotondati colorati nelle mod di trixie.</Text>
