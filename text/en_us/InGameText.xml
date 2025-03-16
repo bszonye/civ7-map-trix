@@ -62,26 +62,41 @@
             <Text>{1_name} People</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_FIX_RELATIONSHIP_TOOLTIPS">
-            <Text>fix relationship tooltip width</Text>
+            <Text>Map Trix • fix relationship tooltip width</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_FIX_RELATIONSHIP_TOOLTIPS_DESCRIPTION">
-            <Text>[B]Map Trix:[/B] Fixes a formatting bug that makes relationship tooltips much wider than they should be.</Text>
+            <Text>Fixes a formatting bug that makes relationship tooltips much wider than they should be.</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE">
-            <Text>verbose map tooltips</Text>
+            <Text>Map Trix • verbose map tooltips</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE_DESCRIPTION">
-            <Text>[B]Map Trix:[/B] Shows extended tooltip information.  When unchecked, you can show verbose information by holding down Ctrl or Shift.</Text>
+            <Text>Shows extended tooltip information.  When unchecked, you can show verbose information by holding down Ctrl or Shift.</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER">
-            <Text>restyle yield banner</Text>
+            <Text>Map Trix • restyle yield banner</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER_DESCRIPTION">
-            <Text>[B]Map Trix:[/B] Restyles the top bar to match the rounded color highlights in trixie's mods.</Text>
+            <Text>Restyles the top bar to match the rounded color highlights in trixie's mods.</Text>
         </Row>
         <InsertOrIgnore Tag="LOC_OPTIONS_GROUP_BZ_MODS">
             <Text>trixie's mods</Text>
         </InsertOrIgnore>
+        <Row Tag="LOC_RESOURCECLASS_BONUS_NAME_BZ">
+            <Text>Bonus Resource</Text>
+        </Row>
+        <Row Tag="LOC_RESOURCECLASS_CITY_NAME_BZ">
+            <Text>City Resource</Text>
+        </Row>
+        <Row Tag="LOC_RESOURCECLASS_EMPIRE_NAME_BZ">
+            <Text>Empire Resource</Text>
+        </Row>
+        <Row Tag="LOC_RESOURCECLASS_FACTORY_NAME_BZ">
+            <Text>Factory Resource</Text>
+        </Row>
+        <Row Tag="LOC_RESOURCECLASS_TREASURE_NAME_BZ">
+            <Text>Treasure Resource</Text>
+        </Row>
         <Row Tag="LOC_STATE_BZ_OBSOLETE">
             <Text>Obsolete</Text>
         </Row>

@@ -62,26 +62,41 @@
             <Text>Volk der {1_name}</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_FIX_RELATIONSHIP_TOOLTIPS" Language="de_DE">
-            <Text>behebt die Breite der Beziehungstools</Text>
+            <Text>Map Trix • behebt die Breite der Beziehungstools</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_FIX_RELATIONSHIP_TOOLTIPS_DESCRIPTION" Language="de_DE">
-            <Text>[B]Map Trix:[/B] Behebt einen Formatierungsfehler, der Beziehungstools viel breiter macht, als sie sein sollten.</Text>
+            <Text>Behebt einen Formatierungsfehler, der Beziehungstools viel breiter macht, als sie sein sollten.</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE" Language="de_DE">
-            <Text>ausführliche Kartentools</Text>
+            <Text>Map Trix • ausführliche Kartentools</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE_DESCRIPTION" Language="de_DE">
-            <Text>[B]Map Trix:[/B] Zeigt erweiterte Kartentools an. Wenn diese Option deaktiviert ist, können Sie ausführliche Informationen anzeigen, indem Sie Strg oder Umschalt gedrückt halten.</Text>
+            <Text>Zeigt erweiterte Kartentools an. Wenn diese Option deaktiviert ist, können Sie ausführliche Informationen anzeigen, indem Sie Strg oder Umschalt gedrückt halten.</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER" Language="de_DE">
-            <Text>gestaltet das Ertragsbanner neu</Text>
+            <Text>Map Trix • gestaltet das Ertragsbanner neu</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER_DESCRIPTION" Language="de_DE">
-            <Text>[B]Map Trix:[/B] Ändert die obere Leiste so, dass sie den abgerundeten Farbhervorhebungen in Trixies Mods entspricht.</Text>
+            <Text>Ändert die obere Leiste so, dass sie den abgerundeten Farbhervorhebungen in Trixies Mods entspricht.</Text>
         </Row>
         <InsertOrIgnore Tag="LOC_OPTIONS_GROUP_BZ_MODS" Language="de_DE">
             <Text>Trixies mods</Text>
         </InsertOrIgnore>
+        <Row Tag="LOC_RESOURCECLASS_BONUS_NAME_BZ" Language="de_DE">
+            <Text>Bonus-Ressource</Text>
+        </Row>
+        <Row Tag="LOC_RESOURCECLASS_CITY_NAME_BZ" Language="de_DE">
+            <Text>Stadtressource</Text>
+        </Row>
+        <Row Tag="LOC_RESOURCECLASS_EMPIRE_NAME_BZ" Language="de_DE">
+            <Text>Reich-Ressource</Text>
+        </Row>
+        <Row Tag="LOC_RESOURCECLASS_FACTORY_NAME_BZ" Language="de_DE">
+            <Text>Fabrikressource</Text>
+        </Row>
+        <Row Tag="LOC_RESOURCECLASS_TREASURE_NAME_BZ" Language="de_DE">
+            <Text>Schatzressource</Text>
+        </Row>
         <Row Tag="LOC_STATE_BZ_OBSOLETE" Language="de_DE">
             <Text>Veraltet</Text>
         </Row>

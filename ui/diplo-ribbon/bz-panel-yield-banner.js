@@ -2,6 +2,8 @@ import { PanelYieldBanner } from '/base-standard/ui/diplo-ribbon/panel-yield-ban
 
 const BZ_HEAD_STYLE = document.createElement('style');
 BZ_HEAD_STYLE.textContent = `
+.bz-yield-banner .panel-yield__top-bar-content .text-yield-food,
+.bz-yield-banner .panel-yield__top-bar-content .text-yield-production,
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-gold,
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-influence,
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-science,
@@ -15,6 +17,8 @@ BZ_HEAD_STYLE.textContent = `
     transition: color 0.25s cubic-bezier(0.215, 0.61, 0.355, 1);
     transition: background-color 0.25s cubic-bezier(0.215, 0.61, 0.355, 1);
 }
+.bz-yield-banner .panel-yield__top-bar-content .text-yield-food:hover,
+.bz-yield-banner .panel-yield__top-bar-content .text-yield-production:hover,
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-gold:hover,
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-influence:hover,
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-science:hover,
@@ -23,6 +27,18 @@ BZ_HEAD_STYLE.textContent = `
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-cities:hover {
     color: #e5e5e5;  /* text-accent-1 */
 }
+.bz-yield-banner .panel-yield__top-bar-content .text-yield-food {
+    background-color: #a6cc3344;
+}
+.bz-yield-banner .panel-yield__top-bar-content .text-yield-food:hover {
+    background-color: #a6cc33aa;
+}
+.bz-yield-banner .panel-yield__top-bar-content .text-yield-production {
+    background-color: #a33d2955;
+}
+.bz-yield-banner .panel-yield__top-bar-content .text-yield-production:hover {
+    background-color: #a33d29aa;
+}
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-gold {
     background-color: #f0c44244;
 }
@@ -30,7 +46,7 @@ BZ_HEAD_STYLE.textContent = `
     background-color: #f0c442aa;
 }
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-influence {
-    background-color: #99e6bf44;
+    background-color: #99e6bf66;
 }
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-influence:hover {
     background-color: #99e6bfaa;
@@ -42,7 +58,7 @@ BZ_HEAD_STYLE.textContent = `
     background-color: #80bfffaa;
 }
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-culture {
-    background-color: #bf99e655;
+    background-color: #bf99e666;
 }
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-culture:hover {
     background-color: #bf99e6aa;
