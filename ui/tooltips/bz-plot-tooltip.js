@@ -64,7 +64,7 @@ BZ_HEAD_STYLE.textContent = [
 }`,
 // fix relationship tooltips
 `.bz-relationship-fix .tooltip.relationship-tooltip {
-    max-width: 17.7777777778rem;
+    max-width: 20rem;
 }
 .bz-relationship-fix .relationship-tooltip__agenda-description {
     width: 100%;
