@@ -1380,7 +1380,6 @@ class PlotTooltipType {
         if (!icon.startsWith("url(")) icon = UI.getIconCSS(icon);
         if (overlay && !overlay.startsWith("url(")) overlay = UI.getIconCSS(overlay);
         preloadIcon(icon);  // prevent flicker
-        preloadIcon(overlay);
         const layout = document.createElement("div");
         layout.classList.add("flex-grow", "relative");
         const base = document.createElement("div");
@@ -1391,6 +1390,7 @@ class PlotTooltipType {
         } else {
             // tech icons need a frame
             base.classList.add("size-10", "relative", "z-1");
+            preloadIcon(BZ_ICON_FRAME);  // prevent flicker
             const frame = document.createElement("div");
             frame.classList.value = iconStyle;
             frame.classList.add("size-14", "absolute", "z-0");
@@ -1402,6 +1402,7 @@ class PlotTooltipType {
         base.style.backgroundImage = icon;
         layout.appendChild(base);
         if (overlay) {
+            preloadIcon(overlay);  // prevent flicker
             const over = document.createElement("div");
             over.classList.value = iconStyle;
             over.classList.add("size-9", "absolute", "top-1\\.5", "left-1\\.5");
