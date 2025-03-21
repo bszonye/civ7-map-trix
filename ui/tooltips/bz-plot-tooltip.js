@@ -421,7 +421,6 @@ class PlotTooltipType {
         this.largeBuildings = gatherBuildingsTagged("FULL_TILE");
         Loading.runWhenFinished(() => {
             for (const y of GameInfo.Yields) {
-                // const url = UI.getIcon(`${y.YieldType}`, "YIELD");
                 // Controls.preloadImage(url, 'plot-tooltip');
                 preloadIcon(`${y.YieldType}`, "YIELD");
             }
@@ -707,6 +706,7 @@ class PlotTooltipType {
             }
         }
         // get the improvement type for rural and undeveloped tiles
+        // (but skip special districts like discoveries and villages)
         if (this.improvement && !this.improvement.districtName || !this.district) {
             const geography = [
                 this.terrain?.TerrainType,
