@@ -64,7 +64,7 @@ BZ_HEAD_STYLE.textContent = [
 }`,
 // fix relationship tooltips
 `.bz-relationship-fix .tooltip.relationship-tooltip {
-    max-width: 17.7777777778rem;
+    max-width: 20rem;
 }
 .bz-relationship-fix .relationship-tooltip__agenda-description {
     width: 100%;
@@ -95,11 +95,34 @@ const BZ_URBAN_TYPES = [DistrictTypes.CITY_CENTER, DistrictTypes.URBAN];
 // constructible type for independent settlements
 const BZ_VILLAGE_TYPES = ["IMPROVEMENT_VILLAGE", "IMPROVEMENT_ENCAMPMENT"];
 
-// total yield icons
-const BZ_YIELD_TOTAL_RURAL = "CITY_RURAL";
-const BZ_YIELD_TOTAL_URBAN = "CITY_URBAN";
-// empty building slot
-const BZ_SLOT_EMPTY = "BUILDING_OPEN";
+// custom & adapted icons
+const BZ_ICON_DISCOVERY = 'url("blp:tech_cartography")';
+const BZ_ICON_EMPTY_SLOT = "BUILDING_OPEN";
+const BZ_ICON_FRAME = 'url("hud_sub_circle_bk")';
+const BZ_ICON_TOTAL_RURAL = "CITY_RURAL";  // total yield (rural)
+const BZ_ICON_TOTAL_URBAN = "CITY_URBAN";  // total yield (urban)
+const BZ_ICON_VILLAGE_TYPES = {  // by city-state type and age
+    "MILITARISTIC": [
+        "IMPROVEMENT_HILLFORT",
+        "IMPROVEMENT_KASBAH",
+        "IMPROVEMENT_SHORE_BATTERY",
+    ],
+    "CULTURAL": [
+        "IMPROVEMENT_MEGALITH",
+        "IMPROVEMENT_STONE_HEAD",
+        "IMPROVEMENT_OPEN_AIR_MUSEUM",
+    ],
+    "ECONOMIC": [
+        "IMPROVEMENT_SOUQ",
+        "IMPROVEMENT_TRADING_FACTORY",
+        "IMPROVEMENT_ENTREPOT",
+    ],
+    "SCIENTIFIC": [
+        "IMPROVEMENT_ZIGGURAT",
+        "IMPROVEMENT_MONASTERY",
+        "IMPROVEMENT_INSTITUTE",
+    ]
+};
 
 // color palette
 const BZ_COLOR = {
@@ -309,38 +332,25 @@ function getTopUnit(loc) {
     return null;
 }
 function getVillageIcon(owner, age) {
-    const villages = {
-        "MILITARISTIC": [
-            "IMPROVEMENT_HILLFORT",
-            "IMPROVEMENT_KASBAH",
-            "IMPROVEMENT_SHORE_BATTERY",
-        ],
-        "CULTURAL": [
-            "IMPROVEMENT_MEGALITH",
-            "IMPROVEMENT_STONE_HEAD",
-            "IMPROVEMENT_OPEN_AIR_MUSEUM",
-        ],
-        "ECONOMIC": [
-            "IMPROVEMENT_SOUQ",
-            "IMPROVEMENT_TRADING_FACTORY",
-            "IMPROVEMENT_ENTREPOT",
-        ],
-        "SCIENTIFIC": [
-            "IMPROVEMENT_ZIGGURAT",
-            "IMPROVEMENT_MONASTERY",
-            "IMPROVEMENT_INSTITUTE",
-        ]
-    };
     // get the minor civ type
     let ctype = "MILITARISTIC";  // default
     GameInfo.Independents.forEach(i => {
         if (owner.civilizationAdjective == i.CityStateName) ctype = i.CityStateType;
     });
     // select an icon
-    const icons = villages[ctype ?? "MILITARISTIC"];
+    const icons = BZ_ICON_VILLAGE_TYPES[ctype ?? "MILITARISTIC"];
     const index = age?.ChronologyIndex ?? 0;
     const icon = icons.at(index) ?? icons.at(-1);
     return icon;
+}
+const BZ_PRELOADED_ICONS = {};
+function preloadIcon(icon, context) {
+    if (!icon) return;
+    const url = icon.startsWith("url(")  ? icon : UI.getIcon(icon, context);
+    const name = url.replace(/url|[(\042\047)]/g, '');  // \042\047 = quotation marks
+    if (!name || name in BZ_PRELOADED_ICONS) return;
+    BZ_PRELOADED_ICONS[name] = true;
+    Controls.preloadImage(name, 'plot-tooltip');
 }
 function setStyle(element, style) {
     if (!element || !style) return;
@@ -411,17 +421,14 @@ class PlotTooltipType {
         this.largeBuildings = gatherBuildingsTagged("FULL_TILE");
         Loading.runWhenFinished(() => {
             for (const y of GameInfo.Yields) {
-                const url = UI.getIcon(`${y.YieldType}`, "YIELD");
-                Controls.preloadImage(url, 'plot-tooltip');
+                // Controls.preloadImage(url, 'plot-tooltip');
+                preloadIcon(`${y.YieldType}`, "YIELD");
             }
-            for (const y of [BZ_YIELD_TOTAL_RURAL, BZ_YIELD_TOTAL_URBAN]) {
-                const url = UI.getIcon(y, "YIELD");
-                Controls.preloadImage(url, 'plot-tooltip');
+            for (const y of [BZ_ICON_TOTAL_RURAL, BZ_ICON_TOTAL_URBAN]) {
+                preloadIcon(y, "YIELD");
             }
-            for (const icon of [BZ_SLOT_EMPTY]) {
-                const url = UI.getIcon(icon);
-                Controls.preloadImage(url, 'plot-tooltip');
-            }
+            // stop flicker in Sukritact's city banner tooltip
+            Controls.preloadImage("hud_sub_circle_bk", "city-banner");
         });
     }
     getHTML() {
@@ -692,14 +699,15 @@ class PlotTooltipType {
                 this.improvement.districtName = "LOC_DISTRICT_BZ_INDEPENDENT";
             } else if (this.improvement?.info.Discovery) {
                 // discoveries don't have an icon, but here's a nice map
-                this.improvement.icon = "url('blp:tech_cartography')";
+                this.improvement.icon = BZ_ICON_DISCOVERY;
                 this.improvement.districtName = "LOC_DISTRICT_BZ_DISCOVERY";
             } else {
                 this.improvement.icon = info.ConstructibleType;
             }
         }
         // get the improvement type for rural and undeveloped tiles
-        if (this.improvement || !this.district) {
+        // (but skip special districts like discoveries and villages)
+        if (this.improvement && !this.improvement.districtName || !this.district) {
             const geography = [
                 this.terrain?.TerrainType,
                 this.biome?.BiomeType,
@@ -751,7 +759,7 @@ class PlotTooltipType {
         if (!this.totalYields) return;
         // total yield column
         const type = BZ_URBAN_TYPES.includes(this.district?.type) ?
-            BZ_YIELD_TOTAL_URBAN : BZ_YIELD_TOTAL_RURAL;
+            BZ_ICON_TOTAL_URBAN : BZ_ICON_TOTAL_RURAL;
         const column = { name: "LOC_YIELD_BZ_TOTAL", type, value: this.totalYields };
         this.yields.push(column);
     }
@@ -1190,14 +1198,15 @@ class PlotTooltipType {
         this.renderUrbanDivider();
     }
     renderRuralSection() {
-        let hexName = this.improvement?.districtName;
+        let hexName;
         let hexSubtitle;
         let hexRules = [];
         let hexIcon = this.improvement?.icon;
         let resourceIcon;
         // set name & description
-        if (hexName) {
-            // set by Village or Discovery special improvements
+        if (this.improvement?.districtName) {
+            // village or discovery
+            hexName = this.improvement?.districtName;
         } else if (this.feature?.Tooltip) {
             // natural wonder
             hexName = this.feature.Name;
@@ -1370,16 +1379,33 @@ class PlotTooltipType {
         // icon divider with optional overlay
         if (!icon.startsWith("url(")) icon = UI.getIconCSS(icon);
         if (overlay && !overlay.startsWith("url(")) overlay = UI.getIconCSS(overlay);
+        preloadIcon(icon);  // prevent flicker
         const layout = document.createElement("div");
         layout.classList.add("flex-grow", "relative");
         const base = document.createElement("div");
         const iconStyle = "bg-contain bg-center -my-1 mx-3";  // tight vertical
-        base.classList.value = `${iconStyle} size-12`;
+        base.classList.value = iconStyle;
+        if (icon.search(/blp:tech_/) == -1) {
+            base.classList.add("size-12");
+        } else {
+            // tech icons need a frame
+            base.classList.add("size-10", "relative", "z-1");
+            preloadIcon(BZ_ICON_FRAME);  // prevent flicker
+            const frame = document.createElement("div");
+            frame.classList.value = iconStyle;
+            frame.classList.add("size-14", "absolute", "z-0");
+            frame.style.setProperty("top", "-0.3333333333rem");
+            frame.style.setProperty("left", "-0.5rem");
+            frame.style.backgroundImage = BZ_ICON_FRAME;
+            layout.appendChild(frame);
+        }
         base.style.backgroundImage = icon;
         layout.appendChild(base);
         if (overlay) {
+            preloadIcon(overlay);  // prevent flicker
             const over = document.createElement("div");
-            over.classList.value = `${iconStyle} size-9 absolute top-1\\.5 left-1\\.5`;
+            over.classList.value = iconStyle;
+            over.classList.add("size-9", "absolute", "top-1\\.5", "left-1\\.5");
             over.style.backgroundImage = overlay;
             layout.appendChild(over);
         }
@@ -1396,7 +1422,7 @@ class PlotTooltipType {
         for (const slot of slots) {
             // if the building has more than one yield type, like the
             // Palace, use one type for the ring and one for the glow
-            const icon = slot?.info.ConstructibleType ?? BZ_SLOT_EMPTY;
+            const icon = slot?.info.ConstructibleType ?? BZ_ICON_EMPTY_SLOT;
             const yields = adjacencyYield(slot?.info);
             const blank = "#0000";
             const slotColor = slot ? BZ_YIELD_COLOR[yields.at(0) ?? null] : blank;
@@ -1410,6 +1436,7 @@ class PlotTooltipType {
             if (isCurrent) ttFrame.style.setProperty(
                 "box-shadow", `0rem 0rem 0.33333rem 0.16667rem ${glowColor}`);
             // display the icon
+            preloadIcon(icon);  // prevent flicker
             const ttIcon = document.createElement("div");
             ttIcon.classList.value = "bg-contain bg-center size-12";
             ttIcon.style.backgroundImage = UI.getIconCSS(icon);
