@@ -60,5 +60,7 @@ supported languages:
 - Italian (translated by leonardfactory)
 - Korean (translated by Hotsolidinfill)
 - Russian (translated by Webrok)
+- Simplified Chinese (translated by v480615)
+- Traditional Chinese (translated by v480615)
 
 thank you all for your help!

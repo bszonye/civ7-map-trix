@@ -15,7 +15,7 @@
     </Dependencies>
     <ActionCriteria>
         <Criteria id="always">
-            <AlwaysMet></AlwaysMet>
+            <AlwaysMet/>
         </Criteria>
     </ActionCriteria>
     <ActionGroups>
@@ -34,6 +34,8 @@
                     <Item locale="it_IT">text/it_IT/InGameText.xml</Item>
                     <Item locale="ko_KR">text/ko_kr/InGameText.xml</Item>
                     <Item locale="ru_RU">text/ru_RU/InGameText.xml</Item>
+                    <Item locale="zh_Hans_CN">text/zh_Hans_CN/InGameText.xml</Item>
+                    <Item locale="zh_Hant_HK">text/zh_Hant_HK/InGameText.xml</Item>
                 </UpdateText>
             </Actions>
         </ActionGroup>
@@ -54,6 +56,8 @@
                     <Item locale="it_IT">text/it_IT/InGameText.xml</Item>
                     <Item locale="ko_KR">text/ko_kr/InGameText.xml</Item>
                     <Item locale="ru_RU">text/ru_RU/InGameText.xml</Item>
+                    <Item locale="zh_Hans_CN">text/zh_Hans_CN/InGameText.xml</Item>
+                    <Item locale="zh_Hant_HK">text/zh_Hant_HK/InGameText.xml</Item>
                 </UpdateText>
             </Actions>
         </ActionGroup>
@@ -63,5 +67,7 @@
         <File>text/de_DE/ModInfoText.xml</File>
         <File>text/it_IT/ModInfoText.xml</File>
         <File>text/ko_KR/ModInfoText.xml</File>
+        <File>text/zh_Hans_CN/ModInfoText.xml</File>
+        <File>text/zh_Hant_HK/ModInfoText.xml</File>
     </LocalizedText>
 </Mod>
