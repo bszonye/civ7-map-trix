@@ -1,6 +1,6 @@
 /**
  * Plot Tooltips
- * @copyright 2022, Firaxis Gmaes
+ * @copyright 2022-2025, Firaxis Gmaes
  * @description The tooltips that appear based on the cursor hovering over world plots.
  */
 import TooltipManager, { PlotTooltipPriority } from '/core/ui/tooltips/tooltip-manager.js';
@@ -57,6 +57,7 @@ class PlotTooltipType {
         const hexResource = this.getResource();
         const playerID = GameplayMap.getOwner(plotCoord.x, plotCoord.y);
         const plotIndex = GameplayMap.getIndexFromLocation(plotCoord);
+        const specialistsLabel = this.getSpecialistDescription();
         // Top Section
         if (LensManager.getActiveLens() == "fxs-settler-lens") {
             //Add more details to the tooltip if we are in the settler lens
@@ -139,6 +140,12 @@ class PlotTooltipType {
         //Yields Section
         this.yieldsFlexbox.classList.add("plot-tooltip__resourcesFlex");
         this.container.appendChild(this.yieldsFlexbox);
+        if (specialistsLabel != "") {
+            const specialistText = document.createElement("div");
+            specialistText.classList.add("text-center");
+            specialistText.innerHTML = specialistsLabel;
+            this.container.appendChild(specialistText);
+        }
         this.addPlotYields(this.plotCoord, GameContext.localPlayerID);
         this.addOwnerInfo(this.plotCoord, playerID);
         if (hexResource) {
@@ -159,7 +166,10 @@ class PlotTooltipType {
             toolTipIndividualYieldValues.classList.add("plot-tooltip__IndividualYieldValues", "font-body");
             toolTipIndividualYieldValues.innerHTML = "1"; //TODO: Change This value
             tooltipIndividualYieldFlex.appendChild(toolTipIndividualYieldValues);
-            this.appendTooltipInformation(hexResource.Name, [hexResource.Tooltip], toolTipResourceIconCSS);
+            const additionalText = [];
+            additionalText.push(Locale.compose("LOC_RESOURCECLASS_TOOLTIP_NAME", Locale.compose("LOC_" + hexResource.ResourceClassType + "_NAME")));
+            additionalText.push(hexResource.Tooltip);
+            this.appendTooltipInformation(hexResource.Name, additionalText, toolTipResourceIconCSS);
         }
         // Adds info about constructibles, improvements, and wonders to the tooltip
         this.addConstructibleInformation(this.plotCoord);
@@ -473,6 +483,24 @@ class PlotTooltipType {
             return GameInfo.Resources.lookup(resourceType);
         }
         return null;
+    }
+    getSpecialistDescription() {
+        if (this.plotCoord) {
+            const cityId = GameplayMap.getOwningCityFromXY(this.plotCoord.x, this.plotCoord.y);
+            if (cityId) {
+                const city = Cities.get(cityId);
+                if (city && city.Workers) {
+                    const maxSpecialists = city.Workers.getCityWorkerCap();
+                    if (maxSpecialists > 0) {
+                        const workerInfo = city.Workers.GetTilePlacementInfo(GameplayMap.getIndexFromXY(this.plotCoord.x, this.plotCoord.y));
+                        if (workerInfo.NumWorkers > 0 || !workerInfo.IsBlocked) {
+                            return Locale.compose("LOC_PLOT_TOOLTIP_SPECIALISTS_ASSIGNED", workerInfo.NumWorkers, maxSpecialists);
+                        }
+                    }
+                }
+            }
+        }
+        return "";
     }
     getRouteName() {
         const routeType = GameplayMap.getRouteType(this.plotCoord.x, this.plotCoord.y);
