@@ -1223,23 +1223,7 @@ class PlotTooltipType {
                     let rcname = rc.Name + "_BZ";
                     hexSubtitle = Locale.keyExists(rcname) ? rcname : rc.Name;
                 }
-                let rules = this.resource.Tooltip;
-                if (rctype == "RESOURCECLASS_FACTORY") {
-                    // remove redundant "Factory Resource." from tooltip
-                    rules = Locale.compose(rules);
-                    // remove pokiehl's stylish resource icon
-                    const stylishIcon = /\s*\[icon:NOTIFICATION_DISCOVER_RESOURCE\]/;
-                    rules = rules.replace(stylishIcon, '');
-                    // remove redundant prefix + punctuation + optional whitespace
-                    const prefix = Locale.compose(hexSubtitle).toUpperCase();
-                    if (prefix && rules.toUpperCase().startsWith(prefix)) {
-                        rules = rules.slice(prefix.length);
-                        rules = rules.replace(/^[,.:。]\s*|[.。]$/g, '');
-                    } else {
-                        console.warn(`bz-plot-tooltip: [${rules}] doesn't start with expected prefix [${prefix}]`);
-                    }
-                }
-                hexRules.push(rules);
+                hexRules.push(this.resource.Tooltip);
             }
             resourceIcon = this.resource.ResourceType;
         } else if (this.district?.type) {
