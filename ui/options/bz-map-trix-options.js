@@ -8,7 +8,6 @@ const MOD_ID = "bz-map-trix";
 const bzMapTrixOptions = new class {
     data = {
         verbose: false,
-        relationshipFix: true,
         yieldBanner: true,
     };
     constructor() {
@@ -18,11 +17,6 @@ const bzMapTrixOptions = new class {
     save() {
         ModSettings.save(MOD_ID, this.data);
         // sync optional styling
-        if (this.data.relationshipFix) {
-            document.body.classList.add("bz-relationship-fix");
-        } else {
-            document.body.classList.remove("bz-relationship-fix");
-        }
         if (this.data.yieldBanner) {
             document.body.classList.add("bz-yield-banner");
         } else {
@@ -34,13 +28,6 @@ const bzMapTrixOptions = new class {
     }
     set verbose(flag) {
         this.data.verbose = !!flag;
-        this.save();
-    }
-    get relationshipFix() {
-        return this.data.relationshipFix;
-    }
-    set relationshipFix(flag) {
-        this.data.relationshipFix = !!flag;
         this.save();
     }
     get yieldBanner() {
@@ -68,25 +55,6 @@ Options.addInitCallback(() => {
         updateListener: onUpdateVerbose,
         label: "LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE",
         description: "LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE_DESCRIPTION",
-    });
-});
-const onInitRelationshipFix = (info) => {
-    info.currentValue = bzMapTrixOptions.relationshipFix;
-};
-const onUpdateRelationshipFix = (_info, flag) => {
-    bzMapTrixOptions.relationshipFix = flag;
-};
-Options.addInitCallback(() => {
-    Options.addOption({
-        category: CategoryType.Mods,
-        // @ts-ignore
-        group: "bz_mods",
-        type: OptionType.Checkbox,
-        id: "bz-fix-relationship-tooltips",
-        initListener: onInitRelationshipFix,
-        updateListener: onUpdateRelationshipFix,
-        label: "LOC_OPTIONS_BZ_FIX_RELATIONSHIP_TOOLTIPS",
-        description: "LOC_OPTIONS_BZ_FIX_RELATIONSHIP_TOOLTIPS_DESCRIPTION",
     });
 });
 const onInitYieldBanner = (info) => {

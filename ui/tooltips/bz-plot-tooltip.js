@@ -62,25 +62,9 @@ BZ_HEAD_STYLE.textContent = [
     width: 100%;
     /* background-color: #80808080;  /* DEBUG */
 }`,
-// fix relationship tooltips
-`.bz-relationship-fix .tooltip.relationship-tooltip {
-    max-width: 20rem;
-}
-.bz-relationship-fix .relationship-tooltip__agenda-description {
-    width: 100%;
-    text-align: center;
-}
-.bz-relationship-fix .relationship-tooltip__agenda-description > p {
-    width: 100%;
-}`,
 ].join('\n');
 document.head.appendChild(BZ_HEAD_STYLE);
 // sync optional styling
-if (bzMapTrixOptions.relationshipFix) {
-    document.body.classList.add("bz-relationship-fix");
-} else {
-    document.body.classList.remove("bz-relationship-fix");
-}
 if (bzMapTrixOptions.yieldBanner) {
     document.body.classList.add("bz-yield-banner");
 } else {
