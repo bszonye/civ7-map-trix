@@ -61,12 +61,6 @@
         <Row Tag="LOC_LEADER_BZ_PEOPLE_NAME" Language="it_IT">
             <Text>Popolo di {1_name}</Text>
         </Row>
-        <Row Tag="LOC_OPTIONS_BZ_FIX_RELATIONSHIP_TOOLTIPS" Language="it_IT">
-            <Text>Map Trix • correggi la larghezza dei tooltip sulle relazioni</Text>
-        </Row>
-        <Row Tag="LOC_OPTIONS_BZ_FIX_RELATIONSHIP_TOOLTIPS_DESCRIPTION" Language="it_IT">
-            <Text>Corregge un bug di formattazione che rende i tooltip sulle relazioni molto più larghi di quanto dovrebbero essere.</Text>
-        </Row>
         <Row Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE" Language="it_IT">
             <Text>Map Trix • tooltip mappa dettagliati</Text>
         </Row>

@@ -61,12 +61,6 @@
         <Row Tag="LOC_LEADER_BZ_PEOPLE_NAME" Language="ko_KR">
             <Text>{1_name} 민족</Text>
         </Row>
-        <Row Tag="LOC_OPTIONS_BZ_FIX_RELATIONSHIP_TOOLTIPS" Language="ko_KR">
-            <Text>Map Trix • 관계 툴팁 너비 수정</Text>
-        </Row>
-        <Row Tag="LOC_OPTIONS_BZ_FIX_RELATIONSHIP_TOOLTIPS_DESCRIPTION" Language="ko_KR">
-            <Text>관계 툴팁이 의도보다 넓게 표시되는 형식 오류를 수정합니다.</Text>
-        </Row>
         <Row Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE" Language="ko_KR">
             <Text>Map Trix • 상세한 타일 툴팁</Text>
         </Row>

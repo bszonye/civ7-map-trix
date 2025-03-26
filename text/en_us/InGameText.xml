@@ -61,12 +61,6 @@
         <Row Tag="LOC_LEADER_BZ_PEOPLE_NAME">
             <Text>{1_name} People</Text>
         </Row>
-        <Row Tag="LOC_OPTIONS_BZ_FIX_RELATIONSHIP_TOOLTIPS">
-            <Text>Map Trix • fix relationship tooltip width</Text>
-        </Row>
-        <Row Tag="LOC_OPTIONS_BZ_FIX_RELATIONSHIP_TOOLTIPS_DESCRIPTION">
-            <Text>Fixes a formatting bug that makes relationship tooltips much wider than they should be.</Text>
-        </Row>
         <Row Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE">
             <Text>Map Trix • verbose map tooltips</Text>
         </Row>

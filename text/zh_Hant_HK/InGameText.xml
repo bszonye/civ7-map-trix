@@ -61,12 +61,6 @@
         <Row Tag="LOC_LEADER_BZ_PEOPLE_NAME" Language="zh_Hant_HK">
             <Text>{1_name} 民族</Text>
         </Row>
-        <Row Tag="LOC_OPTIONS_BZ_FIX_RELATIONSHIP_TOOLTIPS" Language="zh_Hant_HK">
-            <Text>Map Trix • 修復關係提示寬度</Text>
-        </Row>
-        <Row Tag="LOC_OPTIONS_BZ_FIX_RELATIONSHIP_TOOLTIPS_DESCRIPTION" Language="zh_Hant_HK">
-            <Text>修復關係提示框異常變寬的格式錯誤</Text>
-        </Row>
         <Row Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE" Language="zh_Hant_HK">
             <Text>Map Trix • 詳細地塊提示</Text>
         </Row>
