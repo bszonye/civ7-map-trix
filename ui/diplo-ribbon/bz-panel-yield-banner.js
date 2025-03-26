@@ -82,5 +82,5 @@ document.head.appendChild(BZ_HEAD_STYLE);
 const YieldBarEntry_render = PanelYieldBanner.prototype.render;
 PanelYieldBanner.prototype.render = function() {
     YieldBarEntry_render.apply(this);
-    this.settlementCapElement.classList.value = 'mr-1\\.5 text-yield-cities focus\\:bg-magenta';
+    this.settlementCapElement.classList.add('mr-1\\.5', 'text-yield-cities', 'focus\\:bg-magenta');
 }
