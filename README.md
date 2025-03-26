@@ -1,4 +1,4 @@
-# Map Trix 1.8.1
+# Map Trix 1.8.2
 better map tools for Civilization VII
 
 ## spot important map details
@@ -60,5 +60,7 @@ supported languages:
 - Italian (translated by leonardfactory)
 - Korean (translated by Hotsolidinfill)
 - Russian (translated by Webrok)
+- Simplified Chinese (translated by v480615)
+- Traditional Chinese (translated by v480615)
 
 thank you all for your help!

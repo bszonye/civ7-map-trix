@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Database>
+    <LocalizedText>
+        <Row Tag="LOC_BZ_CITY_CONNECTIONS" Language="zh_Hans_CN">
+            <Text>连接定居点 • {1_cities}[icon:YIELD_CITIES] {2_towns}[icon:YIELD_TOWNS]</Text>
+        </Row>
+        <Row Tag="LOC_BZ_HEMISPHERE_HOMELANDS" Language="zh_Hans_CN">
+            <Text>故土</Text>
+        </Row>
+        <Row Tag="LOC_BZ_IMPROVEMENT_FOR_TILE" Language="zh_Hans_CN">
+            <Text>可建造 {1_icon} {2_name}</Text>
+        </Row>
+        <Row Tag="LOC_BZ_IMPROVEMENT_FOR_RESOURCE" Language="zh_Hans_CN">
+            <Text>需建造 {1_icon} {2_name}</Text>
+        </Row>
+        <Row Tag="LOC_BZ_IMPROVEMENT_FOR_WAREHOUSE" Language="zh_Hans_CN">
+            <Text>(原为 {1_icon} {2_name})</Text>
+        </Row>
+        <Row Tag="LOC_BZ_PLOTKEY_NO_FRESHWATER" Language="zh_Hans_CN">
+            <Text>无淡水</Text>
+        </Row>
+        <Row Tag="LOC_BZ_RELIGION_MAJORITY" Language="zh_Hans_CN">
+            <Text>主流 {1_icon} {2_name}</Text>
+        </Row>
+        <Row Tag="LOC_BZ_RELIGION_RURAL" Language="zh_Hans_CN">
+            <Text>郊区 {1_icon} {2_name}</Text>
+        </Row>
+        <Row Tag="LOC_BZ_RELIGION_URBAN" Language="zh_Hans_CN">
+            <Text>城区 {1_icon} {2_name}</Text>
+        </Row>
+        <Row Tag="LOC_DISTRICT_BZ_CITY_STATE" Language="zh_Hans_CN">
+            <Text>城邦</Text>
+        </Row>
+        <Row Tag="LOC_DISTRICT_BZ_DISCOVERY" Language="zh_Hans_CN">
+            <Text>发现物</Text>
+        </Row>
+        <Row Tag="LOC_DISTRICT_BZ_INDEPENDENT" Language="zh_Hans_CN">
+            <Text>独立势力</Text>
+        </Row>
+        <Row Tag="LOC_DISTRICT_BZ_SPECIALISTS" Language="zh_Hans_CN">
+            <Text>专家 [icon:CITY_SPECIAL_BASE] {1_number}/{2_maximum}</Text>
+        </Row>
+        <Row Tag="LOC_DISTRICT_BZ_TOWN_CENTER" Language="zh_Hans_CN">
+            <Text>城镇中心</Text>
+        </Row>
+        <Row Tag="LOC_DISTRICT_BZ_URBAN_DISTRICT" Language="zh_Hans_CN">
+            <Text>城市区</Text>
+        </Row>
+        <Row Tag="LOC_DISTRICT_BZ_URBAN_QUARTER" Language="zh_Hans_CN">
+            <Text>城市分区</Text>
+        </Row>
+        <Row Tag="LOC_DISTRICT_BZ_URBAN_VACANT" Language="zh_Hans_CN">
+            <Text>空置区</Text>
+        </Row>
+        <Row Tag="LOC_DISTRICT_BZ_UNDEVELOPED" Language="zh_Hans_CN">
+            <Text>未开发</Text>
+        </Row>
+        <Row Tag="LOC_INDEPENDENT_BZ_RELATIONSHIP_TRIBUTARY" Language="zh_Hans_CN">
+            <Text>朝贡国</Text>
+        </Row>
+        <Row Tag="LOC_LEADER_BZ_PEOPLE_NAME" Language="zh_Hans_CN">
+            <Text>{1_name} 民族</Text>
+        </Row>
+        <Row Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE" Language="zh_Hans_CN">
+            <Text>Map Trix • 详细地块提示</Text>
+        </Row>
+        <Row Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE_DESCRIPTION" Language="zh_Hans_CN">
+            <Text>显示扩展提示信息。取消勾选时可通过按住 Ctrl 或 Shift 键查看详细信息</Text>
+        </Row>
+        <Row Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER" Language="zh_Hans_CN">
+            <Text>Map Trix • 顶部横幅重制</Text>
+        </Row>
+        <Row Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER_DESCRIPTION" Language="zh_Hans_CN">
+            <Text>将顶部横幅样式改为与 trixie 系列模组相同的圆角彩色高亮风格</Text>
+        </Row>
+        <InsertOrIgnore Tag="LOC_OPTIONS_GROUP_BZ_MODS" Language="zh_Hans_CN">
+            <Text>trixie 系列模组</Text>
+        </InsertOrIgnore>
+        <Row Tag="LOC_RESOURCECLASS_BONUS_NAME_BZ" Language="zh_Hans_CN">
+            <Text>加成资源</Text>
+        </Row>
+        <Row Tag="LOC_RESOURCECLASS_CITY_NAME_BZ" Language="zh_Hans_CN">
+            <Text>城市资源</Text>
+        </Row>
+        <Row Tag="LOC_RESOURCECLASS_EMPIRE_NAME_BZ" Language="zh_Hans_CN">
+            <Text>帝国资源</Text>
+        </Row>
+        <Row Tag="LOC_RESOURCECLASS_FACTORY_NAME_BZ" Language="zh_Hans_CN">
+            <Text>工厂资源</Text>
+        </Row>
+        <Row Tag="LOC_RESOURCECLASS_TREASURE_NAME_BZ" Language="zh_Hans_CN">
+            <Text>宝藏资源</Text>
+        </Row>
+        <Row Tag="LOC_STATE_BZ_OBSOLETE" Language="zh_Hans_CN">
+            <Text>已过时</Text>
+        </Row>
+        <Row Tag="LOC_STATE_BZ_UNIQUE" Language="zh_Hans_CN">
+            <Text>独特</Text>
+        </Row>
+        <Row Tag="LOC_YIELD_BZ_TOTAL" Language="zh_Hans_CN">
+            <Text>总产出</Text>
+        </Row>
+    </LocalizedText>
+</Database>

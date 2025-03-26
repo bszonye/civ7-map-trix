@@ -39,8 +39,8 @@ BZ_HEAD_STYLE.textContent = [
     padding-left: calc(var(--padding-left-right) - ${BZ_BORDER_WIDTH});
     padding-right: calc(var(--padding-left-right) - ${BZ_BORDER_WIDTH});
 }`,
-`.bz-text-xxs {
-    font-size: 0.7777777778rem;
+`.bz-text-sub {
+    font-size: 85%;
 }`,
 // centers blocks of rules text with max-w-60 equivalent
 // IMPORTANT: Locale.stylize wraps text in an extra <p> element when it
@@ -62,25 +62,9 @@ BZ_HEAD_STYLE.textContent = [
     width: 100%;
     /* background-color: #80808080;  /* DEBUG */
 }`,
-// fix relationship tooltips
-`.bz-relationship-fix .tooltip.relationship-tooltip {
-    max-width: 20rem;
-}
-.bz-relationship-fix .relationship-tooltip__agenda-description {
-    width: 100%;
-    text-align: center;
-}
-.bz-relationship-fix .relationship-tooltip__agenda-description > p {
-    width: 100%;
-}`,
 ].join('\n');
 document.head.appendChild(BZ_HEAD_STYLE);
 // sync optional styling
-if (bzMapTrixOptions.relationshipFix) {
-    document.body.classList.add("bz-relationship-fix");
-} else {
-    document.body.classList.remove("bz-relationship-fix");
-}
 if (bzMapTrixOptions.yieldBanner) {
     document.body.classList.add("bz-yield-banner");
 } else {
@@ -1223,23 +1207,7 @@ class PlotTooltipType {
                     let rcname = rc.Name + "_BZ";
                     hexSubtitle = Locale.keyExists(rcname) ? rcname : rc.Name;
                 }
-                let rules = this.resource.Tooltip;
-                if (rctype == "RESOURCECLASS_FACTORY") {
-                    // remove redundant "Factory Resource." from tooltip
-                    rules = Locale.compose(rules);
-                    // remove pokiehl's stylish resource icon
-                    const stylishIcon = /\s*\[icon:NOTIFICATION_DISCOVER_RESOURCE\]/;
-                    rules = rules.replace(stylishIcon, '');
-                    // remove redundant prefix + punctuation + optional whitespace
-                    const prefix = Locale.compose(hexSubtitle).toUpperCase();
-                    if (prefix && rules.toUpperCase().startsWith(prefix)) {
-                        rules = rules.slice(prefix.length);
-                        rules = rules.replace(/^[,.:。]\s*|[.。]$/g, '');
-                    } else {
-                        console.warn(`bz-plot-tooltip: [${rules}] doesn't start with expected prefix [${prefix}]`);
-                    }
-                }
-                hexRules.push(rules);
+                hexRules.push(this.resource.Tooltip);
             }
             resourceIcon = this.resource.ResourceType;
         } else if (this.district?.type) {
@@ -1259,7 +1227,7 @@ class PlotTooltipType {
         if (hexName) this.renderTitleDivider(Locale.compose(hexName));
         // optional description
         if (hexRules.length) {
-            const title = "bz-text-xxs leading-none mb-2";
+            const title = "bz-text-sub leading-none mb-2";
             if (hexSubtitle) this.renderRules([hexSubtitle], '', title);
             this.renderRules(hexRules);
         }
@@ -1275,9 +1243,9 @@ class PlotTooltipType {
     renderWonderSection() {
         if (!this.wonder) return;
         this.renderTitleDivider(Locale.compose(this.wonder.info.Name));
-        if (this.wonder.notes) {
+        if (this.wonder.notes.length) {
             const ttState = document.createElement("div");
-            ttState.classList.value = "bz-text-xxs leading-none text-center";
+            ttState.classList.value = "bz-text-sub leading-none text-center mb-1";
             ttState.innerHTML = dotJoinLocale(this.wonder.notes);
             this.container.appendChild(ttState);
         }
@@ -1298,7 +1266,7 @@ class PlotTooltipType {
             const notes = dotJoinLocale(c.notes);
             if (notes) {
                 const ttState = document.createElement("div");
-                ttState.classList.value = "bz-text-xxs";
+                ttState.classList.value = "bz-text-sub";
                 if (c.isDamaged) {
                     setCapsuleStyle(ttState, BZ_ALERT.amber, "mb-0\\.5");
                 } else {
@@ -1312,7 +1280,7 @@ class PlotTooltipType {
         // expansion type for undeveloped & upgraded tiles
         if (this.expansion) {
             const tt = document.createElement("div");
-            if (this.constructibles.length) tt.classList.value = "bz-text-xxs";
+            if (this.constructibles.length) tt.classList.value = "bz-text-sub";
             tt.setAttribute("data-l10n-id", this.expansion.text);
             ttList.appendChild(tt);
         }

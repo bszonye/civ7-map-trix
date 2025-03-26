@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Database>
+    <LocalizedText>
+        <Row Tag="LOC_MOD_BZ_MAP_TRIX_NAME" Language="zh_Hant_HK">
+            <Text>更好的地圖提示工具</Text>
+        </Row>
+        <Row Tag="LOC_MOD_BZ_MAP_TRIX_DESCRIPTION" Language="zh_Hant_HK">
+            <Text>地圖工具提示改進</Text>
+        </Row>
+    </LocalizedText>
+</Database>

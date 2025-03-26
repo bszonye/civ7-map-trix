@@ -61,12 +61,6 @@
         <Row Tag="LOC_LEADER_BZ_PEOPLE_NAME" Language="de_DE">
             <Text>Volk der {1_name}</Text>
         </Row>
-        <Row Tag="LOC_OPTIONS_BZ_FIX_RELATIONSHIP_TOOLTIPS" Language="de_DE">
-            <Text>Map Trix • behebt die Breite der Beziehungstools</Text>
-        </Row>
-        <Row Tag="LOC_OPTIONS_BZ_FIX_RELATIONSHIP_TOOLTIPS_DESCRIPTION" Language="de_DE">
-            <Text>Behebt einen Formatierungsfehler, der Beziehungstools viel breiter macht, als sie sein sollten.</Text>
-        </Row>
         <Row Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE" Language="de_DE">
             <Text>Map Trix • ausführliche Kartentools</Text>
         </Row>
