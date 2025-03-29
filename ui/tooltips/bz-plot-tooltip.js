@@ -352,6 +352,13 @@ function setCapsuleStyle(element, style, ...classes) {
     if (classes.length) element.classList.add(...classes);
     setStyle(element, style);
 }
+var Level;
+(function (Level) {
+        Level[Level["HIDDEN"] = 0] = "HIDDEN";
+        Level[Level["COMPACT"] = 1] = "COMPACT";
+        Level[Level["DEFAULT"] = 2] = "DEFAULT";
+        Level[Level["VERBOSE"] = 3] = "VERBOSE";
+})(Level || (Level = {}));
 class PlotTooltipType {
     constructor() {
         this.plotCoord = null;
@@ -359,9 +366,7 @@ class PlotTooltipType {
         this.isShowingDebug = false;
         this.modCtrl = false;
         this.modShift = false;
-        this.isHidden = false;
-        this.isCompact = false;
-        this.isVerbose = bzMapTrixOptions.verbose;
+        this.verbosity = bzMapTrixOptions.verbose ? Level.VERBOSE : Level.DEFAULT;
         // document root
         this.tooltip = document.createElement('fxs-tooltip');
         this.tooltip.classList.value = "bz-tooltip plot-tooltip max-w-96";
@@ -417,37 +422,35 @@ class PlotTooltipType {
             Controls.preloadImage("hud_sub_circle_bk", "city-banner");
         });
     }
+    get isHidden() { return this.verbosity == Level.HIDDEN; }
+    get isCompact() { return this.verbosity == Level.COMPACT; }
+    get isVerbose() { return this.verbosity == Level.VERBOSE; }
     getHTML() {
         return this.tooltip;
     }
     isUpdateNeeded(plotCoord) {
-        let hasChanged = false;
+        let verbosity = Level.DEFAULT;
         this.modCtrl = Input.isCtrlDown();
         this.modShift = Input.isShiftDown();
         // has the cursor moved?
         const hasMoved =
             plotCoord.x != this.plotCoord?.x ||
             plotCoord.y != this.plotCoord?.y;
-        if (hasMoved) hasChanged = true;
         this.plotCoord = plotCoord;
-        // have keyboard modifiers changed?
+        // has verbosity level changed?
         const isHidden = this.modCtrl && this.modShift;
-        if (isHidden != this.isHidden) {
-            if (isHidden) hasChanged = true;
-            // stay hidden until the cursor moves
-            if (hasChanged) this.isHidden = isHidden;
+        if (isHidden || this.isHidden && !hasMoved) {
+            verbosity = Level.HIDDEN;
+        } else if (this.modCtrl) {
+            if (!this.modShift) verbosity = Level.COMPACT;
+        } else if (this.modShift || bzMapTrixOptions.verbose) {
+            verbosity = Level.VERBOSE;
         }
-        // has verbosity changed?
-        const isCompact = this.modCtrl
-            && !this.modShift && !this.isHidden;
-        const isVerbose = (this.modShift || bzMapTrixOptions.verbose)
-            && !this.modCtrl && !this.isHidden;
-        if (isCompact != this.isCompact) hasChanged = true;
-        if (isVerbose != this.isVerbose) hasChanged = true;
-        this.isCompact = isCompact;
-        this.isVerbose = isVerbose;
-        // report change
-        return hasChanged;
+        if (verbosity != this.verbosity) {
+            this.verbosity = verbosity;
+            return true;
+        }
+        return hasMoved;
     }
     isBlank() {
         // outside the map
@@ -461,20 +464,22 @@ class PlotTooltipType {
         }
         // with a unit selected: ignore the same tile and enemy tiles
         // UNLESS verbose mode is manually engaged
+        if (this.verbosity == Level.VERBOSE && this.modShift) return false;
         const selectedUnitID = UI.Player.getHeadSelectedUnit();
         if (selectedUnitID && ComponentID.isValid(selectedUnitID)) {
             const plotUnits = MapUnits.getUnits(this.plotCoord.x, this.plotCoord.y);
             if (plotUnits.length > 0) {
-                // Hovering over your selected unit; don't show the plot tooltip
+                // hovering over your selected unit: hide the tooltip
                 if (plotUnits.find(e => ComponentID.isMatch(e, selectedUnitID))) {
-                    return !(this.isVerbose && this.modShift);
+                    return true;
                 }
                 let args = {};
                 args.X = this.plotCoord.x;
                 args.Y = this.plotCoord.y;
                 let combatType = Game.Combat.testAttackInto(selectedUnitID, args);
+                // hovering over an enemy: hide the tooltip
                 if (combatType != CombatTypes.NO_COMBAT) {
-                    return !(this.isVerbose && this.modShift);
+                    return true;
                 }
             }
         }
