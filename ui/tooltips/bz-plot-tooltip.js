@@ -352,13 +352,13 @@ function setCapsuleStyle(element, style, ...classes) {
     if (classes.length) element.classList.add(...classes);
     setStyle(element, style);
 }
-var Level;
-(function (Level) {
-        Level[Level["HIDDEN"] = 0] = "HIDDEN";
-        Level[Level["COMPACT"] = 1] = "COMPACT";
-        Level[Level["DEFAULT"] = 2] = "DEFAULT";
-        Level[Level["VERBOSE"] = 3] = "VERBOSE";
-})(Level || (Level = {}));
+var Verbosity;
+(function (Verbosity) {
+        Verbosity[Verbosity["HIDDEN"] = 0] = "HIDDEN";
+        Verbosity[Verbosity["COMPACT"] = 1] = "COMPACT";
+        Verbosity[Verbosity["DEFAULT"] = 2] = "DEFAULT";
+        Verbosity[Verbosity["VERBOSE"] = 3] = "VERBOSE";
+})(Verbosity || (Verbosity = {}));
 class PlotTooltipType {
     constructor() {
         this.plotCoord = null;
@@ -366,7 +366,7 @@ class PlotTooltipType {
         this.isShowingDebug = false;
         this.modCtrl = false;
         this.modShift = false;
-        this.verbosity = bzMapTrixOptions.verbose ? Level.VERBOSE : Level.DEFAULT;
+        this.verbosity = Verbosity.DEFAULT;
         // document root
         this.tooltip = document.createElement('fxs-tooltip');
         this.tooltip.classList.value = "bz-tooltip plot-tooltip max-w-96";
@@ -422,14 +422,14 @@ class PlotTooltipType {
             Controls.preloadImage("hud_sub_circle_bk", "city-banner");
         });
     }
-    get isHidden() { return this.verbosity == Level.HIDDEN; }
-    get isCompact() { return this.verbosity == Level.COMPACT; }
-    get isVerbose() { return this.verbosity == Level.VERBOSE; }
+    get isHidden() { return this.verbosity == Verbosity.HIDDEN; }
+    get isCompact() { return this.verbosity == Verbosity.COMPACT; }
+    get isVerbose() { return this.verbosity == Verbosity.VERBOSE; }
     getHTML() {
         return this.tooltip;
     }
     isUpdateNeeded(plotCoord) {
-        let verbosity = Level.DEFAULT;
+        let verbosity = Verbosity.DEFAULT;
         this.modCtrl = Input.isCtrlDown();
         this.modShift = Input.isShiftDown();
         // has the cursor moved?
@@ -440,11 +440,11 @@ class PlotTooltipType {
         // has verbosity level changed?
         const isHidden = this.modCtrl && this.modShift;
         if (isHidden || this.isHidden && !hasMoved) {
-            verbosity = Level.HIDDEN;
+            verbosity = Verbosity.HIDDEN;
         } else if (this.modCtrl) {
-            if (!this.modShift) verbosity = Level.COMPACT;
+            if (!this.modShift) verbosity = Verbosity.COMPACT;
         } else if (this.modShift || bzMapTrixOptions.verbose) {
-            verbosity = Level.VERBOSE;
+            verbosity = Verbosity.VERBOSE;
         }
         if (verbosity != this.verbosity) {
             this.verbosity = verbosity;
@@ -464,7 +464,7 @@ class PlotTooltipType {
         }
         // with a unit selected: ignore the same tile and enemy tiles
         // UNLESS verbose mode is manually engaged
-        if (this.verbosity == Level.VERBOSE && this.modShift) return false;
+        if (this.verbosity == Verbosity.VERBOSE && this.modShift) return false;
         const selectedUnitID = UI.Player.getHeadSelectedUnit();
         if (selectedUnitID && ComponentID.isValid(selectedUnitID)) {
             const plotUnits = MapUnits.getUnits(this.plotCoord.x, this.plotCoord.y);
