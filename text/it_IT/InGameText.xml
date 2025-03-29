@@ -65,7 +65,7 @@
             <Text>Map Trix • tooltip mappa dettagliati</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE_DESCRIPTION" Language="it_IT">
-            <Text>Mostra informazioni dettagliate nei tooltip. Se deselezionato, puoi visualizzare informazioni dettagliate tenendo premuto Ctrl o Shift.</Text>
+            <Text>Mostra informazioni dettagliate nei tooltip. Se deselezionato, puoi visualizzare informazioni dettagliate tenendo premuto Shift.</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER" Language="it_IT">
             <Text>Map Trix • restyling del banner delle rese</Text>

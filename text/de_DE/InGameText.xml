@@ -65,7 +65,7 @@
             <Text>Map Trix • ausführliche Kartentools</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE_DESCRIPTION" Language="de_DE">
-            <Text>Zeigt erweiterte Kartentools an. Wenn diese Option deaktiviert ist, können Sie ausführliche Informationen anzeigen, indem Sie Strg oder Umschalt gedrückt halten.</Text>
+            <Text>Zeigt erweiterte Kartentools an. Wenn diese Option deaktiviert ist, können Sie ausführliche Informationen anzeigen, indem Sie Umschalt gedrückt halten.</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER" Language="de_DE">
             <Text>Map Trix • gestaltet das Ertragsbanner neu</Text>

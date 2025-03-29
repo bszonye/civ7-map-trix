@@ -65,7 +65,7 @@
             <Text>Map Trix • verbose map tooltips</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE_DESCRIPTION">
-            <Text>Shows extended tooltip information.  When unchecked, you can show verbose information by holding down Ctrl or Shift.</Text>
+            <Text>Shows extended tooltip information.  When unchecked, you can show verbose information by holding down Shift.</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER">
             <Text>Map Trix • restyle yield banner</Text>
