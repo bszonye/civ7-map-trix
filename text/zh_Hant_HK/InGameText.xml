@@ -65,7 +65,7 @@
             <Text>Map Trix • 詳細地塊提示</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE_DESCRIPTION" Language="zh_Hant_HK">
-            <Text>顯示擴展提示資訊。取消勾選時可通過按住 Ctrl 或 Shift 鍵查看詳細資訊</Text>
+            <Text>顯示擴展提示資訊。取消勾選時可通過按住 Shift 鍵查看詳細資訊</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER" Language="zh_Hant_HK">
             <Text>Map Trix • 頂部橫幅重製</Text>
