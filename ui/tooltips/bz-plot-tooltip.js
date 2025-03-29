@@ -405,6 +405,7 @@ class PlotTooltipType {
         this.yields = [];
         this.totalYields = 0;
         // cursor modifier
+        this.relationship = null;
         this.isEnemy = false;  // is the plot held by an enemy?
         // lookup tables
         this.agelessBuildings = gatherBuildingsTagged("AGELESS");
@@ -423,8 +424,8 @@ class PlotTooltipType {
         });
     }
     get isHidden() { return this.verbosity == Verbosity.HIDDEN; }
-    get isCompact() { return this.verbosity == Verbosity.COMPACT; }
-    get isVerbose() { return this.verbosity == Verbosity.VERBOSE; }
+    get isCompact() { return this.verbosity <= Verbosity.COMPACT; }
+    get isVerbose() { return this.verbosity >= Verbosity.VERBOSE; }
     getHTML() {
         return this.tooltip;
     }
@@ -522,6 +523,7 @@ class PlotTooltipType {
         this.yields = [];
         this.totalYields = 0;
         // cursor modifier
+        this.relationship = null;
         this.isEnemy = false;
     }
     update() {
@@ -602,6 +604,10 @@ class PlotTooltipType {
         const loc = this.plotCoord;
         const ownerID = GameplayMap.getOwner(loc.x, loc.y);
         this.owner = Players.get(ownerID);
+        if (this.owner && Players.isAlive(this.owner.id)) {
+            this.relationship = this.getCivRelationship(this.owner);
+            if (this.relationship) this.isEnemy = this.relationship.isEnemy;
+        }
         const cityID = GameplayMap.getOwningCityFromXY(loc.x, loc.y);
         this.city = cityID ? Cities.get(cityID) : null;
         const districtID = MapCities.getDistrict(loc.x, loc.y);
@@ -663,7 +669,9 @@ class PlotTooltipType {
 
             if (isDamaged) notes.push("LOC_PLOT_TOOLTIP_DAMAGED");
             if (!isComplete) notes.push("LOC_PLOT_TOOLTIP_IN_PROGRESS");
-            if (uniqueTrait) {
+            if (this.isCompact) {
+                // skip remaining notes in Compact mode
+            } else if (uniqueTrait) {
                 notes.push("LOC_STATE_BZ_UNIQUE");
             } else if (isAgeless && !isWonder) {
                 notes.push("LOC_UI_PRODUCTION_AGELESS");
@@ -707,6 +715,8 @@ class PlotTooltipType {
                 this.improvement.icon = info.ConstructibleType;
             }
         }
+        // skip all the extras in Compact mode
+        if (this.isCompact && !this.resource) return;
         // get the improvement type for rural and undeveloped tiles
         // (but skip special districts like discoveries and villages)
         if (this.improvement && !this.improvement.districtName || !this.district) {
@@ -788,13 +798,30 @@ class PlotTooltipType {
         lineRight.style.setProperty("background-image", "linear-gradient(to right, #8D97A6, rgba(141, 151, 166, 0))");
         layout.appendChild(lineRight);
     }
+    renderTitleHeading(title, padding=true, capsule=null) {
+        const ttTitle = document.createElement("div");
+        ttTitle.classList.value = "text-secondary font-title uppercase text-sm leading-snug text-center";
+        if (padding) {
+            ttTitle.style.setProperty("padding-top", "var(--padding-top-bottom)");
+        }
+        const ttTerrain = document.createElement("div");
+        setCapsuleStyle(ttTerrain, capsule, "my-0\\.5");
+        ttTerrain.setAttribute('data-l10n-id', title);
+        ttTitle.appendChild(ttTerrain);
+        this.container.appendChild(ttTitle);
+    }
     renderTitleDivider(text=BZ_DOT_DIVIDER) {
+        if (this.isCompact) {
+            this.renderTitleHeading(text);
+            return;
+        }
         const layout = document.createElement("div");
         layout.classList.value = "font-title uppercase text-sm mx-3 max-w-80";
         layout.setAttribute("data-l10n-id", text);
         this.renderFlexDivider(layout);
     }
     renderGeographySection() {
+        if (this.isCompact) return;
         const loc = this.plotCoord;
         // show geographical features
         const effects = this.getPlotEffects(this.plotIndex);
@@ -814,19 +841,10 @@ class PlotTooltipType {
             this.container.appendChild(banner);
         }
         // tooltip title: terrain & biome
-        const ttTitle = document.createElement("div");
-        ttTitle.classList.value = "text-secondary font-title uppercase text-sm leading-snug text-center";
-        if (!banners.length) {
-            ttTitle.style.setProperty("padding-top", "var(--padding-top-bottom)");
-        }
-        const ttTerrain = document.createElement("div");
-        setCapsuleStyle(ttTerrain, terrainLabel.style, "my-0\\.5");
         const title = biomeLabel ?
             Locale.compose("{1_TerrainName} {2_BiomeName}", terrainLabel.text, biomeLabel) :
             terrainLabel.text;
-        ttTerrain.setAttribute('data-l10n-id', title);
-        ttTitle.appendChild(ttTerrain);
-        this.container.appendChild(ttTitle);
+        this.renderTitleHeading(title, !banners.length, terrainLabel.style);
         // other geographical info
         const layout = document.createElement("div");
         layout.classList.value = "text-xs leading-snug text-center mb-2";
@@ -1016,6 +1034,7 @@ class PlotTooltipType {
             [route.Name];
     }
     renderSettlementSection() {
+        if (this.isCompact) return;
         if (!this.owner) return;
         const name = this.city ?  this.city.name :  // city or town
             this.owner.isAlive ?  this.getCivName(this.owner) :  // village
@@ -1056,16 +1075,12 @@ class PlotTooltipType {
         const layout = document.createElement("div");
         layout.classList.value = "text-xs leading-snug text-center mb-2";
         const ownerName = this.getOwnerName(this.owner);
-        const relationship = this.getCivRelationship(this.owner);
-        const relType = Locale.compose(relationship?.type);
+        const relType = Locale.compose(this.relationship?.type);
         const civName = this.getCivName(this.owner, true);
         // highlight enemy players
-        if (relationship) {
-            this.isEnemy = relationship.isEnemy;
-            if (relationship.isEnemy) {
-                layout.classList.add("py-1");
-                setBannerStyle(layout);
-            }
+        if (this.isEnemy) {
+            layout.classList.add("py-1");
+            setBannerStyle(layout);
         }
         // show name & relationship
         const ttPlayer = document.createElement("div");
@@ -1140,11 +1155,26 @@ class PlotTooltipType {
     renderUrbanSection() {
         const quarterOK = this.buildings.reduce((a, b) =>
             a + (b.isCurrent ? b.isLarge ? 2 : 1 : 0), 0);
-        let hexName = GameInfo.Districts.lookup(this.district?.type).Name;
+        let hexName = this.city.name;
         let hexSubhead;
         let hexRules;
         // set name & description
-        if (this.district.type == DistrictTypes.CITY_CENTER) {
+        if (quarterOK >= 2) {
+            const unique = this.buildings[0].uniqueTrait;
+            if (this.buildings.every(b => b.uniqueTrait = unique)) {
+                const uq = GameInfo.UniqueQuarters.find(e => e.TraitType == unique);
+                hexName = uq.Name;
+                // UQs don't have .Tooltip but most have parallel
+                // LOC_QUARTER_XXX_DESCRIPTION and
+                // LOC_QUARTER_XXX_TOOLTIP localization strings
+                const tooltip = uq.Description.replace("_DESCRIPTION", "_TOOLTIP");
+                hexRules = Locale.keyExists(tooltip) ? tooltip : uq.Description;
+            } else if (!this.isCompact) {
+                hexName = "LOC_DISTRICT_BZ_URBAN_QUARTER";
+            }
+        } else if (this.isCompact) {
+            // keep the city name
+        } else if (this.district.type == DistrictTypes.CITY_CENTER) {
             const owner = Players.get(this.city.owner);
             if (owner.isMinor) {
                 hexName = "LOC_DISTRICT_BZ_CITY_STATE";
@@ -1161,25 +1191,12 @@ class PlotTooltipType {
         } else if (this.buildings.length == 0) {
             // urban tile with canceled production
             hexName = "LOC_DISTRICT_BZ_URBAN_VACANT";
-        } else if (quarterOK >= 2) {
-            const unique = this.buildings[0].uniqueTrait;
-            if (this.buildings.every(b => b.uniqueTrait = unique)) {
-                const uq = GameInfo.UniqueQuarters.find(e => e.TraitType == unique);
-                hexName = uq.Name;
-                // UQs don't have .Tooltip but most have parallel
-                // LOC_QUARTER_XXX_DESCRIPTION and
-                // LOC_QUARTER_XXX_TOOLTIP localization strings
-                const tooltip = uq.Description.replace("_DESCRIPTION", "_TOOLTIP");
-                hexRules = Locale.keyExists(tooltip) ? tooltip : uq.Description;
-            } else {
-                hexName = "LOC_DISTRICT_BZ_URBAN_QUARTER";
-            }
         } else {
             hexName = "LOC_DISTRICT_BZ_URBAN_DISTRICT";
         }
         // title bar
         this.renderTitleDivider(Locale.compose(hexName));
-        this.renderDistrictDefense(this.plotCoord);
+        if (!this.isCompact) this.renderDistrictDefense(this.plotCoord);
         // panel interior
         // show rules for city-states and unique quarters
         if (hexRules && this.isVerbose) {
@@ -1208,7 +1225,9 @@ class PlotTooltipType {
         // set name & description
         if (this.improvement?.districtName) {
             // village or discovery
-            hexName = this.improvement?.districtName;
+            hexName = this.isCompact && this.owner?.isAlive ?
+                this.getCivName(this.owner) :
+                this.improvement?.districtName;
         } else if (this.feature?.Tooltip) {
             // natural wonder
             hexName = this.feature.Name;
@@ -1228,10 +1247,12 @@ class PlotTooltipType {
                 hexRules.push(this.resource.Tooltip);
             }
             resourceIcon = this.resource.ResourceType;
+        } else if (this.isCompact && this.city) {
+            hexName = this.city.name;
         } else if (this.district?.type) {
             // rural
             hexName = GameInfo.Districts.lookup(this.district?.type).Name;
-        } else if (!this.improvement && !this.totalYields) {
+        } else if (!this.improvement && !this.totalYields && !this.isCompact) {
             // nothing more to see here
             return;
         } else if (this.city) {
@@ -1239,12 +1260,14 @@ class PlotTooltipType {
             hexName = "LOC_DISTRICT_BZ_UNDEVELOPED";
         } else {
             // unclaimed wilderness
-            hexName = GameInfo.Districts.lookup(DistrictTypes.WILDERNESS).Name;
+            hexName = this.isCompact && this.biome?.BiomeType == "BIOME_MARINE" ?
+                this.terrain.Name :
+                GameInfo.Districts.lookup(DistrictTypes.WILDERNESS).Name;
         }
         // title bar
         if (hexName) this.renderTitleDivider(Locale.compose(hexName));
         // optional description
-        if (hexRules.length) {
+        if (hexRules.length && !this.isCompact) {
             const title = "bz-text-sub leading-none mb-2";
             if (hexSubtitle) this.renderRules([hexSubtitle], '', title);
             this.renderRules(hexRules);
@@ -1261,13 +1284,17 @@ class PlotTooltipType {
     renderWonderSection() {
         if (!this.wonder) return;
         this.renderTitleDivider(Locale.compose(this.wonder.info.Name));
-        if (this.wonder.notes.length) {
+        const notes = this.wonder.notes;
+        if (notes.length) {
             const ttState = document.createElement("div");
             ttState.classList.value = "bz-text-sub leading-none text-center mb-1";
             ttState.innerHTML = dotJoinLocale(this.wonder.notes);
             this.container.appendChild(ttState);
         }
-        this.renderRules([this.wonder.info.Tooltip]);
+        // blank the rules in Compact mode if unfinished
+        // (but still use renderRules for proper vertical spacing)
+        const rules = this.isCompact && notes.length ? [] : [this.wonder.info.Tooltip];
+        this.renderRules([rules]);
         this.renderIconDivider(this.wonder.info.ConstructibleType);
     }
     // lay out a column of constructibles and their construction notes
@@ -1481,26 +1508,26 @@ class PlotTooltipType {
         if (!topUnit || !Visibility.isVisible(this.player.id, topUnit.id)) return;
         const owner = Players.get(topUnit.owner);
         if (!owner) return;
-        // friendly unit? clear the enemy flag
+        // get relationship
         if (owner.id == this.player.id) {
             this.isEnemy = false;
             return;
         }
+        // update isEnemy status to match top unit
+        const relationship = this.getCivRelationship(owner);
+        if (relationship) this.isEnemy = relationship.isEnemy;
         // show unit section
+        if (this.isCompact) return;
         this.renderDivider();
         const layout = document.createElement("div");
         layout.classList.value = "text-xs leading-snug text-center";
         const unitName = topUnit.name;
         const civName = this.getCivName(owner);
-        const relationship = this.getCivRelationship(owner);
         const unitInfo = [unitName, civName, relationship?.type];
         layout.innerHTML = dotJoinLocale(unitInfo);
-        if (relationship) {
-            this.isEnemy = relationship.isEnemy;
-            if (relationship.isEnemy) {
-                layout.classList.add("py-1");
-                setBannerStyle(layout);
-            }
+        if (this.isEnemy) {
+            layout.classList.add("py-1");
+            setBannerStyle(layout);
         }
         this.container.appendChild(layout);
     }
