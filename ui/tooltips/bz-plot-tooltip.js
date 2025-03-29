@@ -359,7 +359,9 @@ class PlotTooltipType {
         this.isShowingDebug = false;
         this.modCtrl = false;
         this.modShift = false;
-        this.isVerbose = this.modCtrl || this.modShift || bzMapTrixOptions.verbose;
+        this.isHidden = false;
+        this.isCompact = false;
+        this.isVerbose = bzMapTrixOptions.verbose;
         // document root
         this.tooltip = document.createElement('fxs-tooltip');
         this.tooltip.classList.value = "bz-tooltip plot-tooltip max-w-96";
@@ -419,49 +421,60 @@ class PlotTooltipType {
         return this.tooltip;
     }
     isUpdateNeeded(plotCoord) {
-        // allow Ctrl and Shift modifiers to change tooltip
-        const modCtrl = Input.isCtrlDown();
-        const modShift = Input.isShiftDown();
-        const isVerbose = modCtrl || modShift || bzMapTrixOptions.verbose;
-        if (modCtrl != this.modCtrl || modShift != this.modShift || isVerbose != this.isVerbose) {
-            this.modCtrl = modCtrl;
-            this.modShift = modShift;
-            this.isVerbose = isVerbose;
-            return true;
+        let hasChanged = false;
+        this.modCtrl = Input.isCtrlDown();
+        this.modShift = Input.isShiftDown();
+        // has the cursor moved?
+        const hasMoved =
+            plotCoord.x != this.plotCoord?.x ||
+            plotCoord.y != this.plotCoord?.y;
+        if (hasMoved) hasChanged = true;
+        this.plotCoord = plotCoord;
+        // have keyboard modifiers changed?
+        const isHidden = this.modCtrl && this.modShift;
+        if (isHidden != this.isHidden) {
+            if (isHidden) hasChanged = true;
+            // stay hidden until the cursor moves
+            if (hasChanged) this.isHidden = isHidden;
         }
-
-        // Check if the plot location has changed, if not return early, otherwise cache it and rebuild.
-        if (this.plotCoord != null) {
-            if (plotCoord.x == this.plotCoord.x && plotCoord.y == this.plotCoord.y) {
-                return false;
-            }
-        }
-        this.plotCoord = plotCoord; // May be cleaner to recompute in update but at cost of computing 2nd time.
-        return true;
+        // has verbosity changed?
+        const isCompact = this.modCtrl
+            && !this.modShift && !this.isHidden;
+        const isVerbose = (this.modShift || bzMapTrixOptions.verbose)
+            && !this.modCtrl && !this.isHidden;
+        if (isCompact != this.isCompact) hasChanged = true;
+        if (isVerbose != this.isVerbose) hasChanged = true;
+        this.isCompact = isCompact;
+        this.isVerbose = isVerbose;
+        // report change
+        return hasChanged;
     }
     isBlank() {
-        if (this.plotCoord == null) {
-            return true;
-        }
+        // outside the map
+        if (this.plotCoord == null) return true;
+        // Ctrl+Shift held
+        if (this.isHidden) return true;
+        // tile isn't revealed yet
         const revealedState = GameplayMap.getRevealedState(this.player.id, this.plotCoord.x, this.plotCoord.y);
         if (revealedState == RevealedStates.HIDDEN) {
             return true;
         }
-        // If a unit is selected, check if over our own unit an enemy unit and prevent the plot tooltip from displaying.
+        // with a unit selected: ignore the same tile and enemy tiles
+        // UNLESS verbose mode is manually engaged
         const selectedUnitID = UI.Player.getHeadSelectedUnit();
         if (selectedUnitID && ComponentID.isValid(selectedUnitID)) {
             const plotUnits = MapUnits.getUnits(this.plotCoord.x, this.plotCoord.y);
             if (plotUnits.length > 0) {
                 // Hovering over your selected unit; don't show the plot tooltip
                 if (plotUnits.find(e => ComponentID.isMatch(e, selectedUnitID))) {
-                    return true;
+                    return !(this.isVerbose && this.modShift);
                 }
                 let args = {};
                 args.X = this.plotCoord.x;
                 args.Y = this.plotCoord.y;
                 let combatType = Game.Combat.testAttackInto(selectedUnitID, args);
                 if (combatType != CombatTypes.NO_COMBAT) {
-                    return true;
+                    return !(this.isVerbose && this.modShift);
                 }
             }
         }
@@ -514,7 +527,7 @@ class PlotTooltipType {
         this.plotIndex = GameplayMap.getIndexFromLocation(this.plotCoord);
         // show debug info if enabled + extra info when Ctrl is held
         this.isShowingDebug = UI.isDebugPlotInfoVisible();
-        if (this.isShowingDebug && this.modCtrl) {
+        if (this.isShowingDebug && this.modShift) {
             this.tooltip.classList.add("bz-debug");
         } else {
             this.tooltip.classList.remove("bz-debug");
