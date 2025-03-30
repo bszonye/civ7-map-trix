@@ -809,10 +809,7 @@ class PlotTooltipType {
         this.container.appendChild(ttTitle);
     }
     renderTitleDivider(text=BZ_DOT_DIVIDER) {
-        if (this.isCompact) {
-            this.renderTitleHeading(text);
-            return;
-        }
+        if (this.isCompact) return this.renderTitleHeading(text);
         const layout = document.createElement("div");
         layout.classList.value = "font-title uppercase text-sm mx-3 max-w-80";
         layout.setAttribute("data-l10n-id", text);
@@ -1418,7 +1415,7 @@ class PlotTooltipType {
             over.style.backgroundImage = overlay;
             layout.appendChild(over);
         }
-        this.renderFlexDivider(layout, false, "mt-2", "mb-1");
+        this.renderFlexDivider(layout, false, "mt-2");
     }
     renderUrbanDivider() {
         // there are at least two building slots (unless one is large)
@@ -1439,7 +1436,7 @@ class PlotTooltipType {
             const isCurrent = slot?.isCurrent;
             // ring the slot with an appropriate color for the yield
             const ttFrame = document.createElement("div");
-            ttFrame.classList.value = "border-2 rounded-full mx-1\\.5";
+            ttFrame.classList.value = "border-2 rounded-full my-0\\.5 mx-1\\.5";
             ttFrame.style.setProperty("border-color", slotColor);
             // also glow if the building is fully operational
             if (isCurrent) ttFrame.style.setProperty(
@@ -1452,7 +1449,7 @@ class PlotTooltipType {
             ttFrame.appendChild(ttIcon);
             layout.appendChild(ttFrame);
         }
-        this.renderFlexDivider(layout, false, "mt-2\\.5", "mb-1");
+        this.renderFlexDivider(layout, false, "mt-2");
     }
     renderYields() {
         if (!this.totalYields) return;  // no yields to show
