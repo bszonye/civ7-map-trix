@@ -778,22 +778,22 @@ class PlotTooltipType {
         divider.classList.add("plot-tooltip__Divider", "my-2");
         this.container.appendChild(divider);
     }
-    renderFlexDivider(center, style=null) {
+    renderFlexDivider(center, rules, ...style) {
         const layout = document.createElement("div");
         layout.classList.value = "flex-auto flex justify-between items-center -mx-6";
-        if (style) layout.classList.add(style);
+        if (style.length) layout.classList.add(...style);
         this.container.appendChild(layout);
         // left frame
         const lineLeft = document.createElement("div");
         lineLeft.classList.value = "flex-auto h-0\\.5 min-w-6 ml-1\\.5";
-        lineLeft.style.setProperty("background-image", "linear-gradient(to left, #8D97A6, rgba(141, 151, 166, 0))");
+        if (rules) lineLeft.style.setProperty("background-image", "linear-gradient(to left, #8D97A6, rgba(141, 151, 166, 0))");
         layout.appendChild(lineLeft);
         // content
         layout.appendChild(center);
         // right frame
         const lineRight = document.createElement("div");
         lineRight.classList.value = "flex-auto h-0\\.5 min-w-6 mr-1\\.5";
-        lineRight.style.setProperty("background-image", "linear-gradient(to right, #8D97A6, rgba(141, 151, 166, 0))");
+        if (rules) lineRight.style.setProperty("background-image", "linear-gradient(to right, #8D97A6, rgba(141, 151, 166, 0))");
         layout.appendChild(lineRight);
     }
     renderTitleHeading(title, padding=true, capsule=null) {
@@ -816,7 +816,7 @@ class PlotTooltipType {
         const layout = document.createElement("div");
         layout.classList.value = "font-title uppercase text-sm mx-3 max-w-80";
         layout.setAttribute("data-l10n-id", text);
-        this.renderFlexDivider(layout, "mt-1\\.5");
+        this.renderFlexDivider(layout, true, "mt-1\\.5");
     }
     renderGeographySection() {
         if (this.isCompact) return;
@@ -1194,13 +1194,13 @@ class PlotTooltipType {
         }
         // title bar
         this.renderTitleDivider(Locale.compose(hexName));
-        if (!this.isCompact) this.renderDistrictDefense(this.plotCoord);
+        this.renderDistrictDefense(this.plotCoord);
         // panel interior
         // show rules for city-states and unique quarters
         if (hexRules && this.isVerbose) {
             const title = "font-title uppercase text-xs leading-snug";
             if (hexSubhead) this.renderRules([hexSubhead], '', title);
-            this.renderRules([hexRules]);
+            this.renderRules([hexRules], "mb-1");
         }
         // constructibles
         this.renderConstructibles();
@@ -1281,18 +1281,16 @@ class PlotTooltipType {
     renderWonderSection() {
         if (!this.wonder) return;
         this.renderTitleDivider(Locale.compose(this.wonder.info.Name));
+        let rulesStyle = null;
         const notes = this.wonder.notes;
         if (notes.length) {
             const ttState = document.createElement("div");
             ttState.classList.value = "bz-text-sub leading-none text-center";
-            ttState.innerHTML = dotJoinLocale(this.wonder.notes);
+            ttState.innerHTML = dotJoinLocale(notes);
             this.container.appendChild(ttState);
+            rulesStyle = "mt-1";
         }
-        // blank the rules in Compact mode if unfinished
-        if (!this.isCompact) {
-            const style = notes.length ? "mt-1" : null;
-            this.renderRules([this.wonder.info.Tooltip], style);
-        }
+        if (!this.isCompact) this.renderRules([this.wonder.info.Tooltip], rulesStyle);
         this.renderIconDivider(this.wonder.info.ConstructibleType);
     }
     // lay out a column of constructibles and their construction notes
@@ -1420,7 +1418,7 @@ class PlotTooltipType {
             over.style.backgroundImage = overlay;
             layout.appendChild(over);
         }
-        this.renderFlexDivider(layout, "mt-2");
+        this.renderFlexDivider(layout, false, "mt-2", "mb-1");
     }
     renderUrbanDivider() {
         // there are at least two building slots (unless one is large)
@@ -1454,12 +1452,12 @@ class PlotTooltipType {
             ttFrame.appendChild(ttIcon);
             layout.appendChild(ttFrame);
         }
-        this.renderFlexDivider(layout, "mt-2");
+        this.renderFlexDivider(layout, false, "mt-2", "mb-1");
     }
     renderYields() {
         if (!this.totalYields) return;  // no yields to show
         const tt = document.createElement('div');
-        tt.classList.value = "plot-tooltip__resourcesFlex mt-2";
+        tt.classList.value = "plot-tooltip__resourcesFlex mt-1\\.5";
         // one column per yield type
         for (const column of this.yields) {
             tt.appendChild(this.yieldColumn(column));
