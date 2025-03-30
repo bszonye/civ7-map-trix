@@ -62,16 +62,28 @@
             <Text>{1_name} People</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE">
-            <Text>Map Trix • verbose map tooltips</Text>
+            <Text>Map Trix • level of detail</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE_DESCRIPTION">
-            <Text>Shows extended tooltip information.  When unchecked, you can show verbose information by holding down Shift.</Text>
+            <Text>How much detail to show in map tooltips.[N] [N][B]Shortcut keys[/B][N]Verbose • Shift[N]Compact • Ctrl[N]Hidden • Ctrl+Shift</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER">
             <Text>Map Trix • restyle yield banner</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER_DESCRIPTION">
             <Text>Restyles the top bar to match the rounded color highlights in trixie's mods.</Text>
+        </Row>
+        <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_HIDDEN">
+            <Text>Hidden</Text>
+        </Row>
+        <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_COMPACT">
+            <Text>Compact</Text>
+        </Row>
+        <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_STANDARD">
+            <Text>Standard</Text>
+        </Row>
+        <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_VERBOSE">
+            <Text>Verbose</Text>
         </Row>
         <InsertOrIgnore Tag="LOC_OPTIONS_GROUP_BZ_MODS">
             <Text>trixie's mods</Text>

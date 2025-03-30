@@ -3,7 +3,7 @@
  * @copyright 2022, Firaxis Gmaes
  * @description The tooltips that appear based on the cursor hovering over world plots.
  */
-import bzMapTrixOptions from '/bz-map-trix/ui/options/bz-map-trix-options.js';
+import bzMapTrixOptions, { bzVerbosity } from '/bz-map-trix/ui/options/bz-map-trix-options.js';
 import "/base-standard/ui/tooltips/plot-tooltip.js";
 
 import TooltipManager, { PlotTooltipPriority } from '/core/ui/tooltips/tooltip-manager.js';
@@ -352,13 +352,6 @@ function setCapsuleStyle(element, style, ...classes) {
     if (classes.length) element.classList.add(...classes);
     setStyle(element, style);
 }
-var Verbosity;
-(function (Verbosity) {
-        Verbosity[Verbosity["HIDDEN"] = 0] = "HIDDEN";
-        Verbosity[Verbosity["COMPACT"] = 1] = "COMPACT";
-        Verbosity[Verbosity["DEFAULT"] = 2] = "DEFAULT";
-        Verbosity[Verbosity["VERBOSE"] = 3] = "VERBOSE";
-})(Verbosity || (Verbosity = {}));
 class PlotTooltipType {
     constructor() {
         this.plotCoord = null;
@@ -366,7 +359,7 @@ class PlotTooltipType {
         this.isShowingDebug = false;
         this.modCtrl = false;
         this.modShift = false;
-        this.verbosity = Verbosity.DEFAULT;
+        this.verbosity = bzVerbosity.STANDARD;
         // document root
         this.tooltip = document.createElement('fxs-tooltip');
         this.tooltip.classList.value = "bz-tooltip plot-tooltip max-w-96";
@@ -405,7 +398,7 @@ class PlotTooltipType {
         this.yields = [];
         this.totalYields = 0;
         // cursor modifier
-        this.relationship = null;
+        this.ownerRelationship = null;
         this.isEnemy = false;  // is the plot held by an enemy?
         // lookup tables
         this.agelessBuildings = gatherBuildingsTagged("AGELESS");
@@ -423,14 +416,13 @@ class PlotTooltipType {
             Controls.preloadImage("hud_sub_circle_bk", "city-banner");
         });
     }
-    get isHidden() { return this.verbosity == Verbosity.HIDDEN; }
-    get isCompact() { return this.verbosity <= Verbosity.COMPACT; }
-    get isVerbose() { return this.verbosity >= Verbosity.VERBOSE; }
+    get isHidden() { return this.verbosity == bzVerbosity.HIDDEN; }
+    get isCompact() { return this.verbosity <= bzVerbosity.COMPACT; }
+    get isVerbose() { return this.verbosity >= bzVerbosity.VERBOSE; }
     getHTML() {
         return this.tooltip;
     }
     isUpdateNeeded(plotCoord) {
-        let verbosity = Verbosity.DEFAULT;
         this.modCtrl = Input.isCtrlDown();
         this.modShift = Input.isShiftDown();
         // has the cursor moved?
@@ -439,14 +431,11 @@ class PlotTooltipType {
             plotCoord.y != this.plotCoord?.y;
         this.plotCoord = plotCoord;
         // has verbosity level changed?
-        const isHidden = this.modCtrl && this.modShift;
-        if (isHidden || this.isHidden && !hasMoved) {
-            verbosity = Verbosity.HIDDEN;
-        } else if (this.modCtrl) {
-            if (!this.modShift) verbosity = Verbosity.COMPACT;
-        } else if (this.modShift || bzMapTrixOptions.verbose) {
-            verbosity = Verbosity.VERBOSE;
-        }
+        const verbosity =
+            this.modCtrl && this.modShift ?  bzVerbosity.HIDDEN :
+            this.modCtrl ?  bzVerbosity.COMPACT :
+            this.modShift ?  bzVerbosity.VERBOSE :
+            bzMapTrixOptions.verbose;
         if (verbosity != this.verbosity) {
             this.verbosity = verbosity;
             return true;
@@ -464,8 +453,8 @@ class PlotTooltipType {
             return true;
         }
         // with a unit selected: ignore the same tile and enemy tiles
-        // UNLESS verbose mode is manually engaged
-        if (this.verbosity == Verbosity.VERBOSE && this.modShift) return false;
+        // UNLESS compact or verbose mode is manually engaged
+        if (this.modCtrl || this.modShift) return false;
         const selectedUnitID = UI.Player.getHeadSelectedUnit();
         if (selectedUnitID && ComponentID.isValid(selectedUnitID)) {
             const plotUnits = MapUnits.getUnits(this.plotCoord.x, this.plotCoord.y);
@@ -522,8 +511,11 @@ class PlotTooltipType {
         // yields
         this.yields = [];
         this.totalYields = 0;
+        // unit
+        // TODO
         // cursor modifier
-        this.relationship = null;
+        // TODO: track hex and unit separately
+        this.ownerRelationship = null;
         this.isEnemy = false;
     }
     update() {
@@ -605,8 +597,8 @@ class PlotTooltipType {
         const ownerID = GameplayMap.getOwner(loc.x, loc.y);
         this.owner = Players.get(ownerID);
         if (this.owner && Players.isAlive(this.owner.id)) {
-            this.relationship = this.getCivRelationship(this.owner);
-            if (this.relationship) this.isEnemy = this.relationship.isEnemy;
+            this.ownerRelationship = this.getCivRelationship(this.owner);
+            this.isEnemy = this.ownerRelationship?.isEnemy ?? false;
         }
         const cityID = GameplayMap.getOwningCityFromXY(loc.x, loc.y);
         this.city = cityID ? Cities.get(cityID) : null;
