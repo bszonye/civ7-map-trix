@@ -1117,10 +1117,11 @@ class PlotTooltipType {
             const isVassal = owner.Influence?.hasSuzerain &&
                 owner.Influence.getSuzerain() == this.player.id;
             const isEnemy = owner.Diplomacy?.isAtWarWith(this.player.id);
-            const name = isVassal ?  "LOC_INDEPENDENT_BZ_RELATIONSHIP_TRIBUTARY" :
-                 isEnemy ?  "LOC_INDEPENDENT_RELATIONSHIP_HOSTILE" :
+            const type =
+                isVassal ? "LOC_INDEPENDENT_BZ_RELATIONSHIP_TRIBUTARY" :
+                 isEnemy ? "LOC_INDEPENDENT_RELATIONSHIP_HOSTILE" :
                 "LOC_INDEPENDENT_RELATIONSHIP_FRIENDLY";
-            return { type: name, isEnemy };
+            return { type, isEnemy };
         }
         // is the other player at war?
         if (owner.Diplomacy.isAtWarWith(this.player.id)) {
@@ -1130,8 +1131,8 @@ class PlotTooltipType {
         if (owner.Diplomacy.hasAllied(this.player.id)) {
             return { type: "LOC_PLAYER_RELATIONSHIP_ALLIANCE", isEnemy: false };
         }
-        const name = owner.Diplomacy.getRelationshipLevelName(this.player.id);
-        return { type: name, isEnemy: false };
+        const type = owner.Diplomacy.getRelationshipLevelName(this.player.id);
+        return { type, isEnemy: false };
     }
     renderHexSection() {
         switch (this.district?.type) {
