@@ -359,7 +359,7 @@ class PlotTooltipType {
         this.isShowingDebug = false;
         this.modCtrl = false;
         this.modShift = false;
-        this.verbosity = bzVerbosity.STANDARD;
+        this.verbosity = bzMapTrixOptions.verbose;
         // document root
         this.tooltip = document.createElement('fxs-tooltip');
         this.tooltip.classList.value = "bz-tooltip plot-tooltip max-w-96";
@@ -451,9 +451,7 @@ class PlotTooltipType {
         if (this.isHidden) return true;
         // tile isn't revealed yet
         const revealedState = GameplayMap.getRevealedState(this.player.id, this.plotCoord.x, this.plotCoord.y);
-        if (revealedState == RevealedStates.HIDDEN) {
-            return true;
-        }
+        if (revealedState == RevealedStates.HIDDEN) return true;
         // with a unit selected: ignore the same tile and enemy tiles
         // UNLESS compact or verbose mode is manually engaged
         if (this.modCtrl || this.modShift) return false;
@@ -527,7 +525,7 @@ class PlotTooltipType {
         this.plotIndex = GameplayMap.getIndexFromLocation(this.plotCoord);
         // show debug info if enabled + extra info when Ctrl is held
         this.isShowingDebug = UI.isDebugPlotInfoVisible();
-        if (this.isShowingDebug && this.modShift) {
+        if (this.isShowingDebug && (this.modCtrl || this.modShift)) {
             this.tooltip.classList.add("bz-debug");
         } else {
             this.tooltip.classList.remove("bz-debug");
@@ -818,7 +816,7 @@ class PlotTooltipType {
         const layout = document.createElement("div");
         layout.classList.value = "font-title uppercase text-sm mx-3 max-w-80";
         layout.setAttribute("data-l10n-id", text);
-        this.renderFlexDivider(layout, "mt-2");
+        this.renderFlexDivider(layout, "mt-1\\.5");
     }
     renderGeographySection() {
         if (this.isCompact) return;
