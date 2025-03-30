@@ -133,10 +133,10 @@ const BZ_COLOR = {
     wet: "#335577",  // Wet features
     road: "#ccbbaa",  // Roads & Railroads
     // yield types
-    food: "#80bf40",  // green
+    food: "#80b34d",  // green
     production: "#a33d29",  // red
     gold: "#f6ce55",  // yellow
-    science: "#51b4fb",  // cyan
+    science: "#6ca6e0",  // cyan
     culture: "#7981d2",  // violet
     happiness: "#f5993d",  // orange
     diplomacy: "#7a94b8",  // blue

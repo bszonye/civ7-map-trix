@@ -28,10 +28,10 @@ BZ_HEAD_STYLE.textContent = `
     color: #e5e5e5;  /* text-accent-1 */
 }
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-food {
-    background-color: #80bf4055;
+    background-color: #80b34d66;
 }
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-food:hover {
-    background-color: #80bf40aa;
+    background-color: #80b34daa;
 }
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-production {
     background-color: #a33d2966;
@@ -40,16 +40,16 @@ BZ_HEAD_STYLE.textContent = `
     background-color: #a33d29aa;
 }
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-gold {
-    background-color: #f6ce5555;
+    background-color: #f6ce5566;
 }
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-gold:hover {
     background-color: #f6ce55aa;
 }
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-science {
-    background-color: #51abfb55;
+    background-color: #6ca6e066;
 }
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-science:hover {
-    background-color: #51abfbaa;
+    background-color: #6ca6e0aa;
 }
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-culture {
     background-color: #7981d266;
