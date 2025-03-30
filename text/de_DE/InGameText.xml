@@ -65,7 +65,7 @@
             <Text>Map Trix • Detaillierungsgrad</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE_DESCRIPTION" Language="de_DE">
-            <Text>Detaillierungsgrad für die Kartentools.[N] [N][B]Tastenkombination[/B][N]Kurz • Strg[N]Detaillierte • Umschalt[N]Verborgen • Strg+Umschalt</Text>
+            <Text>Detaillierungsgrad für die Kartentools.[N] [N][B]Tastenkombination[/B][N]Kurz • Strg[N]Detailliert • Umschalt[N]Verborgen • Strg+Umschalt</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER" Language="de_DE">
             <Text>Map Trix • gestaltet das Ertragsbanner neu</Text>
@@ -83,7 +83,7 @@
             <Text>Standard</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_VERBOSE" Language="de_DE">
-            <Text>Detaillierte</Text>
+            <Text>Detailliert</Text>
         </Row>
         <InsertOrIgnore Tag="LOC_OPTIONS_GROUP_BZ_MODS" Language="de_DE">
             <Text>Trixies mods</Text>
