@@ -446,7 +446,7 @@ class PlotTooltipType {
     }
     isBlank() {
         // outside the map
-        if (this.plotCoord == null) return true;
+        if (!this.plotCoord) return true;
         // Ctrl+Shift held
         if (this.isHidden) return true;
         // tile isn't revealed yet
@@ -518,7 +518,7 @@ class PlotTooltipType {
         this.unitRelationship = null;
     }
     update() {
-        if (this.plotCoord == null) {
+        if (!this.plotCoord) {
             console.error("plot-tooltip: cannot read plot values (coordinate error)");
             return;
         }
@@ -1089,14 +1089,14 @@ class PlotTooltipType {
         this.container.appendChild(layout);
     }
     getOwnerName(owner) {
-        if (owner == null) return "";
+        if (!owner) return "";
         const name = owner.isMinor || owner.isIndependent ?
             Locale.compose("LOC_LEADER_BZ_PEOPLE_NAME", owner.name) :
             Locale.compose(owner.name);
         return name;
     }
     getCivName(owner, fullName=false) {
-        if (owner == null) return "";
+        if (!owner) return "";
         const civName = fullName || owner.isMinor || owner.isIndependent ?
             owner.civilizationFullName :  // "Venice"
             owner.civilizationName;  // "Spain"
@@ -1107,7 +1107,7 @@ class PlotTooltipType {
         return name;
     }
     getCivRelationship(owner) {
-        if (owner == null || !Players.isAlive(owner.id)) return null;
+        if (!owner || !Players.isAlive(owner.id)) return null;
         if (owner.id == this.player.id) {
             return { type: "LOC_PLOT_TOOLTIP_YOU", isEnemy: false };
         }
