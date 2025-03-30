@@ -73,6 +73,18 @@
         <Row Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER_DESCRIPTION" Language="zh_Hans_CN">
             <Text>将顶部横幅样式改为与 trixie 系列模组相同的圆角彩色高亮风格</Text>
         </Row>
+        <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_HIDDEN" Language="zh_Hans_CN">
+            <Text>TODO</Text>
+        </Row>
+        <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_COMPACT" Language="zh_Hans_CN">
+            <Text>TODO</Text>
+        </Row>
+        <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_STANDARD" Language="zh_Hans_CN">
+            <Text>TODO</Text>
+        </Row>
+        <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_VERBOSE" Language="zh_Hans_CN">
+            <Text>TODO</Text>
+        </Row>
         <InsertOrIgnore Tag="LOC_OPTIONS_GROUP_BZ_MODS" Language="zh_Hans_CN">
             <Text>trixie 系列模组</Text>
         </InsertOrIgnore>

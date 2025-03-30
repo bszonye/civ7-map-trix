@@ -73,6 +73,18 @@
         <Row Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER_DESCRIPTION" Language="it_IT">
             <Text>Modifica lo stile della barra superiore per adattarla agli evidenziamenti arrotondati colorati nelle mod di trixie.</Text>
         </Row>
+        <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_HIDDEN" Language="it_IT">
+            <Text>TODO</Text>
+        </Row>
+        <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_COMPACT" Language="it_IT">
+            <Text>TODO</Text>
+        </Row>
+        <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_STANDARD" Language="it_IT">
+            <Text>TODO</Text>
+        </Row>
+        <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_VERBOSE" Language="it_IT">
+            <Text>TODO</Text>
+        </Row>
         <InsertOrIgnore Tag="LOC_OPTIONS_GROUP_BZ_MODS" Language="it_IT">
             <Text>mod di Trixie</Text>
         </InsertOrIgnore>

@@ -61,6 +61,18 @@
         <Row Tag="LOC_LEADER_BZ_PEOPLE_NAME" Language="ru_RU">
             <Text>{1_name}</Text>
         </Row>
+        <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_HIDDEN" Language="ru_RU">
+            <Text>TODO</Text>
+        </Row>
+        <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_COMPACT" Language="ru_RU">
+            <Text>TODO</Text>
+        </Row>
+        <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_STANDARD" Language="ru_RU">
+            <Text>TODO</Text>
+        </Row>
+        <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_VERBOSE" Language="ru_RU">
+            <Text>TODO</Text>
+        </Row>
         <InsertOrIgnore Tag="LOC_OPTIONS_GROUP_BZ_MODS" Language="ru_RU">
             <Text>Моды от Trixie</Text>
         </InsertOrIgnore>

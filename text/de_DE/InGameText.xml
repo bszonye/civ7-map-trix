@@ -73,6 +73,18 @@
         <Row Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER_DESCRIPTION" Language="de_DE">
             <Text>Ändert die obere Leiste so, dass sie den abgerundeten Farbhervorhebungen in Trixies Mods entspricht.</Text>
         </Row>
+        <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_HIDDEN" Language="de_DE">
+            <Text>TODO</Text>
+        </Row>
+        <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_COMPACT" Language="de_DE">
+            <Text>TODO</Text>
+        </Row>
+        <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_STANDARD" Language="de_DE">
+            <Text>TODO</Text>
+        </Row>
+        <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_VERBOSE" Language="de_DE">
+            <Text>TODO</Text>
+        </Row>
         <InsertOrIgnore Tag="LOC_OPTIONS_GROUP_BZ_MODS" Language="de_DE">
             <Text>Trixies mods</Text>
         </InsertOrIgnore>
