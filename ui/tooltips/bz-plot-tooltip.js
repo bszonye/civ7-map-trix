@@ -139,7 +139,7 @@ const BZ_COLOR = {
     science: "#6ca6e0",  // cyan
     culture: "#7981d2",  // violet
     happiness: "#f5993d",  // orange
-    diplomacy: "#7a94b8",  // blue
+    diplomacy: "#7a94b8",  // gray
 };
 const BZ_ALERT = {
     primary: { "background-color": BZ_COLOR.primary },
