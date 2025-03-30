@@ -61,17 +61,29 @@
         <Row Tag="LOC_LEADER_BZ_PEOPLE_NAME" Language="ru_RU">
             <Text>{1_name}</Text>
         </Row>
+        <Row Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE" Language="ru_RU">
+            <Text>Map Trix • уровень детализации</Text>
+        </Row>
+        <Row Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE_DESCRIPTION" Language="ru_RU">
+            <Text>Насколько подробно отображать.[N] [N][B]Сочетания клавиш[/B][N]Краткий • Ctrl[N]Подробный • Shift[N]Скрытое • Ctrl+Shift</Text>
+        </Row>
+        <Row Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER" Language="ru_RU">
+            <Text>Map Trix • изменить внешний вид верхнего баннера</Text>
+        </Row>
+        <Row Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER_DESCRIPTION" Language="ru_RU">
+            <Text>Изменяет верхнюю панель в соответствии с Моды от Trixie.</Text>
+        </Row>
         <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_HIDDEN" Language="ru_RU">
-            <Text>TODO</Text>
+            <Text>Скрытое</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_COMPACT" Language="ru_RU">
-            <Text>TODO</Text>
+            <Text>Краткий</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_STANDARD" Language="ru_RU">
-            <Text>TODO</Text>
+            <Text>Стандартная</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_VERBOSE" Language="ru_RU">
-            <Text>TODO</Text>
+            <Text>Подробный</Text>
         </Row>
         <InsertOrIgnore Tag="LOC_OPTIONS_GROUP_BZ_MODS" Language="ru_RU">
             <Text>Моды от Trixie</Text>

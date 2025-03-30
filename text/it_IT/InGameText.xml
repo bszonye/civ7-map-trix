@@ -62,10 +62,10 @@
             <Text>Popolo di {1_name}</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE" Language="it_IT">
-            <Text>Map Trix • tooltip mappa dettagliati</Text>
+            <Text>Map Trix • grado di dettaglio</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE_DESCRIPTION" Language="it_IT">
-            <Text>Mostra informazioni dettagliate nei tooltip. Se deselezionato, puoi visualizzare informazioni dettagliate tenendo premuto Shift.</Text>
+            <Text>Quanti dettagli mostrare nei tooltip.[N] [N][B]Scorciatoia da tastiera[/B][N]Brevi • Ctrl[N]Dettagliati • Shift[N]Nascosti • Ctrl+Shift</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER" Language="it_IT">
             <Text>Map Trix • restyling del banner delle rese</Text>
@@ -74,16 +74,16 @@
             <Text>Modifica lo stile della barra superiore per adattarla agli evidenziamenti arrotondati colorati nelle mod di trixie.</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_HIDDEN" Language="it_IT">
-            <Text>TODO</Text>
+            <Text>Nascosti</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_COMPACT" Language="it_IT">
-            <Text>TODO</Text>
+            <Text>Brevi</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_STANDARD" Language="it_IT">
-            <Text>TODO</Text>
+            <Text>Standard</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_VERBOSE" Language="it_IT">
-            <Text>TODO</Text>
+            <Text>Dettagliati</Text>
         </Row>
         <InsertOrIgnore Tag="LOC_OPTIONS_GROUP_BZ_MODS" Language="it_IT">
             <Text>mod di Trixie</Text>

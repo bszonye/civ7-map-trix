@@ -62,10 +62,10 @@
             <Text>{1_name} 民族</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE" Language="zh_Hant_HK">
-            <Text>Map Trix • 詳細地塊提示</Text>
+            <Text>Map Trix • 詳細程度</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE_DESCRIPTION" Language="zh_Hant_HK">
-            <Text>顯示擴展提示資訊。取消勾選時可通過按住 Shift 鍵查看詳細資訊</Text>
+            <Text>顯示多少細節[N] [N][B]快速鍵[/B][N]簡洁的　Ctrl[N]詳細　　Shift[N]隱　　　Ctrl+Shift</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER" Language="zh_Hant_HK">
             <Text>Map Trix • 頂部橫幅重製</Text>
@@ -74,16 +74,16 @@
             <Text>將頂部橫幅樣式改為與 trixie 系列模組相同的圓角彩色高亮風格</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_HIDDEN" Language="zh_Hant_HK">
-            <Text>TODO</Text>
+            <Text>隱</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_COMPACT" Language="zh_Hant_HK">
-            <Text>TODO</Text>
+            <Text>簡洁的</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_STANDARD" Language="zh_Hant_HK">
-            <Text>TODO</Text>
+            <Text>標準</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_VERBOSE" Language="zh_Hant_HK">
-            <Text>TODO</Text>
+            <Text>詳細</Text>
         </Row>
         <InsertOrIgnore Tag="LOC_OPTIONS_GROUP_BZ_MODS" Language="zh_Hant_HK">
             <Text>trixie 系列模組</Text>
