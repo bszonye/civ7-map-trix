@@ -1452,7 +1452,7 @@ class PlotTooltipType {
             ttFrame.appendChild(ttIcon);
             layout.appendChild(ttFrame);
         }
-        this.renderFlexDivider(layout, false, "mt-2", "mb-1");
+        this.renderFlexDivider(layout, false, "mt-2\\.5", "mb-1");
     }
     renderYields() {
         if (!this.totalYields) return;  // no yields to show
