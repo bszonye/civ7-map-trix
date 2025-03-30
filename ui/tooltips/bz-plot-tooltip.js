@@ -1250,7 +1250,7 @@ class PlotTooltipType {
         } else if (this.district?.type) {
             // rural
             hexName = GameInfo.Districts.lookup(this.district?.type).Name;
-        } else if (this.city) {
+        } else if (this.city && this.expansion) {
             // claimed but undeveloped
             hexName = "LOC_DISTRICT_BZ_UNDEVELOPED";
         } else if (this.isCompact) {
@@ -1321,7 +1321,7 @@ class PlotTooltipType {
         // expansion type for undeveloped & upgraded tiles
         if (this.expansion) {
             const tt = document.createElement("div");
-            if (this.constructibles.length) tt.classList.value = "bz-text-sub";
+            if (this.constructibles.length) tt.classList.value = "bz-text-sub mt-1";
             tt.setAttribute("data-l10n-id", this.expansion.text);
             ttList.appendChild(tt);
         }
