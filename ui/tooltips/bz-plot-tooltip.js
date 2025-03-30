@@ -1383,14 +1383,16 @@ class PlotTooltipType {
     }
     renderIconDivider(icon, overlay=null) {
         // icon divider with optional overlay
+        const layout = document.createElement("div");
+        layout.classList.add("flex-grow", "relative");
+        if (icon.startsWith("IMPROVEMENT_")) layout.classList.add("-my-1");
+        const base = document.createElement("div");
+        const iconStyle = "bg-contain bg-center mx-3";
+        base.classList.value = iconStyle;
+        // format icon
         if (!icon.startsWith("url(")) icon = UI.getIconCSS(icon);
         if (overlay && !overlay.startsWith("url(")) overlay = UI.getIconCSS(overlay);
         preloadIcon(icon);  // prevent flicker
-        const layout = document.createElement("div");
-        layout.classList.add("flex-grow", "relative");
-        const base = document.createElement("div");
-        const iconStyle = "bg-contain bg-center -my-1 mx-3";  // tight vertical
-        base.classList.value = iconStyle;
         if (icon.search(/blp:tech_/) == -1) {
             base.classList.add("size-12");
         } else {
