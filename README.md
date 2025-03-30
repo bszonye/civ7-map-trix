@@ -36,9 +36,10 @@ show which basic improvement they replaced (for warehouse bonuses).
 ## yields
 the last column shows the total of all yields under a bronze hexagon.
 
-## compact mode and verbose mode
+## compact or verbose
 hold down Ctrl or Shift to change the level of detail, or both together
-to hide the tooltip:
+to hide the tooltip.  you can also set your preferred level in the
+Options menu.
 
 - compact: Ctrl
 - verbose: Shift
