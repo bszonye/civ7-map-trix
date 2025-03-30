@@ -1,4 +1,4 @@
-# Map Trix 1.8.3
+# Map Trix 1.9.0
 better map tools for Civilization VII
 
 ## spot important map details
@@ -36,10 +36,14 @@ show which basic improvement they replaced (for warehouse bonuses).
 ## yields
 the last column shows the total of all yields under a bronze hexagon.
 
-## verbose mode
-you can hold down Ctrl or Shift to show additional information on some
-tiles, like city-states, unique quarters, resources you've already
-connected, and undeveloped land outside your civilization.
+## compact or verbose
+hold down Ctrl or Shift to change the level of detail, or Ctrl+Shift
+together to hide the tooltip.  you can also set your preferred level in
+the Options menu.
+
+- compact: Ctrl
+- verbose: Shift
+- hidden: Ctrl+Shift
 
 ## compatibility with other mods
 known interactions:

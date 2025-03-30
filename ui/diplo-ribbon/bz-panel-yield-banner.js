@@ -28,49 +28,49 @@ BZ_HEAD_STYLE.textContent = `
     color: #e5e5e5;  /* text-accent-1 */
 }
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-food {
-    background-color: #a6cc3344;
+    background-color: #80b34d80;
 }
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-food:hover {
-    background-color: #a6cc33aa;
+    background-color: #80b34daa;
 }
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-production {
-    background-color: #a33d2955;
+    background-color: #a33d2980;
 }
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-production:hover {
     background-color: #a33d29aa;
 }
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-gold {
-    background-color: #f0c44244;
+    background-color: #f6ce5580;
 }
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-gold:hover {
-    background-color: #f0c442aa;
-}
-.bz-yield-banner .panel-yield__top-bar-content .text-yield-influence {
-    background-color: #99e6bf66;
-}
-.bz-yield-banner .panel-yield__top-bar-content .text-yield-influence:hover {
-    background-color: #99e6bfaa;
+    background-color: #f6ce55aa;
 }
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-science {
-    background-color: #80bfff55;
+    background-color: #6ca6e080;
 }
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-science:hover {
-    background-color: #80bfffaa;
+    background-color: #6ca6e0aa;
 }
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-culture {
-    background-color: #bf99e666;
+    background-color: #7981d280;
 }
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-culture:hover {
-    background-color: #bf99e6aa;
+    background-color: #7981d2aa;
 }
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-happiness {
-    background-color: #ff993366;
+    background-color: #f5993d80;
 }
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-happiness:hover {
-    background-color: #ff9933aa;
+    background-color: #f5993daa;
+}
+.bz-yield-banner .panel-yield__top-bar-content .text-yield-influence {
+    background-color: #7a94b880;
+}
+.bz-yield-banner .panel-yield__top-bar-content .text-yield-influence:hover {
+    background-color: #7a94b8aa;
 }
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-cities {
-    background-color: #e5d2ac66;
+    background-color: #e5d2ac80;
 }
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-cities:hover {
     background-color: #e5d2acaa;

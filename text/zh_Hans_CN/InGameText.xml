@@ -62,16 +62,28 @@
             <Text>{1_name} 民族</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE" Language="zh_Hans_CN">
-            <Text>Map Trix • 详细地块提示</Text>
+            <Text>Map Trix • 详细程度</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE_DESCRIPTION" Language="zh_Hans_CN">
-            <Text>显示扩展提示信息。取消勾选时可通过按住 Ctrl 或 Shift 键查看详细信息</Text>
+            <Text>显示多少细节[N] [N][B]快捷键[/B][N]简洁的　Ctrl[N]详细　　Shift[N]隐　　　Ctrl+Shift</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER" Language="zh_Hans_CN">
             <Text>Map Trix • 顶部横幅重制</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER_DESCRIPTION" Language="zh_Hans_CN">
             <Text>将顶部横幅样式改为与 trixie 系列模组相同的圆角彩色高亮风格</Text>
+        </Row>
+        <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_HIDDEN" Language="zh_Hans_CN">
+            <Text>隐</Text>
+        </Row>
+        <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_COMPACT" Language="zh_Hans_CN">
+            <Text>简洁的</Text>
+        </Row>
+        <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_STANDARD" Language="zh_Hans_CN">
+            <Text>标准</Text>
+        </Row>
+        <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_VERBOSE" Language="zh_Hans_CN">
+            <Text>详细</Text>
         </Row>
         <InsertOrIgnore Tag="LOC_OPTIONS_GROUP_BZ_MODS" Language="zh_Hans_CN">
             <Text>trixie 系列模组</Text>
