@@ -310,8 +310,8 @@ function getSpecialists(loc, city) {
 function getTopUnit(loc) {
     let plotUnits = MapUnits.getUnits(loc.x, loc.y);
     if (plotUnits && plotUnits.length > 0) {
-        const topUnit = Units.get(plotUnits[0]);
-        return topUnit;
+        const unit = Units.get(plotUnits[0]);
+        return unit;
     }
     return null;
 }
@@ -397,9 +397,11 @@ class PlotTooltipType {
         // yields
         this.yields = [];
         this.totalYields = 0;
-        // cursor modifier
+        // unit
+        this.unit = null;
+        // owner & unit relationships
         this.ownerRelationship = null;
-        this.isEnemy = false;  // is the plot held by an enemy?
+        this.unitRelationship = null;
         // lookup tables
         this.agelessBuildings = gatherBuildingsTagged("AGELESS");
         this.extraBuildings = gatherBuildingsTagged("IGNORE_DISTRICT_PLACEMENT_CAP");
@@ -512,11 +514,10 @@ class PlotTooltipType {
         this.yields = [];
         this.totalYields = 0;
         // unit
-        // TODO
-        // cursor modifier
-        // TODO: track hex and unit separately
+        this.unit = null;
+        // owner & unit relationships
         this.ownerRelationship = null;
-        this.isEnemy = false;
+        this.unitRelationship = null;
     }
     update() {
         if (this.plotCoord == null) {
@@ -548,6 +549,7 @@ class PlotTooltipType {
         this.modelCivilization();
         this.modelConstructibles();
         this.modelYields();
+        this.modelUnits();
     }
     render() {
         this.renderGeographySection();
@@ -596,10 +598,7 @@ class PlotTooltipType {
         const loc = this.plotCoord;
         const ownerID = GameplayMap.getOwner(loc.x, loc.y);
         this.owner = Players.get(ownerID);
-        if (this.owner && Players.isAlive(this.owner.id)) {
-            this.ownerRelationship = this.getCivRelationship(this.owner);
-            this.isEnemy = this.ownerRelationship?.isEnemy ?? false;
-        }
+        this.ownerRelationship = this.getCivRelationship(this.owner);
         const cityID = GameplayMap.getOwningCityFromXY(loc.x, loc.y);
         this.city = cityID ? Cities.get(cityID) : null;
         const districtID = MapCities.getDistrict(loc.x, loc.y);
@@ -766,6 +765,15 @@ class PlotTooltipType {
             BZ_ICON_TOTAL_URBAN : BZ_ICON_TOTAL_RURAL;
         const column = { name: "LOC_YIELD_BZ_TOTAL", type, value: this.totalYields };
         this.yields.push(column);
+    }
+    modelUnits() {
+        const loc = this.plotCoord;
+        if (GameplayMap.getRevealedState(this.player.id, loc.x, loc.y) != RevealedStates.VISIBLE) return;
+        // get topmost unit and owner
+        const unit = getTopUnit(loc);
+        if (!unit || !Visibility.isVisible(this.player.id, unit.id)) return;
+        this.unit = unit;
+        this.unitRelationship = this.getCivRelationship(Players.get(unit.owner));
     }
     renderDivider() {
         const divider = document.createElement("div");
@@ -1067,10 +1075,10 @@ class PlotTooltipType {
         const layout = document.createElement("div");
         layout.classList.value = "text-xs leading-snug text-center mb-2";
         const ownerName = this.getOwnerName(this.owner);
-        const relType = Locale.compose(this.relationship?.type);
+        const relType = Locale.compose(this.ownerRelationship?.type);
         const civName = this.getCivName(this.owner, true);
         // highlight enemy players
-        if (this.isEnemy) {
+        if (this.ownerRelationship?.isEnemy) {
             layout.classList.add("py-1");
             setBannerStyle(layout);
         }
@@ -1103,6 +1111,7 @@ class PlotTooltipType {
         return name;
     }
     getCivRelationship(owner) {
+        if (owner == null || !Players.isAlive(owner.id)) return null;
         if (owner.id == this.player.id) {
             return { type: "LOC_PLOT_TOOLTIP_YOU", isEnemy: false };
         }
@@ -1115,7 +1124,7 @@ class PlotTooltipType {
             const name = isVassal ?  "LOC_INDEPENDENT_BZ_RELATIONSHIP_TRIBUTARY" :
                  isEnemy ?  "LOC_INDEPENDENT_RELATIONSHIP_HOSTILE" :
                 "LOC_INDEPENDENT_RELATIONSHIP_FRIENDLY";
-            return { type: name, isEnemy: isEnemy };
+            return { type: name, isEnemy };
         }
         // is the other player at war?
         if (owner.Diplomacy.isAtWarWith(this.player.id)) {
@@ -1244,9 +1253,6 @@ class PlotTooltipType {
         } else if (this.district?.type) {
             // rural
             hexName = GameInfo.Districts.lookup(this.district?.type).Name;
-        } else if (!this.improvement && !this.totalYields && !this.isCompact) {
-            // nothing more to see here
-            return;
         } else if (this.city) {
             // claimed but undeveloped
             hexName = "LOC_DISTRICT_BZ_UNDEVELOPED";
@@ -1493,31 +1499,16 @@ class PlotTooltipType {
         return ttIndividualYieldFlex;
     }
     renderUnitSection() {
-        const loc = this.plotCoord;
-        if (GameplayMap.getRevealedState(this.player.id, loc.x, loc.y) != RevealedStates.VISIBLE) return;
-        // get topmost unit and owner
-        let topUnit = getTopUnit(loc);
-        if (!topUnit || !Visibility.isVisible(this.player.id, topUnit.id)) return;
-        const owner = Players.get(topUnit.owner);
-        if (!owner) return;
-        // get relationship
-        if (owner.id == this.player.id) {
-            this.isEnemy = false;
-            return;
-        }
-        // update isEnemy status to match top unit
-        const relationship = this.getCivRelationship(owner);
-        if (relationship) this.isEnemy = relationship.isEnemy;
         // show unit section
-        if (this.isCompact) return;
+        if (this.isCompact || !this.unit) return;
         this.renderDivider();
         const layout = document.createElement("div");
         layout.classList.value = "text-xs leading-snug text-center";
-        const unitName = topUnit.name;
-        const civName = this.getCivName(owner);
-        const unitInfo = [unitName, civName, relationship?.type];
+        const unitName = this.unit.name;
+        const civName = this.getCivName(Players.get(this.unit.owner));
+        const unitInfo = [unitName, civName, this.unitRelationship?.type];
         layout.innerHTML = dotJoinLocale(unitInfo);
-        if (this.isEnemy) {
+        if (this.unitRelationship?.isEnemy) {
             layout.classList.add("py-1");
             setBannerStyle(layout);
         }
@@ -1528,7 +1519,11 @@ class PlotTooltipType {
         if (UI.isCursorLocked()) return;
         // don't block cursor changes from interface-mode-acquire-tile
         if (InterfaceMode.getCurrent() == "INTERFACEMODE_ACQUIRE_TILE") return;
-        if (this.isEnemy) {
+        const isEnemy =
+            this.unitRelationship?.isEnemy ??  // first check occupying unit
+            this.ownerRelationship?.isEnemy ??  // then hex ownership
+            false;
+        if (isEnemy) {
             UI.setCursorByURL("fs://game/core/ui/cursors/enemy.ani");
         } else {
             UI.setCursorByType(UIHTMLCursorTypes.Default);
