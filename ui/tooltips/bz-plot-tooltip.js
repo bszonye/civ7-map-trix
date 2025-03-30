@@ -818,7 +818,7 @@ class PlotTooltipType {
         const layout = document.createElement("div");
         layout.classList.value = "font-title uppercase text-sm mx-3 max-w-80";
         layout.setAttribute("data-l10n-id", text);
-        this.renderFlexDivider(layout);
+        this.renderFlexDivider(layout, "mt-2");
     }
     renderGeographySection() {
         if (this.isCompact) return;
@@ -847,7 +847,7 @@ class PlotTooltipType {
         this.renderTitleHeading(title, !banners.length, terrainLabel.style);
         // other geographical info
         const layout = document.createElement("div");
-        layout.classList.value = "text-xs leading-snug text-center mb-2";
+        layout.classList.value = "text-xs leading-snug text-center";
         if (featureLabel) {
             const tt = document.createElement("div");
             setCapsuleStyle(tt, featureLabel.style, "my-0\\.5");
@@ -1057,9 +1057,7 @@ class PlotTooltipType {
         // fresh water
         if (!this.isFreshWater) stats.push(["LOC_BZ_PLOTKEY_NO_FRESHWATER"]);
         // render
-        if (stats.length) {
-            this.renderRules(stats, "-mt-1 mb-2");  // tighten space above icon
-        }
+        if (stats.length) this.renderRules(stats, "mt-1");
     }
     renderOwnerInfo() {
         if (!this.owner || !Players.isAlive(this.owner.id)) return;
@@ -1073,7 +1071,7 @@ class PlotTooltipType {
             return;
         }
         const layout = document.createElement("div");
-        layout.classList.value = "text-xs leading-snug text-center mb-2";
+        layout.classList.value = "text-xs leading-snug text-center";
         const ownerName = this.getOwnerName(this.owner);
         const relType = Locale.compose(this.ownerRelationship?.type);
         const civName = this.getCivName(this.owner, true);
@@ -1212,7 +1210,7 @@ class PlotTooltipType {
         if (specialists) {
             const text = Locale.compose("LOC_DISTRICT_BZ_SPECIALISTS",
                 specialists.workers, specialists.maximum);
-            this.renderRules([text], "-mt-1 mb-2");  // tighten space above icon
+            this.renderRules([text], "mt-1");
         }
         // bottom bar
         this.renderUrbanDivider();
@@ -1256,17 +1254,19 @@ class PlotTooltipType {
         } else if (this.city) {
             // claimed but undeveloped
             hexName = "LOC_DISTRICT_BZ_UNDEVELOPED";
-        } else {
-            // unclaimed wilderness
-            hexName = this.isCompact && this.biome?.BiomeType == "BIOME_MARINE" ?
+        } else if (this.isCompact) {
+            // unclaimed wilderness only needs a title in compact mode
+            hexName = this.biome?.BiomeType == "BIOME_MARINE" ?
                 this.terrain.Name :
                 GameInfo.Districts.lookup(DistrictTypes.WILDERNESS).Name;
         }
+        // avoid useless section headings
+        if (!this.improvement && !this.totalYields && !this.isCompact) return;
         // title bar
         if (hexName) this.renderTitleDivider(Locale.compose(hexName));
         // optional description
         if (hexRules.length && !this.isCompact) {
-            const title = "bz-text-sub leading-none mb-2";
+            const title = "bz-text-sub leading-none mb-1";
             if (hexSubtitle) this.renderRules([hexSubtitle], '', title);
             this.renderRules(hexRules);
         }
@@ -1285,21 +1285,22 @@ class PlotTooltipType {
         const notes = this.wonder.notes;
         if (notes.length) {
             const ttState = document.createElement("div");
-            ttState.classList.value = "bz-text-sub leading-none text-center mb-1";
+            ttState.classList.value = "bz-text-sub leading-none text-center";
             ttState.innerHTML = dotJoinLocale(this.wonder.notes);
             this.container.appendChild(ttState);
         }
         // blank the rules in Compact mode if unfinished
-        // (but still use renderRules for proper vertical spacing)
-        const rules = this.isCompact && notes.length ? [] : [this.wonder.info.Tooltip];
-        this.renderRules([rules]);
+        if (!this.isCompact) {
+            const style = notes.length ? "mt-1" : null;
+            this.renderRules([this.wonder.info.Tooltip], style);
+        }
         this.renderIconDivider(this.wonder.info.ConstructibleType);
     }
     // lay out a column of constructibles and their construction notes
     renderConstructibles() {
         if (!this.constructibles.length && !this.expansion) return;
         const ttList = document.createElement("div");
-        ttList.classList.value = "text-xs leading-snug text-center mb-2";
+        ttList.classList.value = "text-xs leading-snug text-center";
         for (const c of this.constructibles) {
             const ttConstructible = document.createElement("div");
             const ttName = document.createElement("div");
@@ -1333,7 +1334,7 @@ class PlotTooltipType {
     renderRules(text, listStyle=null, rowStyle=null) {
         // text with icons is squirrelly, only format it at top level!
         const ttText = document.createElement("div");
-        ttText.classList.value = listStyle ?? "mb-2";
+        if (listStyle) ttText.classList.value = listStyle;
         ttText.classList.add("bz-rules-center");
         for (const row of text) {
             const ttRow = document.createElement("div");
@@ -1420,7 +1421,7 @@ class PlotTooltipType {
             over.style.backgroundImage = overlay;
             layout.appendChild(over);
         }
-        this.renderFlexDivider(layout, "mb-2");
+        this.renderFlexDivider(layout, "mt-2");
     }
     renderUrbanDivider() {
         // there are at least two building slots (unless one is large)
@@ -1454,12 +1455,12 @@ class PlotTooltipType {
             ttFrame.appendChild(ttIcon);
             layout.appendChild(ttFrame);
         }
-        this.renderFlexDivider(layout, "mb-2");
+        this.renderFlexDivider(layout, "mt-2");
     }
     renderYields() {
         if (!this.totalYields) return;  // no yields to show
         const tt = document.createElement('div');
-        tt.classList.value = "plot-tooltip__resourcesFlex";
+        tt.classList.value = "plot-tooltip__resourcesFlex mt-2";
         // one column per yield type
         for (const column of this.yields) {
             tt.appendChild(this.yieldColumn(column));
@@ -1500,7 +1501,7 @@ class PlotTooltipType {
     }
     renderUnitSection() {
         // show unit section
-        if (this.isCompact || !this.unit) return;
+        if (this.isCompact || !this.unit || this.unit.owner == this.player.id) return;
         this.renderDivider();
         const layout = document.createElement("div");
         layout.classList.value = "text-xs leading-snug text-center";
