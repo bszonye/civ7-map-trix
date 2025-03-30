@@ -778,7 +778,7 @@ class PlotTooltipType {
         divider.classList.add("plot-tooltip__Divider", "my-2");
         this.container.appendChild(divider);
     }
-    renderFlexDivider(center, rules, ...style) {
+    renderFlexDivider(center, lines, ...style) {
         const layout = document.createElement("div");
         layout.classList.value = "flex-auto flex justify-between items-center -mx-6";
         if (style.length) layout.classList.add(...style);
@@ -786,14 +786,14 @@ class PlotTooltipType {
         // left frame
         const lineLeft = document.createElement("div");
         lineLeft.classList.value = "flex-auto h-0\\.5 min-w-6 ml-1\\.5";
-        if (rules) lineLeft.style.setProperty("background-image", "linear-gradient(to left, #8D97A6, rgba(141, 151, 166, 0))");
+        if (lines) lineLeft.style.setProperty("background-image", "linear-gradient(to left, #8D97A6, rgba(141, 151, 166, 0))");
         layout.appendChild(lineLeft);
         // content
         layout.appendChild(center);
         // right frame
         const lineRight = document.createElement("div");
         lineRight.classList.value = "flex-auto h-0\\.5 min-w-6 mr-1\\.5";
-        if (rules) lineRight.style.setProperty("background-image", "linear-gradient(to right, #8D97A6, rgba(141, 151, 166, 0))");
+        if (lines) lineRight.style.setProperty("background-image", "linear-gradient(to right, #8D97A6, rgba(141, 151, 166, 0))");
         layout.appendChild(lineRight);
     }
     renderTitleHeading(title, padding=true, capsule=null) {
