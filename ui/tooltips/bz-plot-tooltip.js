@@ -1267,7 +1267,7 @@ class PlotTooltipType {
         if (hexRules.length && !this.isCompact) {
             const title = "bz-text-sub leading-none mb-1";
             if (hexSubtitle) this.renderRules([hexSubtitle], '', title);
-            this.renderRules(hexRules);
+            this.renderRules([hexRules], "mb-1");
         }
         // constructibles
         this.renderConstructibles();
