@@ -133,13 +133,13 @@ const BZ_COLOR = {
     wet: "#335577",  // Wet features
     road: "#ccbbaa",  // Roads & Railroads
     // yield types
-    culture: "#bf99e6",  // violet
-    diplomacy: "#99e6bf",  // teal
-    food: "#a6cc33",  // vegetated
-    gold: "#f0c442",  // yellow
-    happiness: "#ff9933",  // orange
-    production: "#a33d29",  // brown
-    science: "#80bfff",  // blue
+    food: "#80bf40",  // green
+    production: "#a33d29",  // red
+    gold: "#f6ce55",  // yellow
+    science: "#51b4fb",  // cyan
+    culture: "#7981d2",  // violet
+    happiness: "#f5993d",  // orange
+    diplomacy: "#7a94b8",  // blue
 };
 const BZ_ALERT = {
     primary: { "background-color": BZ_COLOR.primary },
