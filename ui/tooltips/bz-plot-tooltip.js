@@ -91,21 +91,35 @@ const BZ_ICON_VILLAGE_TYPES = {  // by city-state type and age
         "IMPROVEMENT_KASBAH",
         "IMPROVEMENT_SHORE_BATTERY",
     ],
-    "CULTURAL": [
-        "IMPROVEMENT_MEGALITH",
-        "IMPROVEMENT_STONE_HEAD",
-        "IMPROVEMENT_OPEN_AIR_MUSEUM",
+    "SCIENTIFIC": [
+        "IMPROVEMENT_ZIGGURAT",
+        "IMPROVEMENT_MONASTERY",
+        "IMPROVEMENT_INSTITUTE",
     ],
     "ECONOMIC": [
         "IMPROVEMENT_SOUQ",
         "IMPROVEMENT_TRADING_FACTORY",
         "IMPROVEMENT_ENTREPOT",
     ],
-    "SCIENTIFIC": [
-        "IMPROVEMENT_ZIGGURAT",
-        "IMPROVEMENT_MONASTERY",
-        "IMPROVEMENT_INSTITUTE",
-    ]
+    "CULTURAL": [
+        "IMPROVEMENT_MEGALITH",
+        "IMPROVEMENT_STONE_HEAD",
+        "IMPROVEMENT_OPEN_AIR_MUSEUM",
+    ],
+};
+const BZ_IMPROVEMENT_YIELDS = {
+    "IMPROVEMENT_HILLFORT": ["MILITARISTIC"],
+    "IMPROVEMENT_KASBAH": ["MILITARISTIC"],
+    "IMPROVEMENT_SHORE_BATTERY": ["MILITARISTIC"],
+    "IMPROVEMENT_ZIGGURAT": ["SCIENTIFIC"],
+    "IMPROVEMENT_MONASTERY": ["SCIENTIFIC"],
+    "IMPROVEMENT_INSTITUTE": ["SCIENTIFIC"],
+    "IMPROVEMENT_SOUQ": ["ECONOMIC"],
+    "IMPROVEMENT_TRADING_FACTORY": ["ECONOMIC"],
+    "IMPROVEMENT_ENTREPOT": ["ECONOMIC"],
+    "IMPROVEMENT_MEGALITH": ["CULTURAL"],
+    "IMPROVEMENT_STONE_HEAD": ["CULTURAL"],
+    "IMPROVEMENT_OPEN_AIR_MUSEUM": ["CULTURAL"],
 };
 
 // color palette
@@ -140,6 +154,11 @@ const BZ_COLOR = {
     culture: "#7981d2",     // 235° 50 65 violet
     happiness: "#f5993d",   //  30° 90 60 orange
     diplomacy: "#acbcd2",   // 215° 30 75 gray
+    // independent power types
+    militaristic: "#af1b1c",
+    scientific: "#4d7c96",
+    economic: "#ffd553",
+    cultural: "#892bb3",
 };
 const BZ_ALERT = {
     primary: { "background-color": BZ_COLOR.primary },
@@ -162,7 +181,7 @@ const BZ_STYLE = {
     RIVER_NAVIGABLE: { "background-color": BZ_COLOR.wet },
 }
 // accent colors for building icons
-const BZ_YIELD_COLOR = {
+const BZ_ICON_COLOR = {
     "YIELD_CULTURE": BZ_COLOR.culture,  // violet
     "YIELD_DIPLOMACY": BZ_COLOR.diplomacy,  // teal
     "YIELD_FOOD": BZ_COLOR.food,  // green
@@ -170,6 +189,10 @@ const BZ_YIELD_COLOR = {
     "YIELD_HAPPINESS": BZ_COLOR.happiness,  // orange
     "YIELD_PRODUCTION": BZ_COLOR.production,  // brown
     "YIELD_SCIENCE": BZ_COLOR.science,  // blue
+    "MILITARISTIC": BZ_COLOR.militaristic,  // red
+    "CULTURAL": BZ_COLOR.cultural,  // purple
+    "ECONOMIC": BZ_COLOR.economic,  // yellow
+    "SCIENTIFIC": BZ_COLOR.scientific,  // blue
     null: BZ_COLOR.bronze,  //default
 }
 
@@ -1385,6 +1408,11 @@ class PlotTooltipType {
     renderIconDivider(icon, overlay=null) {
         // icon divider with optional overlay
         const layout = document.createElement("div");
+        if (icon in BZ_IMPROVEMENT_YIELDS) {
+            this.renderIcon(layout, { icon, glow: true}, 12, "-mb-1");
+            this.renderFlexDivider(layout, false);
+            return;
+        }
         layout.classList.add("flex-grow", "relative");
         if (icon.startsWith("IMPROVEMENT_")) layout.classList.add("-my-1");
         const base = document.createElement("div");
@@ -1548,22 +1576,21 @@ class PlotTooltipType {
     renderIcon(layout, info, size=12, ...style) {
         // if the building has more than one yield type, like the
         // Palace, use one type for the ring and one for the glow
-        const slotColor = BZ_YIELD_COLOR[info.yields.at(0) ?? null];
-        const glowColor = BZ_YIELD_COLOR[info.yields.at(-1) ?? null];
+        const colors = info.colors || BZ_IMPROVEMENT_YIELDS[info.icon];
+        const slotColor = colors && BZ_ICON_COLOR[colors.at(0) ?? null];
+        const glowColor = colors && BZ_ICON_COLOR[colors.at(-1) ?? null];
         const borderWidth = size/24;
-        const iconOffset = borderWidth;
-        const frameSize = size + 2*iconOffset;
         const blurRadius = 3*borderWidth;
         const spreadRadius = 1*borderWidth;
+        const iconOffset = borderWidth;
         const frameOffset = blurRadius/2 + spreadRadius;
-        const groundSize = frameSize + 2*frameOffset
         const rem = (d) => `${2/9*d}rem`;
         // background
         const ttIcon = document.createElement("div");
         ttIcon.classList.value = "relative bg-contain bg-center";
         if (style.length) ttIcon.classList.add(...style);
-        ttIcon.style.setProperty("width", rem(groundSize));
-        ttIcon.style.setProperty("height", rem(groundSize));
+        ttIcon.style.setProperty("width", rem(size + 2*iconOffset + 2*frameOffset));
+        ttIcon.style.setProperty("height", rem(size + 2*iconOffset + 2*frameOffset));
         // display the icon
         if (info.icon) {
             preloadIcon(info.icon);  // prevent flicker
@@ -1590,19 +1617,25 @@ class PlotTooltipType {
             ttIcon.appendChild(e);
         }
         // ring the slot with an appropriate color for the yield
-        // TODO: improvement and wonder icons
-        if (info.yields) {
+        if (colors) {
+            const isImprovement = info.icon?.startsWith("IMPROVEMENT_");
+            const isWonder = info.icon?.startsWith("WONDER_");
+            const isSquare = info.isSquare || isImprovement || isWonder;
+            const isTurned = info.isTurned || isImprovement;
+            const borderRadius = isSquare ? rem(borderWidth) : "100%";
             const e = document.createElement("div");
             e.classList.value = "absolute border-0";
-            e.style.setProperty("border-radius", "100%");
+            e.style.setProperty("border-radius", borderRadius);
             e.style.setProperty("z-index", "1");
-            e.style.setProperty("width", rem(frameSize));
-            e.style.setProperty("height", rem(frameSize));
-            e.style.setProperty("left", rem(frameOffset));
-            e.style.setProperty("top", rem(frameOffset));
+            const turnSize = isTurned ?  size / Math.sqrt(2) : size;
+            const turnOffset = (size - turnSize) / 2;
+            if (isTurned) e.style.setProperty("transform", "rotate(-45deg)");
+            e.style.setProperty("width", rem(turnSize + 2*iconOffset));
+            e.style.setProperty("height", rem(turnSize + 2*iconOffset));
+            e.style.setProperty("left", rem(frameOffset + turnOffset));
+            e.style.setProperty("top", rem(frameOffset + turnOffset));
             e.style.setProperty("border-width", rem(borderWidth));
             e.style.setProperty("border-color", slotColor);
-            // e.style.setProperty("background-color", "#000000");
             // also glow if the building is fully operational
             if (info.glow) e.style.setProperty("box-shadow",
                 `0rem 0rem ${rem(blurRadius)} ${rem(spreadRadius)} ${glowColor}`);
@@ -1621,8 +1654,8 @@ class PlotTooltipType {
         // const yields = adjacencyYield(info);
         for (const info of yieldInfo) {
             const style = ["m-0\\.5", "bg-black"];
-            this.renderIcon(dump, { ...info, glow: true }, BZ_DUMP_SIZE, ...style);
-            // this.renderIcon(dump, info, BZ_DUMP_SIZE, ...style);
+            // this.renderIcon(dump, { ...info, glow: true }, BZ_DUMP_SIZE, ...style);
+            this.renderIcon(dump, info, BZ_DUMP_SIZE, ...style);
         }
         this.container.appendChild(dump);
     }
@@ -1634,14 +1667,16 @@ function dump_constructibles() {
 function dump_yields() {
     const bgicon = "BUILDING_OPEN";
     return [
-        { icon: "YIELD_FOOD", yields: ["YIELD_FOOD"], bgicon },
-        { icon: "YIELD_PRODUCTION", yields: ["YIELD_PRODUCTION"], bgicon },
-        { icon: "YIELD_GOLD", yields: ["YIELD_GOLD"], bgicon },
-        { icon: "YIELD_SCIENCE", yields: ["YIELD_SCIENCE"], bgicon },
-        { icon: "YIELD_CULTURE", yields: ["YIELD_CULTURE"], bgicon },
-        { icon: "YIELD_HAPPINESS", yields: ["YIELD_HAPPINESS"], bgicon },
-        { icon: "YIELD_DIPLOMACY", yields: ["YIELD_DIPLOMACY"], bgicon },
-        { icon: "BUILDING_OPEN", yields: [] },
+        { icon: "YIELD_FOOD", colors: ["YIELD_FOOD"], bgicon },
+        { icon: "YIELD_PRODUCTION", colors: ["YIELD_PRODUCTION"], bgicon },
+        { icon: "YIELD_GOLD", colors: ["YIELD_GOLD"], bgicon },
+        { icon: "YIELD_SCIENCE", colors: ["YIELD_SCIENCE"], bgicon },
+        { icon: "YIELD_CULTURE", colors: ["YIELD_CULTURE"], bgicon },
+        { icon: "YIELD_HAPPINESS", colors: ["YIELD_HAPPINESS"], bgicon },
+        { icon: "YIELD_DIPLOMACY", colors: ["YIELD_DIPLOMACY"], bgicon },
+        { icon: "BUILDING_OPEN", colors: [] },
+        { icon: "WONDER_COLOSSEUM", colors: ["YIELD_HAPPINESS"] },
+        { icon: "IMPROVEMENT_FARM", colors: ["YIELD_FOOD"] },
     ];
 }
 
