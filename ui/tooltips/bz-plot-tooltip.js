@@ -116,7 +116,7 @@ const BZ_ICON_VILLAGE_TYPES = {  // by city-state type and age
         "IMPROVEMENT_OPEN_AIR_MUSEUM",
     ],
 };
-const BZ_IMPROVEMENT_YIELDS = {
+const BZ_IMPROVEMENT_COLORS = {
     "IMPROVEMENT_HILLFORT": ["MILITARISTIC"],
     "IMPROVEMENT_KASBAH": ["MILITARISTIC"],
     "IMPROVEMENT_SHORE_BATTERY": ["MILITARISTIC"],
@@ -1313,11 +1313,12 @@ class PlotTooltipType {
         this.renderConstructibles();
         // bottom bar
         if (hexIcon || resourceIcon) {
-            const icon = { glow: true, style: ["-my-1"] };
+            const icon = { isSquare: true, glow: true, style: ["-my-1"] };
             const style = [];
             if (hexIcon) {
                 icon.icon = hexIcon;
                 icon.overlay = resourceIcon;
+                icon.isTurned = true;
                 style.push("mt-1");
             } else {
                 icon.icon = resourceIcon;
@@ -1345,8 +1346,8 @@ class PlotTooltipType {
         if (!colors.length) colors.push("WONDER");
         const icon = {
             icon: info.ConstructibleType,
-            ringsize: 11.5,
             collapse: false,
+            ringsize: 11.5,
             isSquare: true,
             glow: this.wonder.isCurrent,
             style: ["-my-0\\.5"],
@@ -1596,7 +1597,7 @@ class PlotTooltipType {
         const baseSize = Math.max(size, undersize, oversize);
         // get ring colors and thickness
         // (ring & glow collapse by default)
-        const colors = info.colors || BZ_IMPROVEMENT_YIELDS[info.icon];
+        const colors = info.colors || BZ_IMPROVEMENT_COLORS[info.icon];
         const collapse = (test, d) => (test || info.collapse === false ? d : 0);
         const borderWidth = collapse(colors?.length, size/16);
         const blurRadius = collapse(info.glow, 2*borderWidth);
@@ -1641,10 +1642,8 @@ class PlotTooltipType {
             const slotColor = colors && BZ_ICON_COLOR[colors.at(0) ?? null];
             const glowColor = colors && BZ_ICON_COLOR[colors.at(-1) ?? null];
             // get ring shape
-            const isImprovement = info.icon?.startsWith("IMPROVEMENT_");
-            const isWonder = info.icon?.startsWith("WONDER_");
-            const isSquare = info.isSquare || isImprovement || isWonder;
-            const isTurned = info.isTurned || isImprovement;
+            const isSquare = info.isSquare;
+            const isTurned = info.isTurned;
             const borderRadius = isSquare ? rem(borderWidth) : "100%";
             const turnSize = (isTurned ?  ringsize / Math.sqrt(2) : ringsize);
             // create ring
