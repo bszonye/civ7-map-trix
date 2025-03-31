@@ -1427,14 +1427,14 @@ class PlotTooltipType {
             slots.push(...[null, null].slice(this.buildings.length));
         // render the icons
         const layout = document.createElement("div");
-        layout.classList.value = "flex flex-grow relative";
+        layout.classList.value = "flex flex-grow relative mx-2";
         for (const slot of slots) {
             // if the building has more than one yield type, like the
             // Palace, use one type for the ring and one for the glow
             const icon = slot?.info.ConstructibleType ?? BZ_ICON_EMPTY_SLOT;
             const yields = adjacencyYield(slot?.info);
             const info = { icon, yields, glow: slot?.isCurrent };
-            this.renderIcon(layout, info, 12, "-mb-2");
+            this.renderIcon(layout, info, 12, "-mb-1");
         }
         this.renderFlexDivider(layout, false);
     }
@@ -1553,9 +1553,9 @@ class PlotTooltipType {
         const borderWidth = size/24;
         const iconOffset = borderWidth;
         const frameSize = size + 2*iconOffset;
-        const blurRadius = 2*borderWidth;
+        const blurRadius = 3*borderWidth;
         const spreadRadius = 1*borderWidth;
-        const frameOffset = blurRadius + spreadRadius;
+        const frameOffset = blurRadius/2 + spreadRadius;
         const groundSize = frameSize + 2*frameOffset
         const rem = (d) => `${2/9*d}rem`;
         // background
@@ -1564,18 +1564,6 @@ class PlotTooltipType {
         if (style.length) ttIcon.classList.add(...style);
         ttIcon.style.setProperty("width", rem(groundSize));
         ttIcon.style.setProperty("height", rem(groundSize));
-        // display a background icon, if needed
-        if (info.bgicon) {
-            const e = document.createElement("div");
-            e.classList.value = "absolute bg-contain bg-center rounded-full";
-            e.style.setProperty("z-index", "2");
-            e.style.setProperty("width", rem(size));
-            e.style.setProperty("height", rem(size));
-            e.style.setProperty("left", rem(frameOffset + iconOffset));
-            e.style.setProperty("top", rem(frameOffset + iconOffset));
-            e.style.backgroundImage = UI.getIconCSS(info.bgicon);
-            ttIcon.appendChild(e);
-        }
         // display the icon
         if (info.icon) {
             preloadIcon(info.icon);  // prevent flicker
@@ -1587,6 +1575,18 @@ class PlotTooltipType {
             e.style.setProperty("left", rem(frameOffset + iconOffset));
             e.style.setProperty("top", rem(frameOffset + iconOffset));
             e.style.backgroundImage = UI.getIconCSS(info.icon);
+            ttIcon.appendChild(e);
+        }
+        // display a background icon, if needed
+        if (info.bgicon) {
+            const e = document.createElement("div");
+            e.classList.value = "absolute bg-contain bg-center rounded-full";
+            e.style.setProperty("z-index", "2");
+            e.style.setProperty("width", rem(size));
+            e.style.setProperty("height", rem(size));
+            e.style.setProperty("left", rem(frameOffset + iconOffset));
+            e.style.setProperty("top", rem(frameOffset + iconOffset));
+            e.style.backgroundImage = UI.getIconCSS(info.bgicon);
             ttIcon.appendChild(e);
         }
         // ring the slot with an appropriate color for the yield
@@ -1620,15 +1620,15 @@ class PlotTooltipType {
         console.warn(`TRIX DUMP ${BZ_DUMP_SIZE} ${constructibles} ${yieldInfo}`);
         // const yields = adjacencyYield(info);
         for (const info of yieldInfo) {
-            const style = ["m-1", "bg-black"];
+            const style = ["m-0\\.5", "bg-black"];
             this.renderIcon(dump, { ...info, glow: true }, BZ_DUMP_SIZE, ...style);
-            this.renderIcon(dump, info, BZ_DUMP_SIZE, ...style);
+            // this.renderIcon(dump, info, BZ_DUMP_SIZE, ...style);
         }
         this.container.appendChild(dump);
     }
 }
 const BZ_DUMP_ICONS = false;
-const BZ_DUMP_SIZE = 12;
+const BZ_DUMP_SIZE = 24;
 function dump_constructibles() {
 }
 function dump_yields() {
