@@ -40,13 +40,9 @@ BZ_HEAD_STYLE.textContent = [
     padding-right: calc(var(--padding-left-right) - ${BZ_BORDER_WIDTH});
 }`,
 `.bz-banner-bottom {
-    text-align: center;
+    border-top: 0.1111111111rem solid #4c5366;
     margin-top: calc(var(--padding-top-bottom) - ${BZ_BORDER_WIDTH});
-    margin-bottom: calc(-var(--padding-top-bottom));
-    margin-left: calc(-var(--padding-left-right));
-    margin-right: calc(-var(--padding-left-right));
-    padding-left: calc(var(--padding-left-right));
-    padding-right: calc(var(--padding-left-right));
+    margin-bottom: calc(${BZ_BORDER_WIDTH} - var(--padding-top-bottom));
 }`,
 `.bz-text-sub {
     font-size: 85%;
@@ -1558,7 +1554,7 @@ class PlotTooltipType {
         //debug info
         const loc = this.plotCoord;
         const layout = document.createElement("div");
-        layout.classList.value = "bz-banner-bottom border-2 border-primary pt-1 pb-2";
+        layout.classList.value = "bz-banner bz-banner-bottom border-primary pt-1 pb-2";
         setStyle(layout, BZ_ALERT.red);
         const ownerID = GameplayMap.getOwner(loc.x, loc.y);
         const currHp = Players.Districts.get(ownerID)?.getDistrictHealth(loc);
