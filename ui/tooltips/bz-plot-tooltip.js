@@ -43,6 +43,9 @@ BZ_HEAD_STYLE.textContent = [
     border-top: 0.1111111111rem solid #4c5366;
     margin-top: calc(var(--padding-top-bottom) - ${BZ_BORDER_WIDTH});
     margin-bottom: calc(${BZ_BORDER_WIDTH} - var(--padding-top-bottom));
+    padding-top: 0.2222222222rem;
+    padding-bottom: 0.4444444444rem;
+    background-color: #333640;
 }`,
 `.bz-text-sub {
     font-size: 85%;
@@ -1554,8 +1557,7 @@ class PlotTooltipType {
         //debug info
         const loc = this.plotCoord;
         const layout = document.createElement("div");
-        layout.classList.value = "bz-banner bz-banner-bottom pt-1 pb-2";
-        setStyle(layout, BZ_ALERT.red);
+        layout.classList.value = "bz-banner bz-banner-bottom";
         const ownerID = GameplayMap.getOwner(loc.x, loc.y);
         const currHp = Players.Districts.get(ownerID)?.getDistrictHealth(loc);
         const maxHp = Players.Districts.get(ownerID)?.getDistrictMaxHealth(loc);
@@ -1696,7 +1698,7 @@ function dump_yields() {
         { icon: "YIELD_HAPPINESS", colors: ["YIELD_HAPPINESS"], underlay },
         { icon: "YIELD_DIPLOMACY", colors: ["YIELD_DIPLOMACY"], underlay },
         { icon: "BUILDING_OPEN", colors: [] },
-        { icon: "WONDER_COLOSSEUM", colors: ["YIELD_HAPPINESS"] },
+        { icon: "BUILDING_PARTHENON", colors: ["YIELD_CULTURE"], glow: true },
         { icon: "IMPROVEMENT_FARM", colors: ["YIELD_FOOD"] },
     ];
 }
