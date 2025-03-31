@@ -1344,7 +1344,15 @@ class PlotTooltipType {
         if (rules && !this.isCompact) this.renderRules([rules], rulesStyle);
         const colors = baseYields(this.wonder.info);
         if (!colors.length) colors.push("WONDER");
-        const icon = { icon: info.ConstructibleType, ringsize: 11, colors, glow: true };
+        const icon = {
+            icon: info.ConstructibleType,
+            ringsize: 11.5,
+            collapse: false,
+            isSquare: true,
+            glow: this.wonder.isCurrent,
+            style: ["-my-0\\.5"],
+            colors,
+        };
         this.renderIconDivider(icon, "mt-1");
     }
     // lay out a column of constructibles and their construction notes
@@ -1592,8 +1600,8 @@ class PlotTooltipType {
         // (ring & glow collapse by default)
         const colors = info.colors || BZ_IMPROVEMENT_YIELDS[info.icon];
         const collapse = (test, d) => (test || info.collapse === false ? d : 0);
-        const borderWidth = collapse(colors?.length, size/24);
-        const blurRadius = collapse(info.glow, 3*borderWidth);
+        const borderWidth = collapse(colors?.length, size/16);
+        const blurRadius = collapse(info.glow, 2*borderWidth);
         const spreadRadius = collapse(info.glow, 1*borderWidth);
         // calculate overall sizes
         const ringsize = info.ringsize ?? baseSize;
