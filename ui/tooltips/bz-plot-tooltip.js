@@ -203,17 +203,27 @@ const BZ_ICON_COLOR = {
     "CULTURAL": BZ_COLOR.cultural,  // purple
     "ECONOMIC": BZ_COLOR.economic,  // yellow
     "SCIENTIFIC": BZ_COLOR.scientific,  // blue
+    "WONDER": BZ_COLOR.bronze,
     null: BZ_COLOR.bronze,  //default
 }
 
-function adjacencyYield(building) {
-    if (!building) return [];
-    const adjTypes = GameInfo.Constructible_Adjacencies.filter(at =>
-        at.ConstructibleType == building.ConstructibleType && !at.RequiresActivation
-    );
-    const adjYields = adjTypes.map(at => GameInfo.Adjacency_YieldChanges.find(
-        ay => ay.ID == at.YieldChangeId));
-    const yieldSet = new Set(adjYields.map(ay => ay.YieldType));
+function adjacencyYields(building) {
+    if (!building) return null;
+    const findYieldChange = (at) => GameInfo.Adjacency_YieldChanges
+        .find(ay => ay.ID == at.YieldChangeId);
+    const yieldTypes = GameInfo.Constructible_Adjacencies
+        .filter(at => at.ConstructibleType == building.ConstructibleType)
+        .filter(at => !at.RequiresActivation)
+        .map(at => findYieldChange(at).YieldType);
+    const yieldSet = new Set(yieldTypes);
+    return [...yieldSet];
+}
+function baseYields(building) {
+    if (!building) return null;
+    const yieldTypes = GameInfo.Constructible_YieldChanges
+        .filter(yc => yc.ConstructibleType == building.ConstructibleType)
+        .map(yc => yc.YieldType);
+    const yieldSet = new Set(yieldTypes);
     return [...yieldSet];
 }
 function dotJoin(list) {
@@ -1303,15 +1313,24 @@ class PlotTooltipType {
         // constructibles
         this.renderConstructibles();
         // bottom bar
-        if (hexIcon) {
-            this.renderIconDivider(hexIcon, resourceIcon);
-        } else if (resourceIcon) {
-            this.renderIconDivider(resourceIcon);
+        if (hexIcon || resourceIcon) {
+            const icon = { glow: true, style: ["-my-1"] };
+            const style = [];
+            if (hexIcon) {
+                icon.icon = hexIcon;
+                icon.overlay = resourceIcon;
+                style.push("mt-1");
+            } else {
+                icon.icon = resourceIcon;
+                style.push("mt-2");
+            }
+            this.renderIconDivider(icon, ...style);
         }
     }
     renderWonderSection() {
         if (!this.wonder) return;
-        this.renderTitleDivider(Locale.compose(this.wonder.info.Name));
+        const info = this.wonder.info;
+        this.renderTitleDivider(Locale.compose(info.Name));
         let rulesStyle = null;
         const notes = this.wonder.notes;
         if (notes.length) {
@@ -1321,8 +1340,12 @@ class PlotTooltipType {
             this.container.appendChild(ttState);
             rulesStyle = "mt-1";
         }
-        if (!this.isCompact) this.renderRules([this.wonder.info.Tooltip], rulesStyle);
-        this.renderIconDivider(this.wonder.info.ConstructibleType);
+        const rules = this.isVerbose ? info.Description : info.Tooltip;
+        if (rules && !this.isCompact) this.renderRules([rules], rulesStyle);
+        const colors = baseYields(this.wonder.info);
+        if (!colors.length) colors.push("WONDER");
+        const icon = { icon: info.ConstructibleType, ringsize: 11, colors, glow: true };
+        this.renderIconDivider(icon, "mt-1");
     }
     // lay out a column of constructibles and their construction notes
     renderConstructibles() {
@@ -1415,23 +1438,20 @@ class PlotTooltipType {
             this.container.appendChild(ttDefense);
         }
     }
-    renderIconDivider(icon, overlay=null) {
+    renderIconDivider(info, ...style) {
         // icon divider with optional overlay
-        const layout = document.createElement("div");
-        layout.classList.value = "flex relative mx-2";
-        // if (icon.startsWith("IMPROVEMENT_")) layout.classList.add("-my-1");
-        const info = { icon, overlay, glow: true };
-        if (icon.search(/blp:tech_/) != -1) {
+        if (info.icon.search(/blp:tech_/) != -1) {
             // tech icons need a frame
             info.size = 10;
             info.underlay = BZ_ICON_FRAME;
             info.undersize = 14;
             info.undershift = { x: -0.25, y: 0.25 };
             info.ringsize = 12;
-            info.colors = ["YIELD_FOOD"];
         }
-        this.renderIcon(layout, info, "-mb-1");
-        this.renderFlexDivider(layout, false);
+        const layout = document.createElement("div");
+        layout.classList.value = "flex relative mx-2";
+        this.renderIcon(layout, info);
+        this.renderFlexDivider(layout, false, ...style);
     }
     renderUrbanDivider() {
         // there are at least two building slots (unless one is large)
@@ -1445,11 +1465,13 @@ class PlotTooltipType {
             // if the building has more than one yield type, like the
             // Palace, use one type for the ring and one for the glow
             const icon = slot?.info.ConstructibleType ?? BZ_ICON_EMPTY_SLOT;
-            const colors = adjacencyYield(slot?.info);
-            const info = { icon, colors, glow: slot?.isCurrent };
-            this.renderIcon(layout, info, "-mb-1");
+            const colors = adjacencyYields(slot?.info);
+            const info = {
+                icon, colors, glow: slot?.isCurrent, collapse: false, style: ["-my-1"],
+            };
+            this.renderIcon(layout, info);
         }
-        this.renderFlexDivider(layout, false);
+        this.renderFlexDivider(layout, false, "mt-1");
     }
     renderYields() {
         if (!this.totalYields) return;  // no yields to show
@@ -1559,22 +1581,22 @@ class PlotTooltipType {
         layout.appendChild(ttPlotTag);
         this.container.appendChild(layout);
     }
-    renderIcon(layout, info, ...style) {
+    renderIcon(layout, info) {
         if (!info) return
-        // if the building has more than one yield type, like the
-        // Palace, use one type for the ring and one for the glow
-        const colors = info.colors || BZ_IMPROVEMENT_YIELDS[info.icon];
-        const slotColor = colors && BZ_ICON_COLOR[colors.at(0) ?? null];
-        const glowColor = colors && BZ_ICON_COLOR[colors.at(-1) ?? null];
+        // calculate icon sizes
         const size = info.size ?? BZ_ICON_SIZE;
         const undersize = info.undersize ?? size;
         const oversize = info.oversize ?? 3/4 * size;
         const baseSize = Math.max(size, undersize, oversize);
+        // get ring colors and thickness
+        // (ring & glow collapse by default)
+        const colors = info.colors || BZ_IMPROVEMENT_YIELDS[info.icon];
+        const collapse = (test, d) => (test || info.collapse === false ? d : 0);
+        const borderWidth = collapse(colors?.length, size/24);
+        const blurRadius = collapse(info.glow, 3*borderWidth);
+        const spreadRadius = collapse(info.glow, 1*borderWidth);
+        // calculate overall sizes
         const ringsize = info.ringsize ?? baseSize;
-        console.warn(`TRIX SIZE=${size}`);
-        const borderWidth = size/24;
-        const blurRadius = 3*borderWidth;
-        const spreadRadius = 1*borderWidth;
         const frameSize = ringsize + 2*borderWidth;
         const groundSize = Math.max(baseSize, frameSize) + blurRadius + 2*spreadRadius;
         const rem = (d) => `${2/9*d}rem`;
@@ -1582,67 +1604,53 @@ class PlotTooltipType {
             const offset = (groundSize - inside) / 2;
             const dx = shift?.x ?? 0;
             const dy = shift?.y ?? 0;
-            console.warn(`TRIX OUT=${groundSize} IN=${inside} OFF=${offset}`);
             e.style.setProperty("width", rem(inside));
             e.style.setProperty("height", rem(inside));
             e.style.setProperty("left", rem(offset + dx));
             e.style.setProperty("top", rem(offset + dy));
         };
-        const setIcon = (e, icon) => {
+        const setIcon = (icon, size, shift, z) => {
+            if (!icon) return;
+            const e = document.createElement("div");
+            e.classList.value = "absolute bg-contain bg-center";
+            e.style.setProperty("z-index", z);
+            setDimensions(e, size, shift);
             if (!icon.startsWith("url(")) icon = UI.getIconCSS(icon);
             preloadIcon(icon);
-            console.warn(`TRIX ICON=${icon}`);
             e.style.backgroundImage = icon;
+            ttIcon.appendChild(e);
         };
         // background
         const ttIcon = document.createElement("div");
         ttIcon.classList.value = "relative bg-contain bg-center";
-        if (style.length) ttIcon.classList.add(...style);
+        if (info.style) ttIcon.classList.add(...info.style);
         setDimensions(ttIcon, groundSize);
-        // display the icon
-        if (info.icon) {
-            const e = document.createElement("div");
-            e.classList.value = "absolute bg-contain bg-center";
-            e.style.setProperty("z-index", "3");
-            setDimensions(e, size, info.shift);
-            setIcon(e, info.icon);
-            ttIcon.appendChild(e);
-        }
-        // display the underlay
-        if (info.underlay) {
-            const e = document.createElement("div");
-            e.classList.value = "absolute bg-contain bg-center";
-            e.style.setProperty("z-index", "2");
-            setDimensions(e, undersize, info.undershift);
-            setIcon(e, info.underlay);
-            ttIcon.appendChild(e);
-        }
-        // display the overlay
-        if (info.overlay) {
-            const e = document.createElement("div");
-            e.classList.value = "absolute bg-contain bg-center";
-            e.style.setProperty("z-index", "4");
-            setDimensions(e, oversize, info.overshift);
-            setIcon(e, info.overlay);
-            ttIcon.appendChild(e);
-        }
-        // ring the slot with an appropriate color for the yield
+        // display the icons
+        setIcon(info.icon, size, info.shift, 3);
+        setIcon(info.underlay, undersize, info.undershift, 2);
+        setIcon(info.overlay, oversize, info.overshit, 4);
+        // ring the icon with one or two colors
         if (colors) {
+            // split multiple colors between ring and glow
+            const slotColor = colors && BZ_ICON_COLOR[colors.at(0) ?? null];
+            const glowColor = colors && BZ_ICON_COLOR[colors.at(-1) ?? null];
+            // get ring shape
             const isImprovement = info.icon?.startsWith("IMPROVEMENT_");
             const isWonder = info.icon?.startsWith("WONDER_");
             const isSquare = info.isSquare || isImprovement || isWonder;
             const isTurned = info.isTurned || isImprovement;
             const borderRadius = isSquare ? rem(borderWidth) : "100%";
+            const turnSize = (isTurned ?  ringsize / Math.sqrt(2) : ringsize);
+            // create ring
             const e = document.createElement("div");
             e.classList.value = "absolute border-0";
             e.style.setProperty("border-radius", borderRadius);
             e.style.setProperty("z-index", "1");
             if (isTurned) e.style.setProperty("transform", "rotate(-45deg)");
-            const turnSize = (isTurned ?  ringsize / Math.sqrt(2) : ringsize);
             setDimensions(e, turnSize + 2*borderWidth);
             e.style.setProperty("border-width", rem(borderWidth));
             e.style.setProperty("border-color", slotColor);
-            // also glow if the building is fully operational
+            // optionally also glow
             if (info.glow) e.style.setProperty("box-shadow",
                 `0rem 0rem ${rem(blurRadius)} ${rem(spreadRadius)} ${glowColor}`);
             ttIcon.appendChild(e);
@@ -1657,12 +1665,14 @@ class PlotTooltipType {
         const constructibles = dump_constructibles();
         const yieldInfo = dump_yields();
         console.warn(`TRIX DUMP ${BZ_DUMP_SIZE} ${constructibles} ${yieldInfo}`);
-        // const yields = adjacencyYield(info);
-        for (const info of yieldInfo) {
-            const style = ["m-0\\.5", "bg-black"];
-            const size = BZ_DUMP_SIZE;
-            // this.renderIcon(dump, { ...info, glow: true }, BZ_DUMP_SIZE, ...style);
-            this.renderIcon(dump, { ...info, size }, ...style);
+        // const yields = adjacencyYields(info);
+        for (const y of yieldInfo) {
+            const info = { ...y };
+            info.size = BZ_DUMP_SIZE;
+            info.collapse = false;
+            info.style = ["m-0\\.5", "bg-black"];
+            // this.renderIcon(dump, { ...info, glow: true }, ...style);
+            this.renderIcon(dump, info);
         }
         this.container.appendChild(dump);
     }
