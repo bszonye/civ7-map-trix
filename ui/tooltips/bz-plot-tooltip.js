@@ -1554,7 +1554,7 @@ class PlotTooltipType {
         //debug info
         const loc = this.plotCoord;
         const layout = document.createElement("div");
-        layout.classList.value = "bz-banner bz-banner-bottom border-primary pt-1 pb-2";
+        layout.classList.value = "bz-banner bz-banner-bottom pt-1 pb-2";
         setStyle(layout, BZ_ALERT.red);
         const ownerID = GameplayMap.getOwner(loc.x, loc.y);
         const currHp = Players.Districts.get(ownerID)?.getDistrictHealth(loc);
