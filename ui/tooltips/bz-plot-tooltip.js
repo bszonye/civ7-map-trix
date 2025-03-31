@@ -90,9 +90,9 @@ const BZ_VILLAGE_TYPES = ["IMPROVEMENT_VILLAGE", "IMPROVEMENT_ENCAMPMENT"];
 
 // custom & adapted icons
 const BZ_ICON_SIZE = 12;
-const BZ_ICON_DISCOVERY = 'url("blp:tech_cartography")';
+const BZ_ICON_DISCOVERY = "url('blp:tech_cartography')";
 const BZ_ICON_EMPTY_SLOT = "BUILDING_OPEN";
-const BZ_ICON_FRAME = 'url("hud_sub_circle_bk")';
+const BZ_ICON_FRAME = "url('hud_sub_circle_bk')";
 const BZ_ICON_TOTAL_RURAL = "CITY_RURAL";  // total yield (rural)
 const BZ_ICON_TOTAL_URBAN = "CITY_URBAN";  // total yield (urban)
 const BZ_ICON_VILLAGE_TYPES = {  // by city-state type and age
@@ -1420,42 +1420,18 @@ class PlotTooltipType {
         const layout = document.createElement("div");
         layout.classList.value = "flex relative mx-2";
         // if (icon.startsWith("IMPROVEMENT_")) layout.classList.add("-my-1");
-        // TODO: map thingy
-        this.renderIcon(layout, { icon, overlay, glow: true}, "-mb-1");
-        this.renderFlexDivider(layout, false);
-        return;
-        const base = document.createElement("div");
-        const iconStyle = "bg-contain bg-center mx-3";
-        base.classList.value = iconStyle;
-        // format icon
-        if (!icon.startsWith("url(")) icon = UI.getIconCSS(icon);
-        if (overlay && !overlay.startsWith("url(")) overlay = UI.getIconCSS(overlay);
-        preloadIcon(icon);  // prevent flicker
-        if (icon.search(/blp:tech_/) == -1) {
-            base.classList.add("size-12");
-        } else {
+        const info = { icon, overlay, glow: true };
+        if (icon.search(/blp:tech_/) != -1) {
             // tech icons need a frame
-            base.classList.add("size-10", "relative", "z-1");
-            preloadIcon(BZ_ICON_FRAME);  // prevent flicker
-            const frame = document.createElement("div");
-            frame.classList.value = iconStyle;
-            frame.classList.add("size-14", "absolute", "z-0");
-            frame.style.setProperty("top", "-0.3333333333rem");
-            frame.style.setProperty("left", "-0.5rem");
-            frame.style.backgroundImage = BZ_ICON_FRAME;
-            layout.appendChild(frame);
+            info.size = 10;
+            info.underlay = BZ_ICON_FRAME;
+            info.undersize = 14;
+            info.undershift = { x: -0.25, y: 0.25 };
+            info.ringsize = 12;
+            info.colors = ["YIELD_FOOD"];
         }
-        base.style.backgroundImage = icon;
-        layout.appendChild(base);
-        if (overlay) {
-            preloadIcon(overlay);  // prevent flicker
-            const over = document.createElement("div");
-            over.classList.value = iconStyle;
-            over.classList.add("size-9", "absolute", "top-1\\.5", "left-1\\.5");
-            over.style.backgroundImage = overlay;
-            layout.appendChild(over);
-        }
-        this.renderFlexDivider(layout, false, "mt-2");
+        this.renderIcon(layout, info, "-mb-1");
+        this.renderFlexDivider(layout, false);
     }
     renderUrbanDivider() {
         // there are at least two building slots (unless one is large)
@@ -1591,23 +1567,31 @@ class PlotTooltipType {
         const slotColor = colors && BZ_ICON_COLOR[colors.at(0) ?? null];
         const glowColor = colors && BZ_ICON_COLOR[colors.at(-1) ?? null];
         const size = info.size ?? BZ_ICON_SIZE;
+        const undersize = info.undersize ?? size;
+        const oversize = info.oversize ?? 3/4 * size;
+        const baseSize = Math.max(size, undersize, oversize);
+        const ringsize = info.ringsize ?? baseSize;
+        console.warn(`TRIX SIZE=${size}`);
         const borderWidth = size/24;
         const blurRadius = 3*borderWidth;
         const spreadRadius = 1*borderWidth;
-        const frameSize = size + 2*borderWidth;
-        const groundSize = frameSize + blurRadius + 2*spreadRadius;
+        const frameSize = ringsize + 2*borderWidth;
+        const groundSize = Math.max(baseSize, frameSize) + blurRadius + 2*spreadRadius;
         const rem = (d) => `${2/9*d}rem`;
-        const setDimensions = (e, inside) => {
+        const setDimensions = (e, inside, shift) => {
             const offset = (groundSize - inside) / 2;
+            const dx = shift?.x ?? 0;
+            const dy = shift?.y ?? 0;
             console.warn(`TRIX OUT=${groundSize} IN=${inside} OFF=${offset}`);
             e.style.setProperty("width", rem(inside));
             e.style.setProperty("height", rem(inside));
-            e.style.setProperty("left", rem(offset));
-            e.style.setProperty("top", rem(offset));
+            e.style.setProperty("left", rem(offset + dx));
+            e.style.setProperty("top", rem(offset + dy));
         };
         const setIcon = (e, icon) => {
             if (!icon.startsWith("url(")) icon = UI.getIconCSS(icon);
             preloadIcon(icon);
+            console.warn(`TRIX ICON=${icon}`);
             e.style.backgroundImage = icon;
         };
         // background
@@ -1615,31 +1599,31 @@ class PlotTooltipType {
         ttIcon.classList.value = "relative bg-contain bg-center";
         if (style.length) ttIcon.classList.add(...style);
         setDimensions(ttIcon, groundSize);
-        // display the overlay
-        if (info.overlay) {
-            const e = document.createElement("div");
-            e.classList.value = "absolute bg-contain bg-center";
-            e.style.setProperty("z-index", "4");
-            setDimensions(e, info.oversize ?? 3/4 * size);
-            setIcon(e, info.overlay);
-            ttIcon.appendChild(e);
-        }
         // display the icon
         if (info.icon) {
             const e = document.createElement("div");
             e.classList.value = "absolute bg-contain bg-center";
             e.style.setProperty("z-index", "3");
-            setDimensions(e, size);
+            setDimensions(e, size, info.shift);
             setIcon(e, info.icon);
             ttIcon.appendChild(e);
         }
-        // display a background icon, if needed
-        if (info.bgicon) {
+        // display the underlay
+        if (info.underlay) {
             const e = document.createElement("div");
-            e.classList.value = "absolute bg-contain bg-center rounded-full";
+            e.classList.value = "absolute bg-contain bg-center";
             e.style.setProperty("z-index", "2");
-            setDimensions(e, size);
-            setIcon(e, info.bgicon);
+            setDimensions(e, undersize, info.undershift);
+            setIcon(e, info.underlay);
+            ttIcon.appendChild(e);
+        }
+        // display the overlay
+        if (info.overlay) {
+            const e = document.createElement("div");
+            e.classList.value = "absolute bg-contain bg-center";
+            e.style.setProperty("z-index", "4");
+            setDimensions(e, oversize, info.overshift);
+            setIcon(e, info.overlay);
             ttIcon.appendChild(e);
         }
         // ring the slot with an appropriate color for the yield
@@ -1654,8 +1638,8 @@ class PlotTooltipType {
             e.style.setProperty("border-radius", borderRadius);
             e.style.setProperty("z-index", "1");
             if (isTurned) e.style.setProperty("transform", "rotate(-45deg)");
-            const turnSize = (isTurned ?  size / Math.sqrt(2) : size) + 2 * borderWidth;
-            setDimensions(e, turnSize);
+            const turnSize = (isTurned ?  ringsize / Math.sqrt(2) : ringsize);
+            setDimensions(e, turnSize + 2*borderWidth);
             e.style.setProperty("border-width", rem(borderWidth));
             e.style.setProperty("border-color", slotColor);
             // also glow if the building is fully operational
@@ -1688,15 +1672,15 @@ const BZ_DUMP_SIZE = 24;
 function dump_constructibles() {
 }
 function dump_yields() {
-    const bgicon = "BUILDING_OPEN";
+    const underlay = "BUILDING_OPEN";
     return [
-        { icon: "YIELD_FOOD", colors: ["YIELD_FOOD"], bgicon },
-        { icon: "YIELD_PRODUCTION", colors: ["YIELD_PRODUCTION"], bgicon },
-        { icon: "YIELD_GOLD", colors: ["YIELD_GOLD"], bgicon },
-        { icon: "YIELD_SCIENCE", colors: ["YIELD_SCIENCE"], bgicon },
-        { icon: "YIELD_CULTURE", colors: ["YIELD_CULTURE"], bgicon },
-        { icon: "YIELD_HAPPINESS", colors: ["YIELD_HAPPINESS"], bgicon },
-        { icon: "YIELD_DIPLOMACY", colors: ["YIELD_DIPLOMACY"], bgicon },
+        { icon: "YIELD_FOOD", colors: ["YIELD_FOOD"], underlay },
+        { icon: "YIELD_PRODUCTION", colors: ["YIELD_PRODUCTION"], underlay },
+        { icon: "YIELD_GOLD", colors: ["YIELD_GOLD"], underlay },
+        { icon: "YIELD_SCIENCE", colors: ["YIELD_SCIENCE"], underlay },
+        { icon: "YIELD_CULTURE", colors: ["YIELD_CULTURE"], underlay },
+        { icon: "YIELD_HAPPINESS", colors: ["YIELD_HAPPINESS"], underlay },
+        { icon: "YIELD_DIPLOMACY", colors: ["YIELD_DIPLOMACY"], underlay },
         { icon: "BUILDING_OPEN", colors: [] },
         { icon: "WONDER_COLOSSEUM", colors: ["YIELD_HAPPINESS"] },
         { icon: "IMPROVEMENT_FARM", colors: ["YIELD_FOOD"] },
