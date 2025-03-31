@@ -550,6 +550,7 @@ class PlotTooltipType {
         this.modelUnits();
     }
     render() {
+        if (BZ_DUMP_ICONS) return this.dumpIcons();
         this.renderGeographySection();
         this.renderSettlementSection();
         this.renderHexSection();
@@ -1560,7 +1561,101 @@ class PlotTooltipType {
         layout.appendChild(ttPlotTag);
         this.container.appendChild(layout);
     }
+    renderIcon(layout, info, size=12) {
+        // if the building has more than one yield type, like the
+        // Palace, use one type for the ring and one for the glow
+        const slotColor = BZ_YIELD_COLOR[info.yields.at(0) ?? null];
+        const glowColor = BZ_YIELD_COLOR[info.yields.at(-1) ?? null];
+        const borderWidth = size/24;
+        const iconOffset = borderWidth;
+        const frameSize = size + 2*iconOffset;
+        const blurRadius = 2*borderWidth;
+        const spreadRadius = 1*borderWidth;
+        const frameOffset = blurRadius + spreadRadius;
+        const groundSize = frameSize + 2*frameOffset
+        const rem = (d) => `${2/9*d}rem`;
+        // background
+        const ttGround = document.createElement("div");
+        ttGround.classList.value = "relative bg-contain bg-center";
+        ttGround.style.setProperty("width", rem(groundSize));
+        ttGround.style.setProperty("height", rem(groundSize));
+        if (info.bg) ttGround.style.setProperty("background-color", info.bg);
+        // ring the slot with an appropriate color for the yield
+        if (info.yields) {
+            const e = document.createElement("div");
+            e.classList.value = "absolute rounded-full border-0";
+            e.style.setProperty("z-index", "3");
+            e.style.setProperty("width", rem(frameSize));
+            e.style.setProperty("height", rem(frameSize));
+            e.style.setProperty("left", rem(frameOffset));
+            e.style.setProperty("top", rem(frameOffset));
+            e.style.setProperty("border-width", rem(borderWidth));
+            e.style.setProperty("border-color", slotColor);
+            // e.style.setProperty("background-color", "#000000");
+            // also glow if the building is fully operational
+            if (info.glow) e.style.setProperty("box-shadow",
+                `0rem 0rem ${rem(blurRadius)} ${rem(spreadRadius)} ${glowColor}`);
+            ttGround.appendChild(e);
+        }
+        // display a background icon, if needed
+        if (info.bgicon) {
+            const e = document.createElement("div");
+            e.classList.value = "absolute bg-contain bg-center rounded-full";
+            e.style.setProperty("z-index", "1");
+            e.style.setProperty("width", rem(size));
+            e.style.setProperty("height", rem(size));
+            e.style.setProperty("left", rem(frameOffset + iconOffset));
+            e.style.setProperty("top", rem(frameOffset + iconOffset));
+            e.style.backgroundImage = UI.getIconCSS(info.bgicon);
+            ttGround.appendChild(e);
+        }
+        // display the icon
+        if (info.icon) {
+            preloadIcon(info.icon);  // prevent flicker
+            const e = document.createElement("div");
+            e.classList.value = "absolute bg-contain bg-center";
+            e.style.setProperty("z-index", "2");
+            e.style.setProperty("width", rem(size));
+            e.style.setProperty("height", rem(size));
+            e.style.setProperty("left", rem(frameOffset + iconOffset));
+            e.style.setProperty("top", rem(frameOffset + iconOffset));
+            e.style.backgroundImage = UI.getIconCSS(info.icon);
+            ttGround.appendChild(e);
+        }
+        layout.appendChild(ttGround);
+    }
+    dumpIcons() {
+        const dump = document.createElement("div");
+        dump.style.setProperty("padding-top", "var(--padding-top-bottom)");
+        dump.classList.value = "w-96 self-center flex flex-wrap justify-center items-center";
+        const constructibles = dump_constructibles();
+        const yieldInfo = dump_yields();
+        console.warn(`TRIX DUMP ${BZ_DUMP_SIZE} ${constructibles} ${yieldInfo}`);
+        // const yields = adjacencyYield(info);
+        for (const info of yieldInfo) {
+            this.renderIcon(dump, { ...info, glow: true, bg: "#000" }, BZ_DUMP_SIZE);
+            this.renderIcon(dump, { ...info, bg: "#000" }, BZ_DUMP_SIZE);
+        }
+        this.container.appendChild(dump);
+    }
 }
-TooltipManager.registerPlotType('plot', PlotTooltipPriority.LOW, new PlotTooltipType());
+const BZ_DUMP_ICONS = true;
+const BZ_DUMP_SIZE = 16;
+function dump_constructibles() {
+}
+function dump_yields() {
+    const bgicon = "BUILDING_OPEN";
+    return [
+        { icon: "YIELD_FOOD", yields: ["YIELD_FOOD"], bgicon },
+        { icon: "YIELD_PRODUCTION", yields: ["YIELD_PRODUCTION"], bgicon },
+        { icon: "YIELD_GOLD", yields: ["YIELD_GOLD"], bgicon },
+        { icon: "YIELD_SCIENCE", yields: ["YIELD_SCIENCE"], bgicon },
+        { icon: "YIELD_CULTURE", yields: ["YIELD_CULTURE"], bgicon },
+        { icon: "YIELD_HAPPINESS", yields: ["YIELD_HAPPINESS"], bgicon },
+        { icon: "YIELD_DIPLOMACY", yields: ["YIELD_DIPLOMACY"], bgicon },
+        { icon: "BUILDING_OPEN", yields: [] },
+    ];
+}
 
+TooltipManager.registerPlotType('plot', PlotTooltipPriority.LOW, new PlotTooltipType());
 //# sourceMappingURL=file:///base-standard/ui/tooltips/plot-tooltip.js.map
