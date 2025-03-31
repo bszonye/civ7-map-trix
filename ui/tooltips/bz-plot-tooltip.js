@@ -39,6 +39,15 @@ BZ_HEAD_STYLE.textContent = [
     padding-left: calc(var(--padding-left-right) - ${BZ_BORDER_WIDTH});
     padding-right: calc(var(--padding-left-right) - ${BZ_BORDER_WIDTH});
 }`,
+`.bz-banner-bottom {
+    text-align: center;
+    margin-top: calc(var(--padding-top-bottom) - ${BZ_BORDER_WIDTH});
+    margin-bottom: calc(-var(--padding-top-bottom));
+    margin-left: calc(-var(--padding-left-right));
+    margin-right: calc(-var(--padding-left-right));
+    padding-left: calc(var(--padding-left-right));
+    padding-right: calc(var(--padding-left-right));
+}`,
 `.bz-text-sub {
     font-size: 85%;
 }`,
@@ -80,6 +89,7 @@ const BZ_URBAN_TYPES = [DistrictTypes.CITY_CENTER, DistrictTypes.URBAN];
 const BZ_VILLAGE_TYPES = ["IMPROVEMENT_VILLAGE", "IMPROVEMENT_ENCAMPMENT"];
 
 // custom & adapted icons
+const BZ_ICON_SIZE = 12;
 const BZ_ICON_DISCOVERY = 'url("blp:tech_cartography")';
 const BZ_ICON_EMPTY_SLOT = "BUILDING_OPEN";
 const BZ_ICON_FRAME = 'url("hud_sub_circle_bk")';
@@ -448,24 +458,24 @@ class PlotTooltipType {
         return this.tooltip;
     }
     isUpdateNeeded(plotCoord) {
-        this.modCtrl = Input.isCtrlDown();
-        this.modShift = Input.isShiftDown();
         // has the cursor moved?
         const hasMoved =
             plotCoord.x != this.plotCoord?.x ||
             plotCoord.y != this.plotCoord?.y;
+        // have the key modifiers changed?
+        const modCtrl = Input.isCtrlDown();
+        const modShift = Input.isShiftDown();
+        const hasShifted = modCtrl != this.modCtrl || modShift != this.modShift;
+        // update properties
         this.plotCoord = plotCoord;
-        // has verbosity level changed?
-        const verbosity =
+        this.modCtrl = modCtrl;
+        this.modShift = modShift;
+        this.verbosity =
             this.modCtrl && this.modShift ?  bzVerbosity.HIDDEN :
             this.modCtrl ?  bzVerbosity.COMPACT :
             this.modShift ?  bzVerbosity.VERBOSE :
             bzMapTrixOptions.verbose;
-        if (verbosity != this.verbosity) {
-            this.verbosity = verbosity;
-            return true;
-        }
-        return hasMoved;
+        return hasShifted || hasMoved;
     }
     isBlank() {
         // outside the map
@@ -1408,13 +1418,12 @@ class PlotTooltipType {
     renderIconDivider(icon, overlay=null) {
         // icon divider with optional overlay
         const layout = document.createElement("div");
-        if (icon in BZ_IMPROVEMENT_YIELDS) {
-            this.renderIcon(layout, { icon, glow: true}, 12, "-mb-1");
-            this.renderFlexDivider(layout, false);
-            return;
-        }
-        layout.classList.add("flex-grow", "relative");
-        if (icon.startsWith("IMPROVEMENT_")) layout.classList.add("-my-1");
+        layout.classList.value = "flex relative mx-2";
+        // if (icon.startsWith("IMPROVEMENT_")) layout.classList.add("-my-1");
+        // TODO: map thingy
+        this.renderIcon(layout, { icon, overlay, glow: true}, "-mb-1");
+        this.renderFlexDivider(layout, false);
+        return;
         const base = document.createElement("div");
         const iconStyle = "bg-contain bg-center mx-3";
         base.classList.value = iconStyle;
@@ -1455,14 +1464,14 @@ class PlotTooltipType {
             slots.push(...[null, null].slice(this.buildings.length));
         // render the icons
         const layout = document.createElement("div");
-        layout.classList.value = "flex flex-grow relative mx-2";
+        layout.classList.value = "flex relative mx-2";
         for (const slot of slots) {
             // if the building has more than one yield type, like the
             // Palace, use one type for the ring and one for the glow
             const icon = slot?.info.ConstructibleType ?? BZ_ICON_EMPTY_SLOT;
-            const yields = adjacencyYield(slot?.info);
-            const info = { icon, yields, glow: slot?.isCurrent };
-            this.renderIcon(layout, info, 12, "-mb-1");
+            const colors = adjacencyYield(slot?.info);
+            const info = { icon, colors, glow: slot?.isCurrent };
+            this.renderIcon(layout, info, "-mb-1");
         }
         this.renderFlexDivider(layout, false);
     }
@@ -1543,7 +1552,8 @@ class PlotTooltipType {
         //debug info
         const loc = this.plotCoord;
         const layout = document.createElement("div");
-        setBannerStyle(layout);
+        layout.classList.value = "bz-banner-bottom border-2 border-primary pt-1 pb-2";
+        setStyle(layout, BZ_ALERT.red);
         const ownerID = GameplayMap.getOwner(loc.x, loc.y);
         const currHp = Players.Districts.get(ownerID)?.getDistrictHealth(loc);
         const maxHp = Players.Districts.get(ownerID)?.getDistrictMaxHealth(loc);
@@ -1573,35 +1583,54 @@ class PlotTooltipType {
         layout.appendChild(ttPlotTag);
         this.container.appendChild(layout);
     }
-    renderIcon(layout, info, size=12, ...style) {
+    renderIcon(layout, info, ...style) {
+        if (!info) return
         // if the building has more than one yield type, like the
         // Palace, use one type for the ring and one for the glow
         const colors = info.colors || BZ_IMPROVEMENT_YIELDS[info.icon];
         const slotColor = colors && BZ_ICON_COLOR[colors.at(0) ?? null];
         const glowColor = colors && BZ_ICON_COLOR[colors.at(-1) ?? null];
+        const size = info.size ?? BZ_ICON_SIZE;
         const borderWidth = size/24;
         const blurRadius = 3*borderWidth;
         const spreadRadius = 1*borderWidth;
-        const iconOffset = borderWidth;
-        const frameOffset = blurRadius/2 + spreadRadius;
+        const frameSize = size + 2*borderWidth;
+        const groundSize = frameSize + blurRadius + 2*spreadRadius;
         const rem = (d) => `${2/9*d}rem`;
+        const setDimensions = (e, inside) => {
+            const offset = (groundSize - inside) / 2;
+            console.warn(`TRIX OUT=${groundSize} IN=${inside} OFF=${offset}`);
+            e.style.setProperty("width", rem(inside));
+            e.style.setProperty("height", rem(inside));
+            e.style.setProperty("left", rem(offset));
+            e.style.setProperty("top", rem(offset));
+        };
+        const setIcon = (e, icon) => {
+            if (!icon.startsWith("url(")) icon = UI.getIconCSS(icon);
+            preloadIcon(icon);
+            e.style.backgroundImage = icon;
+        };
         // background
         const ttIcon = document.createElement("div");
         ttIcon.classList.value = "relative bg-contain bg-center";
         if (style.length) ttIcon.classList.add(...style);
-        ttIcon.style.setProperty("width", rem(size + 2*iconOffset + 2*frameOffset));
-        ttIcon.style.setProperty("height", rem(size + 2*iconOffset + 2*frameOffset));
+        setDimensions(ttIcon, groundSize);
+        // display the overlay
+        if (info.overlay) {
+            const e = document.createElement("div");
+            e.classList.value = "absolute bg-contain bg-center";
+            e.style.setProperty("z-index", "4");
+            setDimensions(e, info.oversize ?? 3/4 * size);
+            setIcon(e, info.overlay);
+            ttIcon.appendChild(e);
+        }
         // display the icon
         if (info.icon) {
-            preloadIcon(info.icon);  // prevent flicker
             const e = document.createElement("div");
             e.classList.value = "absolute bg-contain bg-center";
             e.style.setProperty("z-index", "3");
-            e.style.setProperty("width", rem(size));
-            e.style.setProperty("height", rem(size));
-            e.style.setProperty("left", rem(frameOffset + iconOffset));
-            e.style.setProperty("top", rem(frameOffset + iconOffset));
-            e.style.backgroundImage = UI.getIconCSS(info.icon);
+            setDimensions(e, size);
+            setIcon(e, info.icon);
             ttIcon.appendChild(e);
         }
         // display a background icon, if needed
@@ -1609,11 +1638,8 @@ class PlotTooltipType {
             const e = document.createElement("div");
             e.classList.value = "absolute bg-contain bg-center rounded-full";
             e.style.setProperty("z-index", "2");
-            e.style.setProperty("width", rem(size));
-            e.style.setProperty("height", rem(size));
-            e.style.setProperty("left", rem(frameOffset + iconOffset));
-            e.style.setProperty("top", rem(frameOffset + iconOffset));
-            e.style.backgroundImage = UI.getIconCSS(info.bgicon);
+            setDimensions(e, size);
+            setIcon(e, info.bgicon);
             ttIcon.appendChild(e);
         }
         // ring the slot with an appropriate color for the yield
@@ -1627,13 +1653,9 @@ class PlotTooltipType {
             e.classList.value = "absolute border-0";
             e.style.setProperty("border-radius", borderRadius);
             e.style.setProperty("z-index", "1");
-            const turnSize = isTurned ?  size / Math.sqrt(2) : size;
-            const turnOffset = (size - turnSize) / 2;
             if (isTurned) e.style.setProperty("transform", "rotate(-45deg)");
-            e.style.setProperty("width", rem(turnSize + 2*iconOffset));
-            e.style.setProperty("height", rem(turnSize + 2*iconOffset));
-            e.style.setProperty("left", rem(frameOffset + turnOffset));
-            e.style.setProperty("top", rem(frameOffset + turnOffset));
+            const turnSize = (isTurned ?  size / Math.sqrt(2) : size) + 2 * borderWidth;
+            setDimensions(e, turnSize);
             e.style.setProperty("border-width", rem(borderWidth));
             e.style.setProperty("border-color", slotColor);
             // also glow if the building is fully operational
@@ -1654,8 +1676,9 @@ class PlotTooltipType {
         // const yields = adjacencyYield(info);
         for (const info of yieldInfo) {
             const style = ["m-0\\.5", "bg-black"];
+            const size = BZ_DUMP_SIZE;
             // this.renderIcon(dump, { ...info, glow: true }, BZ_DUMP_SIZE, ...style);
-            this.renderIcon(dump, info, BZ_DUMP_SIZE, ...style);
+            this.renderIcon(dump, { ...info, size }, ...style);
         }
         this.container.appendChild(dump);
     }
