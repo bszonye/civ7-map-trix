@@ -91,8 +91,6 @@ const BZ_DOT_DIVIDER = Locale.compose("LOC_PLOT_DIVIDER_DOT");
 
 // all urban DistrictTypes
 const BZ_URBAN_TYPES = [DistrictTypes.CITY_CENTER, DistrictTypes.URBAN];
-// constructible type for independent settlements
-const BZ_VILLAGE_TYPES = ["IMPROVEMENT_VILLAGE", "IMPROVEMENT_ENCAMPMENT"];
 
 // custom & adapted icons
 const BZ_ICON_SIZE = 12;
@@ -789,15 +787,15 @@ class PlotTooltipType {
         if (this.improvement) {
             // set up icons and special district names for improvements
             const info = this.improvement.info;
-            if (BZ_VILLAGE_TYPES.includes(info.ConstructibleType)) {
+            if (this.improvement?.info.Discovery) {
+                // discoveries don't have an icon, but here's a nice map
+                this.improvement.icon = BZ_ICON_DISCOVERY;
+                this.improvement.districtName = "LOC_DISTRICT_BZ_DISCOVERY";
+            } else if (info.Age == null && info.Population == 0) {
                 // villages and encampments get icons based on their unique
                 // improvements, appropriate for the age and minor civ type
                 this.improvement.icon = getVillageIcon(this.owner, this.age);
                 this.improvement.districtName = "LOC_DISTRICT_BZ_INDEPENDENT";
-            } else if (this.improvement?.info.Discovery) {
-                // discoveries don't have an icon, but here's a nice map
-                this.improvement.icon = BZ_ICON_DISCOVERY;
-                this.improvement.districtName = "LOC_DISTRICT_BZ_DISCOVERY";
             } else {
                 this.improvement.icon = info.ConstructibleType;
             }
@@ -1367,12 +1365,14 @@ class PlotTooltipType {
         this.renderConstructibles();
         // bottom bar
         if (hexIcon || resourceIcon) {
-            const icon = { isSquare: true, style: ["-my-1"] };
+            const style = [hexIcon == BZ_ICON_DISCOVERY ? "-my-2" : "-my-1"];
+            const icon = { isSquare: true, style };
             if (hexIcon) {
                 icon.icon = hexIcon;
                 icon.overlay = resourceIcon;
                 icon.oversize = 8;
                 icon.isTurned = true;
+                icon.colors = BZ_ICON_TYPES[hexIcon]?.map(type => BZ_TYPE_COLOR[type]);
             } else {
                 icon.icon = resourceIcon;
             }
