@@ -151,15 +151,14 @@ const BZ_COLOR = {
     accent6: "#05070d",
     // alert colors
     black: "#000000",
-    red: "#661d19",  // danger
-    enemy: "#661d19",  // enemy
-    amber: "#cea92f",  // caution
-    brown: "#604639",  // note
+    danger: "#af1b1c99",  // danger = militaristic 60% opacity
+    caution: "#cea92f",  // caution
+    note: "#ff800033",  // note = orange 20% opacity
     // geographic colors
-    hill: "#604639",  // Rough terrain
-    vegetated: "#445533",  // Vegetated features
-    wet: "#335577",  // Wet features
-    road: "#ccbbaa",  // Roads & Railroads
+    hill: "#ff800033",  // Rough terrain = orange 20% opacity
+    vegetated: "#aaff0033",  // Vegetated features = green 20% opacity
+    wet: "#55aaff66",  // Wet features = teal 60% opacity
+    road: "#e5d2accc",  // Roads & Railroads = bronze 80% opacity
     // yield types
     food: "#80b34d",        //  90° 40 50 green
     production: "#a33d29",  //  10° 60 40 red
@@ -178,16 +177,16 @@ const BZ_ALERT = {
     primary: { "background-color": BZ_COLOR.primary },
     secondary: { "background-color": BZ_COLOR.secondary, "color": BZ_COLOR.black },
     black: { "background-color": BZ_COLOR.black },
-    red: { "background-color": BZ_COLOR.red },
-    enemy: { "background-color": BZ_COLOR.enemy },
-    conqueror: { "background-color": BZ_COLOR.enemy, "color": BZ_COLOR.amber },
-    amber: { "background-color": BZ_COLOR.amber, "color": BZ_COLOR.black },
-    brown: { "background-color": BZ_COLOR.brown },
+    danger: { "background-color": BZ_COLOR.danger },
+    enemy: { "background-color": BZ_COLOR.danger },
+    conqueror: { "background-color": BZ_COLOR.danger, "color": BZ_COLOR.caution },
+    caution: { "background-color": BZ_COLOR.caution, "color": BZ_COLOR.black },
+    note: { "background-color": BZ_COLOR.note },
     DEBUG: { "background-color": "#80808080" },
 }
 const BZ_STYLE = {
     road: { "background-color": BZ_COLOR.road, "color": BZ_COLOR.black },
-    volcano: BZ_ALERT.amber,
+    volcano: BZ_ALERT.caution,
     // obstacle types
     TERRAIN_HILL: { "background-color": BZ_COLOR.hill },
     TERRAIN_OCEAN: {},  // don't need to highlight this
@@ -210,7 +209,7 @@ const BZ_TYPE_COLOR = {
     "ECONOMIC": BZ_COLOR.economic,  // yellow
     "SCIENTIFIC": BZ_COLOR.scientific,  // blue
     "WONDER": BZ_COLOR.bronze,
-    null: BZ_COLOR.bronze,  //default
+    null: BZ_COLOR.bronze,  // default
 }
 
 function adjacencyYields(building) {
@@ -391,7 +390,7 @@ function setStyle(element, style) {
         element.style.setProperty(property, value);
     }
 }
-function setBannerStyle(element, style=BZ_ALERT.red, ...classes) {
+function setBannerStyle(element, style=BZ_ALERT.danger, ...classes) {
     element.classList.add("bz-banner", ...classes);
     setStyle(element, style);
 }
@@ -932,7 +931,7 @@ class PlotTooltipType {
     getSettlerBanner(loc) {
         const banners = [];
         if (LensManager.getActiveLens() != "fxs-settler-lens") return banners;
-        //Add more details to the tooltip if we are in the settler lens
+        // Add more details to the tooltip if we are in the settler lens
         if (!this.player) {
             console.error("plot-tooltip: Attempting to update settler tooltip, but no valid local player!");
             return banners;
@@ -953,7 +952,7 @@ class PlotTooltipType {
         }
         // Show why we can't settle here
         let warning;
-        let warningStyle = BZ_ALERT.red;
+        let warningStyle = BZ_ALERT.danger;
         if (!GameplayMap.isPlotInAdvancedStartRegion(this.player.id, loc.x, loc.y) && !localPlayerAdvancedStart?.getPlacementComplete()) {
             warning = "LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_FAR";
         } else if (!localPlayerDiplomacy.isValidLandClaimLocation(loc, true /*bIgnoreFriendlyUnitRequirement*/)) {
@@ -963,7 +962,7 @@ class PlotTooltipType {
                 warning = "LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_CLOSE";
             }
         } else if (!GameplayMap.isFreshWater(loc.x, loc.y)) {
-            warningStyle = BZ_ALERT.amber;
+            warningStyle = BZ_ALERT.caution;
             warning = "LOC_PLOT_TOOLTIP_NO_FRESH_WATER";
         }
         if (warning) {
@@ -988,7 +987,7 @@ class PlotTooltipType {
                 const tt = document.createElement("div");
                 tt.classList.value = "text-xs leading-normal mb-1";
                 tt.setAttribute('data-l10n-id', effectInfo.Name);
-                const style = effectInfo.Damage ? BZ_ALERT.red : BZ_ALERT.brown;
+                const style = effectInfo.Damage ? BZ_ALERT.danger : BZ_ALERT.note;
                 setBannerStyle(tt, style);
                 banners.push(tt);
             } else {
@@ -1001,7 +1000,7 @@ class PlotTooltipType {
         if (!this.obstacles.has(obstacleType)) return null;
         const style = [obstacleType, ...fallbackStyles].find(s => s in BZ_STYLE);
         if (style) return BZ_STYLE[style];
-        return BZ_ALERT.amber;
+        return BZ_ALERT.caution;
     }
     getTerrainLabel(loc) {
         if (!this.terrain) return { text: "", style: null };
@@ -1375,7 +1374,7 @@ class PlotTooltipType {
                 const ttState = document.createElement("div");
                 ttState.classList.value = "bz-text-sub";
                 if (c.isDamaged) {
-                    setCapsuleStyle(ttState, BZ_ALERT.amber, "mb-0\\.5");
+                    setCapsuleStyle(ttState, BZ_ALERT.caution, "mb-0\\.5");
                 } else {
                     ttState.classList.add("-mt-1");
                 }
@@ -1411,18 +1410,19 @@ class PlotTooltipType {
     renderDistrictDefense() {
         if (!this.district) return;
         // occupation status
-        const loc = this.plotCoord;
-        const info = [];
         if (this.district.owner != this.district.controllingPlayer) {
             const conqueror = Players.get(this.district.controllingPlayer);
             const conquerorName = this.getCivName(conqueror, true);
             const conquerorText = Locale.compose("{1_Term} {2_Subject}", "LOC_PLOT_TOOLTIP_CONQUEROR", conquerorName);
-            const ttConqueror = document.createElement("div");
-            setBannerStyle(ttConqueror, BZ_ALERT.conqueror);
-            ttConqueror.innerHTML = conquerorText;
-            info.push(ttConqueror);
+            const tt = document.createElement("div");
+            tt.classList.value = "text-xs leading-snug mb-1 py-1";
+            setBannerStyle(tt, BZ_ALERT.conqueror);
+            tt.innerHTML = conquerorText;
+            this.container.appendChild(tt);
         }
         // district health
+        const loc = this.plotCoord;
+        const info = [];
         const ownerID = GameplayMap.getOwner(loc.x, loc.y);
         const ownerDistricts = Players.Districts.get(ownerID);
         if (!ownerDistricts) return;
@@ -1438,7 +1438,7 @@ class PlotTooltipType {
             info.push(ttStatus);
             // current health
             const ttHealth = document.createElement("div");
-            setStyle(ttHealth, { color: BZ_COLOR.amber });
+            setStyle(ttHealth, { color: BZ_COLOR.caution });
             ttHealth.innerHTML = currentHealth + '/' + maxHealth;
             info.push(ttHealth);
         }
@@ -1557,12 +1557,11 @@ class PlotTooltipType {
         }
     }
     renderDebugInfo() {
-        //debug info
+        // debug info
         this.renderDivider();
         const loc = this.plotCoord;
         const layout = document.createElement("div");
         layout.classList.value = "bz-banner bz-banner-bottom";
-        // layout.style.setProperty("background-color", "#a33d2933");  // brown
         layout.style.setProperty("background-color", "#8d97a633");  // gray
         const ownerID = GameplayMap.getOwner(loc.x, loc.y);
         const currHp = Players.Districts.get(ownerID)?.getDistrictHealth(loc);
