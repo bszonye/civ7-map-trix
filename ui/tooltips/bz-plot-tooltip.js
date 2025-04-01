@@ -1672,25 +1672,25 @@ class PlotTooltipType {
         layout.appendChild(ttIcon);
     }
     dumpIcons() {
-        const dump = document.createElement("div");
-        dump.style.setProperty("padding-top", "var(--padding-top-bottom)");
-        dump.classList.value = "self-center flex flex-wrap justify-center items-center";
-        dump.style.setProperty("width", "100rem");
-        const constructibles = dump_constructibles();
-        const yields = dump_yields();
-        // const yields = adjacencyYields(info);
-        for (const y of [...constructibles, ...yields]) {
-            const info = { ...y };
-            info.collapse = false;
-            info.style = ["m-0\\.5", "bg-black"];
-            // this.renderIcon(dump, { ...info, glow: true }, ...style);
-            this.renderIcon(dump, info);
+        for (const list of [dump_constructibles(), dump_yields()]) {
+            const dump = document.createElement("div");
+            dump.classList.value =
+                "self-center flex flex-wrap justify-center items-center";
+            dump.style.setProperty("width", "100rem");
+            // const yields = adjacencyYields(info);
+            for (const item of list) {
+                const info = { ...item };
+                info.collapse = false;
+                info.style = ["m-0\\.5", "bg-black"];
+                // this.renderIcon(dump, { ...info, glow: true }, ...style);
+                this.renderIcon(dump, info);
+            }
+            this.container.appendChild(dump);
         }
-        this.container.appendChild(dump);
     }
 }
 const BZ_DUMP_ICONS = true;
-const BZ_DUMP_SIZE = 24;
+const BZ_DUMP_SIZE = 16;
 function dump_constructibles() {
     const dump = [];
     for (const item of GameInfo.Constructibles) {
