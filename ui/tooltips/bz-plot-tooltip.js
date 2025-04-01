@@ -265,7 +265,7 @@ function constructibleColors(info) {
     if (!base.length && !bonus.length) return null;  // walls
     if (!base.length) return bonus;  // no current examples of this
     // warehouse & infrastructure buildings: darken the base yield
-    if (!bonus.length) return [base.at(-1) + "bb", ageless];
+    if (!bonus.length) return [base.at(-1) + "c0", ageless];
     // when possible, select different colors
     const cbase = base.at(-1);  // favor influence & happiness yields
     const cbonus = bonus.at(-1);
