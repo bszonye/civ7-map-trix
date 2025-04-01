@@ -1744,8 +1744,6 @@ class PlotTooltipType {
         }
     }
 }
-const BZ_DUMP_ICONS = false;
-const BZ_DUMP_SIZE = 12;
 function dump_constructibles() {
     const dump = [];
     for (const item of GameInfo.Constructibles) {
@@ -1789,6 +1787,8 @@ function dump_yields() {
     return yields.map(icon =>
         ({ icon, size, underlay, glow, colors: [BZ_TYPE_COLOR[icon]] }));
 }
+const BZ_DUMP_ICONS = false;
+const BZ_DUMP_SIZE = 12;
 
 TooltipManager.registerPlotType('plot', PlotTooltipPriority.LOW, new PlotTooltipType());
 //# sourceMappingURL=file:///base-standard/ui/tooltips/plot-tooltip.js.map
