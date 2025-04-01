@@ -1608,8 +1608,8 @@ class PlotTooltipType {
         const colors = info.colors || BZ_ICON_TYPES[info.icon];
         const collapse = (test, d) => (test || info.collapse === false ? d : 0);
         const borderWidth = collapse(colors?.length, size/16);
-        const blurRadius = collapse(info.glow, 2*borderWidth);
-        const spreadRadius = collapse(info.glow, 1*borderWidth);
+        const blurRadius = collapse(info.glow, 18/5*borderWidth);
+        const spreadRadius = collapse(info.glow, 6/5*borderWidth);
         // calculate overall sizes
         const ringsize = info.ringsize ?? baseSize;
         const frameSize = ringsize + 2*borderWidth;
@@ -1672,11 +1672,23 @@ class PlotTooltipType {
         layout.appendChild(ttIcon);
     }
     dumpIcons() {
-        for (const list of [dump_constructibles(), dump_yields()]) {
+        const constructibles = dump_constructibles();
+        const buildings = constructibles.filter(c => c.cclass == "BUILDING");
+        const improvements = constructibles.filter(c => c.cclass == "IMPROVEMENT");
+        const wonders = constructibles.filter(c => c.cclass == "WONDER");
+        const yields = dump_yields();
+        const dumps = [
+            buildings,
+            buildings.map(b => ({ ...b, glow: true })),
+            improvements,
+            wonders,
+            yields,
+        ];
+        for (const list of dumps) {
             const dump = document.createElement("div");
             dump.classList.value =
                 "self-center flex flex-wrap justify-center items-center";
-            dump.style.setProperty("width", "100rem");
+            dump.style.setProperty("width", "106rem");
             // const yields = adjacencyYields(info);
             for (const item of list) {
                 const info = { ...item };
@@ -1690,7 +1702,7 @@ class PlotTooltipType {
     }
 }
 const BZ_DUMP_ICONS = true;
-const BZ_DUMP_SIZE = 16;
+const BZ_DUMP_SIZE = 12;
 function dump_constructibles() {
     const dump = [];
     for (const item of GameInfo.Constructibles) {
@@ -1699,21 +1711,22 @@ function dump_constructibles() {
             item.ConstructibleType.endsWith("_RESOURCE"))  // duplicate
             continue;
         const icon = item.ConstructibleType;
-        const isBuilding = item.ConstructibleClass == "BUILDING";
-        const isImprovement = item.ConstructibleClass == "IMPROVEMENT";
-        const isWonder = item.ConstructibleClass == "WONDER";
+        const cclass = item.ConstructibleClass;
+        const isBuilding = cclass == "BUILDING";
+        const isImprovement = cclass == "IMPROVEMENT";
+        const isWonder = cclass == "WONDER";
         const isSquare = isImprovement || isWonder;
         const isTurned = isImprovement;
         const size = BZ_DUMP_SIZE;
         const ringsize = isWonder ? 11.5/12 * size : size;
-        const minsize = size * 11/8;
+        const minsize = size * 3/2;
         const colors =
             isBuilding && item.Population ? adjacencyYields(item) :
             isWonder ? baseYields(item) :
             BZ_ICON_TYPES[item];
         const glow = isWonder;
         const info = {
-            icon, isSquare, isTurned, size, ringsize, minsize, colors, glow,
+            icon, cclass, isSquare, isTurned, size, ringsize, minsize, colors, glow,
         };
         dump.push(info);
     }
@@ -1724,15 +1737,15 @@ function dump_yields() {
     const underlay = "BUILDING_OPEN";
     const size = BZ_DUMP_SIZE;
     const dump = [
-        { size, icon: "YIELD_FOOD", colors: ["YIELD_FOOD"], underlay },
-        { size, icon: "YIELD_PRODUCTION", colors: ["YIELD_PRODUCTION"], underlay },
-        { size, icon: "YIELD_GOLD", colors: ["YIELD_GOLD"], underlay },
-        { size, icon: "YIELD_SCIENCE", colors: ["YIELD_SCIENCE"], underlay },
-        { size, icon: "YIELD_CULTURE", colors: ["YIELD_CULTURE"], underlay },
-        { size, icon: "YIELD_HAPPINESS", colors: ["YIELD_HAPPINESS"], underlay },
-        { size, icon: "YIELD_DIPLOMACY", colors: ["YIELD_DIPLOMACY"], underlay },
+        { icon: "YIELD_FOOD", colors: ["YIELD_FOOD"], },
+        { icon: "YIELD_PRODUCTION", colors: ["YIELD_PRODUCTION"], },
+        { icon: "YIELD_GOLD", colors: ["YIELD_GOLD"], },
+        { icon: "YIELD_SCIENCE", colors: ["YIELD_SCIENCE"], },
+        { icon: "YIELD_CULTURE", colors: ["YIELD_CULTURE"], },
+        { icon: "YIELD_HAPPINESS", colors: ["YIELD_HAPPINESS"], },
+        { icon: "YIELD_DIPLOMACY", colors: ["YIELD_DIPLOMACY"], },
     ];
-    return dump;
+    return dump.map(i => ({ ...i, size, underlay, glow: true }));
 }
 
 TooltipManager.registerPlotType('plot', PlotTooltipPriority.LOW, new PlotTooltipType());
