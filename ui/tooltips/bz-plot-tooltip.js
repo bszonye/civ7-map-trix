@@ -269,10 +269,13 @@ function constructibleColors(info) {
     if (!bonus.length) return [base.at(0) + "bb", BZ_TYPE_COLOR[undefined]];
     // when possible, select different colors
     const cbase = base.at(-1);  // favor influence & happiness yields
-    const cbonus = bonus.at(0);
-    if (cbase == cbonus && base.length + bonus.length != 2) {
-        // general rule fails for Manufactory, so reverse it
-        return [base.at(0), bonus.at(-1)];
+    const cbonus = bonus.at(-1);
+    if (cbase == cbonus) {
+        if (bonus.length != 1) {
+            return [cbase, bonus.at(0)];  // Mosque, Manigramam, Casa Consistorial
+        } else if (base.length != 1) {
+            return [base.at(0), cbonus];  // no examples of this
+        }
     }
     return [cbase, cbonus];
 }
@@ -1772,23 +1775,25 @@ function dump_constructibles() {
         const bc2 = b.colors?.at(-1) ?? "";
         const ai = a.icon;
         const bi = b.icon;
-        return bzTypeSort(ac2, bc2) || bzTypeSort(ac1, bc1) || ai.localeCompare(bi);
+        return bzTypeSort(ac1, bc1) || bzTypeSort(ac2, bc2) || ai.localeCompare(bi);
     });
     return dump;
 }
 function dump_yields() {
     const underlay = "BUILDING_OPEN";
     const size = BZ_DUMP_SIZE;
-    const dump = [
-        { icon: "YIELD_FOOD", colors: [BZ_TYPE_COLOR.YIELD_FOOD], },
-        { icon: "YIELD_PRODUCTION", colors: [BZ_TYPE_COLOR.YIELD_PRODUCTION], },
-        { icon: "YIELD_GOLD", colors: [BZ_TYPE_COLOR.YIELD_GOLD], },
-        { icon: "YIELD_SCIENCE", colors: [BZ_TYPE_COLOR.YIELD_SCIENCE], },
-        { icon: "YIELD_CULTURE", colors: [BZ_TYPE_COLOR.YIELD_CULTURE], },
-        { icon: "YIELD_HAPPINESS", colors: [BZ_TYPE_COLOR.YIELD_HAPPINESS], },
-        { icon: "YIELD_DIPLOMACY", colors: [BZ_TYPE_COLOR.YIELD_DIPLOMACY], },
+    const glow = true;
+    const yields = [
+        "YIELD_FOOD",
+        "YIELD_PRODUCTION",
+        "YIELD_GOLD",
+        "YIELD_SCIENCE",
+        "YIELD_CULTURE",
+        "YIELD_HAPPINESS",
+        "YIELD_DIPLOMACY",
     ];
-    return dump.map(i => ({ ...i, size, underlay, glow: true }));
+    return yields.map(icon =>
+        ({ icon, size, underlay, glow, colors: [BZ_TYPE_COLOR[icon]] }));
 }
 
 TooltipManager.registerPlotType('plot', PlotTooltipPriority.LOW, new PlotTooltipType());
