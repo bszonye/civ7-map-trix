@@ -32,6 +32,9 @@ BZ_HEAD_STYLE.textContent = [
 `.bz-tooltip.bz-debug > div > div > div > div p {
     background-color: #808080c0;  /* DEBUG */
 }`,
+`.plot-tooltip__Divider {
+    margin-top: calc(var(--padding-top-bottom) - ${BZ_BORDER_WIDTH});
+}`,
 `.bz-banner {
     text-align: center;
     margin-left: calc(${BZ_BORDER_WIDTH} - var(--padding-left-right));
@@ -39,13 +42,14 @@ BZ_HEAD_STYLE.textContent = [
     padding-left: calc(var(--padding-left-right) - ${BZ_BORDER_WIDTH});
     padding-right: calc(var(--padding-left-right) - ${BZ_BORDER_WIDTH});
 }`,
-`.bz-banner-bottom {
-    border-top: ${BZ_BORDER_WIDTH} solid #4c5366;
-    margin-top: calc(var(--padding-top-bottom) - ${BZ_BORDER_WIDTH});
+`.bz-banner-unit {
     margin-bottom: calc(${BZ_BORDER_WIDTH} - var(--padding-top-bottom));
-    padding-top: 0.1111111111rem;
-    padding-bottom: 0.4444444444rem;
-    background-color: #a33d2933;
+    padding-top: calc((var(--padding-top-bottom) - ${BZ_BORDER_WIDTH}) / 2);
+    padding-bottom: calc((var(--padding-top-bottom) - ${BZ_BORDER_WIDTH}) / 2);
+}`,
+`.bz-banner-bottom {
+    margin-bottom: calc(${BZ_BORDER_WIDTH} - var(--padding-top-bottom));
+    padding-bottom: calc(var(--padding-top-bottom) - ${BZ_BORDER_WIDTH});
 }`,
 `.bz-text-sub {
     font-size: 85%;
@@ -147,7 +151,7 @@ const BZ_COLOR = {
     accent6: "#05070d",
     // alert colors
     black: "#000000",
-    red: "#3a0806",  // danger
+    red: "#661d19",  // danger
     amber: "#cea92f",  // caution
     brown: "#604639",  // note
     // geographic colors
@@ -174,6 +178,7 @@ const BZ_ALERT = {
     secondary: { "background-color": BZ_COLOR.secondary, "color": BZ_COLOR.black },
     black: { "background-color": BZ_COLOR.black },
     red: { "background-color": BZ_COLOR.red },
+    enemy: { "background-color": BZ_COLOR.red },
     amber: { "background-color": BZ_COLOR.amber, "color": BZ_COLOR.black },
     brown: { "background-color": BZ_COLOR.brown },
     DEBUG: { "background-color": "#80808080" },
@@ -818,7 +823,7 @@ class PlotTooltipType {
     }
     renderDivider() {
         const divider = document.createElement("div");
-        divider.classList.add("plot-tooltip__Divider", "my-2");
+        divider.classList.add("plot-tooltip__Divider");
         this.container.appendChild(divider);
     }
     renderFlexDivider(center, lines, ...style) {
@@ -1115,8 +1120,7 @@ class PlotTooltipType {
         const civName = this.getCivName(this.owner, true);
         // highlight enemy players
         if (this.ownerRelationship?.isEnemy) {
-            layout.classList.add("py-1");
-            setBannerStyle(layout);
+            setBannerStyle(layout, BZ_ALERT.enemy, "py-1");
         }
         // show name & relationship
         const ttPlayer = document.createElement("div");
@@ -1526,15 +1530,13 @@ class PlotTooltipType {
         if (this.isCompact || !this.unit || this.unit.owner == this.player.id) return;
         this.renderDivider();
         const layout = document.createElement("div");
-        layout.classList.value = "text-xs leading-snug text-center";
+        layout.classList.value =
+            "bz-banner-unit text-xs leading-snug text-center";
         const unitName = this.unit.name;
         const civName = this.getCivName(Players.get(this.unit.owner));
         const unitInfo = [unitName, civName, this.unitRelationship?.type];
         layout.innerHTML = dotJoinLocale(unitInfo);
-        if (this.unitRelationship?.isEnemy) {
-            layout.classList.add("py-1");
-            setBannerStyle(layout);
-        }
+        if (this.unitRelationship?.isEnemy) setBannerStyle(layout, BZ_ALERT.enemy);
         this.container.appendChild(layout);
     }
     setWarningCursor() {
@@ -1554,15 +1556,18 @@ class PlotTooltipType {
     }
     renderDebugInfo() {
         //debug info
+        this.renderDivider();
         const loc = this.plotCoord;
         const layout = document.createElement("div");
         layout.classList.value = "bz-banner bz-banner-bottom";
+        // layout.style.setProperty("background-color", "#a33d2933");  // brown
+        layout.style.setProperty("background-color", "#8d97a633");  // gray
         const ownerID = GameplayMap.getOwner(loc.x, loc.y);
         const currHp = Players.Districts.get(ownerID)?.getDistrictHealth(loc);
         const maxHp = Players.Districts.get(ownerID)?.getDistrictMaxHealth(loc);
         const ttTitle = document.createElement("div");
         ttTitle.classList.value =
-            "text-secondary font-title uppercase text-xs text-center";
+            "text-secondary font-title uppercase text-xs text-center mt-1";
         let title = Locale.compose("LOC_PLOT_TOOLTIP_DEBUG_TITLE");
         if (currHp && maxHp) title += ": " + currHp + " / " + maxHp;
         ttTitle.innerHTML = title;
