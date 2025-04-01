@@ -152,7 +152,7 @@ const BZ_COLOR = {
     // alert colors
     black: "#000000",
     danger: "#af1b1c99",  // danger = militaristic 60% opacity
-    caution: "#cea92f",  // caution
+    caution: "#cea92f",  // caution = healthbar-medium
     note: "#ff800033",  // note = orange 20% opacity
     // geographic colors
     hill: "#ff800033",  // Rough terrain = orange 20% opacity
