@@ -32,9 +32,11 @@ BZ_HEAD_STYLE.textContent = [
 `.bz-tooltip.bz-debug > div > div > div > div p {
     background-color: #808080c0;  /* DEBUG */
 }`,
+// renderDivider: imitate the bottom of the tooltip
 `.plot-tooltip__Divider {
     margin-top: calc(var(--padding-top-bottom) - ${BZ_BORDER_WIDTH});
 }`,
+// full-width banners: general, unit info, debug info
 `.bz-banner {
     text-align: center;
     margin-left: calc(${BZ_BORDER_WIDTH} - var(--padding-left-right));
@@ -47,10 +49,11 @@ BZ_HEAD_STYLE.textContent = [
     padding-top: calc((var(--padding-top-bottom) - ${BZ_BORDER_WIDTH}) / 2);
     padding-bottom: calc((var(--padding-top-bottom) - ${BZ_BORDER_WIDTH}) / 2);
 }`,
-`.bz-banner-bottom {
+`.bz-banner-debug {
     margin-bottom: calc(${BZ_BORDER_WIDTH} - var(--padding-top-bottom));
     padding-bottom: calc(var(--padding-top-bottom) - ${BZ_BORDER_WIDTH});
 }`,
+// extra-small text for notes
 `.bz-text-sub {
     font-size: 85%;
 }`,
@@ -1561,7 +1564,7 @@ class PlotTooltipType {
         this.renderDivider();
         const loc = this.plotCoord;
         const layout = document.createElement("div");
-        layout.classList.value = "bz-banner bz-banner-bottom";
+        layout.classList.value = "bz-banner bz-banner-debug";
         layout.style.setProperty("background-color", "#8d97a633");  // gray
         const ownerID = GameplayMap.getOwner(loc.x, loc.y);
         const currHp = Players.Districts.get(ownerID)?.getDistrictHealth(loc);
