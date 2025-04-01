@@ -167,9 +167,9 @@ const BZ_COLOR = {
     production: "#a33d29",  //  10° 60 40 red
     gold: "#f6ce55",        //  45° 90 65 yellow
     science: "#6ca6e0",     // 210° 65 65 cyan
-    culture: "#7981d2",     // 235° 50 65 violet
+    culture: "#5c5cd6",     // 235° 60 60 violet
     happiness: "#f5993d",   //  30° 90 60 orange
-    diplomacy: "#acbcd2",   // 215° 30 75 gray
+    diplomacy: "#a3b1dc",   // 215° 30 75 gray
     // independent power types
     militaristic: "#af1b1c",
     scientific: "#4d7c96",
@@ -200,6 +200,11 @@ const BZ_STYLE = {
 }
 // accent colors for icon types
 const BZ_TYPE_COLOR = {
+    undefined: BZ_COLOR.bronze,  // default
+    "CULTURAL": BZ_COLOR.cultural,  // purple
+    "ECONOMIC": BZ_COLOR.economic,  // yellow
+    "MILITARISTIC": BZ_COLOR.militaristic,  // red
+    "SCIENTIFIC": BZ_COLOR.scientific,  // blue
     "YIELD_CULTURE": BZ_COLOR.culture,  // violet
     "YIELD_DIPLOMACY": BZ_COLOR.diplomacy,  // teal
     "YIELD_FOOD": BZ_COLOR.food,  // green
@@ -207,32 +212,69 @@ const BZ_TYPE_COLOR = {
     "YIELD_HAPPINESS": BZ_COLOR.happiness,  // orange
     "YIELD_PRODUCTION": BZ_COLOR.production,  // brown
     "YIELD_SCIENCE": BZ_COLOR.science,  // blue
-    "MILITARISTIC": BZ_COLOR.militaristic,  // red
-    "CULTURAL": BZ_COLOR.cultural,  // purple
-    "ECONOMIC": BZ_COLOR.economic,  // yellow
-    "SCIENTIFIC": BZ_COLOR.scientific,  // blue
-    "WONDER": BZ_COLOR.bronze,
-    null: BZ_COLOR.bronze,  // default
+}
+const BZ_TYPE_SORT = {
+    [BZ_COLOR.bronze]: 0,  // neutral
+    [BZ_COLOR.food]: 1,  // green
+    [BZ_COLOR.production]: 2,  // brown
+    [BZ_COLOR.militaristic]: 3,  // red (city-state)
+    [BZ_COLOR.gold]: 4,  // yellow
+    [BZ_COLOR.economic]: 5,  // yellow (city-state)
+    [BZ_COLOR.science]: 6,  // blue
+    [BZ_COLOR.scientific]: 7,  // blue (city-state)
+    [BZ_COLOR.culture]: 8,  // violet
+    [BZ_COLOR.cultural]: 9,  // purple (city-state)
+    [BZ_COLOR.happiness]: 10,  // orange
+    [BZ_COLOR.diplomacy]: 11,  // teal
+    undefined: 12,
+}
+const bzTypeSort = (a, b) => {
+    const asort = BZ_TYPE_SORT[a?.substring(0, 7)] ?? BZ_TYPE_SORT[undefined];
+    const bsort = BZ_TYPE_SORT[b?.substring(0, 7)] ?? BZ_TYPE_SORT[undefined];
+    return asort - bsort;
 }
 
-function adjacencyYields(building) {
-    if (!building) return null;
+function baseYields(info) {
+    if (!info) return null;
+    const yieldTypes = GameInfo.Constructible_YieldChanges
+        .filter(yc => yc.ConstructibleType == info.ConstructibleType)
+        .map(yc => yc.YieldType);
+    const yieldSet = new Set(yieldTypes);
+    return [...yieldSet];
+}
+function bonusYields(info) {
+    if (!info) return null;
     const findYieldChange = (at) => GameInfo.Adjacency_YieldChanges
         .find(yc => yc.ID == at.YieldChangeId);
     const yieldTypes = GameInfo.Constructible_Adjacencies
-        .filter(at => at.ConstructibleType == building.ConstructibleType)
+        .filter(at => at.ConstructibleType == info.ConstructibleType)
         .filter(at => !at.RequiresActivation)
         .map(at => findYieldChange(at).YieldType);
     const yieldSet = new Set(yieldTypes);
     return [...yieldSet];
 }
-function baseYields(building) {
-    if (!building) return null;
-    const yieldTypes = GameInfo.Constructible_YieldChanges
-        .filter(yc => yc.ConstructibleType == building.ConstructibleType)
-        .map(yc => yc.YieldType);
-    const yieldSet = new Set(yieldTypes);
-    return [...yieldSet];
+function constructibleColors(info) {
+    if (!info) return null;
+    const colorize = (list) => list.map(type => BZ_TYPE_COLOR[type]);
+    if (info.ConstructibleClass == "IMPROVEMENT") {
+        const types = BZ_ICON_TYPES[info.ConstructibleType];
+        return types && colorize(types).sort(bzTypeSort);
+    }
+    const base = colorize(baseYields(info)).sort(bzTypeSort);
+    const bonus = colorize(bonusYields(info)).sort(bzTypeSort);
+    if (info.ConstructibleClass == "WONDER") return base;
+    if (!base.length && !bonus.length) return null;  // walls
+    if (!base.length) return bonus;  // no current examples of this
+    // warehouse & infrastructure buildings: darken the base yield
+    if (!bonus.length) return [base.at(0) + "bb", BZ_TYPE_COLOR[undefined]];
+    // when possible, select different colors
+    const cbase = base.at(-1);  // favor influence & happiness yields
+    const cbonus = bonus.at(0);
+    if (cbase == cbonus && base.length + bonus.length != 2) {
+        // general rule fails for Manufactory, so reverse it
+        return [base.at(0), bonus.at(-1)];
+    }
+    return [cbase, cbonus];
 }
 function dotJoin(list) {
     // join text with dots after removing empty elements
@@ -1348,8 +1390,7 @@ class PlotTooltipType {
         }
         const rules = this.isVerbose ? info.Description : info.Tooltip;
         if (rules && !this.isCompact) this.renderRules([rules], rulesStyle);
-        const colors = baseYields(this.wonder.info);
-        if (!colors.length) colors.push("WONDER");
+        const colors = constructibleColors(this.wonder.info);
         const icon = {
             icon: info.ConstructibleType,
             isSquare: true,
@@ -1480,7 +1521,7 @@ class PlotTooltipType {
             // if the building has more than one yield type, like the
             // Palace, use one type for the ring and one for the glow
             const icon = slot?.info.ConstructibleType ?? BZ_ICON_EMPTY_SLOT;
-            const colors = adjacencyYields(slot?.info);
+            const colors = constructibleColors(slot?.info);
             const info = {
                 icon, colors, glow: slot?.isCurrent, collapse: false, style: ["-my-1"],
             };
@@ -1605,11 +1646,11 @@ class PlotTooltipType {
         const minsize = info.minsize ?? 0;
         // get ring colors and thickness
         // (ring & glow collapse by default)
-        const colors = info.colors || BZ_ICON_TYPES[info.icon];
+        const colors = info.colors;
         const collapse = (test, d) => (test || info.collapse === false ? d : 0);
         const borderWidth = collapse(colors?.length, size/16);
-        const blurRadius = collapse(info.glow, 18/5*borderWidth);
-        const spreadRadius = collapse(info.glow, 6/5*borderWidth);
+        const blurRadius = collapse(info.glow, 10/3*borderWidth);
+        const spreadRadius = collapse(info.glow, 4/3*borderWidth);
         // calculate overall sizes
         const ringsize = info.ringsize ?? baseSize;
         const frameSize = ringsize + 2*borderWidth;
@@ -1648,8 +1689,8 @@ class PlotTooltipType {
         // ring the icon with one or two colors
         if (colors) {
             // split multiple colors between ring and glow
-            const slotColor = colors && BZ_TYPE_COLOR[colors.at(0) ?? null];
-            const glowColor = colors && BZ_TYPE_COLOR[colors.at(-1) ?? null];
+            const slotColor = colors && (colors.at(0) ?? BZ_TYPE_COLOR[undefined]);
+            const glowColor = colors && (colors.at(-1) ?? BZ_TYPE_COLOR[undefined]);
             // get ring shape
             const isSquare = info.isSquare;
             const isTurned = info.isTurned;
@@ -1710,7 +1751,6 @@ function dump_constructibles() {
             continue;
         const icon = item.ConstructibleType;
         const cclass = item.ConstructibleClass;
-        const isBuilding = cclass == "BUILDING";
         const isImprovement = cclass == "IMPROVEMENT";
         const isWonder = cclass == "WONDER";
         const isSquare = isImprovement || isWonder;
@@ -1718,30 +1758,35 @@ function dump_constructibles() {
         const size = BZ_DUMP_SIZE;
         const ringsize = isWonder ? 11.5/12 * size : size;
         const minsize = size * 3/2;
-        const colors =
-            isBuilding && item.Population ? adjacencyYields(item) :
-            isWonder ? baseYields(item) :
-            BZ_ICON_TYPES[item];
+        const colors = constructibleColors(item);
         const glow = isWonder;
         const info = {
             icon, cclass, isSquare, isTurned, size, ringsize, minsize, colors, glow,
         };
         dump.push(info);
     }
-    dump.sort((a, b) => a.icon.localeCompare(b.icon));
+    dump.sort((a, b) => {
+        const ac1 = a.colors?.at(0) ?? "";
+        const bc1 = b.colors?.at(0) ?? "";
+        const ac2 = a.colors?.at(-1) ?? "";
+        const bc2 = b.colors?.at(-1) ?? "";
+        const ai = a.icon;
+        const bi = b.icon;
+        return bzTypeSort(ac2, bc2) || bzTypeSort(ac1, bc1) || ai.localeCompare(bi);
+    });
     return dump;
 }
 function dump_yields() {
     const underlay = "BUILDING_OPEN";
     const size = BZ_DUMP_SIZE;
     const dump = [
-        { icon: "YIELD_FOOD", colors: ["YIELD_FOOD"], },
-        { icon: "YIELD_PRODUCTION", colors: ["YIELD_PRODUCTION"], },
-        { icon: "YIELD_GOLD", colors: ["YIELD_GOLD"], },
-        { icon: "YIELD_SCIENCE", colors: ["YIELD_SCIENCE"], },
-        { icon: "YIELD_CULTURE", colors: ["YIELD_CULTURE"], },
-        { icon: "YIELD_HAPPINESS", colors: ["YIELD_HAPPINESS"], },
-        { icon: "YIELD_DIPLOMACY", colors: ["YIELD_DIPLOMACY"], },
+        { icon: "YIELD_FOOD", colors: [BZ_TYPE_COLOR.YIELD_FOOD], },
+        { icon: "YIELD_PRODUCTION", colors: [BZ_TYPE_COLOR.YIELD_PRODUCTION], },
+        { icon: "YIELD_GOLD", colors: [BZ_TYPE_COLOR.YIELD_GOLD], },
+        { icon: "YIELD_SCIENCE", colors: [BZ_TYPE_COLOR.YIELD_SCIENCE], },
+        { icon: "YIELD_CULTURE", colors: [BZ_TYPE_COLOR.YIELD_CULTURE], },
+        { icon: "YIELD_HAPPINESS", colors: [BZ_TYPE_COLOR.YIELD_HAPPINESS], },
+        { icon: "YIELD_DIPLOMACY", colors: [BZ_TYPE_COLOR.YIELD_DIPLOMACY], },
     ];
     return dump.map(i => ({ ...i, size, underlay, glow: true }));
 }
