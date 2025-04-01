@@ -1701,7 +1701,7 @@ class PlotTooltipType {
         }
     }
 }
-const BZ_DUMP_ICONS = true;
+const BZ_DUMP_ICONS = false;
 const BZ_DUMP_SIZE = 12;
 function dump_constructibles() {
     const dump = [];
