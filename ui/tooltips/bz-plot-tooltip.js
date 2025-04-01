@@ -40,12 +40,12 @@ BZ_HEAD_STYLE.textContent = [
     padding-right: calc(var(--padding-left-right) - ${BZ_BORDER_WIDTH});
 }`,
 `.bz-banner-bottom {
-    border-top: 0.1111111111rem solid #4c5366;
+    border-top: ${BZ_BORDER_WIDTH} solid #4c5366;
     margin-top: calc(var(--padding-top-bottom) - ${BZ_BORDER_WIDTH});
     margin-bottom: calc(${BZ_BORDER_WIDTH} - var(--padding-top-bottom));
-    padding-top: 0.2222222222rem;
+    padding-top: 0.1111111111rem;
     padding-bottom: 0.4444444444rem;
-    background-color: #333640;
+    background-color: #a33d2933;
 }`,
 `.bz-text-sub {
     font-size: 85%;
@@ -209,7 +209,7 @@ const BZ_ICON_COLOR = {
 function adjacencyYields(building) {
     if (!building) return null;
     const findYieldChange = (at) => GameInfo.Adjacency_YieldChanges
-        .find(ay => ay.ID == at.YieldChangeId);
+        .find(yc => yc.ID == at.YieldChangeId);
     const yieldTypes = GameInfo.Constructible_Adjacencies
         .filter(at => at.ConstructibleType == building.ConstructibleType)
         .filter(at => !at.RequiresActivation)
@@ -1313,18 +1313,16 @@ class PlotTooltipType {
         this.renderConstructibles();
         // bottom bar
         if (hexIcon || resourceIcon) {
-            const icon = { isSquare: true, glow: true, style: ["-my-1"] };
-            const style = [];
+            const icon = { isSquare: true, style: ["-my-1"] };
             if (hexIcon) {
                 icon.icon = hexIcon;
                 icon.overlay = resourceIcon;
+                icon.oversize = 8;
                 icon.isTurned = true;
-                style.push("mt-1");
             } else {
                 icon.icon = resourceIcon;
-                style.push("mt-2");
             }
-            this.renderIconDivider(icon, ...style);
+            this.renderIconDivider(icon, "mt-2");
         }
     }
     renderWonderSection() {
@@ -1593,7 +1591,7 @@ class PlotTooltipType {
         // calculate icon sizes
         const size = info.size ?? BZ_ICON_SIZE;
         const undersize = info.undersize ?? size;
-        const oversize = info.oversize ?? 3/4 * size;
+        const oversize = info.oversize ?? size;
         const baseSize = Math.max(size, undersize, oversize);
         // get ring colors and thickness
         // (ring & glow collapse by default)
