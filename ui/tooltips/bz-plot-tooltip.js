@@ -262,11 +262,12 @@ function constructibleColors(info) {
     }
     const base = colorize(baseYields(info)).sort(bzTypeSort);
     const bonus = colorize(bonusYields(info)).sort(bzTypeSort);
-    if (info.ConstructibleClass == "WONDER") return base;
+    const ageless = BZ_TYPE_COLOR[undefined];
+    if (info.ConstructibleClass == "WONDER") return [base.at(0) ?? ageless];
     if (!base.length && !bonus.length) return null;  // walls
     if (!base.length) return bonus;  // no current examples of this
     // warehouse & infrastructure buildings: darken the base yield
-    if (!bonus.length) return [base.at(0) + "bb", BZ_TYPE_COLOR[undefined]];
+    if (!bonus.length) return [base.at(0) + "bb", ageless];
     // when possible, select different colors
     const cbase = base.at(-1);  // favor influence & happiness yields
     const cbonus = bonus.at(-1);
@@ -1769,28 +1770,21 @@ function dump_constructibles() {
         dump.push(info);
     }
     dump.sort((a, b) => {
-        const ac1 = a.colors?.at(0) ?? "";
-        const bc1 = b.colors?.at(0) ?? "";
-        const ac2 = a.colors?.at(-1) ?? "";
-        const bc2 = b.colors?.at(-1) ?? "";
-        const ai = a.icon;
-        const bi = b.icon;
-        return bzTypeSort(ac1, bc1) || bzTypeSort(ac2, bc2) || ai.localeCompare(bi);
+        const sort =
+            bzTypeSort(a.colors?.at(0), b.colors?.at(0)) ||
+            bzTypeSort(a.colors?.at(-1), b.colors?.at(-1)) ||
+            a.icon.localeCompare(b.icon);
+        return sort;
     });
     return dump;
 }
 function dump_yields() {
-    const underlay = "BUILDING_OPEN";
     const size = BZ_DUMP_SIZE;
+    const underlay = "BUILDING_OPEN";
     const glow = true;
     const yields = [
-        "YIELD_FOOD",
-        "YIELD_PRODUCTION",
-        "YIELD_GOLD",
-        "YIELD_SCIENCE",
-        "YIELD_CULTURE",
-        "YIELD_HAPPINESS",
-        "YIELD_DIPLOMACY",
+        "YIELD_FOOD", "YIELD_PRODUCTION", "YIELD_GOLD", "YIELD_SCIENCE",
+        "YIELD_CULTURE", "YIELD_HAPPINESS", "YIELD_DIPLOMACY",
     ];
     return yields.map(icon =>
         ({ icon, size, underlay, glow, colors: [BZ_TYPE_COLOR[icon]] }));
