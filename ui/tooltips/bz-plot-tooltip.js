@@ -152,6 +152,7 @@ const BZ_COLOR = {
     // alert colors
     black: "#000000",
     red: "#661d19",  // danger
+    enemy: "#661d19",  // enemy
     amber: "#cea92f",  // caution
     brown: "#604639",  // note
     // geographic colors
@@ -178,7 +179,8 @@ const BZ_ALERT = {
     secondary: { "background-color": BZ_COLOR.secondary, "color": BZ_COLOR.black },
     black: { "background-color": BZ_COLOR.black },
     red: { "background-color": BZ_COLOR.red },
-    enemy: { "background-color": BZ_COLOR.red },
+    enemy: { "background-color": BZ_COLOR.enemy },
+    conqueror: { "background-color": BZ_COLOR.enemy, "color": BZ_COLOR.amber },
     amber: { "background-color": BZ_COLOR.amber, "color": BZ_COLOR.black },
     brown: { "background-color": BZ_COLOR.brown },
     DEBUG: { "background-color": "#80808080" },
@@ -1416,7 +1418,7 @@ class PlotTooltipType {
             const conquerorName = this.getCivName(conqueror, true);
             const conquerorText = Locale.compose("{1_Term} {2_Subject}", "LOC_PLOT_TOOLTIP_CONQUEROR", conquerorName);
             const ttConqueror = document.createElement("div");
-            setBannerStyle(ttConqueror, { color: BZ_COLOR.amber });
+            setBannerStyle(ttConqueror, BZ_ALERT.conqueror);
             ttConqueror.innerHTML = conquerorText;
             info.push(ttConqueror);
         }
@@ -1443,7 +1445,7 @@ class PlotTooltipType {
         if (info.length) {
             const ttDefense = document.createElement("div");
             ttDefense.classList.value = "text-xs leading-snug mb-1 py-1";
-            setBannerStyle(ttDefense);
+            setBannerStyle(ttDefense, BZ_ALERT.enemy);
             for (const row of info) ttDefense.appendChild(row);
             this.container.appendChild(ttDefense);
         }
