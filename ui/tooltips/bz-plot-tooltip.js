@@ -116,7 +116,7 @@ const BZ_ICON_VILLAGE_TYPES = {  // by city-state type and age
         "IMPROVEMENT_OPEN_AIR_MUSEUM",
     ],
 };
-const BZ_IMPROVEMENT_COLORS = {
+const BZ_ICON_TYPES = {
     "IMPROVEMENT_HILLFORT": ["MILITARISTIC"],
     "IMPROVEMENT_KASBAH": ["MILITARISTIC"],
     "IMPROVEMENT_SHORE_BATTERY": ["MILITARISTIC"],
@@ -189,8 +189,8 @@ const BZ_STYLE = {
     RIVER_MINOR: { "background-color": BZ_COLOR.wet },
     RIVER_NAVIGABLE: { "background-color": BZ_COLOR.wet },
 }
-// accent colors for building icons
-const BZ_ICON_COLOR = {
+// accent colors for icon types
+const BZ_TYPE_COLOR = {
     "YIELD_CULTURE": BZ_COLOR.culture,  // violet
     "YIELD_DIPLOMACY": BZ_COLOR.diplomacy,  // teal
     "YIELD_FOOD": BZ_COLOR.food,  // green
@@ -1595,7 +1595,7 @@ class PlotTooltipType {
         const baseSize = Math.max(size, undersize, oversize);
         // get ring colors and thickness
         // (ring & glow collapse by default)
-        const colors = info.colors || BZ_IMPROVEMENT_COLORS[info.icon];
+        const colors = info.colors || BZ_ICON_TYPES[info.icon];
         const collapse = (test, d) => (test || info.collapse === false ? d : 0);
         const borderWidth = collapse(colors?.length, size/16);
         const blurRadius = collapse(info.glow, 2*borderWidth);
@@ -1637,8 +1637,8 @@ class PlotTooltipType {
         // ring the icon with one or two colors
         if (colors) {
             // split multiple colors between ring and glow
-            const slotColor = colors && BZ_ICON_COLOR[colors.at(0) ?? null];
-            const glowColor = colors && BZ_ICON_COLOR[colors.at(-1) ?? null];
+            const slotColor = colors && BZ_TYPE_COLOR[colors.at(0) ?? null];
+            const glowColor = colors && BZ_TYPE_COLOR[colors.at(-1) ?? null];
             // get ring shape
             const isSquare = info.isSquare;
             const isTurned = info.isTurned;
