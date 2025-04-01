@@ -64,10 +64,10 @@ BZ_HEAD_STYLE.textContent = `
     background-color: #f5993daa;
 }
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-influence {
-    background-color: #acb6d280;
+    background-color: #afb7cf80;
 }
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-influence:hover {
-    background-color: #acb6d2aa;
+    background-color: #afb7cfaa;
 }
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-cities {
     background-color: #e5d2ac80;

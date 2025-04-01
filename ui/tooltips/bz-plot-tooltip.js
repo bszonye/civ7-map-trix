@@ -169,7 +169,7 @@ const BZ_COLOR = {
     science: "#6ca6e0",     // 210° 65 65 cyan
     culture: "#5c5cd6",     // 235° 60 60 violet
     happiness: "#f5993d",   //  30° 90 60 orange
-    diplomacy: "#a3b1dc",   // 215° 30 75 gray
+    diplomacy: "#afb7cf",   // 215° 30 75 gray
     // independent power types
     militaristic: "#af1b1c",
     scientific: "#4d7c96",
