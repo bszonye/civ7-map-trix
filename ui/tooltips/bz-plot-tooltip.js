@@ -1689,12 +1689,10 @@ class PlotTooltipType {
             dump.classList.value =
                 "self-center flex flex-wrap justify-center items-center";
             dump.style.setProperty("width", "106rem");
-            // const yields = adjacencyYields(info);
             for (const item of list) {
                 const info = { ...item };
                 info.collapse = false;
                 info.style = ["m-0\\.5", "bg-black"];
-                // this.renderIcon(dump, { ...info, glow: true }, ...style);
                 this.renderIcon(dump, info);
             }
             this.container.appendChild(dump);
