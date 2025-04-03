@@ -478,9 +478,11 @@ class PlotTooltipType {
         this.district = null;
         // settlement stats
         this.isCityCenter = false;
-        this.connections = null;
-        this.religions = null;
+        this.townFocus = null
+        this.isGrowingTown = false;
         this.isFreshWater = null;
+        this.religions = null;
+        this.connections = null;
         // constructibles
         this.constructibles = [];
         this.buildings = [];  // omits walls
@@ -592,9 +594,11 @@ class PlotTooltipType {
         this.district = null;
         // settlement stats
         this.isCityCenter = false;
-        this.connections = null;
-        this.religions = null;
+        this.townFocus = null
+        this.isGrowingTown = false;
         this.isFreshWater = null;
+        this.religions = null;
+        this.connections = null;
         // constructibles
         this.constructibles = [];
         this.buildings = [];
@@ -701,16 +705,22 @@ class PlotTooltipType {
         const center = this.city.location;
         this.isCityCenter = center.x == loc.x && center.y == loc.y
         if (!this.isCityCenter) return;
-        // get connected settlements
-        this.connections = getConnections(this.city);
+        // get town focus
+        if (this.city.isTown) {
+            const ptype = this.city.Growth?.projectType ?? null;
+            this.townFocus = ptype && GameInfo.Projects.lookup(ptype);
+            this.isGrowingTown = this.city.Growth?.growthType == GrowthTypes.EXPAND;
+        }
+        // report fresh water supply
+        this.isFreshWater = GameplayMap.isFreshWater(center.x, center.y);
         // get religions (majority, urban, rural)
         if (this.age.AgeType == "AGE_EXPLORATION") {
             // but only during Exploration, when conversion is possible
             // (plus custom names stop working in the Modern Age)
             this.religions = getReligions(this.city);
         }
-        // report fresh water supply
-        this.isFreshWater = GameplayMap.isFreshWater(center.x, center.y);
+        // get connected settlements
+        this.connections = getConnections(this.city);
     }
     modelConstructibles() {
         const loc = this.plotCoord;
@@ -1130,45 +1140,39 @@ class PlotTooltipType {
             this.owner.isAlive ?  this.getCivName(this.owner) :  // village
             null;  // discoveries are owned by a placeholder "World" player
         if (!name) return;
-        this.renderTitleDivider(name);
-        let subhead;
-        let notes = [];
-        // town focus
-        if (this.city.isTown) {
-            const ptype = this.city.Growth?.projectType;
-            const project = ptype && GameInfo.Projects.lookup(ptype);
-            if (project) {
-                console.warn(`TRIX PROJECT=${JSON.stringify(project)}`);
-                subhead = project.Name;
-                if (this.city.Growth?.growthType == GrowthTypes.EXPAND) {
-                    notes.push("LOC_PROJECT_TOWN_BZ_GROWING");
-                }
-            }
+        // collect notes
+        const notes = [];
+        if (this.townFocus && this.isGrowingTown) {
+            notes.push("LOC_PROJECT_TOWN_BZ_GROWING");
         }
-        // fresh water
-        if (!this.isFreshWater) notes.push("LOC_BZ_PLOTKEY_NO_FRESHWATER");
-        // render heading and notes
-        if (subhead || notes.length) {
-            console.warn(`TRIX SUB=${subhead} NOTES=${notes}`);
+        if (this.isCityCenter && !this.isFreshWater) {
+            notes.push("LOC_BZ_PLOTKEY_NO_FRESHWATER");
+        }
+        // render headings and notes
+        this.renderTitleDivider(name);
+        if (this.townFocus || notes.length) {
+            // note: extra div layer here to align bz-debug levels
             const tt = document.createElement("div");
             tt.classList.value = "text-xs leading-snug text-center mb-1";
-            if (subhead) {
-                const ttHead = document.createElement("div");
-                ttHead.classList.value = "font-title uppercase";
-                ttHead.setAttribute('data-l10n-id', subhead);
-                tt.appendChild(ttHead);
+            const ttSubhead = document.createElement("div");
+            if (this.townFocus) {
+                const ttFocus = document.createElement("div");
+                ttFocus.classList.value = "text-accent-2 font-title uppercase -mt-0\\.5";
+                ttFocus.setAttribute('data-l10n-id', this.townFocus.Name);
+                ttSubhead.appendChild(ttFocus);
             }
             if (notes.length) {
                 const ttNote = document.createElement("div");
                 ttNote.classList.value = "bz-text-sub -mt-1";
                 ttNote.setAttribute('data-l10n-id', dotJoinLocale(notes));
-                tt.appendChild(ttNote);
+                ttSubhead.appendChild(ttNote);
             }
+            tt.appendChild(ttSubhead);
             this.container.appendChild(tt);
         }
         // owner info
         this.renderOwnerInfo();
-        // settlement stats (only at city center or in verbose mode)
+        // settlement stats (only at city center)
         if (!this.isCityCenter) return;
         const stats = [];
         // religion
