@@ -8,7 +8,6 @@ import "/base-standard/ui/tooltips/plot-tooltip.js";
 
 import TooltipManager, { PlotTooltipPriority } from '/core/ui/tooltips/tooltip-manager.js';
 import { ComponentID } from '/core/ui/utilities/utilities-component-id.js';
-import DistrictHealthManager from '/base-standard/ui/district/district-health-manager.js';
 import LensManager from '/core/ui/lenses/lens-manager.js';
 import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
 
@@ -1478,7 +1477,7 @@ class PlotTooltipType {
         const currentHealth = ownerDistricts.getDistrictHealth(loc);
         const maxHealth = ownerDistricts.getDistrictMaxHealth(loc);
         const isUnderSiege = ownerDistricts.getDistrictIsBesieged(loc);
-        if (DistrictHealthManager.canShowDistrictHealth(currentHealth, maxHealth)) {
+        if (currentHealth != maxHealth) {
             // under siege or healing
             const ttStatus = document.createElement("div");
             ttStatus.setAttribute("data-l10n-id", isUnderSiege ?
@@ -1489,11 +1488,16 @@ class PlotTooltipType {
             setStyle(ttHealth, { color: BZ_COLOR.caution });
             ttHealth.innerHTML = currentHealth + '/' + maxHealth;
             info.push(ttHealth);
+        } else if (currentHealth && this.isVerbose) {
+            const ttHealth = document.createElement("div");
+            ttHealth.innerHTML = currentHealth + '/' + maxHealth;
+            info.push(ttHealth);
         }
         if (info.length) {
             const ttDefense = document.createElement("div");
-            ttDefense.classList.value = "text-xs leading-snug mb-1 py-1";
-            setBannerStyle(ttDefense, BZ_ALERT.enemy);
+            ttDefense.classList.value = "text-xs leading-snug text-center mb-1";
+            const style = currentHealth != maxHealth ? BZ_ALERT.danger : BZ_ALERT.note;
+            setBannerStyle(ttDefense, style, "py-1");
             for (const row of info) ttDefense.appendChild(row);
             this.container.appendChild(ttDefense);
         }
