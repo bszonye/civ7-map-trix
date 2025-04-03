@@ -18,7 +18,8 @@ effects, and terrain features that can stop your movement.
 ## civilization
 see which settlement claims each tile, who owns it, and their atttitude
 toward you.  hover over the city center to see additional information
-about connected settlements, religion, and fresh water.
+about town focus, fresh water, religion, and connected settlements.
+hold Shift for more details.
 
 ## buildings
 everything constructible goes here: buildings, improvements, and
