@@ -279,7 +279,7 @@ function constructibleColors(info) {
 }
 function dotJoin(list) {
     // join text with dots after removing empty elements
-    return list.filter(e => e).join(" " + BZ_DOT_DIVIDER + " ");
+    return list.filter(e => e).join("&nbsp;" + BZ_DOT_DIVIDER + " ");
 }
 function dotJoinLocale(list) {
     return dotJoin(list.map(s => Locale.compose(s)));
@@ -1141,6 +1141,12 @@ class PlotTooltipType {
             const connectionsNote = Locale.compose("LOC_BZ_CITY_CONNECTIONS",
                 this.connections.cities.length, this.connections.towns.length);
             stats.push(connectionsNote);
+            if (this.isVerbose) {
+                const cities = this.connections.cities.map(i => i.name);
+                const towns = this.connections.towns.map(i => i.name);
+                stats.push(dotJoinLocale(cities));
+                stats.push(dotJoinLocale(towns));
+            }
         }
         // religion
         if (this.religions) stats.push(...this.religions);
