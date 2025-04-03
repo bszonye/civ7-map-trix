@@ -1143,7 +1143,7 @@ class PlotTooltipType {
         // collect notes
         const notes = [];
         if (this.townFocus && this.isGrowingTown) {
-            notes.push("LOC_PROJECT_TOWN_BZ_GROWING");
+            notes.push("LOC_UI_FOOD_CHOOSER_FOCUS_GROWTH");
         }
         if (this.isCityCenter && !this.isFreshWater) {
             notes.push("LOC_BZ_PLOTKEY_NO_FRESHWATER");
@@ -1163,7 +1163,7 @@ class PlotTooltipType {
             }
             if (notes.length) {
                 const ttNote = document.createElement("div");
-                ttNote.classList.value = "bz-text-sub -mt-1";
+                ttNote.classList.value = "bz-text-sub leading-none mb-0\\.5";
                 ttNote.setAttribute('data-l10n-id', dotJoinLocale(notes));
                 ttSubhead.appendChild(ttNote);
             }
@@ -1462,11 +1462,11 @@ class PlotTooltipType {
             const notes = dotJoinLocale(c.notes);
             if (notes) {
                 const ttState = document.createElement("div");
-                ttState.classList.value = "bz-text-sub";
+                ttState.classList.value = "bz-text-sub mb-0\\.5";
                 if (c.isDamaged) {
-                    setCapsuleStyle(ttState, BZ_ALERT.caution, "mb-0\\.5");
+                    setCapsuleStyle(ttState, BZ_ALERT.caution);
                 } else {
-                    ttState.classList.add("-mt-1");
+                    ttState.classList.add("leading-none");
                 }
                 ttState.innerHTML = notes;
                 ttConstructible.appendChild(ttState);
