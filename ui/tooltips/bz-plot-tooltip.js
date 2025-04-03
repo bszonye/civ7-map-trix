@@ -478,7 +478,7 @@ class PlotTooltipType {
         this.district = null;
         // settlement stats
         this.isCityCenter = false;
-        this.townFocus = null
+        this.townFocus = null;
         this.isGrowingTown = false;
         this.isFreshWater = null;
         this.religions = null;
@@ -594,7 +594,7 @@ class PlotTooltipType {
         this.district = null;
         // settlement stats
         this.isCityCenter = false;
-        this.townFocus = null
+        this.townFocus = null;
         this.isGrowingTown = false;
         this.isFreshWater = null;
         this.religions = null;
