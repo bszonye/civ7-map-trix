@@ -282,7 +282,7 @@ function dotJoin(list) {
     return list.filter(e => e).join("&nbsp;" + BZ_DOT_DIVIDER + " ");
 }
 function dotJoinLocale(list) {
-    return dotJoin(list.map(s => Locale.compose(s)));
+    return dotJoin(list.map(s => s && Locale.compose(s)));
 }
 function gatherBuildingsTagged(tag) {
     return new Set(GameInfo.TypeTags.filter(e => e.Tag == tag).map(e => e.Type));
@@ -1131,11 +1131,48 @@ class PlotTooltipType {
             null;  // discoveries are owned by a placeholder "World" player
         if (!name) return;
         this.renderTitleDivider(name);
+        let subhead;
+        let notes = [];
+        // town focus
+        if (this.city.isTown) {
+            const ptype = this.city.Growth?.projectType;
+            const project = ptype && GameInfo.Projects.lookup(ptype);
+            if (project) {
+                console.warn(`TRIX PROJECT=${JSON.stringify(project)}`);
+                subhead = project.Name;
+                if (this.city.Growth?.growthType == GrowthTypes.EXPAND) {
+                    notes.push("LOC_PROJECT_TOWN_BZ_GROWING");
+                }
+            }
+        }
+        // fresh water
+        if (!this.isFreshWater) notes.push("LOC_BZ_PLOTKEY_NO_FRESHWATER");
+        // render heading and notes
+        if (subhead || notes.length) {
+            console.warn(`TRIX SUB=${subhead} NOTES=${notes}`);
+            const tt = document.createElement("div");
+            tt.classList.value = "text-xs leading-snug text-center mb-1";
+            if (subhead) {
+                const ttHead = document.createElement("div");
+                ttHead.classList.value = "font-title uppercase";
+                ttHead.setAttribute('data-l10n-id', subhead);
+                tt.appendChild(ttHead);
+            }
+            if (notes.length) {
+                const ttNote = document.createElement("div");
+                ttNote.classList.value = "bz-text-sub -mt-1";
+                ttNote.setAttribute('data-l10n-id', dotJoinLocale(notes));
+                tt.appendChild(ttNote);
+            }
+            this.container.appendChild(tt);
+        }
         // owner info
         this.renderOwnerInfo();
         // settlement stats (only at city center or in verbose mode)
         if (!this.isCityCenter) return;
         const stats = [];
+        // religion
+        if (this.religions) stats.push(...this.religions);
         // settlement connections
         if (this.connections) {
             const connectionsNote = Locale.compose("LOC_BZ_CITY_CONNECTIONS",
@@ -1148,11 +1185,7 @@ class PlotTooltipType {
                 stats.push(dotJoinLocale(towns));
             }
         }
-        // religion
-        if (this.religions) stats.push(...this.religions);
-        // fresh water
-        if (!this.isFreshWater) stats.push(["LOC_BZ_PLOTKEY_NO_FRESHWATER"]);
-        // render
+        // render stats
         if (stats.length) this.renderRules(stats, "mt-1");
     }
     renderOwnerInfo() {
