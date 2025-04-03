@@ -1783,6 +1783,10 @@ function dump_yields() {
     const yields = [
         "YIELD_FOOD", "YIELD_PRODUCTION", "YIELD_GOLD", "YIELD_SCIENCE",
         "YIELD_CULTURE", "YIELD_HAPPINESS", "YIELD_DIPLOMACY",
+        "BUILDING_OPEN",
+        "url(city_buildingslist)", "url(city_citizenslist)",
+        "url(city_foodlist)", "url(city_improvementslist)",
+        "url(city_resourceslistlist)", "url(city_wonderslist)",
     ];
     return yields.map(icon =>
         ({ icon, size, underlay, glow, colors: [BZ_TYPE_COLOR[icon]] }));
