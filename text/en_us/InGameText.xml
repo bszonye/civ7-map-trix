@@ -88,9 +88,6 @@
         <InsertOrIgnore Tag="LOC_OPTIONS_GROUP_BZ_MODS">
             <Text>trixie's mods</Text>
         </InsertOrIgnore>
-        <Row Tag="LOC_PROJECT_TOWN_BZ_GROWING">
-            <Text>Growing</Text>
-        </Row>
         <Row Tag="LOC_RESOURCECLASS_BONUS_NAME_BZ">
             <Text>Bonus Resource</Text>
         </Row>
