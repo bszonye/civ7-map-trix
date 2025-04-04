@@ -87,8 +87,8 @@ if (bzMapTrixOptions.yieldBanner) {
 
 // horizontal list separator
 const BZ_DOT_DIVIDER = Locale.compose("LOC_PLOT_DIVIDER_DOT");
-const BZ_CITY_DIVIDER = BZ_DOT_DIVIDER;
-const BZ_TOWN_DIVIDER = BZ_DOT_DIVIDER;
+const BZ_CITY_DIVIDER = "[icon:BZ_CITY_DIVIDER]";
+const BZ_TOWN_DIVIDER = "[icon:BZ_TOWN_DIVIDER]";
 
 // all urban DistrictTypes
 const BZ_URBAN_TYPES = [DistrictTypes.CITY_CENTER, DistrictTypes.URBAN];
@@ -293,8 +293,8 @@ function dotJoinLocale(list, dot=BZ_DOT_DIVIDER) {
 }
 function dotJoinCities(list, dot=BZ_CITY_DIVIDER) {
     // replace all spaces with no-break spaces
-    list = list.map(s => s && Locale.compose(s).replace(/ /g, "&nbsp;"));
-    return dotJoin(list, dot)
+    list = list.filter(e => e).map(s => Locale.compose(s).replace(/ /g, "&nbsp;"));
+    return list.join(dot);
 }
 function gatherBuildingsTagged(tag) {
     return new Set(GameInfo.TypeTags.filter(e => e.Tag == tag).map(e => e.Type));

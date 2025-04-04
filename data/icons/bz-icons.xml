@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Database>
+  <IconDefinitions>
+    <InsertOrIgnore>
+      <ID>BZ_CITY_DIVIDER</ID>
+      <Path>fs://game/bz-map-trix/data/icons/bz_city_divider.png</Path>
+    </InsertOrIgnore>
+    <InsertOrIgnore>
+      <ID>BZ_TOWN_DIVIDER</ID>
+      <Path>fs://game/bz-map-trix/data/icons/bz_town_divider.png</Path>
+    </InsertOrIgnore>
+  </IconDefinitions>
+</Database>
