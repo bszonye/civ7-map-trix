@@ -44,12 +44,19 @@
                 <LoadOrder>1000</LoadOrder>
             </Properties>
             <Actions>
+                <ImportFiles>
+                    <Item>data/icons/bz-city-dot.png</Item>
+                    <Item>data/icons/bz-town-dot.png</Item>
+                </ImportFiles>
                 <UIScripts>
                     <Item>ui/diplo-ribbon/bz-panel-yield-banner.js</Item>
                     <Item>ui/options/bz-map-trix-options.js</Item>
                     <Item>ui/options/mod-options-decorator.js</Item>
                     <Item>ui/tooltips/bz-plot-tooltip.js</Item>
                 </UIScripts>
+                <UpdateIcons>
+                    <Item>data/icons/bz-icons.xml</Item>
+                </UpdateIcons>
                 <UpdateText>
                     <Item>text/en_us/InGameText.xml</Item>
                     <Item locale="de_DE">text/de_DE/InGameText.xml</Item>

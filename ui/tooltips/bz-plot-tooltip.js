@@ -87,6 +87,8 @@ if (bzMapTrixOptions.yieldBanner) {
 
 // horizontal list separator
 const BZ_DOT_DIVIDER = Locale.compose("LOC_PLOT_DIVIDER_DOT");
+const BZ_CITY_DIVIDER = "[icon:BZ_CITY_DOT]";
+const BZ_TOWN_DIVIDER = "[icon:BZ_TOWN_DOT]";
 
 // all urban DistrictTypes
 const BZ_URBAN_TYPES = [DistrictTypes.CITY_CENTER, DistrictTypes.URBAN];
@@ -230,6 +232,11 @@ const bzTypeSort = (a, b) => {
     const bsort = BZ_TYPE_SORT[b?.substring(0, 7)] ?? BZ_TYPE_SORT[undefined];
     return asort - bsort;
 }
+const bzNameSort = (a, b) => {
+    const aname = Locale.compose(a).toUpperCase();
+    const bname = Locale.compose(b).toUpperCase();
+    return aname.localeCompare(bname);
+}
 
 function baseYields(info) {
     if (!info) return null;
@@ -277,12 +284,17 @@ function constructibleColors(info) {
     }
     return [cbase, cbonus];
 }
-function dotJoin(list) {
+function dotJoin(list, dot=BZ_DOT_DIVIDER) {
     // join text with dots after removing empty elements
-    return list.filter(e => e).join("&nbsp;" + BZ_DOT_DIVIDER + " ");
+    return list.filter(e => e).join("&nbsp;" + dot + " ");
 }
-function dotJoinLocale(list) {
-    return dotJoin(list.map(s => s && Locale.compose(s)));
+function dotJoinLocale(list, dot=BZ_DOT_DIVIDER) {
+    return dotJoin(list.map(s => s && Locale.compose(s)), dot);
+}
+function dotJoinCities(list, dot=BZ_CITY_DIVIDER) {
+    // replace all spaces with no-break spaces
+    list = list.filter(e => e).map(s => Locale.compose(s).replace(/ /g, "&nbsp;"));
+    return list.join(dot);
 }
 function gatherBuildingsTagged(tag) {
     return new Set(GameInfo.TypeTags.filter(e => e.Tag == tag).map(e => e.Type));
@@ -1185,8 +1197,10 @@ class PlotTooltipType {
             if (this.isVerbose) {
                 const cities = this.connections.cities.map(i => i.name);
                 const towns = this.connections.towns.map(i => i.name);
-                stats.push(dotJoinLocale(cities));
-                stats.push(dotJoinLocale(towns));
+                cities.sort(bzNameSort);
+                towns.sort(bzNameSort);
+                stats.push(dotJoinCities(cities, BZ_CITY_DIVIDER));
+                stats.push(dotJoinCities(towns, BZ_TOWN_DIVIDER));
             }
         }
         // render stats
