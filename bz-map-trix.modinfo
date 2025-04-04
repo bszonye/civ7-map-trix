@@ -45,8 +45,8 @@
             </Properties>
             <Actions>
                 <ImportFiles>
-                    <Item>data/icons/bz_city_divider.png</Item>
-                    <Item>data/icons/bz_town_divider.png</Item>
+                    <Item>data/icons/bz-city-dot.png</Item>
+                    <Item>data/icons/bz-town-dot.png</Item>
                 </ImportFiles>
                 <UIScripts>
                     <Item>ui/diplo-ribbon/bz-panel-yield-banner.js</Item>
