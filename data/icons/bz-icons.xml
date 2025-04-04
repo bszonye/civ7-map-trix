@@ -2,12 +2,12 @@
 <Database>
   <IconDefinitions>
     <InsertOrIgnore>
-      <ID>BZ_CITY_DIVIDER</ID>
-      <Path>fs://game/bz-map-trix/data/icons/bz_city_divider.png</Path>
+      <ID>BZ_CITY_DOT</ID>
+      <Path>fs://game/bz-map-trix/data/icons/bz_city_dot.png</Path>
     </InsertOrIgnore>
     <InsertOrIgnore>
-      <ID>BZ_TOWN_DIVIDER</ID>
-      <Path>fs://game/bz-map-trix/data/icons/bz_town_divider.png</Path>
+      <ID>BZ_TOWN_DOT</ID>
+      <Path>fs://game/bz-map-trix/data/icons/bz_town_dot.png</Path>
     </InsertOrIgnore>
   </IconDefinitions>
 </Database>

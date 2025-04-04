@@ -87,8 +87,8 @@ if (bzMapTrixOptions.yieldBanner) {
 
 // horizontal list separator
 const BZ_DOT_DIVIDER = Locale.compose("LOC_PLOT_DIVIDER_DOT");
-const BZ_CITY_DIVIDER = "[icon:BZ_CITY_DIVIDER]";
-const BZ_TOWN_DIVIDER = "[icon:BZ_TOWN_DIVIDER]";
+const BZ_CITY_DIVIDER = "[icon:BZ_CITY_DOT]";
+const BZ_TOWN_DIVIDER = "[icon:BZ_TOWN_DOT]";
 
 // all urban DistrictTypes
 const BZ_URBAN_TYPES = [DistrictTypes.CITY_CENTER, DistrictTypes.URBAN];
