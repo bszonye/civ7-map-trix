@@ -407,9 +407,8 @@ function getSpecialists(loc, city) {
     if (!maximum) return null;
     const plotIndex = GameplayMap.getIndexFromLocation(loc);
     const plot = city.Workers.GetAllPlacementInfo().find(p => p.PlotIndex == plotIndex);
-    if (!plot) return null;
-    const workers = plot?.NumWorkers;
-    if (!workers) return null;  // hide 0/X specialists
+    const workers = plot?.NumWorkers ?? -1;
+    if (workers < 0) return null;
     return { workers, maximum };
 }
 function getTopUnit(loc) {
@@ -497,6 +496,7 @@ class PlotTooltipType {
         // constructibles
         this.constructibles = [];
         this.buildings = [];  // omits walls
+        this.specialists = null;  // { workers, maximum }
         this.improvement = null;
         this.wonder = null;
         this.expansion = null;  // improvement type for rural expansion
@@ -613,6 +613,7 @@ class PlotTooltipType {
         // constructibles
         this.constructibles = [];
         this.buildings = [];
+        this.specialists = null;  // { workers, maximum }
         this.improvement = null;
         this.wonder = null;
         this.expansion = null;  // improvement type for rural expansion
@@ -804,6 +805,7 @@ class PlotTooltipType {
                 console.warn(`bz-plot-tooltip: expected 1 constructible, not ${n}`);
             }
         }
+        this.specialists = getSpecialists(this.plotCoord, this.city);
         if (this.improvement) {
             // set up icons and special district names for improvements
             const info = this.improvement.info;
@@ -1352,10 +1354,9 @@ class PlotTooltipType {
         // constructibles
         this.renderConstructibles();
         // report specialists
-        const specialists = getSpecialists(this.plotCoord, this.city);
-        if (specialists) {
+        if (this.specialists && (this.specialists.workers || this.isVerbose)) {
             const text = Locale.compose("LOC_DISTRICT_BZ_SPECIALISTS",
-                specialists.workers, specialists.maximum);
+                this.specialists.workers, this.specialists.maximum);
             this.renderRules([text], "mt-1");
         }
         // bottom bar
