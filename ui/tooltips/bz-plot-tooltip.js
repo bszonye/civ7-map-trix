@@ -15,8 +15,7 @@ import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
 const BZ_BORDER_WIDTH = "0.1111111111rem";  // tooltip main border
 
 // additional CSS definitions
-const BZ_HEAD_STYLE = document.createElement('style');
-BZ_HEAD_STYLE.textContent = [
+const BZ_HEAD_STYLE = [
 `.tooltip.plot-tooltip.bz-tooltip .tooltip__content {
     /* width: 21.3333333333rem;  /* DEBUG */
     padding-top: ${BZ_BORDER_WIDTH};
@@ -72,8 +71,12 @@ BZ_HEAD_STYLE.textContent = [
     width: 100%;
     /* background-color: #80808080;  /* DEBUG */
 }`,
-].join('\n');
-document.head.appendChild(BZ_HEAD_STYLE);
+];
+BZ_HEAD_STYLE.map(style => {
+    const e = document.createElement('style');
+    e.textContent = style;
+    document.head.appendChild(e);
+});
 // sync optional styling
 if (bzMapTrixOptions.yieldBanner) {
     document.body.classList.add("bz-yield-banner");

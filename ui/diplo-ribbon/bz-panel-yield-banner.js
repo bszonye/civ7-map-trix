@@ -1,7 +1,6 @@
 import { PanelYieldBanner } from '/base-standard/ui/diplo-ribbon/panel-yield-banner.js';
 
-const BZ_HEAD_STYLE = document.createElement('style');
-BZ_HEAD_STYLE.textContent = `
+const BZ_HEAD_STYLE = [`
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-food,
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-production,
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-gold,
@@ -75,8 +74,12 @@ BZ_HEAD_STYLE.textContent = `
 .bz-yield-banner .panel-yield__top-bar-content .text-yield-cities:hover {
     background-color: #e5d2acaa;
 }
-`;
-document.head.appendChild(BZ_HEAD_STYLE);
+`];
+BZ_HEAD_STYLE.map(style => {
+    const e = document.createElement('style');
+    e.textContent = style;
+    document.head.appendChild(e);
+});
 
 // add missing style for settlement count
 const YieldBarEntry_render = PanelYieldBanner.prototype.render;
