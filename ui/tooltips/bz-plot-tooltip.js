@@ -402,7 +402,7 @@ function getReligions(city) {
     return list.length ? list : null;
 }
 function getSpecialists(loc, city) {
-    if (city.isTown) return null;  // no specialists in towns
+    if (!city || city.isTown) return null;  // no specialists in towns
     const maximum = city.Workers?.getCityWorkerCap();
     if (!maximum) return null;
     const plotIndex = GameplayMap.getIndexFromLocation(loc);
