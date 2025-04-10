@@ -85,9 +85,9 @@
         <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_VERBOSE" Language="ru_RU">
             <Text>Подробный</Text>
         </Row>
-        <InsertOrIgnore Tag="LOC_OPTIONS_GROUP_BZ_MODS" Language="ru_RU">
+        <Replace Tag="LOC_OPTIONS_GROUP_BZ_MODS" Language="ru_RU">
             <Text>Моды от Trixie</Text>
-        </InsertOrIgnore>
+        </Replace>
         <Row Tag="LOC_RESOURCECLASS_BONUS_NAME_BZ" Language="ru_RU">
             <Text>Бонусный Ресурс</Text>
         </Row>

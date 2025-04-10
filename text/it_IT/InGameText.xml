@@ -85,9 +85,9 @@
         <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_VERBOSE" Language="it_IT">
             <Text>Dettagliati</Text>
         </Row>
-        <InsertOrIgnore Tag="LOC_OPTIONS_GROUP_BZ_MODS" Language="it_IT">
+        <Replace Tag="LOC_OPTIONS_GROUP_BZ_MODS" Language="it_IT">
             <Text>mod di Trixie</Text>
-        </InsertOrIgnore>
+        </Replace>
         <Row Tag="LOC_RESOURCECLASS_BONUS_NAME_BZ" Language="it_IT">
             <Text>Risorsa Bonus</Text>
         </Row>

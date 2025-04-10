@@ -85,9 +85,9 @@
         <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_VERBOSE" Language="ko_KR">
             <Text>상세</Text>
         </Row>
-        <InsertOrIgnore Tag="LOC_OPTIONS_GROUP_BZ_MODS" Language="ko_KR">
+        <Replace Tag="LOC_OPTIONS_GROUP_BZ_MODS" Language="ko_KR">
             <Text>trixie의 다양한 모드</Text>
-        </InsertOrIgnore>
+        </Replace>
         <Row Tag="LOC_RESOURCECLASS_BONUS_NAME_BZ" Language="ko_KR">
             <Text>보너스 자원</Text>
         </Row>

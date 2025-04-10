@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Database>
   <IconDefinitions>
-    <InsertOrIgnore>
+    <Replace>
       <ID>BZ_CITY_DOT</ID>
       <Path>fs://game/bz-map-trix/data/icons/bz-city-dot.png</Path>
-    </InsertOrIgnore>
-    <InsertOrIgnore>
+    </Replace>
+    <Replace>
       <ID>BZ_TOWN_DOT</ID>
       <Path>fs://game/bz-map-trix/data/icons/bz-town-dot.png</Path>
-    </InsertOrIgnore>
+    </Replace>
   </IconDefinitions>
 </Database>
