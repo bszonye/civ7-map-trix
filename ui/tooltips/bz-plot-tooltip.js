@@ -522,7 +522,7 @@ class PlotTooltipType {
                 preloadIcon(y, "YIELD");
             }
             // stop flicker in Sukritact's city banner tooltip
-            Controls.preloadImage("hud_sub_circle_bk");
+            Controls.preloadImage("hud_sub_circle_bk", "city-banner");
         });
     }
     get isHidden() { return this.verbosity == bzVerbosity.HIDDEN; }
