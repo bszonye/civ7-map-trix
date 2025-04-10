@@ -85,9 +85,9 @@
         <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_VERBOSE">
             <Text>Verbose</Text>
         </Row>
-        <InsertOrIgnore Tag="LOC_OPTIONS_GROUP_BZ_MODS">
+        <Replace Tag="LOC_OPTIONS_GROUP_BZ_MODS">
             <Text>trixie's mods</Text>
-        </InsertOrIgnore>
+        </Replace>
         <Row Tag="LOC_RESOURCECLASS_BONUS_NAME_BZ">
             <Text>Bonus Resource</Text>
         </Row>

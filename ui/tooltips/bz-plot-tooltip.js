@@ -15,8 +15,7 @@ import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
 const BZ_BORDER_WIDTH = "0.1111111111rem";  // tooltip main border
 
 // additional CSS definitions
-const BZ_HEAD_STYLE = document.createElement('style');
-BZ_HEAD_STYLE.textContent = [
+const BZ_HEAD_STYLE = [
 `.tooltip.plot-tooltip.bz-tooltip .tooltip__content {
     /* width: 21.3333333333rem;  /* DEBUG */
     padding-top: ${BZ_BORDER_WIDTH};
@@ -52,10 +51,6 @@ BZ_HEAD_STYLE.textContent = [
     margin-bottom: calc(${BZ_BORDER_WIDTH} - var(--padding-top-bottom));
     padding-bottom: calc(var(--padding-top-bottom) - ${BZ_BORDER_WIDTH});
 }`,
-// extra-small text for notes
-`.bz-text-sub {
-    font-size: 85%;
-}`,
 // centers blocks of rules text with max-w-60 equivalent
 // IMPORTANT: Locale.stylize wraps text in an extra <p> element when it
 // contains icons, which interferes with text-align and max-width.  the
@@ -76,8 +71,12 @@ BZ_HEAD_STYLE.textContent = [
     width: 100%;
     /* background-color: #80808080;  /* DEBUG */
 }`,
-].join('\n');
-document.head.appendChild(BZ_HEAD_STYLE);
+];
+BZ_HEAD_STYLE.map(style => {
+    const e = document.createElement('style');
+    e.textContent = style;
+    document.head.appendChild(e);
+});
 // sync optional styling
 if (bzMapTrixOptions.yieldBanner) {
     document.body.classList.add("bz-yield-banner");
@@ -403,14 +402,13 @@ function getReligions(city) {
     return list.length ? list : null;
 }
 function getSpecialists(loc, city) {
-    if (city.isTown) return null;  // no specialists in towns
+    if (!city || city.isTown) return null;  // no specialists in towns
     const maximum = city.Workers?.getCityWorkerCap();
     if (!maximum) return null;
     const plotIndex = GameplayMap.getIndexFromLocation(loc);
     const plot = city.Workers.GetAllPlacementInfo().find(p => p.PlotIndex == plotIndex);
-    if (!plot) return null;
-    const workers = plot?.NumWorkers;
-    if (!workers) return null;  // hide 0/X specialists
+    const workers = plot?.NumWorkers ?? -1;
+    if (workers < 0) return null;
     return { workers, maximum };
 }
 function getTopUnit(loc) {
@@ -498,6 +496,7 @@ class PlotTooltipType {
         // constructibles
         this.constructibles = [];
         this.buildings = [];  // omits walls
+        this.specialists = null;  // { workers, maximum }
         this.improvement = null;
         this.wonder = null;
         this.expansion = null;  // improvement type for rural expansion
@@ -614,6 +613,7 @@ class PlotTooltipType {
         // constructibles
         this.constructibles = [];
         this.buildings = [];
+        this.specialists = null;  // { workers, maximum }
         this.improvement = null;
         this.wonder = null;
         this.expansion = null;  // improvement type for rural expansion
@@ -805,6 +805,7 @@ class PlotTooltipType {
                 console.warn(`bz-plot-tooltip: expected 1 constructible, not ${n}`);
             }
         }
+        this.specialists = getSpecialists(this.plotCoord, this.city);
         if (this.improvement) {
             // set up icons and special district names for improvements
             const info = this.improvement.info;
@@ -1175,7 +1176,7 @@ class PlotTooltipType {
             }
             if (notes.length) {
                 const ttNote = document.createElement("div");
-                ttNote.classList.value = "bz-text-sub leading-none mb-0\\.5";
+                ttNote.classList.value = "text-2xs leading-none mb-0\\.5";
                 ttNote.setAttribute('data-l10n-id', dotJoinLocale(notes));
                 ttSubhead.appendChild(ttNote);
             }
@@ -1353,10 +1354,9 @@ class PlotTooltipType {
         // constructibles
         this.renderConstructibles();
         // report specialists
-        const specialists = getSpecialists(this.plotCoord, this.city);
-        if (specialists) {
+        if (this.specialists && (this.specialists.workers || this.isVerbose)) {
             const text = Locale.compose("LOC_DISTRICT_BZ_SPECIALISTS",
-                specialists.workers, specialists.maximum);
+                this.specialists.workers, this.specialists.maximum);
             this.renderRules([text], "mt-1");
         }
         // bottom bar
@@ -1413,7 +1413,7 @@ class PlotTooltipType {
         if (hexName) this.renderTitleDivider(Locale.compose(hexName));
         // optional description
         if (hexRules.length && !this.isCompact) {
-            const title = "bz-text-sub leading-none mb-1";
+            const title = "text-2xs leading-none mb-1";
             if (hexSubtitle) this.renderRules([hexSubtitle], '', title);
             this.renderRules(hexRules, "mb-1");
         }
@@ -1443,7 +1443,7 @@ class PlotTooltipType {
         const notes = this.wonder.notes;
         if (notes.length) {
             const ttState = document.createElement("div");
-            ttState.classList.value = "bz-text-sub leading-none text-center";
+            ttState.classList.value = "text-2xs leading-none text-center";
             ttState.innerHTML = dotJoinLocale(notes);
             this.container.appendChild(ttState);
             rulesStyle = "mt-1";
@@ -1476,7 +1476,7 @@ class PlotTooltipType {
             const notes = dotJoinLocale(c.notes);
             if (notes) {
                 const ttState = document.createElement("div");
-                ttState.classList.value = "bz-text-sub mb-0\\.5";
+                ttState.classList.value = "text-2xs mb-0\\.5";
                 if (c.isDamaged) {
                     setCapsuleStyle(ttState, BZ_ALERT.caution);
                 } else {
@@ -1490,7 +1490,7 @@ class PlotTooltipType {
         // expansion type for undeveloped & upgraded tiles
         if (this.expansion) {
             const tt = document.createElement("div");
-            if (this.constructibles.length) tt.classList.value = "bz-text-sub mt-1";
+            if (this.constructibles.length) tt.classList.value = "text-2xs mt-1";
             tt.setAttribute("data-l10n-id", this.expansion.text);
             ttList.appendChild(tt);
         }

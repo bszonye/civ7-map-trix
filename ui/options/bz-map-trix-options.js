@@ -18,11 +18,12 @@ const verbosityOptions = [
     { label: 'LOC_OPTIONS_BZ_VERBOSITY_VERBOSE', value: bzVerbosity.VERBOSE },
 ];
 
+const BZ_DEFAULT_OPTIONS = {
+    verbose: bzVerbosity.STANDARD,
+    yieldBanner: true,
+};
 const bzMapTrixOptions = new class {
-    data = {
-        verbose: bzVerbosity.STANDARD,
-        yieldBanner: true,
-    };
+    data = { ...BZ_DEFAULT_OPTIONS };
     constructor() {
         const modSettings = ModSettings.load(MOD_ID);
         if (modSettings) this.data = modSettings;
@@ -30,7 +31,7 @@ const bzMapTrixOptions = new class {
     save() {
         ModSettings.save(MOD_ID, this.data);
         // sync optional styling
-        if (this.data.yieldBanner) {
+        if (this.yieldBanner) {
             document.body.classList.add("bz-yield-banner");
         } else {
             document.body.classList.remove("bz-yield-banner");
@@ -40,14 +41,14 @@ const bzMapTrixOptions = new class {
         // convert legacy boolean options
         if (this.data.verbose === true) return bzVerbosity.VERBOSE;
         if (this.data.verbose === false) return bzVerbosity.STANDARD;
-        return this.data.verbose;
+        return this.data.verbose ?? BZ_DEFAULT_OPTIONS.verbose;
     }
     set verbose(level) {
         this.data.verbose = level;
         this.save();
     }
     get yieldBanner() {
-        return this.data.yieldBanner;
+        return this.data.yieldBanner ?? BZ_DEFAULT_OPTIONS.yieldBanner;
     }
     set yieldBanner(flag) {
         this.data.yieldBanner = !!flag;

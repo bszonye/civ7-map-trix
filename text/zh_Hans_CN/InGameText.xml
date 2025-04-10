@@ -85,9 +85,9 @@
         <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_VERBOSE" Language="zh_Hans_CN">
             <Text>详细</Text>
         </Row>
-        <InsertOrIgnore Tag="LOC_OPTIONS_GROUP_BZ_MODS" Language="zh_Hans_CN">
+        <Replace Tag="LOC_OPTIONS_GROUP_BZ_MODS" Language="zh_Hans_CN">
             <Text>trixie 系列模组</Text>
-        </InsertOrIgnore>
+        </Replace>
         <Row Tag="LOC_RESOURCECLASS_BONUS_NAME_BZ" Language="zh_Hans_CN">
             <Text>加成资源</Text>
         </Row>
