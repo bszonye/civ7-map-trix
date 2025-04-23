@@ -1646,10 +1646,6 @@ class PlotTooltipType {
         ttPlotIndex.innerHTML =
             `${Locale.compose("LOC_PLOT_TOOLTIP_INDEX")}: ${this.plotIndex}`;
         layout.appendChild(ttPlotIndex);
-        const ttPlotTag = document.createElement("div");
-        ttPlotTag.classList.add("plot-tooltip__coordinate-text");
-        ttPlotTag.innerHTML = Locale.compose(this.hemisphere);
-        layout.appendChild(ttPlotTag);
         this.container.appendChild(layout);
     }
     renderIcon(layout, info) {
