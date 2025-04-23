@@ -455,6 +455,8 @@ class PlotTooltipType {
         this.feature = null;
         this.river = null;
         this.resource = null;
+        this.isDistantLands = false;
+        this.hemisphere = null;
         // ownership
         this.owner = null;
         this.city = null;
@@ -570,6 +572,8 @@ class PlotTooltipType {
         this.feature = null;
         this.river = null;
         this.resource = null;
+        this.isDistantLands = false;
+        this.hemisphere = null;
         // ownership
         this.owner = null;
         this.city = null;
@@ -670,6 +674,10 @@ class PlotTooltipType {
         }
         const resourceType = GameplayMap.getResourceType(loc.x, loc.y);
         this.resource = GameInfo.Resources.lookup(resourceType);
+        this.isDistantLands = this.player.isDistantLands(loc);
+        this.hemisphere = this.isDistantLands ?
+            "LOC_PLOT_TOOLTIP_HEMISPHERE_WEST" :
+            "LOC_PLOT_TOOLTIP_HEMISPHERE_EAST";
     }
     modelCivilization() {
         // owner, civ, city, district
@@ -888,7 +896,6 @@ class PlotTooltipType {
         const featureLabel = this.getFeatureLabel(loc);
         const river = this.getRiverInfo(loc);
         const continentName = this.getContinentName(loc);
-        const distantLandsLabel = this.getDistantLandsLabel(loc);
         const routes = this.getRouteList();
         const hasRoad = routes.length != 0;
         // alert banners: settler warnings, damaging & defense effects
@@ -937,7 +944,7 @@ class PlotTooltipType {
         // continent + distant lands tag
         if (continentName) {
             const tt = document.createElement("div");
-            tt.innerHTML = dotJoinLocale([continentName, distantLandsLabel]);
+            tt.innerHTML = dotJoinLocale([continentName, this.hemisphere]);
             layout.appendChild(tt);
         }
         this.container.appendChild(layout);
@@ -1077,11 +1084,6 @@ class PlotTooltipType {
         const continent = GameInfo.Continents.lookup(continentType);
         if (!continent?.Description) return null;
         return continent.Description;
-    }
-    getDistantLandsLabel(loc) {
-        return this.player.isDistantLands(loc) ?
-            "LOC_PLOT_TOOLTIP_HEMISPHERE_WEST" :
-            "LOC_PLOT_TOOLTIP_HEMISPHERE_EAST";
     }
     getRouteList() {
         const routeType = GameplayMap.getRouteType(this.plotCoord.x, this.plotCoord.y);
@@ -1336,6 +1338,12 @@ class PlotTooltipType {
                     hexSubtitle = Locale.keyExists(rcname) ? rcname : rc.Name;
                 }
                 hexRules.push(this.resource.Tooltip);
+                if (this.resource.ResourceClassType == "RESOURCECLASS_TREASURE") {
+                    // also show treasure fleet rules
+                    if (this.isDistantLands) {
+                        hexRules.push("LOC_CAN_CREATE_TREASURE_FLEET");
+                    }
+                }
             }
             resourceIcon = this.resource.ResourceType;
         } else if (this.isCompact && this.city) {
@@ -1360,7 +1368,7 @@ class PlotTooltipType {
         if (hexRules.length && !this.isCompact) {
             const title = "text-2xs leading-none mb-1";
             if (hexSubtitle) this.renderRules([hexSubtitle], '', title);
-            this.renderRules(hexRules, "mb-1");
+            this.renderRules(hexRules, null, "text-xs leading-snug mb-1");
         }
         // constructibles
         this.renderConstructibles();
@@ -1637,12 +1645,9 @@ class PlotTooltipType {
         ttPlotIndex.innerHTML =
             `${Locale.compose("LOC_PLOT_TOOLTIP_INDEX")}: ${this.plotIndex}`;
         layout.appendChild(ttPlotIndex);
-        const hemi = this.player?.isDistantLands(loc) ?
-            "LOC_PLOT_TOOLTIP_HEMISPHERE_WEST" :
-            "LOC_PLOT_TOOLTIP_HEMISPHERE_EAST";
         const ttPlotTag = document.createElement("div");
         ttPlotTag.classList.add("plot-tooltip__coordinate-text");
-        ttPlotTag.innerHTML = Locale.compose(hemi);
+        ttPlotTag.innerHTML = Locale.compose(this.hemisphere);
         layout.appendChild(ttPlotTag);
         this.container.appendChild(layout);
     }
