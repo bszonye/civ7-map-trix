@@ -4,9 +4,6 @@
         <Row Tag="LOC_BZ_CITY_CONNECTIONS" Language="de_DE">
             <Text>Verbindungen • {1_cities}[icon:YIELD_CITIES] {2_towns}[icon:YIELD_TOWNS]</Text>
         </Row>
-        <Row Tag="LOC_BZ_HEMISPHERE_HOMELANDS" Language="de_DE">
-            <Text>Heimatland</Text>
-        </Row>
         <Row Tag="LOC_BZ_IMPROVEMENT_FOR_TILE" Language="de_DE">
             <Text>Erlaubt {1_icon} {2_name}</Text>
         </Row>
@@ -51,9 +48,6 @@
         </Row>
         <Row Tag="LOC_DISTRICT_BZ_URBAN_VACANT" Language="de_DE">
             <Text>Freier Bezirk</Text>
-        </Row>
-        <Row Tag="LOC_DISTRICT_BZ_UNDEVELOPED" Language="de_DE">
-            <Text>Unverbessert</Text>
         </Row>
         <Row Tag="LOC_INDEPENDENT_BZ_RELATIONSHIP_TRIBUTARY" Language="de_DE">
             <Text>Abhängig</Text>
@@ -102,9 +96,6 @@
         </Row>
         <Row Tag="LOC_RESOURCECLASS_TREASURE_NAME_BZ" Language="de_DE">
             <Text>Schatzressource</Text>
-        </Row>
-        <Row Tag="LOC_STATE_BZ_OBSOLETE" Language="de_DE">
-            <Text>Veraltet</Text>
         </Row>
         <Row Tag="LOC_STATE_BZ_UNIQUE" Language="de_DE">
             <Text>Einzigartig</Text>

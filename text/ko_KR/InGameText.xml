@@ -4,9 +4,6 @@
         <Row Tag="LOC_BZ_CITY_CONNECTIONS" Language="ko_KR">
             <Text>연결된 정착지 • {1_cities}[icon:YIELD_CITIES] {2_towns}[icon:YIELD_TOWNS]</Text>
         </Row>
-        <Row Tag="LOC_BZ_HEMISPHERE_HOMELANDS" Language="ko_KR">
-            <Text>고향</Text>
-        </Row>
         <Row Tag="LOC_BZ_IMPROVEMENT_FOR_TILE" Language="ko_KR">
             <Text>건설 가능 {1_icon} {2_name}</Text>
         </Row>
@@ -51,9 +48,6 @@
         </Row>
         <Row Tag="LOC_DISTRICT_BZ_URBAN_VACANT" Language="ko_KR">
             <Text>빈 시가지</Text>
-        </Row>
-        <Row Tag="LOC_DISTRICT_BZ_UNDEVELOPED" Language="ko_KR">
-            <Text>미개발</Text>
         </Row>
         <Row Tag="LOC_INDEPENDENT_BZ_RELATIONSHIP_TRIBUTARY" Language="ko_KR">
             <Text>종속국</Text>
@@ -102,9 +96,6 @@
         </Row>
         <Row Tag="LOC_RESOURCECLASS_TREASURE_NAME_BZ" Language="ko_KR">
             <Text>보물 자원</Text>
-        </Row>
-        <Row Tag="LOC_STATE_BZ_OBSOLETE" Language="ko_KR">
-            <Text>구시대</Text>
         </Row>
         <Row Tag="LOC_STATE_BZ_UNIQUE" Language="ko_KR">
             <Text>특유</Text>

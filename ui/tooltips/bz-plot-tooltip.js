@@ -21,43 +21,49 @@ const BZ_HEAD_STYLE = [
     padding-top: ${BZ_BORDER_WIDTH};
 }`,
 // debug highlighting for content boxes
-`.bz-tooltip.bz-debug > div > div > div {
+`
+.bz-debug .bz-tooltip > div > div > div {
     background-color: #80808040;  /* DEBUG */
-}`,
-`.bz-tooltip.bz-debug > div > div > div > div {
+}
+.bz-debug .bz-tooltip > div > div > div > div {
     background-color: #00c0c080;  /* DEBUG */
-}`,
-`.bz-tooltip.bz-debug > div > div > div > div p {
+}
+.bz-debug .bz-tooltip > div > div > div > div p {
     background-color: #808080c0;  /* DEBUG */
-}`,
+}
+`,
 // renderDivider: imitate the bottom of the tooltip
 `.plot-tooltip__Divider {
     margin-top: calc(var(--padding-top-bottom) - ${BZ_BORDER_WIDTH});
-}`,
+}
+`,
 // full-width banners: general, unit info, debug info
-`.bz-banner {
+`
+.bz-banner {
     text-align: center;
     margin-left: calc(${BZ_BORDER_WIDTH} - var(--padding-left-right));
     margin-right: calc(${BZ_BORDER_WIDTH} - var(--padding-left-right));
     padding-left: calc(var(--padding-left-right) - ${BZ_BORDER_WIDTH});
     padding-right: calc(var(--padding-left-right) - ${BZ_BORDER_WIDTH});
-}`,
-`.bz-banner-unit {
+}
+.bz-banner-unit {
     margin-bottom: calc(${BZ_BORDER_WIDTH} - var(--padding-top-bottom));
     padding-top: calc((var(--padding-top-bottom) - ${BZ_BORDER_WIDTH}) / 2);
     padding-bottom: calc((var(--padding-top-bottom) - ${BZ_BORDER_WIDTH}) / 2);
-}`,
-`.bz-banner-debug {
+}
+.bz-banner-debug {
     margin-bottom: calc(${BZ_BORDER_WIDTH} - var(--padding-top-bottom));
     padding-bottom: calc(var(--padding-top-bottom) - ${BZ_BORDER_WIDTH});
-}`,
+}
+`,
 // centers blocks of rules text with max-w-60 equivalent
 // IMPORTANT: Locale.stylize wraps text in an extra <p> element when it
 // contains icons, which interferes with text-align and max-width.  the
 // result also changes with single-line vs multi-line text.  these rules
 // apply the properties in the correct order & scope to work with all
 // combinations (with/without icons, single/multiple lines).
-`.bz-tooltip .bz-rules-center {
+`
+.bz-tooltip .bz-rules-center {
     width: 100%;
     text-align: center;
     /* background-color: #00808080;  /* DEBUG */
@@ -70,7 +76,8 @@ const BZ_HEAD_STYLE = [
 .bz-tooltip .bz-rules-center p {
     width: 100%;
     /* background-color: #80808080;  /* DEBUG */
-}`,
+}
+`,
 ];
 BZ_HEAD_STYLE.map(style => {
     const e = document.createElement('style');
@@ -298,39 +305,6 @@ function dotJoinCities(list, dot=BZ_CITY_DIVIDER) {
 function gatherBuildingsTagged(tag) {
     return new Set(GameInfo.TypeTags.filter(e => e.Tag == tag).map(e => e.Type));
 }
-// get the set of unique traits for a civilization
-const BZ_CIV_TRAITS = {};  // cache
-function gatherCivTraits(civType) {
-    if (civType in BZ_CIV_TRAITS) return BZ_CIV_TRAITS[civType];
-    const traits = (GameInfo.CivilizationTraits
-        .filter(trait => trait.CivilizationType == civType)
-        .map(trait => trait.TraitType));
-    // set the cache and return it
-    return BZ_CIV_TRAITS[civType] = new Set(traits);
-}
-// get the geographic rules for rural expansions (new improvements)
-const BZ_EXPANSION_RULES = {};  // cache
-function gatherExpansionRules(civType) {
-    if (civType in BZ_EXPANSION_RULES) return BZ_EXPANSION_RULES[civType];
-    const traits = gatherCivTraits(civType);
-    const support = {};
-    for (const row of GameInfo.District_FreeConstructibles) {
-        const imp = GameInfo.Improvements.lookup(row.ConstructibleType);
-        // unique improvement: check against player traits
-        if (imp.TraitType && !traits?.has(imp.TraitType)) continue;
-        // get the geographic selector (TERRAIN_HILL, RIVER_MINOR, etc)
-        const key = (row.ResourceType || row.RiverType ||
-            row.FeatureType || row.TerrainType || row.BiomeType);
-        if (!key) continue;
-        // collect the matching improvement type and priority
-        support[key] = {
-            constructible: row.ConstructibleType,
-            priority: row.Priority,
-        };
-    }
-    // set the cache and return it
-    return BZ_EXPANSION_RULES[civType] = support;
-}
 // get the set of obstacles that end movement for a movement class
 const BZ_OBSTACLES = {};  // cache
 function gatherMovementObstacles(mclass) {
@@ -472,7 +446,6 @@ class PlotTooltipType {
         // player-dependent info (may change with hotseat mode)
         this.player = Players.get(GameContext.localPlayerID);
         this.playerCiv = GameInfo.Civilizations.lookup(this.player.civilizationType);
-        this.expansionRules = gatherExpansionRules(this.playerCiv.CivilizationType);
         // selection-dependent info
         this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
         // world
@@ -499,8 +472,8 @@ class PlotTooltipType {
         this.specialists = null;  // { workers, maximum }
         this.improvement = null;
         this.wonder = null;
+        this.freeConstructible = null;  // improvement type for warehouses
         this.expansion = null;  // improvement type for rural expansion
-        this.warehouse = null;  // improvement type for warehouses
         // yields
         this.yields = [];
         this.totalYields = 0;
@@ -589,7 +562,6 @@ class PlotTooltipType {
         // player-dependent info (may change with hotseat mode)
         this.player = Players.get(GameContext.localPlayerID);
         this.playerCiv = GameInfo.Civilizations.lookup(this.player.civilizationType);
-        this.expansionRules = gatherExpansionRules(this.playerCiv.CivilizationType);
         // selection-dependent info
         this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
         // world
@@ -616,8 +588,8 @@ class PlotTooltipType {
         this.specialists = null;  // { workers, maximum }
         this.improvement = null;
         this.wonder = null;
+        this.freeConstructible = null;  // improvement type for warehouses
         this.expansion = null;  // improvement type for rural expansion
-        this.warehouse = null;  // improvement type for warehouses
         // yields
         this.yields = [];
         this.totalYields = 0;
@@ -636,9 +608,9 @@ class PlotTooltipType {
         // show debug info if enabled + extra info when Ctrl is held
         this.isShowingDebug = UI.isDebugPlotInfoVisible();
         if (this.isShowingDebug && (this.modCtrl || this.modShift)) {
-            this.tooltip.classList.add("bz-debug");
+            document.body.classList.add("bz-debug");
         } else {
-            this.tooltip.classList.remove("bz-debug");
+            document.body.classList.remove("bz-debug");
         }
         this.model();
         this.render();
@@ -649,7 +621,6 @@ class PlotTooltipType {
         // update player and civilization info
         this.player = Players.get(GameContext.localPlayerID);
         this.playerCiv = GameInfo.Civilizations.lookup(this.player.civilizationType);
-        this.expansionRules = gatherExpansionRules(this.playerCiv.CivilizationType);
         // update selection-dependent info
         // (note: currently using "foot" instead of the selected unit)
         this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
@@ -764,14 +735,14 @@ class PlotTooltipType {
             const currentAge = this.age.ChronologyIndex;
             const age = isAgeless ? currentAge - 0.5 :
                 GameInfo.Ages.lookup(info.Age ?? "")?.ChronologyIndex ?? 0;
-            const isObsolete = isBuilding && Math.ceil(age) != currentAge;
+            const isOverbuildable = isBuilding && Math.ceil(age) != currentAge;
             const uniqueTrait =
                 isBuilding ?
                 GameInfo.Buildings.lookup(info.ConstructibleType).TraitType :
                 isImprovement ?
                 GameInfo.Improvements.lookup(info.ConstructibleType).TraitType :
                 null;
-            const isCurrent = isComplete && !isDamaged && !isObsolete && !isExtra;
+            const isCurrent = isComplete && !isDamaged && !isOverbuildable && !isExtra;
 
             if (isDamaged) notes.push("LOC_PLOT_TOOLTIP_DAMAGED");
             if (!isComplete) notes.push("LOC_PLOT_TOOLTIP_IN_PROGRESS");
@@ -781,8 +752,8 @@ class PlotTooltipType {
                 notes.push("LOC_STATE_BZ_UNIQUE");
             } else if (isAgeless && !isWonder) {
                 notes.push("LOC_UI_PRODUCTION_AGELESS");
-            } else if (isObsolete) {
-                notes.push("LOC_STATE_BZ_OBSOLETE");
+            } else if (isOverbuildable) {
+                notes.push("LOC_PLOT_TOOLTIP_OVERBUILDABLE");
                 const ageName = GameInfo.Ages.lookup(info.Age).Name;
                 if (ageName) notes.push(Locale.compose(ageName));
             }
@@ -827,39 +798,27 @@ class PlotTooltipType {
         // get the improvement type for rural and undeveloped tiles
         // (but skip special districts like discoveries and villages)
         if (this.improvement && !this.improvement.districtName || !this.district) {
-            const geography = [
-                this.terrain?.TerrainType,
-                this.biome?.BiomeType,
-                this.feature?.FeatureType,
-                this.river?.RiverType,
-                this.resource?.ResourceType,
-            ].filter(e => e);
-            let best;  // best matching improvement
-            for (const trait of geography) {
-                const match = this.expansionRules[trait];
-                if (!match) continue;
-                if (!best || match.priority < best.priority) best = match;
-            }
-            if (best) {
-                const info = GameInfo.Constructibles.lookup(best.constructible);
+            const fc = Districts.getFreeConstructible(loc, this.player.id);
+            const info = GameInfo.Constructibles.lookup(fc);
+            if (info) {
                 const format =
                     this.improvement ? "LOC_BZ_IMPROVEMENT_FOR_WAREHOUSE" :
                     this.resource ?  "LOC_BZ_IMPROVEMENT_FOR_RESOURCE" :
                     "LOC_BZ_IMPROVEMENT_FOR_TILE";
-                const icon = `[icon:${best.constructible}]`;
+                const icon = `[icon:${info.ConstructibleType}]`;
                 const name = info.Name;
                 const text = Locale.compose(format, icon, name);
-                this.warehouse = { info, format, icon, name, text };
+                this.freeConstructible = { info, format, icon, name, text };
             }
         }
-        if (this.warehouse && this.warehouse.name != this.improvement?.info?.Name) {
+        if (this.freeConstructible?.name != this.improvement?.info?.Name) {
             // tile is undeveloped or upgraded to a unique improvement
             if (this.city?.owner == this.player.id || this.resource || this.isVerbose) {
                 // show the standard improvement type if
                 // - owned by player
                 // - undeveloped resource
                 // - verbose mode
-                this.expansion = this.warehouse;
+                this.expansion = this.freeConstructible;
             }
         }
     }
@@ -1135,8 +1094,8 @@ class PlotTooltipType {
     }
     getDistantLandsLabel(loc) {
         return this.player.isDistantLands(loc) ?
-            "LOC_RESOURCE_GENERAL_TYPE_DISTANT_LANDS" :
-            "LOC_BZ_HEMISPHERE_HOMELANDS";
+            "LOC_PLOT_TOOLTIP_HEMISPHERE_WEST" :
+            "LOC_PLOT_TOOLTIP_HEMISPHERE_EAST";
     }
     getRouteList() {
         const routeType = GameplayMap.getRouteType(this.plotCoord.x, this.plotCoord.y);
@@ -1400,7 +1359,7 @@ class PlotTooltipType {
             hexName = GameInfo.Districts.lookup(this.district?.type).Name;
         } else if (this.city && this.expansion) {
             // claimed but undeveloped
-            hexName = "LOC_DISTRICT_BZ_UNDEVELOPED";
+            hexName = "LOC_PLOT_TOOLTIP_UNIMPROVED";
         } else if (this.isCompact) {
             // unclaimed wilderness only needs a title in compact mode
             hexName = this.biome?.BiomeType == "BIOME_MARINE" ?
@@ -1638,7 +1597,7 @@ class PlotTooltipType {
     }
     renderUnitSection() {
         // show unit section
-        if (this.isCompact || !this.unit || this.unit.owner == this.player.id) return;
+        if (this.isCompact || !this.unit) return;
         this.renderDivider();
         const layout = document.createElement("div");
         layout.classList.value =

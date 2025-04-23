@@ -4,9 +4,6 @@
         <Row Tag="LOC_BZ_CITY_CONNECTIONS" Language="zh_Hant_HK">
             <Text>連接定居點 • {1_cities}[icon:YIELD_CITIES] {2_towns}[icon:YIELD_TOWNS]</Text>
         </Row>
-        <Row Tag="LOC_BZ_HEMISPHERE_HOMELANDS" Language="zh_Hant_HK">
-            <Text>故土</Text>
-        </Row>
         <Row Tag="LOC_BZ_IMPROVEMENT_FOR_TILE" Language="zh_Hant_HK">
             <Text>可建造 {1_icon} {2_name}</Text>
         </Row>
@@ -51,9 +48,6 @@
         </Row>
         <Row Tag="LOC_DISTRICT_BZ_URBAN_VACANT" Language="zh_Hant_HK">
             <Text>空置區</Text>
-        </Row>
-        <Row Tag="LOC_DISTRICT_BZ_UNDEVELOPED" Language="zh_Hant_HK">
-            <Text>未開發</Text>
         </Row>
         <Row Tag="LOC_INDEPENDENT_BZ_RELATIONSHIP_TRIBUTARY" Language="zh_Hant_HK">
             <Text>朝貢國</Text>
@@ -102,9 +96,6 @@
         </Row>
         <Row Tag="LOC_RESOURCECLASS_TREASURE_NAME_BZ" Language="zh_Hant_HK">
             <Text>寶藏資源</Text>
-        </Row>
-        <Row Tag="LOC_STATE_BZ_OBSOLETE" Language="zh_Hant_HK">
-            <Text>已過時</Text>
         </Row>
         <Row Tag="LOC_STATE_BZ_UNIQUE" Language="zh_Hant_HK">
             <Text>獨特</Text>
