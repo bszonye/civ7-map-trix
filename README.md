@@ -26,11 +26,11 @@ everything constructible goes here: buildings, improvements, and
 wonders.  city-states, unique quarters, and wonders show their names and
 special abilities.  buildings show their yield types as colored rings
 around the building icons:  **green** for food, **yellow** for gold, and
-so on.  a glowing ring means that a building is complete and up-to-date,
-and two glowing buildings make a Quarter.
+so on.  a glowing ring means that a building is eligible for adjacency
+bonuses and counts toward a quarter.
 
 ## improvements
-undeveloped tiles show which basic improvement type the land supports,
+unimproved tiles show which basic improvement type the land supports,
 and resources show which improvements unlock them.  unique improvements
 show which basic improvement they replaced (for warehouse bonuses).
 

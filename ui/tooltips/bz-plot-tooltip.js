@@ -800,6 +800,7 @@ class PlotTooltipType {
             }
         }
         // get the free constructible (standard tile improvement)
+        if (this.improvement?.districtName) return;  // skip discoveries and villages
         if (this.isVerbose || this.resource ||  // check verbosity level
             this.city?.owner == this.player.id && !this.isCompact) {
             const fcID = Districts.getFreeConstructible(loc, this.player.id);
