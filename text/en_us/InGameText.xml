@@ -4,9 +4,6 @@
         <Row Tag="LOC_BZ_CITY_CONNECTIONS">
             <Text>Connections • {1_cities}[icon:YIELD_CITIES] {2_towns}[icon:YIELD_TOWNS]</Text>
         </Row>
-        <Row Tag="LOC_BZ_HEMISPHERE_HOMELANDS">
-            <Text>Homelands</Text>
-        </Row>
         <Row Tag="LOC_BZ_IMPROVEMENT_FOR_TILE">
             <Text>Supports {1_icon} {2_name}</Text>
         </Row>
@@ -51,9 +48,6 @@
         </Row>
         <Row Tag="LOC_DISTRICT_BZ_URBAN_VACANT">
             <Text>Vacant District</Text>
-        </Row>
-        <Row Tag="LOC_DISTRICT_BZ_UNDEVELOPED">
-            <Text>Undeveloped</Text>
         </Row>
         <Row Tag="LOC_INDEPENDENT_BZ_RELATIONSHIP_TRIBUTARY">
             <Text>Tributary</Text>
@@ -102,9 +96,6 @@
         </Row>
         <Row Tag="LOC_RESOURCECLASS_TREASURE_NAME_BZ">
             <Text>Treasure Resource</Text>
-        </Row>
-        <Row Tag="LOC_STATE_BZ_OBSOLETE">
-            <Text>Obsolete</Text>
         </Row>
         <Row Tag="LOC_STATE_BZ_UNIQUE">
             <Text>Unique</Text>

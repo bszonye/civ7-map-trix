@@ -21,43 +21,49 @@ const BZ_HEAD_STYLE = [
     padding-top: ${BZ_BORDER_WIDTH};
 }`,
 // debug highlighting for content boxes
-`.bz-tooltip.bz-debug > div > div > div {
+`
+.bz-debug .bz-tooltip > div > div > div {
     background-color: #80808040;  /* DEBUG */
-}`,
-`.bz-tooltip.bz-debug > div > div > div > div {
+}
+.bz-debug .bz-tooltip > div > div > div > div {
     background-color: #00c0c080;  /* DEBUG */
-}`,
-`.bz-tooltip.bz-debug > div > div > div > div p {
+}
+.bz-debug .bz-tooltip > div > div > div > div p {
     background-color: #808080c0;  /* DEBUG */
-}`,
+}
+`,
 // renderDivider: imitate the bottom of the tooltip
 `.plot-tooltip__Divider {
     margin-top: calc(var(--padding-top-bottom) - ${BZ_BORDER_WIDTH});
-}`,
+}
+`,
 // full-width banners: general, unit info, debug info
-`.bz-banner {
+`
+.bz-banner {
     text-align: center;
     margin-left: calc(${BZ_BORDER_WIDTH} - var(--padding-left-right));
     margin-right: calc(${BZ_BORDER_WIDTH} - var(--padding-left-right));
     padding-left: calc(var(--padding-left-right) - ${BZ_BORDER_WIDTH});
     padding-right: calc(var(--padding-left-right) - ${BZ_BORDER_WIDTH});
-}`,
-`.bz-banner-unit {
+}
+.bz-banner-unit {
     margin-bottom: calc(${BZ_BORDER_WIDTH} - var(--padding-top-bottom));
     padding-top: calc((var(--padding-top-bottom) - ${BZ_BORDER_WIDTH}) / 2);
     padding-bottom: calc((var(--padding-top-bottom) - ${BZ_BORDER_WIDTH}) / 2);
-}`,
-`.bz-banner-debug {
+}
+.bz-banner-debug {
     margin-bottom: calc(${BZ_BORDER_WIDTH} - var(--padding-top-bottom));
     padding-bottom: calc(var(--padding-top-bottom) - ${BZ_BORDER_WIDTH});
-}`,
+}
+`,
 // centers blocks of rules text with max-w-60 equivalent
 // IMPORTANT: Locale.stylize wraps text in an extra <p> element when it
 // contains icons, which interferes with text-align and max-width.  the
 // result also changes with single-line vs multi-line text.  these rules
 // apply the properties in the correct order & scope to work with all
 // combinations (with/without icons, single/multiple lines).
-`.bz-tooltip .bz-rules-center {
+`
+.bz-tooltip .bz-rules-center {
     width: 100%;
     text-align: center;
     /* background-color: #00808080;  /* DEBUG */
@@ -70,7 +76,8 @@ const BZ_HEAD_STYLE = [
 .bz-tooltip .bz-rules-center p {
     width: 100%;
     /* background-color: #80808080;  /* DEBUG */
-}`,
+}
+`,
 ];
 BZ_HEAD_STYLE.map(style => {
     const e = document.createElement('style');
@@ -78,11 +85,7 @@ BZ_HEAD_STYLE.map(style => {
     document.head.appendChild(e);
 });
 // sync optional styling
-if (bzMapTrixOptions.yieldBanner) {
-    document.body.classList.add("bz-yield-banner");
-} else {
-    document.body.classList.remove("bz-yield-banner");
-}
+document.body.classList.toggle("bz-yield-banner", bzMapTrixOptions.yieldBanner);
 
 // horizontal list separator
 const BZ_DOT_DIVIDER = Locale.compose("LOC_PLOT_DIVIDER_DOT");
@@ -298,39 +301,6 @@ function dotJoinCities(list, dot=BZ_CITY_DIVIDER) {
 function gatherBuildingsTagged(tag) {
     return new Set(GameInfo.TypeTags.filter(e => e.Tag == tag).map(e => e.Type));
 }
-// get the set of unique traits for a civilization
-const BZ_CIV_TRAITS = {};  // cache
-function gatherCivTraits(civType) {
-    if (civType in BZ_CIV_TRAITS) return BZ_CIV_TRAITS[civType];
-    const traits = (GameInfo.CivilizationTraits
-        .filter(trait => trait.CivilizationType == civType)
-        .map(trait => trait.TraitType));
-    // set the cache and return it
-    return BZ_CIV_TRAITS[civType] = new Set(traits);
-}
-// get the geographic rules for rural expansions (new improvements)
-const BZ_EXPANSION_RULES = {};  // cache
-function gatherExpansionRules(civType) {
-    if (civType in BZ_EXPANSION_RULES) return BZ_EXPANSION_RULES[civType];
-    const traits = gatherCivTraits(civType);
-    const support = {};
-    for (const row of GameInfo.District_FreeConstructibles) {
-        const imp = GameInfo.Improvements.lookup(row.ConstructibleType);
-        // unique improvement: check against player traits
-        if (imp.TraitType && !traits?.has(imp.TraitType)) continue;
-        // get the geographic selector (TERRAIN_HILL, RIVER_MINOR, etc)
-        const key = (row.ResourceType || row.RiverType ||
-            row.FeatureType || row.TerrainType || row.BiomeType);
-        if (!key) continue;
-        // collect the matching improvement type and priority
-        support[key] = {
-            constructible: row.ConstructibleType,
-            priority: row.Priority,
-        };
-    }
-    // set the cache and return it
-    return BZ_EXPANSION_RULES[civType] = support;
-}
 // get the set of obstacles that end movement for a movement class
 const BZ_OBSTACLES = {};  // cache
 function gatherMovementObstacles(mclass) {
@@ -472,7 +442,6 @@ class PlotTooltipType {
         // player-dependent info (may change with hotseat mode)
         this.player = Players.get(GameContext.localPlayerID);
         this.playerCiv = GameInfo.Civilizations.lookup(this.player.civilizationType);
-        this.expansionRules = gatherExpansionRules(this.playerCiv.CivilizationType);
         // selection-dependent info
         this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
         // world
@@ -482,6 +451,7 @@ class PlotTooltipType {
         this.feature = null;
         this.river = null;
         this.resource = null;
+        this.isDistantLands = false;
         // ownership
         this.owner = null;
         this.city = null;
@@ -499,8 +469,7 @@ class PlotTooltipType {
         this.specialists = null;  // { workers, maximum }
         this.improvement = null;
         this.wonder = null;
-        this.expansion = null;  // improvement type for rural expansion
-        this.warehouse = null;  // improvement type for warehouses
+        this.freeConstructible = null;  // standard improvement type
         // yields
         this.yields = [];
         this.totalYields = 0;
@@ -589,7 +558,6 @@ class PlotTooltipType {
         // player-dependent info (may change with hotseat mode)
         this.player = Players.get(GameContext.localPlayerID);
         this.playerCiv = GameInfo.Civilizations.lookup(this.player.civilizationType);
-        this.expansionRules = gatherExpansionRules(this.playerCiv.CivilizationType);
         // selection-dependent info
         this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
         // world
@@ -599,6 +567,7 @@ class PlotTooltipType {
         this.feature = null;
         this.river = null;
         this.resource = null;
+        this.isDistantLands = false;
         // ownership
         this.owner = null;
         this.city = null;
@@ -616,8 +585,7 @@ class PlotTooltipType {
         this.specialists = null;  // { workers, maximum }
         this.improvement = null;
         this.wonder = null;
-        this.expansion = null;  // improvement type for rural expansion
-        this.warehouse = null;  // improvement type for warehouses
+        this.freeConstructible = null;  // standard improvement type
         // yields
         this.yields = [];
         this.totalYields = 0;
@@ -635,11 +603,8 @@ class PlotTooltipType {
         this.plotIndex = GameplayMap.getIndexFromLocation(this.plotCoord);
         // show debug info if enabled + extra info when Ctrl is held
         this.isShowingDebug = UI.isDebugPlotInfoVisible();
-        if (this.isShowingDebug && (this.modCtrl || this.modShift)) {
-            this.tooltip.classList.add("bz-debug");
-        } else {
-            this.tooltip.classList.remove("bz-debug");
-        }
+        const isDebugStyle = this.isShowingDebug && (this.modCtrl || this.modShift);
+        document.body.classList.toggle("bz-debug", isDebugStyle);
         this.model();
         this.render();
         UI.setPlotLocation(this.plotCoord.x, this.plotCoord.y, this.plotIndex);
@@ -649,7 +614,6 @@ class PlotTooltipType {
         // update player and civilization info
         this.player = Players.get(GameContext.localPlayerID);
         this.playerCiv = GameInfo.Civilizations.lookup(this.player.civilizationType);
-        this.expansionRules = gatherExpansionRules(this.playerCiv.CivilizationType);
         // update selection-dependent info
         // (note: currently using "foot" instead of the selected unit)
         this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
@@ -701,6 +665,7 @@ class PlotTooltipType {
         }
         const resourceType = GameplayMap.getResourceType(loc.x, loc.y);
         this.resource = GameInfo.Resources.lookup(resourceType);
+        this.isDistantLands = this.player.isDistantLands(loc);
     }
     modelCivilization() {
         // owner, civ, city, district
@@ -764,14 +729,14 @@ class PlotTooltipType {
             const currentAge = this.age.ChronologyIndex;
             const age = isAgeless ? currentAge - 0.5 :
                 GameInfo.Ages.lookup(info.Age ?? "")?.ChronologyIndex ?? 0;
-            const isObsolete = isBuilding && Math.ceil(age) != currentAge;
+            const isOverbuildable = isBuilding && Math.ceil(age) != currentAge;
             const uniqueTrait =
                 isBuilding ?
                 GameInfo.Buildings.lookup(info.ConstructibleType).TraitType :
                 isImprovement ?
                 GameInfo.Improvements.lookup(info.ConstructibleType).TraitType :
                 null;
-            const isCurrent = isComplete && !isDamaged && !isObsolete && !isExtra;
+            const isCurrent = isComplete && !isDamaged && !isOverbuildable && !isExtra;
 
             if (isDamaged) notes.push("LOC_PLOT_TOOLTIP_DAMAGED");
             if (!isComplete) notes.push("LOC_PLOT_TOOLTIP_IN_PROGRESS");
@@ -781,8 +746,8 @@ class PlotTooltipType {
                 notes.push("LOC_STATE_BZ_UNIQUE");
             } else if (isAgeless && !isWonder) {
                 notes.push("LOC_UI_PRODUCTION_AGELESS");
-            } else if (isObsolete) {
-                notes.push("LOC_STATE_BZ_OBSOLETE");
+            } else if (isOverbuildable) {
+                notes.push("LOC_PLOT_TOOLTIP_OVERBUILDABLE");
                 const ageName = GameInfo.Ages.lookup(info.Age).Name;
                 if (ageName) notes.push(Locale.compose(ageName));
             }
@@ -822,45 +787,22 @@ class PlotTooltipType {
                 this.improvement.icon = info.ConstructibleType;
             }
         }
-        // skip all the extras in Compact mode
-        if (this.isCompact && !this.resource) return;
-        // get the improvement type for rural and undeveloped tiles
-        // (but skip special districts like discoveries and villages)
-        if (this.improvement && !this.improvement.districtName || !this.district) {
-            const geography = [
-                this.terrain?.TerrainType,
-                this.biome?.BiomeType,
-                this.feature?.FeatureType,
-                this.river?.RiverType,
-                this.resource?.ResourceType,
-            ].filter(e => e);
-            let best;  // best matching improvement
-            for (const trait of geography) {
-                const match = this.expansionRules[trait];
-                if (!match) continue;
-                if (!best || match.priority < best.priority) best = match;
-            }
-            if (best) {
-                const info = GameInfo.Constructibles.lookup(best.constructible);
-                const format =
-                    this.improvement ? "LOC_BZ_IMPROVEMENT_FOR_WAREHOUSE" :
-                    this.resource ?  "LOC_BZ_IMPROVEMENT_FOR_RESOURCE" :
-                    "LOC_BZ_IMPROVEMENT_FOR_TILE";
-                const icon = `[icon:${best.constructible}]`;
-                const name = info.Name;
-                const text = Locale.compose(format, icon, name);
-                this.warehouse = { info, format, icon, name, text };
-            }
-        }
-        if (this.warehouse && this.warehouse.name != this.improvement?.info?.Name) {
-            // tile is undeveloped or upgraded to a unique improvement
-            if (this.city?.owner == this.player.id || this.resource || this.isVerbose) {
-                // show the standard improvement type if
-                // - owned by player
-                // - undeveloped resource
-                // - verbose mode
-                this.expansion = this.warehouse;
-            }
+        // get the free constructible (standard tile improvement)
+        if (this.improvement?.districtName) return;  // skip discoveries and villages
+        if (this.isVerbose || this.resource ||  // check verbosity level
+            this.city?.owner == this.player.id && !this.isCompact) {
+            const fcID = Districts.getFreeConstructible(loc, this.player.id);
+            const info = GameInfo.Constructibles.lookup(fcID);
+            if (!info) return;  // mountains, open ocean
+            const name = info.Name;
+            if (name == this.improvement?.info?.Name) return;  // redundant
+            const format =
+                this.improvement ? "LOC_BZ_IMPROVEMENT_FOR_WAREHOUSE" :
+                this.resource ?  "LOC_BZ_IMPROVEMENT_FOR_RESOURCE" :
+                "LOC_BZ_IMPROVEMENT_FOR_TILE";
+            const icon = `[icon:${info.ConstructibleType}]`;
+            const text = Locale.compose(format, icon, name);
+            this.freeConstructible = { info, name, format, icon, text };
         }
     }
     modelYields() {
@@ -943,7 +885,6 @@ class PlotTooltipType {
         const featureLabel = this.getFeatureLabel(loc);
         const river = this.getRiverInfo(loc);
         const continentName = this.getContinentName(loc);
-        const distantLandsLabel = this.getDistantLandsLabel(loc);
         const routes = this.getRouteList();
         const hasRoad = routes.length != 0;
         // alert banners: settler warnings, damaging & defense effects
@@ -992,7 +933,10 @@ class PlotTooltipType {
         // continent + distant lands tag
         if (continentName) {
             const tt = document.createElement("div");
-            tt.innerHTML = dotJoinLocale([continentName, distantLandsLabel]);
+            const hemisphereName = this.isDistantLands ?
+                "LOC_PLOT_TOOLTIP_HEMISPHERE_WEST" :
+                "LOC_PLOT_TOOLTIP_HEMISPHERE_EAST";
+            tt.innerHTML = dotJoinLocale([continentName, hemisphereName]);
             layout.appendChild(tt);
         }
         this.container.appendChild(layout);
@@ -1132,11 +1076,6 @@ class PlotTooltipType {
         const continent = GameInfo.Continents.lookup(continentType);
         if (!continent?.Description) return null;
         return continent.Description;
-    }
-    getDistantLandsLabel(loc) {
-        return this.player.isDistantLands(loc) ?
-            "LOC_RESOURCE_GENERAL_TYPE_DISTANT_LANDS" :
-            "LOC_BZ_HEMISPHERE_HOMELANDS";
     }
     getRouteList() {
         const routeType = GameplayMap.getRouteType(this.plotCoord.x, this.plotCoord.y);
@@ -1383,7 +1322,7 @@ class PlotTooltipType {
         } else if (this.resource) {
             // resource
             hexName = this.resource.Name;
-            if (this.expansion || this.isVerbose) {
+            if (this.freeConstructible || this.isVerbose) {
                 const rctype = this.resource.ResourceClassType;
                 const rc = rctype && GameInfo.ResourceClasses.lookup(rctype);
                 if (rc?.Name) {
@@ -1391,6 +1330,11 @@ class PlotTooltipType {
                     hexSubtitle = Locale.keyExists(rcname) ? rcname : rc.Name;
                 }
                 hexRules.push(this.resource.Tooltip);
+                if (this.isDistantLands &&
+                    this.resource.ResourceClassType == "RESOURCECLASS_TREASURE") {
+                    // also show treasure fleet rules
+                    hexRules.push("LOC_CAN_CREATE_TREASURE_FLEET");
+                }
             }
             resourceIcon = this.resource.ResourceType;
         } else if (this.isCompact && this.city) {
@@ -1398,9 +1342,9 @@ class PlotTooltipType {
         } else if (this.district?.type) {
             // rural
             hexName = GameInfo.Districts.lookup(this.district?.type).Name;
-        } else if (this.city && this.expansion) {
+        } else if (this.city && this.freeConstructible) {
             // claimed but undeveloped
-            hexName = "LOC_DISTRICT_BZ_UNDEVELOPED";
+            hexName = "LOC_PLOT_TOOLTIP_UNIMPROVED";
         } else if (this.isCompact) {
             // unclaimed wilderness only needs a title in compact mode
             hexName = this.biome?.BiomeType == "BIOME_MARINE" ?
@@ -1415,7 +1359,7 @@ class PlotTooltipType {
         if (hexRules.length && !this.isCompact) {
             const title = "text-2xs leading-none mb-1";
             if (hexSubtitle) this.renderRules([hexSubtitle], '', title);
-            this.renderRules(hexRules, "mb-1");
+            this.renderRules(hexRules, null, "text-xs leading-snug mb-1");
         }
         // constructibles
         this.renderConstructibles();
@@ -1464,7 +1408,7 @@ class PlotTooltipType {
     }
     // lay out a column of constructibles and their construction notes
     renderConstructibles() {
-        if (!this.constructibles.length && !this.expansion) return;
+        if (!this.constructibles.length && !this.freeConstructible) return;
         const ttList = document.createElement("div");
         ttList.classList.value = "text-xs leading-snug text-center";
         for (const c of this.constructibles) {
@@ -1488,10 +1432,10 @@ class PlotTooltipType {
             ttList.appendChild(ttConstructible);
         }
         // expansion type for undeveloped & upgraded tiles
-        if (this.expansion) {
+        if (this.freeConstructible) {
             const tt = document.createElement("div");
             if (this.constructibles.length) tt.classList.value = "text-2xs mt-1";
-            tt.setAttribute("data-l10n-id", this.expansion.text);
+            tt.setAttribute("data-l10n-id", this.freeConstructible.text);
             ttList.appendChild(tt);
         }
         this.container.appendChild(ttList);
@@ -1638,7 +1582,7 @@ class PlotTooltipType {
     }
     renderUnitSection() {
         // show unit section
-        if (this.isCompact || !this.unit || this.unit.owner == this.player.id) return;
+        if (this.isCompact || !this.unit) return;
         this.renderDivider();
         const layout = document.createElement("div");
         layout.classList.value =
@@ -1660,7 +1604,7 @@ class PlotTooltipType {
             this.ownerRelationship?.isEnemy ??  // then hex ownership
             false;
         if (isEnemy) {
-            UI.setCursorByURL("fs://game/core/ui/cursors/enemy.ani");
+            UI.setCursorByType(UIHTMLCursorTypes.Enemy);
         } else {
             UI.setCursorByType(UIHTMLCursorTypes.Default);
         }
@@ -1692,13 +1636,6 @@ class PlotTooltipType {
         ttPlotIndex.innerHTML =
             `${Locale.compose("LOC_PLOT_TOOLTIP_INDEX")}: ${this.plotIndex}`;
         layout.appendChild(ttPlotIndex);
-        const hemi = this.player?.isDistantLands(loc) ?
-            "LOC_PLOT_TOOLTIP_HEMISPHERE_WEST" :
-            "LOC_PLOT_TOOLTIP_HEMISPHERE_EAST";
-        const ttPlotTag = document.createElement("div");
-        ttPlotTag.classList.add("plot-tooltip__coordinate-text");
-        ttPlotTag.innerHTML = Locale.compose(hemi);
-        layout.appendChild(ttPlotTag);
         this.container.appendChild(layout);
     }
     renderIcon(layout, info) {
