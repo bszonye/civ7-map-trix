@@ -452,7 +452,6 @@ class PlotTooltipType {
         this.river = null;
         this.resource = null;
         this.isDistantLands = false;
-        this.hemisphere = null;
         // ownership
         this.owner = null;
         this.city = null;
@@ -569,7 +568,6 @@ class PlotTooltipType {
         this.river = null;
         this.resource = null;
         this.isDistantLands = false;
-        this.hemisphere = null;
         // ownership
         this.owner = null;
         this.city = null;
@@ -668,9 +666,6 @@ class PlotTooltipType {
         const resourceType = GameplayMap.getResourceType(loc.x, loc.y);
         this.resource = GameInfo.Resources.lookup(resourceType);
         this.isDistantLands = this.player.isDistantLands(loc);
-        this.hemisphere = this.isDistantLands ?
-            "LOC_PLOT_TOOLTIP_HEMISPHERE_WEST" :
-            "LOC_PLOT_TOOLTIP_HEMISPHERE_EAST";
     }
     modelCivilization() {
         // owner, civ, city, district
@@ -938,7 +933,10 @@ class PlotTooltipType {
         // continent + distant lands tag
         if (continentName) {
             const tt = document.createElement("div");
-            tt.innerHTML = dotJoinLocale([continentName, this.hemisphere]);
+            const hemisphereName = this.isDistantLands ?
+                "LOC_PLOT_TOOLTIP_HEMISPHERE_WEST" :
+                "LOC_PLOT_TOOLTIP_HEMISPHERE_EAST";
+            tt.innerHTML = dotJoinLocale([continentName, hemisphereName]);
             layout.appendChild(tt);
         }
         this.container.appendChild(layout);
@@ -1332,11 +1330,10 @@ class PlotTooltipType {
                     hexSubtitle = Locale.keyExists(rcname) ? rcname : rc.Name;
                 }
                 hexRules.push(this.resource.Tooltip);
-                if (this.resource.ResourceClassType == "RESOURCECLASS_TREASURE") {
+                if (this.isDistantLands &&
+                    this.resource.ResourceClassType == "RESOURCECLASS_TREASURE") {
                     // also show treasure fleet rules
-                    if (this.isDistantLands) {
-                        hexRules.push("LOC_CAN_CREATE_TREASURE_FLEET");
-                    }
+                    hexRules.push("LOC_CAN_CREATE_TREASURE_FLEET");
                 }
             }
             resourceIcon = this.resource.ResourceType;
