@@ -472,8 +472,7 @@ class PlotTooltipType {
         this.specialists = null;  // { workers, maximum }
         this.improvement = null;
         this.wonder = null;
-        this.freeConstructible = null;  // improvement type for warehouses
-        this.expansion = null;  // improvement type for rural expansion
+        this.freeConstructible = null;  // standard improvement type
         // yields
         this.yields = [];
         this.totalYields = 0;
@@ -588,8 +587,7 @@ class PlotTooltipType {
         this.specialists = null;  // { workers, maximum }
         this.improvement = null;
         this.wonder = null;
-        this.freeConstructible = null;  // improvement type for warehouses
-        this.expansion = null;  // improvement type for rural expansion
+        this.freeConstructible = null;  // standard improvement type
         // yields
         this.yields = [];
         this.totalYields = 0;
@@ -793,33 +791,21 @@ class PlotTooltipType {
                 this.improvement.icon = info.ConstructibleType;
             }
         }
-        // skip all the extras in Compact mode
-        if (this.isCompact && !this.resource) return;
-        // get the improvement type for rural and undeveloped tiles
-        // (but skip special districts like discoveries and villages)
-        if (this.improvement && !this.improvement.districtName || !this.district) {
-            const fc = Districts.getFreeConstructible(loc, this.player.id);
-            const info = GameInfo.Constructibles.lookup(fc);
-            if (info) {
-                const format =
-                    this.improvement ? "LOC_BZ_IMPROVEMENT_FOR_WAREHOUSE" :
-                    this.resource ?  "LOC_BZ_IMPROVEMENT_FOR_RESOURCE" :
-                    "LOC_BZ_IMPROVEMENT_FOR_TILE";
-                const icon = `[icon:${info.ConstructibleType}]`;
-                const name = info.Name;
-                const text = Locale.compose(format, icon, name);
-                this.freeConstructible = { info, format, icon, name, text };
-            }
-        }
-        if (this.freeConstructible?.name != this.improvement?.info?.Name) {
-            // tile is undeveloped or upgraded to a unique improvement
-            if (this.city?.owner == this.player.id || this.resource || this.isVerbose) {
-                // show the standard improvement type if
-                // - owned by player
-                // - undeveloped resource
-                // - verbose mode
-                this.expansion = this.freeConstructible;
-            }
+        // get the free constructible (standard tile improvement)
+        if (this.isVerbose || this.resource ||  // check verbosity level
+            this.city?.owner == this.player.id && !this.isCompact) {
+            const fcID = Districts.getFreeConstructible(loc, this.player.id);
+            const info = GameInfo.Constructibles.lookup(fcID);
+            if (!info) return;  // mountains, open ocean
+            const name = info.Name;
+            if (name == this.improvement?.info?.Name) return;  // redundant
+            const format =
+                this.improvement ? "LOC_BZ_IMPROVEMENT_FOR_WAREHOUSE" :
+                this.resource ?  "LOC_BZ_IMPROVEMENT_FOR_RESOURCE" :
+                "LOC_BZ_IMPROVEMENT_FOR_TILE";
+            const icon = `[icon:${info.ConstructibleType}]`;
+            const text = Locale.compose(format, icon, name);
+            this.freeConstructible = { info, name, format, icon, text };
         }
     }
     modelYields() {
@@ -1342,7 +1328,7 @@ class PlotTooltipType {
         } else if (this.resource) {
             // resource
             hexName = this.resource.Name;
-            if (this.expansion || this.isVerbose) {
+            if (this.freeConstructible || this.isVerbose) {
                 const rctype = this.resource.ResourceClassType;
                 const rc = rctype && GameInfo.ResourceClasses.lookup(rctype);
                 if (rc?.Name) {
@@ -1357,7 +1343,7 @@ class PlotTooltipType {
         } else if (this.district?.type) {
             // rural
             hexName = GameInfo.Districts.lookup(this.district?.type).Name;
-        } else if (this.city && this.expansion) {
+        } else if (this.city && this.freeConstructible) {
             // claimed but undeveloped
             hexName = "LOC_PLOT_TOOLTIP_UNIMPROVED";
         } else if (this.isCompact) {
@@ -1423,7 +1409,7 @@ class PlotTooltipType {
     }
     // lay out a column of constructibles and their construction notes
     renderConstructibles() {
-        if (!this.constructibles.length && !this.expansion) return;
+        if (!this.constructibles.length && !this.freeConstructible) return;
         const ttList = document.createElement("div");
         ttList.classList.value = "text-xs leading-snug text-center";
         for (const c of this.constructibles) {
@@ -1447,10 +1433,10 @@ class PlotTooltipType {
             ttList.appendChild(ttConstructible);
         }
         // expansion type for undeveloped & upgraded tiles
-        if (this.expansion) {
+        if (this.freeConstructible) {
             const tt = document.createElement("div");
             if (this.constructibles.length) tt.classList.value = "text-2xs mt-1";
-            tt.setAttribute("data-l10n-id", this.expansion.text);
+            tt.setAttribute("data-l10n-id", this.freeConstructible.text);
             ttList.appendChild(tt);
         }
         this.container.appendChild(ttList);
