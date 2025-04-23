@@ -1614,7 +1614,7 @@ class PlotTooltipType {
             this.ownerRelationship?.isEnemy ??  // then hex ownership
             false;
         if (isEnemy) {
-            UI.setCursorByURL("fs://game/core/ui/cursors/enemy.ani");
+            UI.setCursorByType(UIHTMLCursorTypes.Enemy);
         } else {
             UI.setCursorByType(UIHTMLCursorTypes.Default);
         }
