@@ -85,11 +85,7 @@ BZ_HEAD_STYLE.map(style => {
     document.head.appendChild(e);
 });
 // sync optional styling
-if (bzMapTrixOptions.yieldBanner) {
-    document.body.classList.add("bz-yield-banner");
-} else {
-    document.body.classList.remove("bz-yield-banner");
-}
+document.body.classList.toggle("bz-yield-banner", bzMapTrixOptions.yieldBanner);
 
 // horizontal list separator
 const BZ_DOT_DIVIDER = Locale.compose("LOC_PLOT_DIVIDER_DOT");
@@ -609,11 +605,8 @@ class PlotTooltipType {
         this.plotIndex = GameplayMap.getIndexFromLocation(this.plotCoord);
         // show debug info if enabled + extra info when Ctrl is held
         this.isShowingDebug = UI.isDebugPlotInfoVisible();
-        if (this.isShowingDebug && (this.modCtrl || this.modShift)) {
-            document.body.classList.add("bz-debug");
-        } else {
-            document.body.classList.remove("bz-debug");
-        }
+        const isDebugStyle = this.isShowingDebug && (this.modCtrl || this.modShift);
+        document.body.classList.toggle("bz-debug", isDebugStyle);
         this.model();
         this.render();
         UI.setPlotLocation(this.plotCoord.x, this.plotCoord.y, this.plotIndex);

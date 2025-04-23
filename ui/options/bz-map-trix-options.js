@@ -31,11 +31,7 @@ const bzMapTrixOptions = new class {
     save() {
         ModSettings.save(MOD_ID, this.data);
         // sync optional styling
-        if (this.yieldBanner) {
-            document.body.classList.add("bz-yield-banner");
-        } else {
-            document.body.classList.remove("bz-yield-banner");
-        }
+        document.body.classList.toggle("bz-yield-banner", this.yieldBanner);
     }
     get verbose() {
         // convert legacy boolean options
