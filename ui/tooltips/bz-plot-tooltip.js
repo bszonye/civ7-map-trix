@@ -63,19 +63,12 @@ const BZ_HEAD_STYLE = [
 // apply the properties in the correct order & scope to work with all
 // combinations (with/without icons, single/multiple lines).
 `
-.bz-tooltip .bz-rules-center {
-    width: 100%;
+.bz-tooltip .bz-rules-list {
     text-align: center;
-    /* background-color: #00808080;  /* DEBUG */
 }
-.bz-tooltip .bz-rules-max-width {
+.bz-tooltip .bz-rules-item,
+.bz-tooltip .bz-rules-item p {
     width: 100%;
-    max-width: 13.3333333333rem;
-    /* background-color: #00800080;  /* DEBUG */
-}
-.bz-tooltip .bz-rules-center p {
-    width: 100%;
-    /* background-color: #80808080;  /* DEBUG */
 }
 `,
 ];
@@ -1145,7 +1138,7 @@ class PlotTooltipType {
             }
         }
         // render stats
-        if (stats.length) this.renderRules(stats, "mt-1");
+        if (stats.length) this.renderRules(stats, "w-full mt-1");
     }
     renderOwnerInfo() {
         if (!this.owner || !Players.isAlive(this.owner.id)) return;
@@ -1288,8 +1281,8 @@ class PlotTooltipType {
         // show rules for city-states and unique quarters
         if (hexRules && this.isVerbose) {
             const title = "font-title uppercase text-xs leading-snug";
-            if (hexSubhead) this.renderRules([hexSubhead], '', title);
-            this.renderRules([hexRules], "mb-1");
+            if (hexSubhead) this.renderRules([hexSubhead], null, title);
+            this.renderRules([hexRules], "w-60 mb-1");
         }
         // constructibles
         this.renderConstructibles();
@@ -1297,7 +1290,7 @@ class PlotTooltipType {
         if (this.specialists && (this.specialists.workers || this.isVerbose)) {
             const text = Locale.compose("LOC_DISTRICT_BZ_SPECIALISTS",
                 this.specialists.workers, this.specialists.maximum);
-            this.renderRules([text], "mt-1");
+            this.renderRules([text], "w-full mt-1");
         }
         // bottom bar
         this.renderUrbanDivider();
@@ -1359,8 +1352,8 @@ class PlotTooltipType {
         // optional description
         if (hexRules.length && !this.isCompact) {
             const title = "text-2xs leading-none mb-1";
-            if (hexSubtitle) this.renderRules([hexSubtitle], '', title);
-            this.renderRules(hexRules, null, "text-xs leading-snug mb-1");
+            if (hexSubtitle) this.renderRules([hexSubtitle], null, title);
+            this.renderRules(hexRules, "w-60", "text-xs leading-snug mb-1");
         }
         // constructibles
         this.renderConstructibles();
@@ -1384,14 +1377,14 @@ class PlotTooltipType {
         if (!this.wonder) return;
         const info = this.wonder.info;
         this.renderTitleDivider(Locale.compose(info.Name));
-        let rulesStyle = null;
+        let rulesStyle = "w-60";
         const notes = this.wonder.notes;
         if (notes.length) {
             const ttState = document.createElement("div");
             ttState.classList.value = "text-2xs leading-none text-center";
             ttState.innerHTML = dotJoinLocale(notes);
             this.container.appendChild(ttState);
-            rulesStyle = "mt-1";
+            rulesStyle = "w-60 mt-1";
         }
         const rules = this.isVerbose ? info.Description : info.Tooltip;
         if (rules && !this.isCompact) this.renderRules([rules], rulesStyle);
@@ -1442,17 +1435,17 @@ class PlotTooltipType {
         this.container.appendChild(ttList);
     }
     // lay out paragraphs of rules text
-    renderRules(text, listStyle=null, rowStyle=null) {
+    renderRules(text, listStyle=null, itemStyle=null) {
         // text with icons is squirrelly, only format it at top level!
         const ttText = document.createElement("div");
-        if (listStyle) ttText.classList.value = listStyle;
-        ttText.classList.add("bz-rules-center");
-        for (const row of text) {
-            const ttRow = document.createElement("div");
-            ttRow.classList.value = rowStyle ?? "text-xs leading-snug";
-            ttRow.classList.add("bz-rules-max-width");
-            ttRow.setAttribute("data-l10n-id", row);
-            ttText.appendChild(ttRow);
+        ttText.classList.value = listStyle ?? "w-full";
+        ttText.classList.add("bz-rules-list");
+        for (const item of text) {
+            const ttItem = document.createElement("div");
+            ttItem.classList.value = itemStyle ?? "text-xs leading-snug";
+            ttItem.classList.add("bz-rules-item");
+            ttItem.setAttribute("data-l10n-id", item);
+            ttText.appendChild(ttItem);
         }
         this.container.appendChild(ttText);
     }
