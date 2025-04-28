@@ -433,6 +433,7 @@ class PlotTooltipType {
         this.container = document.createElement('div');
         this.tooltip.appendChild(this.container);
         // point-of-view info
+        this.observerID = GameContext.localObserverID;
         this.playerID = GameContext.localPlayerID;
         this.player = Players.get(this.playerID);
         // selection-dependent info
@@ -517,7 +518,7 @@ class PlotTooltipType {
         if (!this.plotCoord) return true;  // outside the map
         if (this.isHidden) return true;  // Hidden verbosity level
         // is the tile revealed yet?
-        const revealedState = this.player && GameplayMap.getRevealedState(this.playerID, this.plotCoord.x, this.plotCoord.y);
+        const revealedState = GameplayMap.getRevealedState(this.observerID, this.plotCoord.x, this.plotCoord.y);
         if (revealedState == RevealedStates.HIDDEN) return true;
         // with a unit selected: ignore the same tile and enemy tiles
         // UNLESS compact or verbose mode is manually engaged
@@ -547,6 +548,7 @@ class PlotTooltipType {
         // document root
         this.container.innerHTML = '';
         // point-of-view info
+        this.observerID = GameContext.localObserverID;
         this.playerID = GameContext.localPlayerID;
         this.player = Players.get(this.playerID);
         // selection-dependent info
@@ -603,6 +605,7 @@ class PlotTooltipType {
     }
     model() {
         // update point-of-view info
+        this.observerID = GameContext.localObserverID;
         this.playerID = GameContext.localPlayerID;
         this.player = Players.get(this.playerID);
         // update selection-dependent info
@@ -783,9 +786,9 @@ class PlotTooltipType {
         if (this.improvement?.districtName) return;  // skip discoveries and villages
         if (this.district && !this.improvement) return;  // rural tiles only
         // outside player territory, only show resources (unless verbose)
-        if (this.player && this.city?.owner != this.playerID && !this.resource &&
+        if (this.city?.owner != this.observerID && !this.resource &&
             !this.isVerbose) return;
-        const fcID = Districts.getFreeConstructible(loc, this.playerID);
+        const fcID = Districts.getFreeConstructible(loc, this.observerID);
         const info = GameInfo.Constructibles.lookup(fcID);
         if (!info) return;  // mountains, open ocean
         const name = info.Name;
@@ -803,7 +806,7 @@ class PlotTooltipType {
         this.totalYields = 0;
         // one column per yield type
         GameInfo.Yields.forEach(info => {
-            const value = GameplayMap.getYield(this.plotCoord.x, this.plotCoord.y, info.YieldType, this.playerID);
+            const value = GameplayMap.getYield(this.plotCoord.x, this.plotCoord.y, info.YieldType, this.observerID);
             if (value) {
                 const column = { name: info.Name, type: info.YieldType, value };
                 this.yields.push(column);
@@ -819,11 +822,11 @@ class PlotTooltipType {
     }
     modelUnits() {
         const loc = this.plotCoord;
-        if (this.player && GameplayMap.getRevealedState(this.playerID, loc.x, loc.y) != RevealedStates.VISIBLE) return;
+        if (GameplayMap.getRevealedState(this.observerID, loc.x, loc.y) != RevealedStates.VISIBLE) return;
         // get topmost unit and owner
         const unit = getTopUnit(loc);
         if (!unit) return;
-        if (this.player && !Visibility.isVisible(this.playerID, unit.id)) return;
+        if (this.player && !Visibility.isVisible(this.observerID, unit.id)) return;
         this.unit = unit;
         this.unitRelationship = this.getCivRelationship(Players.get(unit.owner));
     }
@@ -987,7 +990,7 @@ class PlotTooltipType {
         const plotEffects = MapPlotEffects.getPlotEffects(this.plotIndex);
         if (!plotEffects) return { text, banners };
         for (const item of plotEffects) {
-            if (item.onlyVisibleToOwner && item.owner != this.playerID) continue;
+            if (item.onlyVisibleToOwner && item.owner != this.observerID) continue;
             const effectInfo = GameInfo.PlotEffects.lookup(item.effectType);
             if (!effectInfo) return;
             if (effectInfo.Damage || effectInfo.Defense) {
@@ -1190,15 +1193,15 @@ class PlotTooltipType {
     }
     getCivRelationship(owner) {
         if (!owner || !Players.isAlive(owner.id)) return null;
-        if (owner.id == this.playerID) {
+        if (owner.id == this.observerID) {
             return { type: "LOC_PLOT_TOOLTIP_YOU", isEnemy: false };
         }
         if (!owner.Diplomacy) return null;
         // is the other player a city-state or village?
         if (owner.isMinor || owner.isIndependent) {
             const isVassal = owner.Influence?.hasSuzerain &&
-                owner.Influence.getSuzerain() == this.playerID;
-            const isEnemy = owner.Diplomacy?.isAtWarWith(this.playerID);
+                owner.Influence.getSuzerain() == this.observerID;
+            const isEnemy = owner.Diplomacy?.isAtWarWith(this.observerID);
             const type =
                 isVassal ? "LOC_INDEPENDENT_BZ_RELATIONSHIP_TRIBUTARY" :
                  isEnemy ? "LOC_INDEPENDENT_RELATIONSHIP_HOSTILE" :
@@ -1206,14 +1209,14 @@ class PlotTooltipType {
             return { type, isEnemy };
         }
         // is the other player at war?
-        if (owner.Diplomacy.isAtWarWith(this.playerID)) {
+        if (owner.Diplomacy.isAtWarWith(this.observerID)) {
             return { type: "LOC_PLAYER_RELATIONSHIP_AT_WAR", isEnemy: true };
         }
         // not an enemy
-        if (owner.Diplomacy.hasAllied(this.playerID)) {
+        if (owner.Diplomacy.hasAllied(this.observerID)) {
             return { type: "LOC_PLAYER_RELATIONSHIP_ALLIANCE", isEnemy: false };
         }
-        const type = owner.Diplomacy.getRelationshipLevelName(this.playerID);
+        const type = owner.Diplomacy.getRelationshipLevelName(this.observerID);
         return { type, isEnemy: false };
     }
     renderHexSection() {
