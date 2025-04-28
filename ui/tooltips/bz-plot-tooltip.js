@@ -663,7 +663,6 @@ class PlotTooltipType {
         const resourceType = GameplayMap.getResourceType(loc.x, loc.y);
         this.resource = GameInfo.Resources.lookup(resourceType);
         this.isDistantLands = this.observer?.isDistantLands(loc) ?? null;
-        console.warn(`TRIX DISTANT=${this.isDistantLands}`);
     }
     modelCivilization() {
         // owner, civ, city, district
@@ -829,7 +828,8 @@ class PlotTooltipType {
         if (GameplayMap.getRevealedState(this.observerID, loc.x, loc.y) != RevealedStates.VISIBLE) return;
         // get topmost unit and owner
         const unit = getTopUnit(loc);
-        if (!unit || !Visibility.isVisible(this.observerID, unit.id)) return;
+        if (!unit) return;
+        if (this.observer && !Visibility.isVisible(this.observerID, unit.id)) return;
         this.unit = unit;
         this.unitRelationship = this.getCivRelationship(Players.get(unit.owner));
     }
