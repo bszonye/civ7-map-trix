@@ -434,6 +434,7 @@ class PlotTooltipType {
         this.tooltip.appendChild(this.container);
         // point-of-view info
         this.observerID = GameContext.localObserverID;
+        this.observer = Players.get(this.observerID);
         this.playerID = GameContext.localPlayerID;
         this.player = Players.get(this.playerID);
         // selection-dependent info
@@ -445,7 +446,7 @@ class PlotTooltipType {
         this.feature = null;
         this.river = null;
         this.resource = null;
-        this.isDistantLands = false;
+        this.isDistantLands = null;
         // ownership
         this.owner = null;
         this.city = null;
@@ -549,6 +550,7 @@ class PlotTooltipType {
         this.container.innerHTML = '';
         // point-of-view info
         this.observerID = GameContext.localObserverID;
+        this.observer = Players.get(this.observerID);
         this.playerID = GameContext.localPlayerID;
         this.player = Players.get(this.playerID);
         // selection-dependent info
@@ -560,7 +562,7 @@ class PlotTooltipType {
         this.feature = null;
         this.river = null;
         this.resource = null;
-        this.isDistantLands = false;
+        this.isDistantLands = null;
         // ownership
         this.owner = null;
         this.city = null;
@@ -606,6 +608,7 @@ class PlotTooltipType {
     model() {
         // update point-of-view info
         this.observerID = GameContext.localObserverID;
+        this.observer = Players.get(this.observerID);
         this.playerID = GameContext.localPlayerID;
         this.player = Players.get(this.playerID);
         // update selection-dependent info
@@ -659,7 +662,8 @@ class PlotTooltipType {
         }
         const resourceType = GameplayMap.getResourceType(loc.x, loc.y);
         this.resource = GameInfo.Resources.lookup(resourceType);
-        this.isDistantLands = this.player?.isDistantLands(loc) ?? false;
+        this.isDistantLands = this.observer?.isDistantLands(loc) ?? null;
+        console.warn(`TRIX DISTANT=${this.isDistantLands}`);
     }
     modelCivilization() {
         // owner, civ, city, district
@@ -825,8 +829,7 @@ class PlotTooltipType {
         if (GameplayMap.getRevealedState(this.observerID, loc.x, loc.y) != RevealedStates.VISIBLE) return;
         // get topmost unit and owner
         const unit = getTopUnit(loc);
-        if (!unit) return;
-        if (this.player && !Visibility.isVisible(this.observerID, unit.id)) return;
+        if (!unit || !Visibility.isVisible(this.observerID, unit.id)) return;
         this.unit = unit;
         this.unitRelationship = this.getCivRelationship(Players.get(unit.owner));
     }
@@ -930,9 +933,10 @@ class PlotTooltipType {
         // continent + distant lands tag
         if (continentName) {
             const tt = document.createElement("div");
-            const hemisphereName = this.isDistantLands ?
-                "LOC_PLOT_TOOLTIP_HEMISPHERE_WEST" :
-                "LOC_PLOT_TOOLTIP_HEMISPHERE_EAST";
+            const hemisphereName =
+                this.isDistantLands ?  "LOC_PLOT_TOOLTIP_HEMISPHERE_WEST" :
+                this.isDistantLands === false ?  "LOC_PLOT_TOOLTIP_HEMISPHERE_EAST" :
+                null;  // autoplaying
             tt.innerHTML = dotJoinLocale([continentName, hemisphereName]);
             layout.appendChild(tt);
         }
