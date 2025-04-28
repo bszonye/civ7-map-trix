@@ -940,35 +940,23 @@ class PlotTooltipType {
         const banners = [];
         if (LensManager.getActiveLens() != "fxs-settler-lens") return banners;
         // Add more details to the tooltip if we are in the settler lens
-        if (!this.observer) {
-            console.error("plot-tooltip: Attempting to update settler tooltip, but no valid local player!");
-            return banners;
-        }
-        const localPlayerDiplomacy = this.observer.Diplomacy;
-        if (localPlayerDiplomacy === undefined) {
-            console.error("plot-tooltip: Attempting to update settler tooltip, but no valid local player Diplomacy object!");
-            return banners;
-        }
         if (GameplayMap.isWater(loc.x, loc.y) || GameplayMap.isImpassable(loc.x, loc.y) || GameplayMap.isNavigableRiver(loc.x, loc.y)) {
             // Dont't add any extra tooltip to mountains, oceans, or navigable rivers, should be obvious enough w/o them
-            return banners;
-        }
-        const localPlayerAdvancedStart = this.observer.AdvancedStart;
-        if (localPlayerAdvancedStart === undefined) {
-            console.error("plot-tooltip: Attempting to update settler tooltip, but no valid local player advanced start object!");
             return banners;
         }
         // Show why we can't settle here
         let warning;
         let warningStyle = BZ_ALERT.danger;
-        if (!GameplayMap.isPlotInAdvancedStartRegion(this.observerID, loc.x, loc.y) && !localPlayerAdvancedStart?.getPlacementComplete()) {
+        if (this.observer?.AdvancedStart &&
+            !this.observer.AdvancedStart.getPlacementComplete() &&
+            !GameplayMap.isPlotInAdvancedStartRegion(this.observerID, loc.x, loc.y)) {
             warning = "LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_FAR";
-        } else if (!localPlayerDiplomacy.isValidLandClaimLocation(loc, true /*bIgnoreFriendlyUnitRequirement*/)) {
-            if (this.resource) {
-                warning = "LOC_PLOT_TOOLTIP_CANT_SETTLE_RESOURCES";
-            } else {  // if (GameplayMap.isCityWithinMinimumDistance(loc.x, loc.y)) {
-                warning = "LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_CLOSE";
-            }
+        } else if (this.resource) {
+            warning = "LOC_PLOT_TOOLTIP_CANT_SETTLE_RESOURCES";
+        } else if (this.observer?.Diplomacy &&
+            !this.observer.Diplomacy.isValidLandClaimLocation(loc, true /*bIgnoreFriendlyUnitRequirement*/)) {
+            // related: GameplayMap.isCityWithinMinimumDistance(loc.x, loc.y))
+            warning = "LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_CLOSE";
         } else if (!GameplayMap.isFreshWater(loc.x, loc.y)) {
             warningStyle = BZ_ALERT.caution;
             warning = "LOC_PLOT_TOOLTIP_NO_FRESH_WATER";
@@ -977,7 +965,10 @@ class PlotTooltipType {
             const tt = document.createElement("div");
             tt.classList.value = "text-xs leading-normal mb-1";
             setBannerStyle(tt, warningStyle);
-            tt.setAttribute('data-l10n-id', warning);
+            const ttWarning = document.createElement("div");
+            ttWarning.classList.value = "max-w-64";  // better word wrapping
+            ttWarning.setAttribute('data-l10n-id', warning);
+            tt.appendChild(ttWarning);
             banners.push(tt);
         }
         return banners;
