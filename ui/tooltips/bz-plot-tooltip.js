@@ -435,8 +435,6 @@ class PlotTooltipType {
         // point-of-view info
         this.observerID = GameContext.localObserverID;
         this.observer = Players.get(this.observerID);
-        this.playerID = GameContext.localPlayerID;
-        this.player = Players.get(this.playerID);
         // selection-dependent info
         this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
         // world
@@ -551,8 +549,6 @@ class PlotTooltipType {
         // point-of-view info
         this.observerID = GameContext.localObserverID;
         this.observer = Players.get(this.observerID);
-        this.playerID = GameContext.localPlayerID;
-        this.player = Players.get(this.playerID);
         // selection-dependent info
         this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
         // world
@@ -609,8 +605,6 @@ class PlotTooltipType {
         // update point-of-view info
         this.observerID = GameContext.localObserverID;
         this.observer = Players.get(this.observerID);
-        this.playerID = GameContext.localPlayerID;
-        this.player = Players.get(this.playerID);
         // update selection-dependent info
         // (note: currently using "foot" instead of the selected unit)
         this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
@@ -946,11 +940,11 @@ class PlotTooltipType {
         const banners = [];
         if (LensManager.getActiveLens() != "fxs-settler-lens") return banners;
         // Add more details to the tooltip if we are in the settler lens
-        if (!this.player) {
+        if (!this.observer) {
             console.error("plot-tooltip: Attempting to update settler tooltip, but no valid local player!");
             return banners;
         }
-        const localPlayerDiplomacy = this.player.Diplomacy;
+        const localPlayerDiplomacy = this.observer.Diplomacy;
         if (localPlayerDiplomacy === undefined) {
             console.error("plot-tooltip: Attempting to update settler tooltip, but no valid local player Diplomacy object!");
             return banners;
@@ -959,7 +953,7 @@ class PlotTooltipType {
             // Dont't add any extra tooltip to mountains, oceans, or navigable rivers, should be obvious enough w/o them
             return banners;
         }
-        const localPlayerAdvancedStart = this.player.AdvancedStart;
+        const localPlayerAdvancedStart = this.observer.AdvancedStart;
         if (localPlayerAdvancedStart === undefined) {
             console.error("plot-tooltip: Attempting to update settler tooltip, but no valid local player advanced start object!");
             return banners;
@@ -967,7 +961,7 @@ class PlotTooltipType {
         // Show why we can't settle here
         let warning;
         let warningStyle = BZ_ALERT.danger;
-        if (!GameplayMap.isPlotInAdvancedStartRegion(this.playerID, loc.x, loc.y) && !localPlayerAdvancedStart?.getPlacementComplete()) {
+        if (!GameplayMap.isPlotInAdvancedStartRegion(this.observerID, loc.x, loc.y) && !localPlayerAdvancedStart?.getPlacementComplete()) {
             warning = "LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_FAR";
         } else if (!localPlayerDiplomacy.isValidLandClaimLocation(loc, true /*bIgnoreFriendlyUnitRequirement*/)) {
             if (this.resource) {
