@@ -51,8 +51,9 @@ const BZ_HEAD_STYLE = [
 }
 `,  // renderDivider: imitate the bottom of the tooltip
 `
-.plot-tooltip__Divider {
+.bz-tooltip .plot-tooltip__Divider {
     margin-top: ${BZ_PADDING};
+    background-image: linear-gradient(90deg, #E5D2AC00 0%, #E5D2ACFF 50%, #E5D2AC00 100%);
 }
 `,  // full-width banners: general, unit info, debug info
 `
@@ -66,8 +67,7 @@ const BZ_HEAD_STYLE = [
 .bz-banner-unit {
     margin-bottom: -${BZ_PADDING};
     padding-top: 0.3333333333rem;
-    padding-bottom: 0.3333333333rem;
-    border-radius: 0 0 0.5555555556rem 0.5555555556rem;
+    padding-bottom: 0.3888888889rem;
 }
 .bz-banner-debug {
     margin-bottom: -${BZ_PADDING};
@@ -873,15 +873,16 @@ class PlotTooltipType {
         this.renderTitleHeading(text, "mt-1\\.5");
     }
     renderTitleHeading(title, style=null, capsule=null) {
-        const ttTitle = document.createElement("div");
-        ttTitle.classList.value = "text-secondary font-title uppercase text-sm leading-snug text-center mx-1";
+        const layout = document.createElement("div");
+        layout.classList.value =
+            "text-secondary font-title-sm uppercase text-center mb-1";
         if (!style) style = BZ_PADDING_STYLE;
-        ttTitle.classList.add(style);
-        const ttTerrain = document.createElement("div");
-        setCapsuleStyle(ttTerrain, capsule, "my-0\\.5");
-        ttTerrain.setAttribute('data-l10n-id', title);
-        ttTitle.appendChild(ttTerrain);
-        this.container.appendChild(ttTitle);
+        layout.classList.add(style, capsule ? "leading-snug" : "leading-none");
+        const ttText = document.createElement("div");
+        setCapsuleStyle(ttText, capsule, "my-0\\.5");
+        ttText.setAttribute('data-l10n-id', title);
+        layout.appendChild(ttText);
+        this.container.appendChild(layout);
     }
     renderGeographySection() {
         if (this.isCompact) return;
@@ -900,8 +901,10 @@ class PlotTooltipType {
         banners.push(...this.getSettlerBanner(loc));
         banners.push(...effects.banners);
         if (banners.length) {
-            banners[0].style.paddingTop = '0.0555555556rem';
-            banners[0].style.borderRadius = '0.5555555556rem 0.5555555556rem 0 0';
+            // round off topmost banner
+            banners.at(0).style.paddingTop = '0.0555555556rem';
+            banners.at(0).style.borderRadius = `${BZ_PADDING} ${BZ_PADDING} 0 0`;
+            banners.at(-1).style.marginBottom = '0.4444444444rem';
             for (const banner of banners) {
                 this.container.appendChild(banner);
             }
@@ -1592,6 +1595,10 @@ class PlotTooltipType {
         const layout = document.createElement("div");
         layout.classList.value =
             "bz-banner-unit text-xs leading-snug text-center";
+        if (!this.isShowingDebug) {
+            // round off bottom banner
+            layout.style.borderRadius = `0 0 ${BZ_PADDING} ${BZ_PADDING}`;
+        }
         const unitName = this.unit.name;
         const civName = this.getCivName(Players.get(this.unit.owner));
         const unitInfo = [unitName, civName, this.unitRelationship?.type];
