@@ -870,9 +870,6 @@ class bzPlotTooltip {
         if (lines) lineRight.style.setProperty("background-image", "linear-gradient(to right, #8D97A6, rgba(141, 151, 166, 0))");
         layout.appendChild(lineRight);
     }
-    renderTitleDivider(text) {
-        this.renderTitleHeading(text, "mt-1\\.5");
-    }
     renderTitleHeading(title, style=null, capsule=null) {
         const layout = document.createElement("div");
         layout.classList.value = "text-secondary font-title-sm uppercase leading-snug text-center mx-1";
@@ -882,6 +879,9 @@ class bzPlotTooltip {
         ttText.setAttribute('data-l10n-id', title);
         layout.appendChild(ttText);
         this.container.appendChild(layout);
+    }
+    renderTitleDivider(text) {
+        this.renderTitleHeading(text, "mt-1\\.5");
     }
     renderGeographySection() {
         if (this.isCompact) return;
