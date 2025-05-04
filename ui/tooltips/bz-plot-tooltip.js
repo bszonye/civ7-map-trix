@@ -871,15 +871,14 @@ class bzPlotTooltip {
         layout.appendChild(lineRight);
     }
     renderTitleDivider(text) {
-        this.renderTitleHeading(text, "mt-2");
+        this.renderTitleHeading(text, "mt-1\\.5");
     }
     renderTitleHeading(title, style=null, capsule=null) {
         const layout = document.createElement("div");
-        layout.classList.value = "text-secondary font-title-sm uppercase text-center";
+        layout.classList.value = "text-secondary font-title-sm uppercase leading-snug text-center mx-1";
         layout.classList.add(style || BZ_PADDING_STYLE);
         const ttText = document.createElement("div");
-        setCapsuleStyle(ttText, capsule, "leading-snug", "my-0\\.5");
-        if (!capsule) layout.classList.add("leading-none", "mb-1");
+        setCapsuleStyle(ttText, capsule, "my-0\\.5");
         ttText.setAttribute('data-l10n-id', title);
         layout.appendChild(ttText);
         this.container.appendChild(layout);
@@ -904,7 +903,6 @@ class bzPlotTooltip {
             // round off topmost banner
             banners.at(0).style.paddingTop = '0.0555555556rem';
             banners.at(0).style.borderRadius = `${BZ_PADDING} ${BZ_PADDING} 0 0`;
-            banners.at(-1).style.marginBottom = '0.4444444444rem';
             for (const banner of banners) {
                 this.container.appendChild(banner);
             }
@@ -1249,7 +1247,7 @@ class bzPlotTooltip {
     renderUrbanSection() {
         const quarterOK = this.buildings.reduce((a, b) =>
             a + (b.isCurrent ? b.isLarge ? 2 : 1 : 0), 0);
-        let hexName = this.city.name;
+        let hexName = GameInfo.Districts.lookup(this.district.type).Name;
         let hexSubhead;
         let hexRules;
         // set name & description
@@ -1281,8 +1279,6 @@ class bzPlotTooltip {
             } else if (this.city.isTown) {
                 // rename "City Center" to "Town Center" in towns
                 hexName = "LOC_DISTRICT_BZ_TOWN_CENTER";
-            } else {
-                hexName = GameInfo.Districts.lookup(this.district.type).Name;
             }
         } else if (this.buildings.length == 0) {
             // urban tile with canceled production
