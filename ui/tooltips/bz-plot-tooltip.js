@@ -899,8 +899,12 @@ class PlotTooltipType {
         const banners = [];
         banners.push(...this.getSettlerBanner(loc));
         banners.push(...effects.banners);
-        for (const banner of banners) {
-            this.container.appendChild(banner);
+        if (banners.length) {
+            banners[0].style.paddingTop = '0.0555555556rem';
+            banners[0].style.borderRadius = '0.5555555556rem 0.5555555556rem 0 0';
+            for (const banner of banners) {
+                this.container.appendChild(banner);
+            }
         }
         // tooltip title: terrain & biome
         const title = biomeLabel ?
