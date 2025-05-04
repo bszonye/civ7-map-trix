@@ -11,15 +11,33 @@ import { ComponentID } from '/core/ui/utilities/utilities-component-id.js';
 import LensManager from '/core/ui/lenses/lens-manager.js';
 import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
 
-// box metrics for warning banners
-const BZ_BORDER_WIDTH = "0.1111111111rem";  // tooltip main border
+const BZ_PADDING = '0.5555555556rem';
+const BZ_PADDING_STYLE = 'pt-2\\.5';
 
 // additional CSS definitions
 const BZ_HEAD_STYLE = [
-`.tooltip.plot-tooltip.bz-tooltip .tooltip__content {
-    /* width: 21.3333333333rem;  /* DEBUG */
-    padding-top: ${BZ_BORDER_WIDTH};
-}`,
+`
+.bz-tooltip.tooltip.plot-tooltip {
+    --padding-top-bottom: ${BZ_PADDING};
+    --padding-left-right: ${BZ_PADDING};
+}
+.bz-tooltip.tooltip.plot-tooltip .tooltip__content {
+    padding: ${BZ_PADDING};
+    padding-top: 0;
+}
+.bz-tooltip.plot-tooltip .img-tooltip-border {
+    border-radius: 0.6666666667rem;
+    border-image-source: none;
+    border: 0.1111111111rem solid #8C7E62;
+    filter: drop-shadow(0 1rem 1rem #000c);
+}
+.bz-tooltip.plot-tooltip .img-tooltip-bg {
+    background-image: linear-gradient(to bottom, rgba(35, 37, 43, 0.875) 0%, rgba(18, 21, 31, 0.875) 100%);
+}
+.bz-tooltip.plot-tooltip .shadow {
+    filter: drop-shadow(0 0.0555555556rem 0.0555555556rem black);
+}
+`,
 // debug highlighting for content boxes
 `
 .bz-debug .bz-tooltip > div > div > div {
@@ -31,37 +49,38 @@ const BZ_HEAD_STYLE = [
 .bz-debug .bz-tooltip > div > div > div > div p {
     background-color: #808080c0;  /* DEBUG */
 }
-`,
-// renderDivider: imitate the bottom of the tooltip
-`.plot-tooltip__Divider {
-    margin-top: calc(var(--padding-top-bottom) - ${BZ_BORDER_WIDTH});
-}
-`,
-// full-width banners: general, unit info, debug info
+`,  // renderDivider: imitate the bottom of the tooltip
 `
-.bz-banner {
+.plot-tooltip__Divider {
+    margin-top: ${BZ_PADDING};
+}
+`,  // full-width banners: general, unit info, debug info
+`
+.plot-tooltip .bz-banner {
     text-align: center;
-    margin-left: calc(${BZ_BORDER_WIDTH} - var(--padding-left-right));
-    margin-right: calc(${BZ_BORDER_WIDTH} - var(--padding-left-right));
-    padding-left: calc(var(--padding-left-right) - ${BZ_BORDER_WIDTH});
-    padding-right: calc(var(--padding-left-right) - ${BZ_BORDER_WIDTH});
+    margin-left: -${BZ_PADDING};
+    margin-right: -${BZ_PADDING};
+    padding-left: ${BZ_PADDING};
+    padding-right: ${BZ_PADDING};
 }
 .bz-banner-unit {
-    margin-bottom: calc(${BZ_BORDER_WIDTH} - var(--padding-top-bottom));
-    padding-top: calc((var(--padding-top-bottom) - ${BZ_BORDER_WIDTH}) / 2);
-    padding-bottom: calc((var(--padding-top-bottom) - ${BZ_BORDER_WIDTH}) / 2);
+    margin-bottom: -${BZ_PADDING};
+    padding-top: 0.3333333333rem;
+    padding-bottom: 0.3333333333rem;
+    border-radius: 0 0 0.5555555556rem 0.5555555556rem;
 }
 .bz-banner-debug {
-    margin-bottom: calc(${BZ_BORDER_WIDTH} - var(--padding-top-bottom));
-    padding-bottom: calc(var(--padding-top-bottom) - ${BZ_BORDER_WIDTH});
+    margin-bottom: -${BZ_PADDING};
+    padding-bottom: ${BZ_PADDING};
 }
-`,
-// centers blocks of rules text with max-w-60 equivalent
-// IMPORTANT: Locale.stylize wraps text in an extra <p> element when it
-// contains icons, which interferes with text-align and max-width.  the
-// result also changes with single-line vs multi-line text.  these rules
-// apply the properties in the correct order & scope to work with all
-// combinations (with/without icons, single/multiple lines).
+`,  // centers blocks of rules text
+    // IMPORTANT:
+    // Locale.stylize wraps text in an extra <p> element when it
+    // contains styling, which interferes with text-align and max-width.
+    // the result also changes with single- vs multi-line text.  these
+    // rules apply the properties in the correct order and scope to work
+    // with all combinations (with/without icons, single/multiple
+    // lines).
 `
 .bz-tooltip .bz-rules-list {
     text-align: center;
@@ -397,7 +416,7 @@ function getVillageIcon(owner, age) {
 const BZ_PRELOADED_ICONS = {};
 function preloadIcon(icon, context) {
     if (!icon) return;
-    const url = icon.startsWith("url(")  ? icon : UI.getIcon(icon, context);
+    const url = icon.startsWith("url(") ? icon : UI.getIcon(icon, context);
     const name = url.replace(/url|[(\042\047)]/g, '');  // \042\047 = quotation marks
     if (!name || name in BZ_PRELOADED_ICONS) return;
     BZ_PRELOADED_ICONS[name] = true;
@@ -507,9 +526,9 @@ class PlotTooltipType {
         this.modCtrl = modCtrl;
         this.modShift = modShift;
         this.verbosity =
-            this.modCtrl && this.modShift ?  bzVerbosity.HIDDEN :
-            this.modCtrl ?  bzVerbosity.COMPACT :
-            this.modShift ?  bzVerbosity.VERBOSE :
+            this.modCtrl && this.modShift ? bzVerbosity.HIDDEN :
+            this.modCtrl ? bzVerbosity.COMPACT :
+            this.modShift ? bzVerbosity.VERBOSE :
             bzMapTrixOptions.verbose;
         return hasShifted || hasMoved;
     }
@@ -792,7 +811,7 @@ class PlotTooltipType {
         if (name == this.improvement?.info?.Name) return;  // redundant
         const format =
             this.improvement ? "LOC_BZ_IMPROVEMENT_FOR_WAREHOUSE" :
-            this.resource ?  "LOC_BZ_IMPROVEMENT_FOR_RESOURCE" :
+            this.resource ? "LOC_BZ_IMPROVEMENT_FOR_RESOURCE" :
             "LOC_BZ_IMPROVEMENT_FOR_TILE";
         const icon = `[icon:${info.ConstructibleType}]`;
         const text = Locale.compose(format, icon, name);
@@ -850,24 +869,19 @@ class PlotTooltipType {
         if (lines) lineRight.style.setProperty("background-image", "linear-gradient(to right, #8D97A6, rgba(141, 151, 166, 0))");
         layout.appendChild(lineRight);
     }
-    renderTitleHeading(title, padding=true, capsule=null) {
+    renderTitleDivider(text) {
+        this.renderTitleHeading(text, "mt-1\\.5");
+    }
+    renderTitleHeading(title, style=null, capsule=null) {
         const ttTitle = document.createElement("div");
-        ttTitle.classList.value = "text-secondary font-title uppercase text-sm leading-snug text-center";
-        if (padding) {
-            ttTitle.style.setProperty("padding-top", "var(--padding-top-bottom)");
-        }
+        ttTitle.classList.value = "text-secondary font-title uppercase text-sm leading-snug text-center mx-1";
+        if (!style) style = BZ_PADDING_STYLE;
+        ttTitle.classList.add(style);
         const ttTerrain = document.createElement("div");
         setCapsuleStyle(ttTerrain, capsule, "my-0\\.5");
         ttTerrain.setAttribute('data-l10n-id', title);
         ttTitle.appendChild(ttTerrain);
         this.container.appendChild(ttTitle);
-    }
-    renderTitleDivider(text=BZ_DOT_DIVIDER) {
-        if (this.isCompact) return this.renderTitleHeading(text);
-        const layout = document.createElement("div");
-        layout.classList.value = "font-title uppercase text-sm mx-3 max-w-80";
-        layout.setAttribute("data-l10n-id", text);
-        this.renderFlexDivider(layout, true, "mt-1\\.5");
     }
     renderGeographySection() {
         if (this.isCompact) return;
@@ -892,7 +906,8 @@ class PlotTooltipType {
         const title = biomeLabel ?
             Locale.compose("{1_TerrainName} {2_BiomeName}", terrainLabel.text, biomeLabel) :
             terrainLabel.text;
-        this.renderTitleHeading(title, !banners.length, terrainLabel.style);
+        const titleStyle = banners.length ? "pt-0" : null;
+        this.renderTitleHeading(title, titleStyle, terrainLabel.style);
         // other geographical info
         const layout = document.createElement("div");
         layout.classList.value = "text-xs leading-snug text-center";
@@ -925,11 +940,11 @@ class PlotTooltipType {
             layout.appendChild(ttEffects);
         }
         // continent + distant lands tag
-        if (continentName) {
+        if (this.terrain.TerrainType != "TERRAIN_OCEAN") {
             const tt = document.createElement("div");
             const hemisphereName =
-                this.isDistantLands ?  "LOC_PLOT_TOOLTIP_HEMISPHERE_WEST" :
-                this.isDistantLands === false ?  "LOC_PLOT_TOOLTIP_HEMISPHERE_EAST" :
+                this.isDistantLands ? "LOC_PLOT_TOOLTIP_HEMISPHERE_WEST" :
+                this.isDistantLands === false ? "LOC_PLOT_TOOLTIP_HEMISPHERE_EAST" :
                 null;  // autoplaying
             tt.innerHTML = dotJoinLocale([continentName, hemisphereName]);
             layout.appendChild(tt);
@@ -1074,8 +1089,8 @@ class PlotTooltipType {
     renderSettlementSection() {
         if (this.isCompact) return;
         if (!this.owner) return;
-        const name = this.city ?  this.city.name :  // city or town
-            this.owner.isAlive ?  this.getCivName(this.owner) :  // village
+        const name = this.city ? this.city.name :  // city or town
+            this.owner.isAlive ? this.getCivName(this.owner) :  // village
             null;  // discoveries are owned by a placeholder "World" player
         if (!name) return;
         // collect notes
@@ -1683,7 +1698,7 @@ class PlotTooltipType {
             const isSquare = info.isSquare;
             const isTurned = info.isTurned;
             const borderRadius = isSquare ? rem(borderWidth) : "100%";
-            const turnSize = (isTurned ?  ringsize / Math.sqrt(2) : ringsize);
+            const turnSize = (isTurned ? ringsize / Math.sqrt(2) : ringsize);
             // create ring
             const e = document.createElement("div");
             e.classList.value = "absolute border-0";
