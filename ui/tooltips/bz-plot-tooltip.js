@@ -438,7 +438,7 @@ function setCapsuleStyle(element, style, ...classes) {
     if (classes.length) element.classList.add(...classes);
     setStyle(element, style);
 }
-class PlotTooltipType {
+class bzPlotTooltip {
     constructor() {
         this.plotCoord = null;
         this.plotIndex = null;
@@ -506,6 +506,7 @@ class PlotTooltipType {
             Controls.preloadImage("hud_sub_circle_bk", "city-banner");
         });
     }
+    static get instance() { return bzPlotTooltip._instance; }
     get isHidden() { return this.verbosity == bzVerbosity.HIDDEN; }
     get isCompact() { return this.verbosity <= bzVerbosity.COMPACT; }
     get isVerbose() { return this.verbosity >= bzVerbosity.VERBOSE; }
@@ -1804,5 +1805,6 @@ function dump_yields() {
 const BZ_DUMP_ICONS = false;
 const BZ_DUMP_SIZE = 12;
 
-TooltipManager.registerPlotType('plot', PlotTooltipPriority.LOW, new PlotTooltipType());
-//# sourceMappingURL=file:///base-standard/ui/tooltips/plot-tooltip.js.map
+bzPlotTooltip._instance = new bzPlotTooltip();
+TooltipManager.registerPlotType('plot', PlotTooltipPriority.LOW, bzPlotTooltip.instance);
+export { bzPlotTooltip as default };
