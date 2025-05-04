@@ -871,16 +871,15 @@ class bzPlotTooltip {
         layout.appendChild(lineRight);
     }
     renderTitleDivider(text) {
-        this.renderTitleHeading(text, "mt-1\\.5");
+        this.renderTitleHeading(text, "mt-2");
     }
     renderTitleHeading(title, style=null, capsule=null) {
         const layout = document.createElement("div");
-        layout.classList.value =
-            "text-secondary font-title-sm uppercase text-center mb-1";
-        if (!style) style = BZ_PADDING_STYLE;
-        layout.classList.add(style, capsule ? "leading-snug" : "leading-none");
+        layout.classList.value = "text-secondary font-title-sm uppercase text-center";
+        layout.classList.add(style || BZ_PADDING_STYLE);
         const ttText = document.createElement("div");
-        setCapsuleStyle(ttText, capsule, "my-0\\.5");
+        setCapsuleStyle(ttText, capsule, "leading-snug", "my-0\\.5");
+        if (!capsule) layout.classList.add("leading-none", "mb-1");
         ttText.setAttribute('data-l10n-id', title);
         layout.appendChild(ttText);
         this.container.appendChild(layout);
@@ -1282,6 +1281,8 @@ class bzPlotTooltip {
             } else if (this.city.isTown) {
                 // rename "City Center" to "Town Center" in towns
                 hexName = "LOC_DISTRICT_BZ_TOWN_CENTER";
+            } else {
+                hexName = GameInfo.Districts.lookup(this.district.type).Name;
             }
         } else if (this.buildings.length == 0) {
             // urban tile with canceled production
