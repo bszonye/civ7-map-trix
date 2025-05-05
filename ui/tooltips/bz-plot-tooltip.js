@@ -12,93 +12,12 @@ import LensManager from '/core/ui/lenses/lens-manager.js';
 import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
 
 const BZ_PADDING = '0.5555555556rem';
-const BZ_PADDING_STYLE = 'pt-2\\.5';
-
-// additional CSS definitions
-const BZ_HEAD_STYLE = [
-`
-.bz-tooltip.tooltip.plot-tooltip {
-    --padding-top-bottom: ${BZ_PADDING};
-    --padding-left-right: ${BZ_PADDING};
-}
-.bz-tooltip.tooltip.plot-tooltip .tooltip__content {
-    padding: ${BZ_PADDING};
-    padding-top: 0;
-}
-.bz-tooltip.plot-tooltip .img-tooltip-border {
-    border-radius: 0.6666666667rem;
-    border-image-source: none;
-    border: 0.1111111111rem solid #8C7E62;
-    filter: drop-shadow(0 1rem 1rem #000c);
-}
-.bz-tooltip.plot-tooltip .img-tooltip-bg {
-    background-image: linear-gradient(to bottom, rgba(35, 37, 43, 0.875) 0%, rgba(18, 21, 31, 0.875) 100%);
-}
-.bz-tooltip.plot-tooltip .shadow {
-    filter: drop-shadow(0 0.0555555556rem 0.0555555556rem black);
-}
-`,
-// debug highlighting for content boxes
-`
-.bz-debug .bz-tooltip > div > div > div {
-    background-color: #80808040;  /* DEBUG */
-}
-.bz-debug .bz-tooltip > div > div > div > div {
-    background-color: #00c0c080;  /* DEBUG */
-}
-.bz-debug .bz-tooltip > div > div > div > div p {
-    background-color: #808080c0;  /* DEBUG */
-}
-`,  // renderDivider: imitate the bottom of the tooltip
-`
-.bz-tooltip .plot-tooltip__Divider {
-    margin-top: ${BZ_PADDING};
-    background-image: linear-gradient(90deg, #E5D2AC00 0%, #E5D2ACFF 50%, #E5D2AC00 100%);
-}
-`,  // full-width banners: general, unit info, debug info
-`
-.plot-tooltip .bz-banner {
-    text-align: center;
-    margin-left: -${BZ_PADDING};
-    margin-right: -${BZ_PADDING};
-    padding-left: ${BZ_PADDING};
-    padding-right: ${BZ_PADDING};
-}
-.bz-banner-unit {
-    margin-bottom: -${BZ_PADDING};
-    padding-top: 0.3333333333rem;
-    padding-bottom: 0.3888888889rem;
-}
-.bz-banner-debug {
-    margin-bottom: -${BZ_PADDING};
-    padding-bottom: ${BZ_PADDING};
-}
-`,  // centers blocks of rules text
-    // IMPORTANT:
-    // Locale.stylize wraps text in an extra <p> element when it
-    // contains styling, which interferes with text-align and max-width.
-    // the result also changes with single- vs multi-line text.  these
-    // rules apply the properties in the correct order and scope to work
-    // with all combinations (with/without icons, single/multiple
-    // lines).
-`
-.bz-tooltip .bz-rules-list {
-    text-align: center;
-}
-.bz-tooltip .bz-rules-item,
-.bz-tooltip .bz-rules-item p {
-    width: 100%;
-}
-`,
-];
-BZ_HEAD_STYLE.map(style => {
-    const e = document.createElement('style');
-    e.textContent = style;
-    document.head.appendChild(e);
-});
-// sync optional styling
-document.body.classList.toggle("bz-yield-banner", bzMapTrixOptions.yieldBanner);
-
+const BZ_PADDING_SM = `0.3888888889rem`;  // reduced for leading
+const BZ_PADDING_XS = `0.4444444444rem`;  // reduced for leading
+console.warn(`TRIX SM=${getFontHeight('sm', 1)}`);
+console.warn(`TRIX SM-SNUG=${getFontHeight('sm', 1.375)}`);
+console.warn(`TRIX XS=${getFontHeight('xs', 1)}`);
+console.warn(`TRIX XS-SNUG=${getFontHeight('xs', 1.375)}`);
 // horizontal list separator
 const BZ_DOT_DIVIDER = Locale.compose("LOC_PLOT_DIVIDER_DOT");
 const BZ_CITY_DIVIDER = "[icon:BZ_CITY_DOT]";
@@ -157,7 +76,15 @@ const BZ_COLOR = {
     silver: "#4c5366",  // = primary
     bronze: "#e5d2ac",  // = secondary
     primary: "#4c5366",
+    primary1: "#8d97a6",
+    primary2: "#4c5366",
+    primary3: "#333640",
+    primary4: "#23252b",
+    primary5: "#12151f",
     secondary: "#e5d2ac",
+    secondary1: "#e5d2ac",
+    secondary2: "#8c7e62",
+    secondary3: "#4c473d",
     accent: "#616266",
     accent1: "#e5e5e5",
     accent2: "#c2c4cc",
@@ -165,16 +92,23 @@ const BZ_COLOR = {
     accent4: "#85878c",
     accent5: "#616266",
     accent6: "#05070d",
+    // bronze shades
+    bronze1: "#f9ecd2",
+    bronze2: "#e5d2ac",  // = secondary1
+    bronze3: "#c7b28a",
+    bronze4: "#a99670",
+    bronze5: "#8c7e62",  // = secondary 2
+    bronze6: "#4c473d",  // = secondary 3
     // alert colors
     black: "#000000",
     danger: "#af1b1c99",  // danger = militaristic 60% opacity
     caution: "#cea92f",  // caution = healthbar-medium
     note: "#ff800033",  // note = orange 20% opacity
     // geographic colors
-    hill: "#ff800033",  // Rough terrain = orange 20% opacity
+    hill: "#a9967066",  // Rough terrain = dark bronze 40% opacity
     vegetated: "#aaff0033",  // Vegetated features = green 20% opacity
-    wet: "#55aaff66",  // Wet features = teal 60% opacity
-    road: "#e5d2accc",  // Roads & Railroads = bronze 80% opacity
+    wet: "#55aaff66",  // Wet features = teal 40% opacity
+    road: "#f9ecd2cc",  // Roads & Railroads = pale bronze 80% opacity
     // yield types
     food: "#80b34d",        //  90° 40 50 green
     production: "#a33d29",  //  10° 60 40 red
@@ -201,7 +135,10 @@ const BZ_ALERT = {
     DEBUG: { "background-color": "#80808080" },
 }
 const BZ_STYLE = {
-    road: { "background-color": BZ_COLOR.road, "color": BZ_COLOR.black },
+    road: {
+        "background-color": BZ_COLOR.road,
+        "color": BZ_COLOR.black,
+    },
     volcano: BZ_ALERT.caution,
     // obstacle types
     TERRAIN_HILL: { "background-color": BZ_COLOR.hill },
@@ -252,6 +189,96 @@ const bzNameSort = (a, b) => {
     return aname.localeCompare(bname);
 }
 
+// #TOOLTIP-ROOT.NEW-TOOLTIP--ROOT absolute max-w-96 p-3 img-tooltip-border img-tooltip-bg pointer-events-none break-words [z-index: 99]
+//      #TOOLTIP-ROOT-CONTENT relative font-body text-xs
+
+// additional CSS definitions
+const BZ_HEAD_STYLE = [
+`
+.bz-tooltip.tooltip.plot-tooltip .tooltip__content {
+    padding: ${BZ_PADDING_SM} ${BZ_PADDING} ${BZ_PADDING_XS};
+}
+.bz-tooltip.plot-tooltip .img-tooltip-border {
+    border-radius: 0.6666666667rem;
+    border-image-source: none;
+    border-width: 0.1111111111rem;
+    border-style: solid;
+    border-color: ${BZ_COLOR.bronze3} ${BZ_COLOR.bronze4};
+    filter: drop-shadow(0 1rem 1rem #000c);
+}
+.bz-tooltip.plot-tooltip .img-tooltip-bg {
+    background-image: linear-gradient(to bottom, rgba(35, 37, 43, 0.875) 0%, rgba(18, 21, 31, 0.875) 100%);
+}
+.bz-tooltip.plot-tooltip .shadow {
+    filter: drop-shadow(0 0.0555555556rem 0.0555555556rem black);
+}
+.bz-tooltip .text-secondary {
+    fxs-font-gradient-color: ${BZ_COLOR.bronze1};
+    color: ${BZ_COLOR.bronze2};
+}
+`,
+// debug highlighting for content boxes
+`
+.bz-debug .bz-tooltip > div > div > div {
+    background-color: #80808040;  /* DEBUG */
+}
+.bz-debug .bz-tooltip > div > div > div > div {
+    background-color: #00c0c080;  /* DEBUG */
+}
+.bz-debug .bz-tooltip > div > div > div > div p {
+    background-color: #808080c0;  /* DEBUG */
+}
+`,  // renderDivider: imitate the bottom of the tooltip
+`
+.bz-tooltip .plot-tooltip__Divider {
+    margin-top: ${BZ_PADDING_SM};
+    background-image: linear-gradient(90deg, ${BZ_COLOR.bronze}00 0%, ${BZ_COLOR.bronze} 50%, ${BZ_COLOR.bronze}00 100%);
+}
+`,  // full-width banners: general, unit info, debug info
+`
+.plot-tooltip .bz-banner {
+    text-align: center;
+    margin-left: -${BZ_PADDING};
+    margin-right: -${BZ_PADDING};
+    padding-left: ${BZ_PADDING};
+    padding-right: ${BZ_PADDING};
+}
+.bz-banner-unit {
+    margin-bottom: -${BZ_PADDING_XS};
+    padding-top: 0.2222222222rem;
+    padding-bottom: 0.2777777778rem;
+}
+.bz-banner-debug {
+    margin-bottom: -${BZ_PADDING_XS};
+    padding-bottom: ${BZ_PADDING_XS};
+}
+`,  // centers blocks of rules text
+    // IMPORTANT:
+    // Locale.stylize wraps text in an extra <p> element when it
+    // contains styling, which interferes with text-align and max-width.
+    // the result also changes with single- vs multi-line text.  these
+    // rules apply the properties in the correct order and scope to work
+    // with all combinations (with/without icons, single/multiple
+    // lines).
+`
+.bz-tooltip .bz-rules-list {
+    text-align: center;
+}
+.bz-tooltip .bz-rules-item,
+.bz-tooltip .bz-rules-item p {
+    width: 100%;
+}
+`,
+];
+BZ_HEAD_STYLE.map(style => {
+    const e = document.createElement('style');
+    e.textContent = style;
+    document.head.appendChild(e);
+});
+// sync optional styling
+document.body.classList.toggle("bz-yield-banner", bzMapTrixOptions.yieldBanner);
+
+
 function baseYields(info) {
     if (!info) return null;
     const yieldTypes = GameInfo.Constructible_YieldChanges
@@ -290,8 +317,9 @@ function constructibleColors(info) {
     const cbase = base.at(-1);  // favor influence & happiness yields
     const cbonus = bonus.at(-1);
     if (cbase == cbonus) {
+        // TODO: fall back to second-best, not lowest
         if (bonus.length != 1) {
-            return [cbase, bonus.at(0)];  // Mosque, Manigramam, Casa Consistorial
+            return [cbase, bonus.at(0)];  // Mosque, Manigramam
         } else if (base.length != 1) {
             return [base.at(0), cbonus];  // no examples of this
         }
@@ -351,6 +379,27 @@ function getConnections(city) {
     }
     if (towns.length + cities.length == 0) return null;
     return { cities, towns };
+}
+function getDigits(list, min=0) {
+    return Math.max(min, ...list.map(n => n.length));
+}
+function getFigureWidth(size, digits=1) {
+    const nwidth = 0.6 * getFontSizeScalePx(size);
+    return Math.round(nwidth * digits);
+}
+function getFontHeight(size, leading) {
+    return Math.round(leading * getFontSizeScalePx(size));
+}
+function getFontSizeBasePx(size) {
+    return GlobalScaling.getFontSizePx(size);
+}
+function getFontSizeRem(size) {
+    const fpx = getFontSizeBasePx(size);
+    return GlobalScaling.pixelsToRem(fpx);
+}
+function getFontSizeScalePx(size) {
+    if (typeof size === "string") size = getFontSizeRem(size);
+    return size * GlobalScaling.currentScalePx;
 }
 function getReligionInfo(id) {
     // find a matching player religion, to get custom names
@@ -872,8 +921,8 @@ class bzPlotTooltip {
     }
     renderTitleHeading(title, style=null, capsule=null) {
         const layout = document.createElement("div");
-        layout.classList.value = "text-secondary font-title-sm uppercase leading-snug text-center mx-1";
-        layout.classList.add(style || BZ_PADDING_STYLE);
+        layout.classList.value = "text-secondary font-title-sm uppercase leading-snug text-center";
+        if (style) layout.classList.add(style);
         const ttText = document.createElement("div");
         setCapsuleStyle(ttText, capsule, "my-0\\.5");
         ttText.setAttribute('data-l10n-id', title);
@@ -881,7 +930,7 @@ class bzPlotTooltip {
         this.container.appendChild(layout);
     }
     renderTitleDivider(text) {
-        this.renderTitleHeading(text, "mt-1\\.5");
+        this.renderTitleHeading(text, this.isCompact ? null : "mt-1\\.5");
     }
     renderGeographySection() {
         if (this.isCompact) return;
@@ -901,6 +950,7 @@ class bzPlotTooltip {
         banners.push(...effects.banners);
         if (banners.length) {
             // round off topmost banner
+            banners.at(0).style.marginTop = `-${BZ_PADDING_SM}`;
             banners.at(0).style.paddingTop = '0.0555555556rem';
             banners.at(0).style.borderRadius = `${BZ_PADDING} ${BZ_PADDING} 0 0`;
             for (const banner of banners) {
@@ -983,7 +1033,7 @@ class bzPlotTooltip {
         }
         if (warning) {
             const tt = document.createElement("div");
-            tt.classList.value = "text-xs leading-normal mb-1";
+            tt.classList.value = "text-xs leading-snug mb-1";
             setBannerStyle(tt, warningStyle);
             const ttWarning = document.createElement("div");
             ttWarning.classList.value = "max-w-64";  // better word wrapping
@@ -1004,7 +1054,7 @@ class bzPlotTooltip {
             if (!effectInfo) return;
             if (effectInfo.Damage || effectInfo.Defense) {
                 const tt = document.createElement("div");
-                tt.classList.value = "text-xs leading-normal mb-1";
+                tt.classList.value = "text-xs leading-snug mb-1";
                 tt.setAttribute('data-l10n-id', effectInfo.Name);
                 const style = effectInfo.Damage ? BZ_ALERT.danger : BZ_ALERT.note;
                 setBannerStyle(tt, style);

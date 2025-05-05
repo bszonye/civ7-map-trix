@@ -25,6 +25,7 @@ export default [
                 GameContext: "readonly",
                 GameInfo: "readonly",
                 GameplayMap: "readonly",
+                GlobalScaling: "readonly",
                 GrowthTypes: "readonly",
                 IndependentRelationship: "readonly",
                 Input: "readonly",
