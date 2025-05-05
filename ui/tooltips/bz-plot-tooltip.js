@@ -314,10 +314,8 @@ function constructibleColors(info) {
     const cbonus = bonus.at(-1);
     if (cbase == cbonus) {
         if (bonus.length != 1) {
-            console.warn(`TRIX ${info.ConstructibleType} ${base} ${bonus}`);
             return [cbase, bonus.at(-2)];  // Mosque, Manigramam
         } else if (base.length != 1) {
-            console.warn(`TRIX ${info.ConstructibleType} ${base} ${bonus}`);
             return [base.at(-2), cbonus];  // no examples of this
         }
     }
