@@ -11,9 +11,6 @@ import { ComponentID } from '/core/ui/utilities/utilities-component-id.js';
 import LensManager from '/core/ui/lenses/lens-manager.js';
 import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
 
-const BZ_PADDING = '0.5555555556rem';
-const BZ_PADDING_SM = `0.3888888889rem`;  // reduced for leading
-const BZ_PADDING_XS = `0.4444444444rem`;  // reduced for leading
 // horizontal list separator
 const BZ_DOT_DIVIDER = Locale.compose("LOC_PLOT_DIVIDER_DOT");
 const BZ_CITY_DIVIDER = "[icon:BZ_CITY_DOT]";
@@ -65,6 +62,11 @@ const BZ_ICON_TYPES = {
     "IMPROVEMENT_MONASTERY": ["SCIENTIFIC"],
     "IMPROVEMENT_INSTITUTE": ["SCIENTIFIC"],
 };
+
+// box padding
+const BZ_PADDING = '0.5555555556rem';
+const BZ_PADDING_SM = `0.3888888889rem`;  // reduced for leading
+const BZ_PADDING_XS = `0.4444444444rem`;  // reduced for leading
 
 // color palette
 const BZ_COLOR = {
@@ -131,10 +133,7 @@ const BZ_ALERT = {
     DEBUG: { "background-color": "#80808080" },
 }
 const BZ_STYLE = {
-    road: {
-        "background-color": BZ_COLOR.road,
-        "color": BZ_COLOR.black,
-    },
+    road: { "background-color": BZ_COLOR.road, "color": BZ_COLOR.black },
     volcano: BZ_ALERT.caution,
     // obstacle types
     TERRAIN_HILL: { "background-color": BZ_COLOR.hill },
@@ -208,7 +207,7 @@ const BZ_HEAD_STYLE = [
 .bz-tooltip.plot-tooltip .shadow {
     filter: drop-shadow(0 0.0555555556rem 0.0555555556rem black);
 }
-.bz-tooltip .text-secondary {
+.bz-tooltip.plot-tooltip .text-secondary {
     fxs-font-gradient-color: ${BZ_COLOR.bronze1};
     color: ${BZ_COLOR.bronze2};
 }
