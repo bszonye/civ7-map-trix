@@ -63,11 +63,6 @@ const BZ_ICON_TYPES = {
     "IMPROVEMENT_INSTITUTE": ["SCIENTIFIC"],
 };
 
-// box padding
-const BZ_PADDING = '0.5555555556rem';
-const BZ_PADDING_SM = `0.3888888889rem`;  // reduced for leading
-const BZ_PADDING_XS = `0.4444444444rem`;  // reduced for leading
-
 // color palette
 const BZ_COLOR = {
     // game colors
@@ -184,11 +179,17 @@ const bzNameSort = (a, b) => {
     return aname.localeCompare(bname);
 }
 
-// #TOOLTIP-ROOT.NEW-TOOLTIP--ROOT absolute max-w-96 p-3 img-tooltip-border img-tooltip-bg pointer-events-none break-words [z-index: 99]
-//      #TOOLTIP-ROOT-CONTENT relative font-body text-xs
+// box padding
+const BZ_PADDING = '0.5555555556rem';
+const BZ_PADDING_SM = `0.3888888889rem`;  // reduced for leading
+const BZ_PADDING_XS = `0.4444444444rem`;  // reduced for leading
 
 // additional CSS definitions
 const BZ_HEAD_STYLE = [
+// 1. #TOOLTIP-ROOT.NEW-TOOLTIP--ROOT absolute max-w-96 p-3
+//    img-tooltip-border img-tooltip-bg pointer-events-none break-words
+//    [z-index: 99]
+//    2. #TOOLTIP-ROOT-CONTENT relative font-body text-xs
 `
 .bz-tooltip.tooltip.plot-tooltip .tooltip__content {
     padding: ${BZ_PADDING_SM} ${BZ_PADDING} ${BZ_PADDING_XS};
@@ -312,11 +313,12 @@ function constructibleColors(info) {
     const cbase = base.at(-1);  // favor influence & happiness yields
     const cbonus = bonus.at(-1);
     if (cbase == cbonus) {
-        // TODO: fall back to second-best, not lowest
         if (bonus.length != 1) {
-            return [cbase, bonus.at(0)];  // Mosque, Manigramam
+            console.warn(`TRIX ${info.ConstructibleType} ${base} ${bonus}`);
+            return [cbase, bonus.at(-2)];  // Mosque, Manigramam
         } else if (base.length != 1) {
-            return [base.at(0), cbonus];  // no examples of this
+            console.warn(`TRIX ${info.ConstructibleType} ${base} ${bonus}`);
+            return [base.at(-2), cbonus];  // no examples of this
         }
     }
     return [cbase, cbonus];
