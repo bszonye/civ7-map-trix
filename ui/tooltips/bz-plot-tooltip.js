@@ -14,10 +14,6 @@ import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
 const BZ_PADDING = '0.5555555556rem';
 const BZ_PADDING_SM = `0.3888888889rem`;  // reduced for leading
 const BZ_PADDING_XS = `0.4444444444rem`;  // reduced for leading
-console.warn(`TRIX SM=${getFontHeight('sm', 1)}`);
-console.warn(`TRIX SM-SNUG=${getFontHeight('sm', 1.375)}`);
-console.warn(`TRIX XS=${getFontHeight('xs', 1)}`);
-console.warn(`TRIX XS-SNUG=${getFontHeight('xs', 1.375)}`);
 // horizontal list separator
 const BZ_DOT_DIVIDER = Locale.compose("LOC_PLOT_DIVIDER_DOT");
 const BZ_CITY_DIVIDER = "[icon:BZ_CITY_DOT]";
@@ -483,8 +479,9 @@ function setBannerStyle(element, style=BZ_ALERT.danger, ...classes) {
 }
 function setCapsuleStyle(element, style, ...classes) {
     if (!style) return;
-    element.classList.add("px-2", "rounded-full");
     if (classes.length) element.classList.add(...classes);
+    element.classList.add("px-2", "rounded-full");
+    element.style.marginLeft = element.style.marginRight = '-0.0555555556rem';
     setStyle(element, style);
 }
 class bzPlotTooltip {
@@ -920,6 +917,7 @@ class bzPlotTooltip {
         layout.appendChild(lineRight);
     }
     renderTitleHeading(title, style=null, capsule=null) {
+        // TODO: clean up parameters
         const layout = document.createElement("div");
         layout.classList.value = "text-secondary font-title-sm uppercase leading-snug text-center";
         if (style) layout.classList.add(style);
@@ -961,8 +959,7 @@ class bzPlotTooltip {
         const title = biomeLabel ?
             Locale.compose("{1_TerrainName} {2_BiomeName}", terrainLabel.text, biomeLabel) :
             terrainLabel.text;
-        const titleStyle = banners.length ? "pt-0" : null;
-        this.renderTitleHeading(title, titleStyle, terrainLabel.style);
+        this.renderTitleHeading(title, null, terrainLabel.style);
         // other geographical info
         const layout = document.createElement("div");
         layout.classList.value = "text-xs leading-snug text-center";
