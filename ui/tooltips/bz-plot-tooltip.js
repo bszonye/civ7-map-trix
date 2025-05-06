@@ -259,6 +259,8 @@ BZ_HEAD_STYLE.map(style => {
 // sync optional styling
 document.body.classList.toggle("bz-yield-banner", bzMapTrixOptions.yieldBanner);
 
+// debug style (manually enable)
+document.body.classList.toggle("bz-debug", false);
 
 function baseYields(info) {
     if (!info) return null;
@@ -329,20 +331,26 @@ function docBanner(text, style) {
     }
     return banner;
 }
-function docRules(text, itemStyle=null) {
+function docRules(text, style=null) {
     // create a paragraph of rules text
-    // text with icons is squirrelly, only format it at top level!
+    // font icons are squirrely!  only center them at top level
     const tt = document.createElement("div");
+    tt.style.textAlign = 'center';
     tt.style.widthPERCENT = 100;
-    tt.classList.add("bz-rules-list");
     for (const item of text) {
         const row = document.createElement("div");
-        row.classList.value = itemStyle ?? "text-xs";
+        if (style) row.classList.value = style;
         row.classList.add("bz-rules-item");
         row.setAttribute("data-l10n-id", item);
         tt.appendChild(row);
     }
     return tt;
+}
+function docText(text, style) {
+    const e = document.createElement("div");
+    if (style) e.classList.value = style;
+    e.setAttribute('data-l10n-id', text);
+    return e;
 }
 function dotJoin(list, dot=BZ_DOT_DIVIDER) {
     // join text with dots after removing empty elements
@@ -422,7 +430,8 @@ function getFontMetrics() {
         const size = sizes(rem);  // font size
         const spacing = sizes(size.rem * ratio);  // line height
         const leading = sizes(spacing.rem - size.rem);  // interline spacing
-        const margin = sizes(BZ_MARGIN - leading.rem / 2);
+        leading.half = sizes(leading.rem / 2);
+        const margin = sizes(BZ_MARGIN - leading.half.rem);
         const radius = sizes(spacing.rem / 2);
         const figure = sizes(0.6 * size.rem, Math.ceil);  // figure width
         const digits = (n) => sizes(n * figure.rem, Math.ceil);
@@ -432,7 +441,7 @@ function getFontMetrics() {
     const rules = font('xs');  // is this needed?
     const table = font('xs');
     const yields = font(8/9);
-    const head = font('sm');
+    const head = font('sm', 1.25);
     const radius = sizes(2/3 * padding.rem);  // TODO: fine-tuning
     radius.content = sizes(radius.rem);
     radius.tooltip = sizes(radius.rem + border.rem);
@@ -543,7 +552,6 @@ function setCapsuleStyle(element, style, ...classes) {
     if (!style) return;
     if (classes.length) element.classList.add(...classes);
     element.classList.add("px-2", "rounded-full");
-    element.style.marginLeft = element.style.marginRight = '-0.0555555556rem';
     setStyle(element, style);
 }
 class bzPlotTooltip {
@@ -991,15 +999,20 @@ class bzPlotTooltip {
         if (lines) lineRight.style.setProperty("background-image", "linear-gradient(to right, #8D97A6, rgba(141, 151, 166, 0))");
         layout.appendChild(lineRight);
     }
-    renderTitleHeading(title, style=null, capsule=null) {
-        // TODO: new margins
-        // TODO: clean up parameters
+    renderTitleHeading(text, capsule=null) {
+        if (!text) return;
         const layout = document.createElement("div");
-        layout.classList.value = "text-secondary font-title-sm uppercase leading-snug text-center";
-        if (style) layout.classList.add(style);
+        layout.classList.value = "text-secondary font-title-sm uppercase text-center";
+        layout.style.lineHeight = metrics.head.ratio;
+        layout.style.marginTop = metrics.head.margin.css;
         const ttText = document.createElement("div");
-        setCapsuleStyle(ttText, capsule, "my-0\\.5");
-        ttText.setAttribute('data-l10n-id', title);
+        setCapsuleStyle(ttText, capsule);
+        if (capsule) {
+            // add leading to capsules
+            layout.style.marginTop = metrics.margin.css;
+            layout.style.marginBottom = metrics.head.leading.half.css;
+        }
+        ttText.setAttribute('data-l10n-id', text);
         layout.appendChild(ttText);
         this.container.appendChild(layout);
     }
@@ -1032,37 +1045,39 @@ class bzPlotTooltip {
         const title = biomeLabel ?
             Locale.compose("{1_TerrainName} {2_BiomeName}", terrainLabel.text, biomeLabel) :
             terrainLabel.text;
-        this.renderTitleHeading(title, null, terrainLabel.style);
+        this.renderTitleHeading(title, terrainLabel.style);
         // other geographical info
+        const thicken = (text) => {
+            // add weight & leading to capsules
+            text.style.lineHeight = metrics.rules.ratio;
+            text.style.marginTop = text.style.marginBottom =
+                metrics.body.leading.half.css;
+        }
         const layout = document.createElement("div");
-        layout.classList.value = "leading-snug text-center";
+        layout.classList.value = "text-center";
+        layout.style.lineHeight = metrics.body.ratio;
         if (featureLabel) {
-            const tt = document.createElement("div");
-            setCapsuleStyle(tt, featureLabel.style, "my-0\\.5");
-            tt.setAttribute('data-l10n-id', featureLabel.text);
-            layout.appendChild(tt);
+            const text = docText(featureLabel.text);
+            setCapsuleStyle(text, featureLabel.style);
+            if (featureLabel.style) thicken(text);
+            layout.appendChild(text);
         }
         if (river) routes.push(river.name);
         if (routes.length) {
             // road, ferry, river info
-            const tt = document.createElement("div");
+            const text = docText(dotJoinLocale(routes));
             // highlight priority: navigable rivers, roads, other rivers
             const routeStyle =
                 river?.type == RiverTypes.RIVER_NAVIGABLE ? river.style :
                 hasRoad ? BZ_STYLE.road :
                 river.style;
-            setCapsuleStyle(tt, routeStyle, "my-0\\.5");
-            tt.innerHTML = dotJoinLocale(routes);
-            layout.appendChild(tt);
+            setCapsuleStyle(text, routeStyle);
+            if (routeStyle) thicken(text);
+            layout.appendChild(text);
         }
         if (effects.text.length) {
-            const ttEffects = document.createElement("div");
-            for (const effect of effects.text) {
-                const tt = document.createElement("div");
-                tt.setAttribute('data-l10n-id', effect);
-                ttEffects.appendChild(tt);
-            }
-            layout.appendChild(ttEffects);
+            const text = docRules(effects.text);
+            layout.appendChild(text);
         }
         // continent + distant lands tag
         if (this.terrain.TerrainType != "TERRAIN_OCEAN") {
@@ -1272,7 +1287,12 @@ class bzPlotTooltip {
             }
         }
         // render stats
-        if (stats.length) this.renderRules(stats, "w-full mt-1");
+        if (stats.length) {
+            const rules = docRules(stats);
+            rules.classList.value = "mt-1";
+            rules.style.marginBottom = metrics.rules.margin.css;
+            this.container.appendChild(rules);
+        }
     }
     TODOrenderOwnerInfo() {
         if (!this.owner || !Players.isAlive(this.owner.id)) return;
