@@ -407,11 +407,12 @@ function getFontMetrics() {
         const digits = (n) => sizes(n * figure.rem, Math.ceil);
         return { size, ratio, spacing, leading, margin, radius, figure, digits, };
     }
+    const head = font('sm', 1.25);
     const body = font('xs', 1.25);
+    const note = font('2xs', 1);
     const rules = font('xs');  // is this needed?
     const table = font('xs');
     const yields = font(8/9);
-    const head = font('sm', 1.25);
     const radius = sizes(2/3 * padding.rem);  // TODO: fine-tuning
     radius.content = sizes(radius.rem);
     radius.tooltip = sizes(radius.rem + border.rem);
@@ -420,7 +421,7 @@ function getFontMetrics() {
     return {
         sizes, font,
         padding, margin, border,
-        body, rules, table, yields, head,
+        head, body, note, rules, table, yields,
         radius, bumper,
     };
 }
@@ -566,7 +567,6 @@ class bzPlotTooltip {
         // settlement
         this.city = null;
         this.district = null;
-        this.isCityCenter = false;
         // ownership
         this.owner = null;
         this.relationship = null;
@@ -681,7 +681,6 @@ class bzPlotTooltip {
         // settlement
         this.city = null;
         this.district = null;
-        this.isCityCenter = false;
         // ownership
         this.owner = null;
         this.relationship = null;
@@ -727,7 +726,7 @@ class bzPlotTooltip {
         this.modelSettlement();  // needed before world plot effects
         this.modelWorld();
         this.modelOwnership();
-        this.modelConstructibles();
+        this.modelConstructibles();  // TODO: refactor
         this.modelYields();
         this.modelUnits();
     }
@@ -745,8 +744,6 @@ class bzPlotTooltip {
         const loc = this.plotCoord;
         const cityID = GameplayMap.getOwningCityFromXY(loc.x, loc.y);
         this.city = cityID ? Cities.get(cityID) : null;
-        const center = this.city?.location;
-        this.isCityCenter = center && center.x == loc.x && center.y == loc.y
         const districtID = MapCities.getDistrict(loc.x, loc.y);
         this.district = districtID ? Districts.get(districtID) : null;
     }
@@ -815,15 +812,17 @@ class bzPlotTooltip {
             return effects;
         }
 
-        // show settler advice including fresh water
+        // check fresh water
         const lens = LensManager.getActiveLens();
-        if (this.city && !this.isCityCenter) {
-            // only report fresh water in city centers & unclaimed land
-        } else if (GameplayMap.isFreshWater(loc.x, loc.y)) {
+        const wloc = this.city ? this.city.location : loc;
+        if (wloc.x != loc.x || wloc.y != loc.y) {
+            // ignore city water out side of the city center
+        } else if (GameplayMap.isFreshWater(wloc.x, wloc.y)) {
             effects.other.push("LOC_PLOTKEY_FRESHWATER");
-        } else if (lens == "fxs-settler-lens") {
+        } else if (!this.city && lens == "fxs-settler-lens") {
             effects.caution.push("LOC_PLOT_TOOLTIP_NO_FRESH_WATER");
         }
+        // remainder is for settler lens only
         if (lens != "fxs-settler-lens") return effects;
         // show limits of the advanced start area
         if (this.observer?.AdvancedStart &&
@@ -948,6 +947,7 @@ class bzPlotTooltip {
                 console.warn(`bz-plot-tooltip: expected 1 constructible, not ${n} (${types})`);
             }
         }
+        // TODO: refactor this part into a separate method
         this.specialists = getSpecialists(this.plotCoord, this.city);
         if (this.improvement) {
             // set up icons and special district names for improvements
@@ -1235,33 +1235,13 @@ class bzPlotTooltip {
             this.owner.isAlive ? this.getCivName(this.owner) :  // village
             null;  // discoveries are owned by a placeholder "World" player
         if (!name) return;
-        // collect notes
-        const notes = [];
-        if (this.townFocus && this.isGrowingTown) {
-            notes.push("LOC_UI_FOOD_CHOOSER_FOCUS_GROWTH");
-        }
-        // render headings and notes
+        // render headings
         this.renderTitleHeading(name);
-        if (this.townFocus || notes.length) {
-            // note: extra div layer here to align bz-debug levels
-            const tt = document.createElement("div");
-            tt.classList.value = "leading-snug text-center mb-1";
-            const ttSubhead = document.createElement("div");
-            if (this.townFocus) {
-                const ttFocus = document.createElement("div");
-                ttFocus.classList.value = "text-accent-2 font-title uppercase -mt-0\\.5";
-                ttFocus.setAttribute('data-l10n-id', this.townFocus.Name);
-                ttSubhead.appendChild(ttFocus);
-            }
-            if (notes.length) {
-                const ttNote = document.createElement("div");
-                ttNote.classList.value = "text-2xs leading-none mb-0\\.5";
-                ttNote.setAttribute('data-l10n-id', dotJoinLocale(notes));
-                ttSubhead.appendChild(ttNote);
-            }
-            tt.appendChild(ttSubhead);
-            this.container.appendChild(tt);
-        }
+        const type = docRules([this.settlementType]);
+        type.classList.value = "text-2xs";
+        type.style.lineHeight = metrics.note.ratio;
+        type.style.marginBottom = metrics.table.leading.half.css;  // TODO: fine-tuning
+        this.container.appendChild(type);
         // owner info
         this.renderOwnerInfo();
     }
@@ -1352,22 +1332,12 @@ class bzPlotTooltip {
         const quarterOK = this.buildings.reduce((a, b) =>
             a + (b.isCurrent ? b.isLarge ? 2 : 1 : 0), 0);
         let hexName = this.city.name;
-        let hexSubhead;
         let hexRules;
         // set name & description
         if (this.isCompact) {
             // keep the city name
         } else if (this.district.type == DistrictTypes.CITY_CENTER) {
-            const owner = Players.get(this.city.owner);
-            if (owner.isMinor) {
-                hexName = "LOC_BZ_SETTLEMENT_CITY_STATE";
-                const bonusType = Game.CityStates.getBonusType(owner.id);
-                const bonus = GameInfo.CityStateBonuses.find(b => b.$hash == bonusType);
-                if (bonus) {
-                    hexSubhead = bonus.Name;
-                    hexRules = bonus.Description;  // .Tooltip doesn't exist
-                }
-            } else if (this.city.isTown) {
+            if (this.city.isTown && !this.owner.isMinor) {
                 // rename "City Center" to "Town Center" in towns
                 hexName = "LOC_DISTRICT_BZ_TOWN_CENTER";
             } else {
@@ -1396,12 +1366,8 @@ class bzPlotTooltip {
         this.renderTitleHeading(Locale.compose(hexName));
         this.renderDistrictDefense(this.plotCoord);
         // panel interior
-        // show rules for city-states and unique quarters
-        if (hexRules && this.isVerbose) {
-            const title = "font-title uppercase leading-snug";
-            if (hexSubhead) this.renderRules([hexSubhead], null, title);
-            this.renderRules([hexRules], "w-60 mb-1");
-        }
+        // show rules for unique quarters
+        if (hexRules && this.isVerbose) this.renderRules([hexRules], "w-60 mb-1");
         // constructibles
         this.renderConstructibles();
         // report specialists
