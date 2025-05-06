@@ -181,6 +181,7 @@ const bzNameSort = (a, b) => {
 
 // box metrics (for initialization, tooltip can update)
 const BASE_FONT_SIZE = 18;
+const BZ_FONT_SPACING = 1.5;
 const BZ_PADDING = 0.6666666667;
 const BZ_MARGIN = BZ_PADDING / 2;
 const BZ_BORDER = 0.1111111111;
@@ -243,8 +244,6 @@ const BZ_HEAD_STYLE = [
 }
 .bz-banner-unit {
     margin-bottom: -${metrics.padding.y.css};
-    padding-top: 0.2222222222rem;
-    padding-bottom: 0.2777777778rem;
 }
 .bz-banner-debug {
     margin-bottom: -${metrics.padding.y.css};
@@ -323,6 +322,33 @@ function constructibleColors(info) {
     }
     return [cbase, cbonus];
 }
+function docBanner(text, bumper=true) {
+    // text-align: center;
+    // margin-left: -${metrics.padding.x.css};
+    // margin-right: -${metrics.padding.x.css};
+    // padding-left: ${metrics.padding.x.css};
+    // padding-right: ${metrics.padding.x.css};
+    // create a banner
+    const banner = document.createElement("div");
+    // extend banner to full width
+    banner.style.paddingLeft = banner.style.paddingRight = metrics.padding.x.css;
+    banner.style.marginLeft = banner.style.marginRight = `-${metrics.padding.x.css}`;
+    // center content vertically and horizontally
+    banner.style.display = 'flex';
+    banner.style.flexDirection = 'column';
+    banner.style.justifyContent = 'center';
+    banner.style.alignItems = 'center';
+    banner.style.textAlign = 'center';
+    // make sure the banner is tall enough for bumper rounding
+    if (bumper) banner.style.minHeight = metrics.bumper.css;
+    // set the text
+    for (const item of text) {
+        const row = document.createElement("div");
+        row.setAttribute("data-l10n-id", item);
+        banner.appendChild(row);
+    }
+    return banner;
+}
 function dotJoin(list, dot=BZ_DOT_DIVIDER) {
     // join text with dots after removing empty elements
     return list.filter(e => e).join("&nbsp;" + dot + " ");
@@ -395,7 +421,7 @@ function getFontMetrics() {
     padding.y = sizes(padding.rem - margin.rem);  // room for end block margins
     const border = sizes(BZ_BORDER);
     // font metrics
-    const metrics = (name, ratio) => {
+    const font = (name, ratio=BZ_FONT_SPACING) => {
         const rem = typeof name === "string" ?
             getFontSizeBasePx(name) / BASE_FONT_SIZE : name;
         const size = sizes(rem);  // font size
@@ -407,17 +433,18 @@ function getFontMetrics() {
         const digits = (n) => sizes(n * figure.rem, Math.ceil);
         return { size, ratio, spacing, leading, margin, radius, figure, digits, };
     }
-    const body = metrics('xs', 1.25);
-    const rules = metrics('xs', 1.5);  // is this needed?
-    const table = metrics('xs', 1.5);
-    const yields = metrics(8/9, 1.5);
-    const head = metrics('sm', 1.5);
+    const body = font('xs', 1.25);
+    const rules = font('xs');  // is this needed?
+    const table = font('xs');
+    const yields = font(8/9);
+    const head = font('sm');
     const radius = sizes(2/3 * padding.rem);  // TODO: fine-tuning
     radius.content = sizes(radius.rem);
     radius.tooltip = sizes(radius.rem + border.rem);
     // minimum end banner height to avoid radius glitches
     const bumper = sizes(Math.max(table.spacing.rem, 2*radius.rem));
     return {
+        sizes, font,
         padding, margin, border,
         body, rules, table, yields, head,
         radius, bumper,
@@ -539,7 +566,9 @@ class bzPlotTooltip {
         // document root
         this.tooltip = document.createElement('fxs-tooltip');
         this.tooltip.classList.value = "bz-tooltip plot-tooltip max-w-96";
+        this.tooltip.style.lineHeight = metrics.table.ratio;
         this.container = document.createElement('div');
+        this.container.classList.value = "relative font-body text-xs";
         this.tooltip.appendChild(this.container);
         // point-of-view info
         this.observerID = GameContext.localObserverID;
@@ -986,16 +1015,14 @@ class bzPlotTooltip {
         const routes = this.getRouteList();
         const hasRoad = routes.length != 0;
         // alert banners: settler warnings, damaging & defense effects
-        const banners = [];
-        banners.push(...this.getSettlerBanner(loc));
-        banners.push(...effects.banners);
+        const banners = [...this.getSettlerBanners(loc), ...effects.banners];
         if (banners.length) {
             // round off topmost banner
             const head = banners.at(0);
             head.style.marginTop = `-${metrics.padding.y.css}`;
             head.style.lineHeight = metrics.bumper.css;
-            head.style.borderRadius =
-                `${metrics.radius.css} ${metrics.radius.css} 0 0`;
+            const radius = metrics.radius.css;
+            head.style.borderRadius = `${radius} ${radius} 0 0`;
             for (const banner of banners) {
                 this.container.appendChild(banner);
             }
@@ -1048,40 +1075,39 @@ class bzPlotTooltip {
         }
         this.container.appendChild(layout);
     }
-    getSettlerBanner(loc) {
+    getSettlerBanners(loc) {
         const banners = [];
         if (LensManager.getActiveLens() != "fxs-settler-lens") return banners;
+        const warn = (text, style=BZ_ALERT.danger) => {
+            const banner = docBanner([text]);
+            setBannerStyle(banner, style);
+            banner.classList.value = "mb-1";
+            banner.children[0].classList.value = "max-w-64";  // better word wrapping
+            banners.push(banner);
+        }
         // Add more details to the tooltip if we are in the settler lens
         if (GameplayMap.isWater(loc.x, loc.y) || GameplayMap.isImpassable(loc.x, loc.y) || GameplayMap.isNavigableRiver(loc.x, loc.y)) {
             // Dont't add any extra tooltip to mountains, oceans, or navigable rivers, should be obvious enough w/o them
             return banners;
         }
         // Show why we can't settle here
-        let warning;
-        let warningStyle = BZ_ALERT.danger;
         if (this.observer?.AdvancedStart &&
             !this.observer.AdvancedStart.getPlacementComplete() &&
             !GameplayMap.isPlotInAdvancedStartRegion(this.observerID, loc.x, loc.y)) {
-            warning = "LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_FAR";
-        } else if (this.resource) {
-            warning = "LOC_PLOT_TOOLTIP_CANT_SETTLE_RESOURCES";
+            warn("LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_FAR");
+        }
+        if (this.resource) {
+            if (GameplayMap.isCityWithinMinimumDistance(loc.x, loc.y)) {
+                warn("LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_CLOSE");
+            }
+            warn("LOC_PLOT_TOOLTIP_CANT_SETTLE_RESOURCES");
         } else if (this.observer?.Diplomacy &&
             !this.observer.Diplomacy.isValidLandClaimLocation(loc, true /*bIgnoreFriendlyUnitRequirement*/)) {
             // related: GameplayMap.isCityWithinMinimumDistance(loc.x, loc.y))
-            warning = "LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_CLOSE";
-        } else if (!GameplayMap.isFreshWater(loc.x, loc.y)) {
-            warningStyle = BZ_ALERT.caution;
-            warning = "LOC_PLOT_TOOLTIP_NO_FRESH_WATER";
+            warn("LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_CLOSE");
         }
-        if (warning) {
-            const tt = document.createElement("div");
-            tt.classList.value = "text-xs leading-snug mb-1";
-            setBannerStyle(tt, warningStyle);
-            const ttWarning = document.createElement("div");
-            ttWarning.classList.value = "max-w-64";  // better word wrapping
-            ttWarning.setAttribute('data-l10n-id', warning);
-            tt.appendChild(ttWarning);
-            banners.push(tt);
+        if (!GameplayMap.isFreshWater(loc.x, loc.y)) {
+            warn("LOC_PLOT_TOOLTIP_NO_FRESH_WATER", BZ_ALERT.caution);
         }
         return banners;
     }
@@ -1684,20 +1710,20 @@ class bzPlotTooltip {
         // show unit section
         if (this.isCompact || !this.unit) return;
         this.renderDivider();
-        const layout = document.createElement("div");
-        layout.classList.value =
-            "bz-banner-unit text-xs leading-snug text-center";
-        if (!this.isShowingDebug) {
-            // round off bottom banner
-            layout.style.borderRadius =
-                `0 0 ${metrics.radius.css} ${metrics.radius.css}`;
-        }
         const unitName = this.unit.name;
         const civName = this.getCivName(Players.get(this.unit.owner));
         const unitInfo = [unitName, civName, this.unitRelationship?.type];
-        layout.innerHTML = dotJoinLocale(unitInfo);
-        if (this.unitRelationship?.isEnemy) setBannerStyle(layout, BZ_ALERT.enemy);
-        this.container.appendChild(layout);
+        const banner = docBanner([dotJoinLocale(unitInfo)]);
+        banner.classList.add("bz-banner-unit");
+        banner.style.lineHeight = metrics.font('xs', 2).spacing.css;
+        banner.style.marginBottom = `-${metrics.padding.y.css}`;
+        if (!this.isShowingDebug) {
+            // bottom bumper rounding
+            const radius = metrics.radius.css;
+            banner.style.borderRadius = `0 0 ${radius} ${radius}`;
+        }
+        if (this.unitRelationship?.isEnemy) setStyle(banner, BZ_ALERT.enemy);
+        this.container.appendChild(banner);
     }
     setWarningCursor() {
         // highlight enemy territory & units with a red cursor
