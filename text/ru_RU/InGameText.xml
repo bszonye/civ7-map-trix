@@ -1,6 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Database>
     <LocalizedText>
+        <Replace Tag="LOC_BZ_GROUPED_DIGITS" Language="ru_RU">
+            <Text>{1_amount: number #,###;-#,###}</Text>
+        </Replace>
+        <Replace Tag="LOC_BZ_GROUPED_MODIFIER" Language="ru_RU">
+            <Text>{1_amount: number +#,###;-#,###}</Text>
+        </Replace>
+        <Replace Tag="LOC_BZ_PEOPLE_NAME" Language="ru_RU">
+            <Text>{1_name}</Text>
+        </Replace>
+        <Replace Tag="LOC_BZ_RELATIONSHIP_TRIBUTARY" Language="ru_RU">
+            <Text>Вассал</Text>
+        </Replace>
+        <Replace Tag="LOC_BZ_SETTLEMENT_CITY_STATE" Language="ru_RU">
+            <Text>Город-государство</Text>
+        </Replace>
+        <Replace Tag="LOC_BZ_SETTLEMENT_CONNECTIONS" Language="ru_RU">
+            <Text>Соединения</Text>
+        </Replace>
+        <Replace Tag="LOC_BZ_SETTLEMENT_NO_FRESHWATER" Language="ru_RU">
+            <Text>Нет Пресная вода</Text>
+        </Replace>
+        <Replace Tag="LOC_BZ_WAS_PREVIOUSLY" Language="ru_RU">
+            <Text>(Раньше {1_name})</Text>
+        </Replace>
+        <Replace Tag="LOC_BZ_WAS_ICON_PREVIOUSLY" Language="ru_RU">
+            <Text>(Раньше {1_icon} {2_name})</Text>
+        </Replace>
         <Row Tag="LOC_BZ_CITY_CONNECTIONS" Language="ru_RU">
             <Text>Соединения • {1_cities}[icon:YIELD_CITIES] {2_towns}[icon:YIELD_TOWNS]</Text>
         </Row>

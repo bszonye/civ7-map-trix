@@ -1,6 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Database>
     <LocalizedText>
+        <Replace Tag="LOC_BZ_GROUPED_DIGITS" Language="zh_Hant_HK">
+            <Text>{1_amount: number #,###;-#,###}</Text>
+        </Replace>
+        <Replace Tag="LOC_BZ_GROUPED_MODIFIER" Language="zh_Hant_HK">
+            <Text>{1_amount: number +#,###;-#,###}</Text>
+        </Replace>
+        <Replace Tag="LOC_BZ_PEOPLE_NAME" Language="zh_Hant_HK">
+            <Text>{1_name} 民族</Text>
+        </Replace>
+        <Replace Tag="LOC_BZ_RELATIONSHIP_TRIBUTARY" Language="zh_Hant_HK">
+            <Text>朝貢國</Text>
+        </Replace>
+        <Replace Tag="LOC_BZ_SETTLEMENT_CITY_STATE" Language="zh_Hant_HK">
+            <Text>城邦</Text>
+        </Replace>
+        <Replace Tag="LOC_BZ_SETTLEMENT_CONNECTIONS" Language="zh_Hant_HK">
+            <Text>連接定居點</Text>
+        </Replace>
+        <Replace Tag="LOC_BZ_SETTLEMENT_NO_FRESHWATER" Language="zh_Hant_HK">
+            <Text>無淡水</Text>
+        </Replace>
+        <Replace Tag="LOC_BZ_WAS_PREVIOUSLY" Language="zh_Hant_HK">
+            <Text>(原為 {1_name})</Text>
+        </Replace>
+        <Replace Tag="LOC_BZ_WAS_ICON_PREVIOUSLY" Language="zh_Hant_HK">
+            <Text>(原為 {1_icon} {2_name})</Text>
+        </Replace>
         <Row Tag="LOC_BZ_CITY_CONNECTIONS" Language="zh_Hant_HK">
             <Text>連接定居點 • {1_cities}[icon:YIELD_CITIES] {2_towns}[icon:YIELD_TOWNS]</Text>
         </Row>
