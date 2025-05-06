@@ -868,7 +868,8 @@ class bzPlotTooltip {
             this.constructibles.sort(ageSort);
             this.buildings.sort(ageSort);
             if (this.wonder || this.improvement) {  // should only be one
-                console.warn(`bz-plot-tooltip: expected 1 constructible, not ${n}`);
+                const types = this.constructibles.map(c => c.info?.ConstructibleType);
+                console.warn(`bz-plot-tooltip: expected 1 constructible, not ${n} (${types})`);
             }
         }
         this.specialists = getSpecialists(this.plotCoord, this.city);
@@ -961,6 +962,7 @@ class bzPlotTooltip {
         layout.appendChild(lineRight);
     }
     renderTitleHeading(title, style=null, capsule=null) {
+        // TODO: new margins
         // TODO: clean up parameters
         const layout = document.createElement("div");
         layout.classList.value = "text-secondary font-title-sm uppercase leading-snug text-center";
