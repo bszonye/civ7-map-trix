@@ -37,12 +37,6 @@
         <Row Tag="LOC_BZ_IMPROVEMENT_FOR_RESOURCE" Language="de_DE">
             <Text>Benötigt {1_icon} {2_name}</Text>
         </Row>
-        <Row Tag="LOC_BZ_IMPROVEMENT_FOR_WAREHOUSE" Language="de_DE">
-            <Text>(War {1_icon} {2_name})</Text>
-        </Row>
-        <Row Tag="LOC_BZ_PLOTKEY_NO_FRESHWATER" Language="de_DE">
-            <Text>Kein Süßwasser</Text>
-        </Row>
         <Row Tag="LOC_BZ_RELIGION_MAJORITY" Language="de_DE">
             <Text>Mehrheit {1_icon} {2_name}</Text>
         </Row>
@@ -51,9 +45,6 @@
         </Row>
         <Row Tag="LOC_BZ_RELIGION_URBAN" Language="de_DE">
             <Text>Städtisch {1_icon} {2_name}</Text>
-        </Row>
-        <Row Tag="LOC_DISTRICT_BZ_CITY_STATE" Language="de_DE">
-            <Text>Stadtstaat</Text>
         </Row>
         <Row Tag="LOC_DISTRICT_BZ_DISCOVERY" Language="de_DE">
             <Text>Entdeckung</Text>
@@ -75,12 +66,6 @@
         </Row>
         <Row Tag="LOC_DISTRICT_BZ_URBAN_VACANT" Language="de_DE">
             <Text>Freier Bezirk</Text>
-        </Row>
-        <Row Tag="LOC_INDEPENDENT_BZ_RELATIONSHIP_TRIBUTARY" Language="de_DE">
-            <Text>Abhängig</Text>
-        </Row>
-        <Row Tag="LOC_LEADER_BZ_PEOPLE_NAME" Language="de_DE">
-            <Text>Volk der {1_name}</Text>
         </Row>
         <Row Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE" Language="de_DE">
             <Text>Map Trix • Detaillierungsgrad</Text>
