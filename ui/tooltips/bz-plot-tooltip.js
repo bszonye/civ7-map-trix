@@ -863,11 +863,10 @@ class bzPlotTooltip {
         };
         const n = this.constructibles.length;
         if (n > 1) {
-            // sort buildings by age, walls last
-            const ageSort = (a, b) =>
-                (b.isExtra ? -1 : b.age) - (a.isExtra ? -1 : a.age);
-            this.constructibles.sort(ageSort);
-            this.buildings.sort(ageSort);
+            // move walls to the end of the list
+            const wallSort = (a, b) => (a.isExtra ? 1 : 0) - (b.isExtra ? 1 : 0);
+            this.constructibles.sort(wallSort);
+            this.buildings.sort(wallSort);
             if (this.wonder || this.improvement) {  // should only be one
                 const types = this.constructibles.map(c => c.info?.ConstructibleType);
                 console.warn(`bz-plot-tooltip: expected 1 constructible, not ${n} (${types})`);
@@ -1016,7 +1015,7 @@ class bzPlotTooltip {
         this.renderTitleHeading(title, null, terrainLabel.style);
         // other geographical info
         const layout = document.createElement("div");
-        layout.classList.value = "text-xs leading-snug text-center";
+        layout.classList.value = "leading-snug text-center";
         if (featureLabel) {
             const tt = document.createElement("div");
             setCapsuleStyle(tt, featureLabel.style, "my-0\\.5");
@@ -1214,7 +1213,7 @@ class bzPlotTooltip {
         if (this.townFocus || notes.length) {
             // note: extra div layer here to align bz-debug levels
             const tt = document.createElement("div");
-            tt.classList.value = "text-xs leading-snug text-center mb-1";
+            tt.classList.value = "leading-snug text-center mb-1";
             const ttSubhead = document.createElement("div");
             if (this.townFocus) {
                 const ttFocus = document.createElement("div");
@@ -1267,7 +1266,7 @@ class bzPlotTooltip {
             return;
         }
         const layout = document.createElement("div");
-        layout.classList.value = "text-xs leading-snug text-center";
+        layout.classList.value = "leading-snug text-center";
         const ownerName = this.getOwnerName(this.owner);
         const relType = Locale.compose(this.relationship.type ?? "");
         const civName = this.getCivName(this.owner, true);
@@ -1398,7 +1397,7 @@ class bzPlotTooltip {
         // panel interior
         // show rules for city-states and unique quarters
         if (hexRules && this.isVerbose) {
-            const title = "font-title uppercase text-xs leading-snug";
+            const title = "font-title uppercase leading-snug";
             if (hexSubhead) this.renderRules([hexSubhead], null, title);
             this.renderRules([hexRules], "w-60 mb-1");
         }
@@ -1471,7 +1470,7 @@ class bzPlotTooltip {
         if (hexRules.length && !this.isCompact) {
             const title = "text-2xs leading-none mb-1";
             if (hexSubtitle) this.renderRules([hexSubtitle], null, title);
-            this.renderRules(hexRules, "w-60", "text-xs leading-snug mb-1");
+            this.renderRules(hexRules, "w-60", "leading-snug mb-1");
         }
         // constructibles
         this.renderConstructibles();
@@ -1522,7 +1521,7 @@ class bzPlotTooltip {
     renderConstructibles() {
         if (!this.constructibles.length && !this.freeConstructible) return;
         const ttList = document.createElement("div");
-        ttList.classList.value = "text-xs leading-snug text-center";
+        ttList.classList.value = "leading-snug text-center";
         for (const c of this.constructibles) {
             const ttConstructible = document.createElement("div");
             const ttName = document.createElement("div");
@@ -1560,7 +1559,7 @@ class bzPlotTooltip {
         ttText.classList.add("bz-rules-list");
         for (const item of text) {
             const ttItem = document.createElement("div");
-            ttItem.classList.value = itemStyle ?? "text-xs leading-snug";
+            ttItem.classList.value = itemStyle ?? "leading-snug";
             ttItem.classList.add("bz-rules-item");
             ttItem.setAttribute("data-l10n-id", item);
             ttText.appendChild(ttItem);
@@ -1575,7 +1574,7 @@ class bzPlotTooltip {
             const conquerorName = this.getCivName(conqueror, true);
             const conquerorText = Locale.compose("{1_Term} {2_Subject}", "LOC_PLOT_TOOLTIP_CONQUEROR", conquerorName);
             const tt = document.createElement("div");
-            tt.classList.value = "text-xs leading-snug mb-1 py-1";
+            tt.classList.value = "leading-snug mb-1 py-1";
             // TODO: switch to docBanner
             setBannerStyle(tt, BZ_ALERT.conqueror);
             tt.innerHTML = conquerorText;
@@ -1609,7 +1608,7 @@ class bzPlotTooltip {
         }
         if (info.length) {
             const ttDefense = document.createElement("div");
-            ttDefense.classList.value = "text-xs leading-snug text-center mb-1";
+            ttDefense.classList.value = "leading-snug text-center mb-1";
             const style = currentHealth != maxHealth ? BZ_ALERT.danger : BZ_ALERT.note;
             // TODO: switch to docBanner
             setBannerStyle(ttDefense, style, "py-1");
