@@ -329,6 +329,21 @@ function docBanner(text, style) {
     }
     return banner;
 }
+function docRules(text, itemStyle=null) {
+    // create a paragraph of rules text
+    // text with icons is squirrelly, only format it at top level!
+    const tt = document.createElement("div");
+    tt.style.widthPERCENT = 100;
+    tt.classList.add("bz-rules-list");
+    for (const item of text) {
+        const row = document.createElement("div");
+        row.classList.value = itemStyle ?? "text-xs";
+        row.classList.add("bz-rules-item");
+        row.setAttribute("data-l10n-id", item);
+        tt.appendChild(row);
+    }
+    return tt;
+}
 function dotJoin(list, dot=BZ_DOT_DIVIDER) {
     // join text with dots after removing empty elements
     return list.filter(e => e).join("&nbsp;" + dot + " ");
@@ -535,7 +550,7 @@ class bzPlotTooltip {
     constructor() {
         this.plotCoord = null;
         this.plotIndex = null;
-        this.isShowingDebug = false;
+        this.isDebug = false;
         this.modCtrl = false;
         this.modShift = false;
         this.verbosity = bzMapTrixOptions.verbose;
@@ -562,6 +577,7 @@ class bzPlotTooltip {
         // ownership
         this.owner = null;
         this.relationship = null;  // TODO: rename
+        this.originalOwner = null;
         this.city = null;
         this.district = null;
         // settlement stats
@@ -675,6 +691,7 @@ class bzPlotTooltip {
         // ownership
         this.owner = null;
         this.relationship = null;
+        this.originalOwner = null;
         this.city = null;
         this.district = null;
         // settlement stats
@@ -703,10 +720,8 @@ class bzPlotTooltip {
             return;
         }
         this.plotIndex = GameplayMap.getIndexFromLocation(this.plotCoord);
-        // show debug info if enabled + extra info when Ctrl is held
-        this.isShowingDebug = UI.isDebugPlotInfoVisible();
-        const isDebugStyle = this.isShowingDebug && (this.modCtrl || this.modShift);
-        document.body.classList.toggle("bz-debug", isDebugStyle);
+        // show debug info if enabled
+        this.isDebug = UI.isDebugPlotInfoVisible();
         this.model();
         this.render();
         UI.setPlotLocation(this.plotCoord.x, this.plotCoord.y, this.plotIndex);
@@ -732,7 +747,7 @@ class bzPlotTooltip {
         this.renderHexSection();
         this.renderYields();
         this.renderUnits();
-        if (this.isShowingDebug) this.renderDebugInfo();
+        if (this.isDebug) this.renderDebugInfo();
     }
     // data modeling methods
     modelWorld() {
@@ -775,12 +790,17 @@ class bzPlotTooltip {
         const ownerID = GameplayMap.getOwner(loc.x, loc.y);
         this.owner = Players.get(ownerID);
         this.relationship = this.getCivRelationship(this.owner);
+        // original owner
+        if (this.city && this.city.originalOwner != this.city.owner) {
+            this.originalOwner = Players.get(this.city.originalOwner);
+        }
+        // city and district
         const cityID = GameplayMap.getOwningCityFromXY(loc.x, loc.y);
         this.city = cityID ? Cities.get(cityID) : null;
         const districtID = MapCities.getDistrict(loc.x, loc.y);
         this.district = districtID ? Districts.get(districtID) : null;
-        // settlement stats (only on the city center)
         if (!this.city) return;
+        // settlement stats (only on the city center)
         const center = this.city.location;
         this.isCityCenter = center.x == loc.x && center.y == loc.y
         if (!this.isCityCenter) return;
@@ -902,7 +922,7 @@ class bzPlotTooltip {
         const name = info.Name;
         if (name == this.improvement?.info?.Name) return;  // redundant
         const format =
-            this.improvement ? "LOC_BZ_IMPROVEMENT_FOR_WAREHOUSE" :
+            this.improvement ? "LOC_BZ_WAS_ICON_PREVIOUSLY" :
             this.resource ? "LOC_BZ_IMPROVEMENT_FOR_RESOURCE" :
             "LOC_BZ_IMPROVEMENT_FOR_TILE";
         const icon = `[icon:${info.ConstructibleType}]`;
@@ -1130,7 +1150,7 @@ class bzPlotTooltip {
         if (this.terrain.TerrainType == "TERRAIN_COAST" && GameplayMap.isLake(loc.x, loc.y)) {
             text = "LOC_TERRAIN_LAKE_NAME";
         }
-        if (this.isShowingDebug) {
+        if (this.isDebug) {
             text = Locale.compose('{1_Name} ({2_Value})',
                 text, this.terrain["$index"].toString());
         }
@@ -1140,7 +1160,7 @@ class bzPlotTooltip {
         // Do not show a label for marine biome.
         if (!this.biome || this.biome.BiomeType == "BIOME_MARINE") return "";
         let text = this.biome.Name;
-        if (this.isShowingDebug) {
+        if (this.isDebug) {
             text = Locale.compose('{1_Name} ({2_Value})',
                 text, this.biome["$index"].toString());
         }
@@ -1206,7 +1226,7 @@ class bzPlotTooltip {
             notes.push("LOC_UI_FOOD_CHOOSER_FOCUS_GROWTH");
         }
         if (this.isCityCenter && !this.isFreshWater) {
-            notes.push("LOC_BZ_PLOTKEY_NO_FRESHWATER");
+            notes.push("LOC_BZ_SETTLEMENT_NO_FRESHWATER");
         }
         // render headings and notes
         this.renderTitleHeading(name);
@@ -1254,7 +1274,7 @@ class bzPlotTooltip {
         // render stats
         if (stats.length) this.renderRules(stats, "w-full mt-1");
     }
-    renderOwnerInfo() {
+    TODOrenderOwnerInfo() {
         if (!this.owner || !Players.isAlive(this.owner.id)) return;
         const loc = this.plotCoord;
         // TODO: simplify this check? why is it here?
@@ -1285,10 +1305,47 @@ class bzPlotTooltip {
         layout.appendChild(ttCiv);
         this.container.appendChild(layout);
     }
+    renderOwnerInfo() {
+        if (!this.owner || !Players.isAlive(this.owner.id)) return;
+        const rows = [];
+        // show name, relationship, and civ
+        const ownerName = this.getOwnerName(this.owner);
+        const relType = Locale.compose(this.relationship.type ?? "");
+        rows.push(dotJoin([ownerName, relType]));
+        rows.push(this.getCivName(this.owner, true));  // full name
+        // show original owner
+        if (this.originalOwner) {
+            const adjective = this.originalOwner.civilizationAdjective;
+            const text = Locale.compose("LOC_BZ_WAS_PREVIOUSLY", adjective);
+            rows.push(text);
+        }
+        const style = this.relationship?.isEnemy ?
+            { ...BZ_ALERT.danger, classList: "py-1" } : null;
+        const banner = docBanner(rows, style);
+        banner.style.lineHeight = metrics.body.ratio;
+        banner.style.marginBottom = metrics.body.margin.css;
+        this.container.appendChild(banner);
+        // show city-state bonus
+        if (this.owner.isMinor) {
+            const bonusType = Game.CityStates.getBonusType(this.owner.id);
+            const bonus = GameInfo.CityStateBonuses.find(b => b.$hash == bonusType);
+            if (bonus) {
+                const title = docRules([bonus.Name]);
+                title.classList.add("text-secondary", "font-title", "uppercase");
+                title.style.lineHeight = metrics.body.ratio;
+                title.style.marginTop = metrics.body.margin.css;
+                const rules = docRules([bonus.Description]);
+                rules.style.width = '12rem';
+                rules.style.marginBottom = metrics.rules.margin.css;
+                this.container.append(title);
+                this.container.append(rules);
+            }
+        }
+    }
     getOwnerName(owner) {
         if (!owner) return "";
         const name = owner.isMinor || owner.isIndependent ?
-            Locale.compose("LOC_LEADER_BZ_PEOPLE_NAME", owner.name) :
+            Locale.compose("LOC_BZ_PEOPLE_NAME", owner.name) :
             Locale.compose(owner.name);
         return name;
     }
@@ -1315,7 +1372,7 @@ class bzPlotTooltip {
                 owner.Influence.getSuzerain() == this.observerID;
             const isEnemy = owner.Diplomacy?.isAtWarWith(this.observerID);
             const type =
-                isVassal ? "LOC_INDEPENDENT_BZ_RELATIONSHIP_TRIBUTARY" :
+                isVassal ? "LOC_BZ_RELATIONSHIP_TRIBUTARY" :
                  isEnemy ? "LOC_INDEPENDENT_RELATIONSHIP_HOSTILE" :
                 "LOC_INDEPENDENT_RELATIONSHIP_FRIENDLY";
             return { type, isEnemy };
@@ -1359,7 +1416,7 @@ class bzPlotTooltip {
         } else if (this.district.type == DistrictTypes.CITY_CENTER) {
             const owner = Players.get(this.city.owner);
             if (owner.isMinor) {
-                hexName = "LOC_DISTRICT_BZ_CITY_STATE";
+                hexName = "LOC_BZ_SETTLEMENT_CITY_STATE";
                 const bonusType = Game.CityStates.getBonusType(owner.id);
                 const bonus = GameInfo.CityStateBonuses.find(b => b.$hash == bonusType);
                 if (bonus) {
@@ -1707,7 +1764,7 @@ class bzPlotTooltip {
         banner.classList.add("py-1");
         banner.style.lineHeight = metrics.body.ratio;
         banner.style.marginBottom = `-${metrics.padding.y.css}`;
-        if (!this.isShowingDebug) {
+        if (!this.isDebug) {
             // bottom bumper rounding
             const radius = metrics.radius.css;
             banner.style.borderRadius = `0 0 ${radius} ${radius}`;
