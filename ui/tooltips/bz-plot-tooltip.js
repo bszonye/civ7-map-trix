@@ -743,7 +743,7 @@ class bzPlotTooltip {
     render() {
         if (BZ_DUMP_ICONS) return this.dumpIcons();
         this.renderGeographySection();
-        this.renderSettlementSection();
+        this.renderSettlement();
         this.renderHexSection();
         this.renderYields();
         this.renderUnits();
@@ -1213,7 +1213,7 @@ class bzPlotTooltip {
             [route.Name, "LOC_NAVIGABLE_RIVER_FERRY"] :
             [route.Name];
     }
-    renderSettlementSection() {
+    renderSettlement() {
         if (this.isCompact) return;
         if (!this.owner) return;
         const name = this.city ? this.city.name :  // city or town
@@ -1325,22 +1325,6 @@ class bzPlotTooltip {
         banner.style.lineHeight = metrics.body.ratio;
         banner.style.marginBottom = metrics.body.margin.css;
         this.container.appendChild(banner);
-        // show city-state bonus
-        if (this.owner.isMinor) {
-            const bonusType = Game.CityStates.getBonusType(this.owner.id);
-            const bonus = GameInfo.CityStateBonuses.find(b => b.$hash == bonusType);
-            if (bonus) {
-                const title = docRules([bonus.Name]);
-                title.classList.add("text-secondary", "font-title", "uppercase");
-                title.style.lineHeight = metrics.body.ratio;
-                title.style.marginTop = metrics.body.margin.css;
-                const rules = docRules([bonus.Description]);
-                rules.style.width = '12rem';
-                rules.style.marginBottom = metrics.rules.margin.css;
-                this.container.append(title);
-                this.container.append(rules);
-            }
-        }
     }
     getOwnerName(owner) {
         if (!owner) return "";
