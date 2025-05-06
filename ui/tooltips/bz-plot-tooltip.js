@@ -1,8 +1,5 @@
-/**
- * Plot Tooltips
- * @copyright 2022, Firaxis Gmaes
- * @description The tooltips that appear based on the cursor hovering over world plots.
- */
+// TODO: update localization
+// TODO: switch Row data to Replace
 import bzMapTrixOptions, { bzVerbosity } from '/bz-map-trix/ui/options/bz-map-trix-options.js';
 import "/base-standard/ui/tooltips/plot-tooltip.js";
 
@@ -27,40 +24,40 @@ const BZ_ICON_FRAME = "url('hud_sub_circle_bk')";
 const BZ_ICON_TOTAL_RURAL = "CITY_RURAL";  // total yield (rural)
 const BZ_ICON_TOTAL_URBAN = "CITY_URBAN";  // total yield (urban)
 const BZ_ICON_VILLAGE_TYPES = {  // by city-state type and age
-    "CULTURAL": [
+    CULTURAL: [
         "IMPROVEMENT_MEGALITH",
         "IMPROVEMENT_STONE_HEAD",
         "IMPROVEMENT_OPEN_AIR_MUSEUM",
     ],
-    "ECONOMIC": [
+    ECONOMIC: [
         "IMPROVEMENT_SOUQ",
         "IMPROVEMENT_TRADING_FACTORY",
         "IMPROVEMENT_ENTREPOT",
     ],
-    "MILITARISTIC": [
+    MILITARISTIC: [
         "IMPROVEMENT_HILLFORT",
         "IMPROVEMENT_KASBAH",
         "IMPROVEMENT_SHORE_BATTERY",
     ],
-    "SCIENTIFIC": [
+    SCIENTIFIC: [
         "IMPROVEMENT_ZIGGURAT",
         "IMPROVEMENT_MONASTERY",
         "IMPROVEMENT_INSTITUTE",
     ],
 };
 const BZ_ICON_TYPES = {
-    "IMPROVEMENT_MEGALITH": ["CULTURAL"],
-    "IMPROVEMENT_STONE_HEAD": ["CULTURAL"],
-    "IMPROVEMENT_OPEN_AIR_MUSEUM": ["CULTURAL"],
-    "IMPROVEMENT_SOUQ": ["ECONOMIC"],
-    "IMPROVEMENT_TRADING_FACTORY": ["ECONOMIC"],
-    "IMPROVEMENT_ENTREPOT": ["ECONOMIC"],
-    "IMPROVEMENT_HILLFORT": ["MILITARISTIC"],
-    "IMPROVEMENT_KASBAH": ["MILITARISTIC"],
-    "IMPROVEMENT_SHORE_BATTERY": ["MILITARISTIC"],
-    "IMPROVEMENT_ZIGGURAT": ["SCIENTIFIC"],
-    "IMPROVEMENT_MONASTERY": ["SCIENTIFIC"],
-    "IMPROVEMENT_INSTITUTE": ["SCIENTIFIC"],
+    IMPROVEMENT_MEGALITH: ["CULTURAL"],
+    IMPROVEMENT_STONE_HEAD: ["CULTURAL"],
+    IMPROVEMENT_OPEN_AIR_MUSEUM: ["CULTURAL"],
+    IMPROVEMENT_SOUQ: ["ECONOMIC"],
+    IMPROVEMENT_TRADING_FACTORY: ["ECONOMIC"],
+    IMPROVEMENT_ENTREPOT: ["ECONOMIC"],
+    IMPROVEMENT_HILLFORT: ["MILITARISTIC"],
+    IMPROVEMENT_KASBAH: ["MILITARISTIC"],
+    IMPROVEMENT_SHORE_BATTERY: ["MILITARISTIC"],
+    IMPROVEMENT_ZIGGURAT: ["SCIENTIFIC"],
+    IMPROVEMENT_MONASTERY: ["SCIENTIFIC"],
+    IMPROVEMENT_INSTITUTE: ["SCIENTIFIC"],
 };
 
 // color palette
@@ -118,17 +115,17 @@ const BZ_COLOR = {
 };
 const BZ_ALERT = {
     primary: { "background-color": BZ_COLOR.primary },
-    secondary: { "background-color": BZ_COLOR.secondary, "color": BZ_COLOR.black },
+    secondary: { "background-color": BZ_COLOR.secondary, color: BZ_COLOR.black },
     black: { "background-color": BZ_COLOR.black },
     danger: { "background-color": BZ_COLOR.danger },
     enemy: { "background-color": BZ_COLOR.danger },
-    conqueror: { "background-color": BZ_COLOR.danger, "color": BZ_COLOR.caution },
-    caution: { "background-color": BZ_COLOR.caution, "color": BZ_COLOR.black },
+    conqueror: { "background-color": BZ_COLOR.danger, color: BZ_COLOR.caution },
+    caution: { "background-color": BZ_COLOR.caution, color: BZ_COLOR.black },
     note: { "background-color": BZ_COLOR.note },
     DEBUG: { "background-color": "#80808080" },
 }
 const BZ_STYLE = {
-    road: { "background-color": BZ_COLOR.road, "color": BZ_COLOR.black },
+    road: { "background-color": BZ_COLOR.road, color: BZ_COLOR.black },
     volcano: BZ_ALERT.caution,
     // obstacle types
     TERRAIN_HILL: { "background-color": BZ_COLOR.hill },
@@ -141,17 +138,17 @@ const BZ_STYLE = {
 // accent colors for icon types
 const BZ_TYPE_COLOR = {
     undefined: BZ_COLOR.bronze,  // default
-    "CULTURAL": BZ_COLOR.cultural,  // purple
-    "ECONOMIC": BZ_COLOR.economic,  // yellow
-    "MILITARISTIC": BZ_COLOR.militaristic,  // red
-    "SCIENTIFIC": BZ_COLOR.scientific,  // blue
-    "YIELD_CULTURE": BZ_COLOR.culture,  // violet
-    "YIELD_DIPLOMACY": BZ_COLOR.diplomacy,  // teal
-    "YIELD_FOOD": BZ_COLOR.food,  // green
-    "YIELD_GOLD": BZ_COLOR.gold,  // yellow
-    "YIELD_HAPPINESS": BZ_COLOR.happiness,  // orange
-    "YIELD_PRODUCTION": BZ_COLOR.production,  // brown
-    "YIELD_SCIENCE": BZ_COLOR.science,  // blue
+    CULTURAL: BZ_COLOR.cultural,  // purple
+    ECONOMIC: BZ_COLOR.economic,  // yellow
+    MILITARISTIC: BZ_COLOR.militaristic,  // red
+    SCIENTIFIC: BZ_COLOR.scientific,  // blue
+    YIELD_CULTURE: BZ_COLOR.culture,  // violet
+    YIELD_DIPLOMACY: BZ_COLOR.diplomacy,  // teal
+    YIELD_FOOD: BZ_COLOR.food,  // green
+    YIELD_GOLD: BZ_COLOR.gold,  // yellow
+    YIELD_HAPPINESS: BZ_COLOR.happiness,  // orange
+    YIELD_PRODUCTION: BZ_COLOR.production,  // brown
+    YIELD_SCIENCE: BZ_COLOR.science,  // blue
 }
 const BZ_TYPE_SORT = {
     [BZ_COLOR.bronze]: 0,  // neutral
@@ -200,13 +197,13 @@ const BZ_HEAD_STYLE = [
 .bz-tooltip.plot-tooltip .img-tooltip-border {
     border-radius: ${metrics.radius.tooltip.css};
     border-image-source: none;
-    border-width: 0.1111111111rem;
+    border-width: ${metrics.border.css};
     border-style: solid;
     border-color: ${BZ_COLOR.bronze3} ${BZ_COLOR.bronze4};
     filter: drop-shadow(0 1rem 1rem #000c);
 }
 .bz-tooltip.plot-tooltip .img-tooltip-bg {
-    background-image: linear-gradient(to bottom, rgba(35, 37, 43, 0.875) 0%, rgba(18, 21, 31, 0.875) 100%);
+    background-image: linear-gradient(to bottom, ${BZ_COLOR.primary4}cc 0%, ${BZ_COLOR.primary5}cc 100%);
 }
 .bz-tooltip.plot-tooltip .shadow {
     filter: drop-shadow(0 0.0555555556rem 0.0555555556rem black);
@@ -215,8 +212,8 @@ const BZ_HEAD_STYLE = [
     fxs-font-gradient-color: ${BZ_COLOR.bronze1};
     color: ${BZ_COLOR.bronze2};
 }
-`,
-// debug highlighting for content boxes
+`,  // debug highlighting for content boxes
+    // TODO: don't tie this to debug mode
 `
 .bz-debug .bz-tooltip > div > div > div {
     background-color: #80808040;  /* DEBUG */
@@ -227,12 +224,6 @@ const BZ_HEAD_STYLE = [
 .bz-debug .bz-tooltip > div > div > div > div p {
     background-color: #808080c0;  /* DEBUG */
 }
-`,  // renderDivider: imitate the bottom of the tooltip
-`
-.bz-tooltip .plot-tooltip__Divider {
-    margin-top: ${metrics.padding.y.css};
-    background-image: linear-gradient(90deg, ${BZ_COLOR.bronze}00 0%, ${BZ_COLOR.bronze} 50%, ${BZ_COLOR.bronze}00 100%);
-}
 `,  // full-width banners: general, unit info, debug info
 `
 .plot-tooltip .bz-banner {
@@ -241,10 +232,6 @@ const BZ_HEAD_STYLE = [
     margin-right: -${metrics.padding.x.css};
     padding-left: ${metrics.padding.x.css};
     padding-right: ${metrics.padding.x.css};
-}
-.bz-banner-debug {
-    margin-bottom: -${metrics.padding.y.css};
-    padding-bottom: ${metrics.padding.y.css};
 }
 `,  // centers blocks of rules text
     // IMPORTANT:
@@ -526,7 +513,11 @@ function preloadIcon(icon, context) {
 function setStyle(element, style) {
     if (!element || !style) return;
     for (const [property, value] of Object.entries(style)) {
-        element.style.setProperty(property, value);
+        if (property == "classList") {
+            element.classList.add(...value.split(/\s+/));
+        } else {
+            element.style.setProperty(property, value);
+        }
     }
 }
 function setBannerStyle(element, style=BZ_ALERT.danger, ...classes) {
@@ -956,7 +947,11 @@ class bzPlotTooltip {
     }
     renderDivider() {
         const divider = document.createElement("div");
-        divider.classList.add("plot-tooltip__Divider");
+        divider.style.height = metrics.border.css;
+        divider.style.marginTop = metrics.padding.y.css;
+        divider.style.marginLeft = divider.style.marginRight =
+            `-${metrics.padding.x.css}`;
+        divider.style.backgroundImage = `linear-gradient(90deg, ${BZ_COLOR.bronze}55 0%, ${BZ_COLOR.bronze} 50%, ${BZ_COLOR.bronze}55 100%)`;
         this.container.appendChild(divider);
     }
     renderFlexDivider(center, lines, ...style) {
@@ -1112,13 +1107,11 @@ class bzPlotTooltip {
             const effectInfo = GameInfo.PlotEffects.lookup(item.effectType);
             if (!effectInfo) return;
             if (effectInfo.Damage || effectInfo.Defense) {
-                const tt = document.createElement("div");
-                tt.classList.value = "text-xs leading-snug mb-1";
-                tt.setAttribute('data-l10n-id', effectInfo.Name);
+                const text = effectInfo.Name;
                 const style = effectInfo.Damage ? BZ_ALERT.danger : BZ_ALERT.note;
-                // TODO: switch to docBanner
-                setBannerStyle(tt, style);
-                banners.push(tt);
+                const banner = docBanner([text], style);
+                banner.classList.value = "mb-1";
+                banners.push(banner);
             } else {
                 text.push(effectInfo.Name);
             }
@@ -1713,7 +1706,7 @@ class bzPlotTooltip {
         const style = this.units[0].relationship.isEnemy ? BZ_ALERT.enemy : null;
         const banner = docBanner(rows, style);
         banner.classList.add("py-1");
-        banner.style.lineHeight = 1.25;
+        banner.style.lineHeight = metrics.body.ratio;
         banner.style.marginBottom = `-${metrics.padding.y.css}`;
         if (!this.isShowingDebug) {
             // bottom bumper rounding
@@ -1741,30 +1734,23 @@ class bzPlotTooltip {
         // debug info
         this.renderDivider();
         const loc = this.plotCoord;
-        const layout = document.createElement("div");
-        layout.classList.value = "bz-banner bz-banner-debug";
-        layout.style.setProperty("background-color", `${BZ_COLOR.bronze6}99`);
+        const rows = [];
         const ownerID = GameplayMap.getOwner(loc.x, loc.y);
         const currHp = Players.Districts.get(ownerID)?.getDistrictHealth(loc);
         const maxHp = Players.Districts.get(ownerID)?.getDistrictMaxHealth(loc);
-        const ttTitle = document.createElement("div");
-        ttTitle.classList.value =
-            "text-secondary font-title uppercase text-xs text-center mt-1";
-        let title = Locale.compose("LOC_PLOT_TOOLTIP_DEBUG_TITLE");
-        if (currHp && maxHp) title += ": " + currHp + " / " + maxHp;
-        ttTitle.innerHTML = title;
-        layout.appendChild(ttTitle);
-        const ttPlotCoord = document.createElement("div");
-        ttPlotCoord.classList.add("plot-tooltip__coordinate-text");
-        ttPlotCoord.innerHTML =
-            `${Locale.compose("LOC_PLOT_TOOLTIP_PLOT")}: (${loc.x},${loc.y})`;
-        layout.appendChild(ttPlotCoord);
-        const ttPlotIndex = document.createElement("div");
-        ttPlotIndex.classList.add("plot-tooltip__coordinate-text");
-        ttPlotIndex.innerHTML =
-            `${Locale.compose("LOC_PLOT_TOOLTIP_INDEX")}: ${this.plotIndex}`;
-        layout.appendChild(ttPlotIndex);
-        this.container.appendChild(layout);
+        rows.push("LOC_PLOT_TOOLTIP_DEBUG_TITLE");
+        rows.push(`${Locale.compose("LOC_PLOT_TOOLTIP_PLOT")}: (${loc.x},${loc.y})`);
+        rows.push(`${Locale.compose("LOC_PLOT_TOOLTIP_INDEX")}: ${this.plotIndex}`);
+        if (maxHp) rows.push(`${currHp} / ${maxHp}`);
+        const banner = docBanner(rows);
+        banner.classList.value = "py-1";
+        banner.style.backgroundColor = `${BZ_COLOR.bronze6}99`;
+        banner.style.lineHeight = metrics.body.ratio;
+        banner.children[0].classList.value = "text-secondary font-title uppercase";
+        const radius = metrics.radius.css;
+        banner.style.borderRadius = `0 0 ${radius} ${radius}`;
+        banner.style.marginBottom = `-${metrics.padding.y.css}`;
+        this.container.appendChild(banner);
     }
     renderIcon(layout, info) {
         if (!info) return
