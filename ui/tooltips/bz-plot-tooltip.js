@@ -10,8 +10,6 @@ import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
 
 // horizontal list separator
 const BZ_DOT_DIVIDER = Locale.compose("LOC_PLOT_DIVIDER_DOT");
-const BZ_CITY_DIVIDER = "[icon:BZ_CITY_DOT]";
-const BZ_TOWN_DIVIDER = "[icon:BZ_TOWN_DOT]";
 
 // all urban DistrictTypes
 const BZ_URBAN_TYPES = [DistrictTypes.CITY_CENTER, DistrictTypes.URBAN];
@@ -169,11 +167,6 @@ const bzTypeSort = (a, b) => {
     const asort = BZ_TYPE_SORT[a?.substring(0, 7)] ?? BZ_TYPE_SORT[undefined];
     const bsort = BZ_TYPE_SORT[b?.substring(0, 7)] ?? BZ_TYPE_SORT[undefined];
     return asort - bsort;
-}
-const bzNameSort = (a, b) => {
-    const aname = Locale.compose(a).toUpperCase();
-    const bname = Locale.compose(b).toUpperCase();
-    return aname.localeCompare(bname);
 }
 
 // box metrics (for initialization, tooltip can update)
@@ -359,11 +352,6 @@ function dotJoin(list, dot=BZ_DOT_DIVIDER) {
 function dotJoinLocale(list, dot=BZ_DOT_DIVIDER) {
     return dotJoin(list.map(s => s && Locale.compose(s)), dot);
 }
-function dotJoinCities(list, dot=BZ_CITY_DIVIDER) {
-    // replace all spaces with no-break spaces
-    list = list.filter(e => e).map(s => Locale.compose(s).replace(/ /g, "&nbsp;"));
-    return list.join(dot);
-}
 function gatherBuildingsTagged(tag) {
     return new Set(GameInfo.TypeTags.filter(e => e.Tag == tag).map(e => e.Type));
 }
@@ -387,24 +375,6 @@ function gatherMovementObstacles(mclass) {
     }
     // set the cache and return it
     return BZ_OBSTACLES[mclass] = obstacles;
-}
-function getConnections(city) {
-    const ids = city?.getConnectedCities();
-    if (!ids) return null;
-    let towns = [];
-    let cities = [];
-    for (const id of ids) {
-        const conn = Cities.get(id);
-        if (!conn) {
-            console.warn(`bz-plot-tooltip: stale connection=${JSON.stringify(id)}`);
-        } else if (conn.isTown) {
-            towns.push(conn);
-        } else {
-            cities.push(conn);
-        }
-    }
-    if (towns.length + cities.length == 0) return null;
-    return { cities, towns };
 }
 function _getDigits(list, min=0) {
     return Math.max(min, ...list.map(n => n.length));
@@ -485,7 +455,7 @@ function getReligionInfo(id) {
     }
     return { name, icon };
 }
-function getReligions(city) {
+function _getReligions(city) {
     const religion = city?.Religion;
     if (!religion) return null;
     const list = [];
@@ -512,6 +482,16 @@ function getSpecialists(loc, city) {
     const workers = plot?.NumWorkers ?? -1;
     if (workers < 0) return null;
     return { workers, maximum };
+}
+function getTownFocus(city) {
+    const ptype = city.Growth?.projectType ?? null;
+    const info = ptype && GameInfo.Projects.lookup(ptype);
+    const isGrowing = !info || city.Growth?.growthType == GrowthTypes.EXPAND;
+    const growth = "LOC_UI_FOOD_CHOOSER_FOCUS_GROWTH";
+    const name = info?.Name ?? growth;
+    const note = isGrowing && name != growth ? growth : null;
+    const icon = isGrowing ? "PROJECT_GROWTH" : info.ProjectType;
+    return { isGrowing, name, note, icon, info, };
 }
 function getVillageIcon(owner, age) {
     // get the minor civ type
@@ -580,21 +560,21 @@ class bzPlotTooltip {
         this.biome = null;
         this.feature = null;
         this.river = null;
+        this.plotEffects = null;
         this.resource = null;
         this.isDistantLands = null;
-        // ownership
-        this.owner = null;
-        this.relationship = null;  // TODO: rename
-        this.originalOwner = null;
+        // settlement
         this.city = null;
         this.district = null;
+        // ownership
+        this.owner = null;
+        this.relationship = null;
+        this.originalOwner = null;
         // settlement stats
-        this.isCityCenter = false;
+        this.settlementType = null;
         this.townFocus = null;
-        this.isGrowingTown = false;
-        this.isFreshWater = null;
-        this.religions = null;
-        this.connections = null;
+        this.religions = null;  // TODO: redesign
+        this.connections = null;  // TODO: remove
         // constructibles
         this.constructibles = [];
         this.buildings = [];  // omits walls
@@ -694,6 +674,7 @@ class bzPlotTooltip {
         this.biome = null;
         this.feature = null;
         this.river = null;
+        this.plotEffects = null;
         this.resource = null;
         this.isDistantLands = null;
         // ownership
@@ -703,10 +684,8 @@ class bzPlotTooltip {
         this.city = null;
         this.district = null;
         // settlement stats
-        this.isCityCenter = false;
+        this.settlementType = null;
         this.townFocus = null;
-        this.isGrowingTown = false;
-        this.isFreshWater = null;
         this.religions = null;
         this.connections = null;
         // constructibles
@@ -742,15 +721,16 @@ class bzPlotTooltip {
         // update selection-dependent info
         // (note: currently using "foot" instead of the selected unit)
         this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
+        this.modelSettlement();  // needed before world plot effects
         this.modelWorld();
-        this.modelCivilization();
+        this.modelOwnership();
         this.modelConstructibles();
         this.modelYields();
         this.modelUnits();
     }
     render() {
         if (BZ_DUMP_ICONS) return this.dumpIcons();
-        this.renderGeographySection();
+        this.renderGeography();
         this.renderSettlement();
         this.renderHexSection();
         this.renderYields();
@@ -758,6 +738,13 @@ class bzPlotTooltip {
         if (this.isDebug) this.renderDebugInfo();
     }
     // data modeling methods
+    modelSettlement() {
+        const loc = this.plotCoord;
+        const cityID = GameplayMap.getOwningCityFromXY(loc.x, loc.y);
+        this.city = cityID ? Cities.get(cityID) : null;
+        const districtID = MapCities.getDistrict(loc.x, loc.y);
+        this.district = districtID ? Districts.get(districtID) : null;
+    }
     modelWorld() {
         const loc = this.plotCoord;
         this.age = GameInfo.Ages.lookup(Game.age);
@@ -788,46 +775,104 @@ class bzPlotTooltip {
                 this.river = null;
                 break;
         }
+        this.plotEffects = this.getPlotEffects(loc);
         const resourceType = GameplayMap.getResourceType(loc.x, loc.y);
         this.resource = GameInfo.Resources.lookup(resourceType);
         this.isDistantLands = this.observer?.isDistantLands(loc) ?? null;
     }
-    modelCivilization() {
+    getPlotEffects() {
+        const loc = this.plotCoord;
+        const effects = {
+            danger: [],
+            caution: [],
+            note: [],
+            other: [],
+        }
+        const plotEffects = MapPlotEffects.getPlotEffects(this.plotIndex) ?? [];
+        for (const item of plotEffects) {
+            if (item.onlyVisibleToOwner && item.owner != this.observerID) continue;
+            const effectInfo = GameInfo.PlotEffects.lookup(item.effectType);
+            if (!effectInfo) return;
+            if (effectInfo.Damage) {
+                effects.danger.push(effectInfo.Name);
+            } else if (effectInfo.Defense) {
+                effects.note.push(effectInfo.Name);
+            } else {
+                effects.other.push(effectInfo.Name);
+            }
+        }
+        // no further effects needed for impassible or offshore tiles
+        if (GameplayMap.isImpassable(loc.x, loc.y) ||
+            GameplayMap.isNavigableRiver(loc.x, loc.y) ||
+            GameplayMap.isWater(loc.x, loc.y)) {
+            // no need here for settlement advice, including
+            // Dont't add any extra tooltip to mountains, oceans, or navigable rivers, should be obvious enough w/o them
+            return effects;
+        }
+
+        // show settler advice including fresh water
+        const lens = LensManager.getActiveLens();
+        if (GameplayMap.isFreshWater(loc.x, loc.y)) {
+            // only check unclaimed land and city centers
+            // TODO
+            // const center = this.city.location;
+            // const isCityCenter = center.x == loc.x && center.y == loc.y
+            effects.other.push("LOC_PLOTKEY_FRESHWATER");
+        } else if (lens == "fxs-settler-lens") {
+            effects.caution.push("LOC_PLOT_TOOLTIP_NO_FRESH_WATER");
+        }
+        if (lens != "fxs-settler-lens") return effects;
+        // show limits of the advanced start area
+        if (this.observer?.AdvancedStart &&
+            !this.observer.AdvancedStart.getPlacementComplete() &&
+            !GameplayMap.isPlotInAdvancedStartRegion(this.observerID, loc.x, loc.y)) {
+            effects.danger.push("LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_FAR");
+        }
+        // show blocked tiles
+        if (this.observer?.Diplomacy &&
+            !this.observer.Diplomacy.isValidLandClaimLocation(loc, true)) {
+            if (GameplayMap.isCityWithinMinimumDistance(loc.x, loc.y)) {
+                // settlement too close
+                effects.danger.push("LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_CLOSE");
+            } else if (!this.resource) {
+                // village too close (implied)
+                effects.danger.push("LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_CLOSE");
+            }
+            if (this.resource) {
+                // resource too close
+                effects.danger.push("LOC_PLOT_TOOLTIP_CANT_SETTLE_RESOURCES");
+            }
+        }
+        return effects;
+    }
+    modelOwnership() {
         // owner, civ, city, district
         const loc = this.plotCoord;
         const ownerID = GameplayMap.getOwner(loc.x, loc.y);
         this.owner = Players.get(ownerID);
         this.relationship = this.getCivRelationship(this.owner);
-        // city and district
-        const cityID = GameplayMap.getOwningCityFromXY(loc.x, loc.y);
-        this.city = cityID ? Cities.get(cityID) : null;
-        const districtID = MapCities.getDistrict(loc.x, loc.y);
-        this.district = districtID ? Districts.get(districtID) : null;
         if (!this.city) return;
         // original owner
         if (this.city.originalOwner != this.city.owner) {
             this.originalOwner = Players.get(this.city.originalOwner);
         }
-        // settlement stats (only on the city center)
-        const center = this.city.location;
-        this.isCityCenter = center.x == loc.x && center.y == loc.y
-        if (!this.isCityCenter) return;
-        // get town focus
-        if (this.city.isTown) {
-            const ptype = this.city.Growth?.projectType ?? null;
-            this.townFocus = ptype && GameInfo.Projects.lookup(ptype);
-            this.isGrowingTown = this.city.Growth?.growthType == GrowthTypes.EXPAND;
+        // settlement type
+        if (this.owner.isIndependent) {
+            // village or encampment
+            // TODO: model constructibles earlier?
+            const imp = null;   // getConstructibles(loc, "IMPROVEMENT").at(0);
+            this.settlementType = imp?.info.Name ?? null;
+        } else if (this.owner.isMinor) {
+            this.settlementType = "LOC_BZ_SETTLEMENT_CITY_STATE";
+        } else if (this.city.isTown) {
+            const focus = getTownFocus(this.city);
+            this.townFocus = focus;
+            this.settlementType = this.townFocus.name;
+        } else if (this.city.isCapital) {
+            this.settlementType = "LOC_CAPITAL_SELECT_PROMOTION_CAPITAL";
+        } else {
+            this.settlementType = "LOC_CAPITAL_SELECT_PROMOTION_CITY";
         }
-        // report fresh water supply
-        this.isFreshWater = GameplayMap.isFreshWater(center.x, center.y);
-        // get religions (majority, urban, rural)
-        if (this.age.AgeType == "AGE_EXPLORATION") {
-            // but only during Exploration, when conversion is possible
-            // (plus custom names stop working in the Modern Age)
-            this.religions = getReligions(this.city);
-        }
-        // get connected settlements
-        this.connections = getConnections(this.city);
     }
     modelConstructibles() {
         const loc = this.plotCoord;
@@ -1016,20 +1061,33 @@ class bzPlotTooltip {
         layout.appendChild(ttText);
         this.container.appendChild(layout);
     }
-    renderGeographySection() {
+    renderGeography() {
         if (this.isCompact) return;
         const loc = this.plotCoord;
         // show geographical features
-        const effects = this.getPlotEffects(this.plotIndex);
         const terrainLabel = this.getTerrainLabel(loc);
         const biomeLabel = this.getBiomeLabel(loc);
         const featureLabel = this.getFeatureLabel(loc);
         const river = this.getRiverInfo(loc);
+        const effects = this.getPlotEffects(this.plotIndex);
         const continentName = this.getContinentName(loc);
         const routes = this.getRouteList();
         const hasRoad = routes.length != 0;
-        // alert banners: settler warnings, damaging & defense effects
-        const banners = [...this.getSettlerBanners(loc), ...effects.banners];
+        // alert banners: damaging & defense effects, settler warnings
+        const banner = (text, style) => {
+            const banner = docBanner([text], style);
+            // leave a small gap between banners
+            banner.style.marginTop = metrics.table.leading.half.css;
+            // better wrapping for longer banners
+            banner.children[0].classList.value = "max-w-64";
+            return banner;
+        }
+        // prepare each banner
+        const banners = [
+            ...effects.danger.map(text => banner(text, BZ_ALERT.danger)),
+            ...effects.caution.map(text => banner(text, BZ_ALERT.caution)),
+            ...effects.note.map(text => banner(text, BZ_ALERT.note)),
+        ];
         if (banners.length) {
             // round off topmost banner
             const head = banners.at(0);
@@ -1075,8 +1133,8 @@ class bzPlotTooltip {
             if (routeStyle) thicken(text);
             layout.appendChild(text);
         }
-        if (effects.text.length) {
-            const text = docRules(effects.text);
+        if (effects.other.length) {
+            const text = docRules(effects.other);
             layout.appendChild(text);
         }
         // continent + distant lands tag
@@ -1090,67 +1148,6 @@ class bzPlotTooltip {
             layout.appendChild(tt);
         }
         this.container.appendChild(layout);
-    }
-    getSettlerBanners(loc) {
-        const banners = [];
-        if (LensManager.getActiveLens() != "fxs-settler-lens") return banners;
-        const warn = (text, style=BZ_ALERT.danger) => {
-            const banner = docBanner([text], style);
-            banner.style.marginTop = metrics.table.leading.half.css;
-            banner.children[0].classList.value = "max-w-64";  // better word wrapping
-            banners.push(banner);
-        }
-        // Add more details to the tooltip if we are in the settler lens
-        if (GameplayMap.isWater(loc.x, loc.y) || GameplayMap.isImpassable(loc.x, loc.y) || GameplayMap.isNavigableRiver(loc.x, loc.y)) {
-            // Dont't add any extra tooltip to mountains, oceans, or navigable rivers, should be obvious enough w/o them
-            return banners;
-        }
-        // Show why we can't settle here
-        if (this.observer?.AdvancedStart &&
-            !this.observer.AdvancedStart.getPlacementComplete() &&
-            !GameplayMap.isPlotInAdvancedStartRegion(this.observerID, loc.x, loc.y)) {
-            warn("LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_FAR");
-        }
-        if (this.observer?.Diplomacy &&
-            !this.observer.Diplomacy.isValidLandClaimLocation(loc, true)) {
-            // blocked location
-            if (GameplayMap.isCityWithinMinimumDistance(loc.x, loc.y)) {
-                // settlement too close
-                warn("LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_CLOSE");
-            } else if (!this.resource) {
-                // village too close (implied)
-                warn("LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_CLOSE");
-            }
-            if (this.resource) {
-                // resource too close
-                warn("LOC_PLOT_TOOLTIP_CANT_SETTLE_RESOURCES");
-            }
-        }
-        if (!GameplayMap.isFreshWater(loc.x, loc.y)) {
-            warn("LOC_PLOT_TOOLTIP_NO_FRESH_WATER", BZ_ALERT.caution);
-        }
-        return banners;
-    }
-    getPlotEffects() {
-        const text = [];
-        const banners = [];
-        const plotEffects = MapPlotEffects.getPlotEffects(this.plotIndex);
-        if (!plotEffects) return { text, banners };
-        for (const item of plotEffects) {
-            if (item.onlyVisibleToOwner && item.owner != this.observerID) continue;
-            const effectInfo = GameInfo.PlotEffects.lookup(item.effectType);
-            if (!effectInfo) return;
-            if (effectInfo.Damage || effectInfo.Defense) {
-                const text = effectInfo.Name;
-                const style = effectInfo.Damage ? BZ_ALERT.danger : BZ_ALERT.note;
-                const banner = docBanner([text], style);
-                banner.style.marginTop = metrics.table.leading.half.css;
-                banners.push(banner);
-            } else {
-                text.push(effectInfo.Name);
-            }
-        }
-        return { text, banners };
     }
     obstacleStyle(obstacleType, ...fallbackStyles) {
         if (!this.obstacles.has(obstacleType)) return null;
@@ -1240,9 +1237,6 @@ class bzPlotTooltip {
         if (this.townFocus && this.isGrowingTown) {
             notes.push("LOC_UI_FOOD_CHOOSER_FOCUS_GROWTH");
         }
-        if (this.isCityCenter && !this.isFreshWater) {
-            notes.push("LOC_BZ_SETTLEMENT_NO_FRESHWATER");
-        }
         // render headings and notes
         this.renderTitleHeading(name);
         if (this.townFocus || notes.length) {
@@ -1267,63 +1261,6 @@ class bzPlotTooltip {
         }
         // owner info
         this.renderOwnerInfo();
-        // settlement stats (only at city center)
-        if (!this.isCityCenter) return;
-        const stats = [];
-        // religion
-        if (this.religions) stats.push(...this.religions);
-        // settlement connections
-        if (this.connections) {
-            const connectionsNote = Locale.compose("LOC_BZ_CITY_CONNECTIONS",
-                this.connections.cities.length, this.connections.towns.length);
-            stats.push(connectionsNote);
-            if (this.isVerbose) {
-                const cities = this.connections.cities.map(i => i.name);
-                const towns = this.connections.towns.map(i => i.name);
-                cities.sort(bzNameSort);
-                towns.sort(bzNameSort);
-                stats.push(dotJoinCities(cities, BZ_CITY_DIVIDER));
-                stats.push(dotJoinCities(towns, BZ_TOWN_DIVIDER));
-            }
-        }
-        // render stats
-        if (stats.length) {
-            const rules = docRules(stats);
-            rules.classList.value = "mt-1";
-            rules.style.marginBottom = metrics.rules.margin.css;
-            this.container.appendChild(rules);
-        }
-    }
-    TODOrenderOwnerInfo() {
-        if (!this.owner || !Players.isAlive(this.owner.id)) return;
-        const loc = this.plotCoord;
-        // TODO: simplify this check? why is it here?
-        const filteredConstructibles = MapConstructibles.getHiddenFilteredConstructibles(loc.x, loc.y);
-        const constructibles = MapConstructibles.getConstructibles(loc.x, loc.y);
-        if (constructibles.length && !filteredConstructibles.length) {
-            console.warn(`bz-plot-tooltip: skipping filtered constructibles`);
-            console.warn(`bz-plot-tooltip: ${JSON.stringify(constructibles)}`);
-            return;
-        }
-        const layout = document.createElement("div");
-        layout.classList.value = "leading-snug text-center";
-        const ownerName = this.getOwnerName(this.owner);
-        const relType = Locale.compose(this.relationship.type ?? "");
-        const civName = this.getCivName(this.owner, true);
-        // highlight enemy players
-        if (this.relationship?.isEnemy) {
-            // TODO: switch to docBanner
-            setBannerStyle(layout, BZ_ALERT.enemy, "py-1");
-        }
-        // show name & relationship
-        const ttPlayer = document.createElement("div");
-        ttPlayer.innerHTML = dotJoin([ownerName, relType]);
-        layout.appendChild(ttPlayer);
-        // show full civ name
-        const ttCiv = document.createElement("div");
-        ttCiv.setAttribute('data-l10n-id', civName);
-        layout.appendChild(ttCiv);
-        this.container.appendChild(layout);
     }
     renderOwnerInfo() {
         if (!this.owner || !Players.isAlive(this.owner.id)) return;
