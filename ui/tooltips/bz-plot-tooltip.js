@@ -566,6 +566,7 @@ class bzPlotTooltip {
         // settlement
         this.city = null;
         this.district = null;
+        this.isCityCenter = false;
         // ownership
         this.owner = null;
         this.relationship = null;
@@ -677,12 +678,14 @@ class bzPlotTooltip {
         this.plotEffects = null;
         this.resource = null;
         this.isDistantLands = null;
+        // settlement
+        this.city = null;
+        this.district = null;
+        this.isCityCenter = false;
         // ownership
         this.owner = null;
         this.relationship = null;
         this.originalOwner = null;
-        this.city = null;
-        this.district = null;
         // settlement stats
         this.settlementType = null;
         this.townFocus = null;
@@ -742,6 +745,8 @@ class bzPlotTooltip {
         const loc = this.plotCoord;
         const cityID = GameplayMap.getOwningCityFromXY(loc.x, loc.y);
         this.city = cityID ? Cities.get(cityID) : null;
+        const center = this.city?.location;
+        this.isCityCenter = center && center.x == loc.x && center.y == loc.y
         const districtID = MapCities.getDistrict(loc.x, loc.y);
         this.district = districtID ? Districts.get(districtID) : null;
     }
@@ -812,11 +817,9 @@ class bzPlotTooltip {
 
         // show settler advice including fresh water
         const lens = LensManager.getActiveLens();
-        if (GameplayMap.isFreshWater(loc.x, loc.y)) {
-            // only check unclaimed land and city centers
-            // TODO
-            // const center = this.city.location;
-            // const isCityCenter = center.x == loc.x && center.y == loc.y
+        if (this.city && !this.isCityCenter) {
+            // only report fresh water in city centers & unclaimed land
+        } else if (GameplayMap.isFreshWater(loc.x, loc.y)) {
             effects.other.push("LOC_PLOTKEY_FRESHWATER");
         } else if (lens == "fxs-settler-lens") {
             effects.caution.push("LOC_PLOT_TOOLTIP_NO_FRESH_WATER");
