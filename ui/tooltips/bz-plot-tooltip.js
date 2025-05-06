@@ -412,7 +412,7 @@ function getFontMetrics() {
     const table = metrics('xs', 1.5);
     const yields = metrics(8/9, 1.5);
     const head = metrics('sm', 1.5);
-    const radius = sizes(padding.rem);
+    const radius = sizes(2/3 * padding.rem);  // TODO: fine-tuning
     radius.content = sizes(radius.rem);
     radius.tooltip = sizes(radius.rem + border.rem);
     // minimum end banner height to avoid radius glitches
