@@ -790,16 +790,16 @@ class bzPlotTooltip {
         const ownerID = GameplayMap.getOwner(loc.x, loc.y);
         this.owner = Players.get(ownerID);
         this.relationship = this.getCivRelationship(this.owner);
-        // original owner
-        if (this.city && this.city.originalOwner != this.city.owner) {
-            this.originalOwner = Players.get(this.city.originalOwner);
-        }
         // city and district
         const cityID = GameplayMap.getOwningCityFromXY(loc.x, loc.y);
         this.city = cityID ? Cities.get(cityID) : null;
         const districtID = MapCities.getDistrict(loc.x, loc.y);
         this.district = districtID ? Districts.get(districtID) : null;
         if (!this.city) return;
+        // original owner
+        if (this.city.originalOwner != this.city.owner) {
+            this.originalOwner = Players.get(this.city.originalOwner);
+        }
         // settlement stats (only on the city center)
         const center = this.city.location;
         this.isCityCenter = center.x == loc.x && center.y == loc.y
