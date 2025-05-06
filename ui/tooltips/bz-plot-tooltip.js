@@ -242,9 +242,6 @@ const BZ_HEAD_STYLE = [
     padding-left: ${metrics.padding.x.css};
     padding-right: ${metrics.padding.x.css};
 }
-.bz-banner-unit {
-    margin-bottom: -${metrics.padding.y.css};
-}
 .bz-banner-debug {
     margin-bottom: -${metrics.padding.y.css};
     padding-bottom: ${metrics.padding.y.css};
@@ -322,7 +319,7 @@ function constructibleColors(info) {
     }
     return [cbase, cbonus];
 }
-function docBanner(text, bumper=true) {
+function docBanner(text, style) {
     // text-align: center;
     // margin-left: -${metrics.padding.x.css};
     // margin-right: -${metrics.padding.x.css};
@@ -330,6 +327,7 @@ function docBanner(text, bumper=true) {
     // padding-right: ${metrics.padding.x.css};
     // create a banner
     const banner = document.createElement("div");
+    setStyle(banner, style);
     // extend banner to full width
     banner.style.paddingLeft = banner.style.paddingRight = metrics.padding.x.css;
     banner.style.marginLeft = banner.style.marginRight = `-${metrics.padding.x.css}`;
@@ -339,8 +337,8 @@ function docBanner(text, bumper=true) {
     banner.style.justifyContent = 'center';
     banner.style.alignItems = 'center';
     banner.style.textAlign = 'center';
-    // make sure the banner is tall enough for bumper rounding
-    if (bumper) banner.style.minHeight = metrics.bumper.css;
+    // make sure the banner is tall enough for end bumpers
+    banner.style.minHeight = metrics.bumper.css;
     // set the text
     for (const item of text) {
         const row = document.createElement("div");
@@ -509,14 +507,6 @@ function getSpecialists(loc, city) {
     if (workers < 0) return null;
     return { workers, maximum };
 }
-function getTopUnit(loc) {
-    let plotUnits = MapUnits.getUnits(loc.x, loc.y);
-    if (plotUnits && plotUnits.length > 0) {
-        const unit = Units.get(plotUnits[0]);
-        return unit;
-    }
-    return null;
-}
 function getVillageIcon(owner, age) {
     // get the minor civ type
     let ctype = "MILITARISTIC";  // default
@@ -585,6 +575,7 @@ class bzPlotTooltip {
         this.isDistantLands = null;
         // ownership
         this.owner = null;
+        this.relationship = null;  // TODO: rename
         this.city = null;
         this.district = null;
         // settlement stats
@@ -604,11 +595,8 @@ class bzPlotTooltip {
         // yields
         this.yields = [];
         this.totalYields = 0;
-        // unit
-        this.unit = null;
-        // owner & unit relationships
-        this.ownerRelationship = null;
-        this.unitRelationship = null;
+        // units
+        this.units = [];
         // lookup tables
         this.agelessBuildings = gatherBuildingsTagged("AGELESS");
         this.extraBuildings = gatherBuildingsTagged("IGNORE_DISTRICT_PLACEMENT_CAP");
@@ -700,6 +688,7 @@ class bzPlotTooltip {
         this.isDistantLands = null;
         // ownership
         this.owner = null;
+        this.relationship = null;
         this.city = null;
         this.district = null;
         // settlement stats
@@ -719,11 +708,8 @@ class bzPlotTooltip {
         // yields
         this.yields = [];
         this.totalYields = 0;
-        // unit
-        this.unit = null;
-        // owner & unit relationships
-        this.ownerRelationship = null;
-        this.unitRelationship = null;
+        // units
+        this.units = [];
     }
     update() {
         if (!this.plotCoord) {
@@ -759,7 +745,7 @@ class bzPlotTooltip {
         this.renderSettlementSection();
         this.renderHexSection();
         this.renderYields();
-        this.renderUnitSection();
+        this.renderUnits();
         if (this.isShowingDebug) this.renderDebugInfo();
     }
     // data modeling methods
@@ -802,7 +788,7 @@ class bzPlotTooltip {
         const loc = this.plotCoord;
         const ownerID = GameplayMap.getOwner(loc.x, loc.y);
         this.owner = Players.get(ownerID);
-        this.ownerRelationship = this.getCivRelationship(this.owner);
+        this.relationship = this.getCivRelationship(this.owner);
         const cityID = GameplayMap.getOwningCityFromXY(loc.x, loc.y);
         this.city = cityID ? Cities.get(cityID) : null;
         const districtID = MapCities.getDistrict(loc.x, loc.y);
@@ -960,12 +946,18 @@ class bzPlotTooltip {
     modelUnits() {
         const loc = this.plotCoord;
         if (GameplayMap.getRevealedState(this.observerID, loc.x, loc.y) != RevealedStates.VISIBLE) return;
-        // get topmost unit and owner
-        const unit = getTopUnit(loc);
-        if (!unit) return;
-        if (this.observer && !Visibility.isVisible(this.observerID, unit.id)) return;
-        this.unit = unit;
-        this.unitRelationship = this.getCivRelationship(Players.get(unit.owner));
+        const units = [];
+        for (const id of MapUnits.getUnits(loc.x, loc.y)) {
+            if (this.observer && !Visibility.isVisible(this.observerID, id)) continue;
+            const unit = Units.get(id);
+            if (!unit) continue;
+            const name = unit.name;
+            const owner = Players.get(unit.owner);
+            const civ = this.getCivName(owner);
+            const relationship = this.getCivRelationship(owner);
+            units.push({ id, name, owner, civ, relationship, });
+        }
+        this.units = units;
     }
     renderDivider() {
         const divider = document.createElement("div");
@@ -1079,8 +1071,7 @@ class bzPlotTooltip {
         const banners = [];
         if (LensManager.getActiveLens() != "fxs-settler-lens") return banners;
         const warn = (text, style=BZ_ALERT.danger) => {
-            const banner = docBanner([text]);
-            setBannerStyle(banner, style);
+            const banner = docBanner([text], style);
             banner.classList.value = "mb-1";
             banner.children[0].classList.value = "max-w-64";  // better word wrapping
             banners.push(banner);
@@ -1096,15 +1087,20 @@ class bzPlotTooltip {
             !GameplayMap.isPlotInAdvancedStartRegion(this.observerID, loc.x, loc.y)) {
             warn("LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_FAR");
         }
-        if (this.resource) {
+        if (this.observer?.Diplomacy &&
+            !this.observer.Diplomacy.isValidLandClaimLocation(loc, true)) {
+            // blocked location
             if (GameplayMap.isCityWithinMinimumDistance(loc.x, loc.y)) {
+                // settlement too close
+                warn("LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_CLOSE");
+            } else if (!this.resource) {
+                // village too close (implied)
                 warn("LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_CLOSE");
             }
-            warn("LOC_PLOT_TOOLTIP_CANT_SETTLE_RESOURCES");
-        } else if (this.observer?.Diplomacy &&
-            !this.observer.Diplomacy.isValidLandClaimLocation(loc, true /*bIgnoreFriendlyUnitRequirement*/)) {
-            // related: GameplayMap.isCityWithinMinimumDistance(loc.x, loc.y))
-            warn("LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_CLOSE");
+            if (this.resource) {
+                // resource too close
+                warn("LOC_PLOT_TOOLTIP_CANT_SETTLE_RESOURCES");
+            }
         }
         if (!GameplayMap.isFreshWater(loc.x, loc.y)) {
             warn("LOC_PLOT_TOOLTIP_NO_FRESH_WATER", BZ_ALERT.caution);
@@ -1125,6 +1121,7 @@ class bzPlotTooltip {
                 tt.classList.value = "text-xs leading-snug mb-1";
                 tt.setAttribute('data-l10n-id', effectInfo.Name);
                 const style = effectInfo.Damage ? BZ_ALERT.danger : BZ_ALERT.note;
+                // TODO: switch to docBanner
                 setBannerStyle(tt, style);
                 banners.push(tt);
             } else {
@@ -1284,10 +1281,11 @@ class bzPlotTooltip {
         const layout = document.createElement("div");
         layout.classList.value = "text-xs leading-snug text-center";
         const ownerName = this.getOwnerName(this.owner);
-        const relType = Locale.compose(this.ownerRelationship.type ?? "");
+        const relType = Locale.compose(this.relationship.type ?? "");
         const civName = this.getCivName(this.owner, true);
         // highlight enemy players
-        if (this.ownerRelationship?.isEnemy) {
+        if (this.relationship?.isEnemy) {
+            // TODO: switch to docBanner
             setBannerStyle(layout, BZ_ALERT.enemy, "py-1");
         }
         // show name & relationship
@@ -1590,6 +1588,7 @@ class bzPlotTooltip {
             const conquerorText = Locale.compose("{1_Term} {2_Subject}", "LOC_PLOT_TOOLTIP_CONQUEROR", conquerorName);
             const tt = document.createElement("div");
             tt.classList.value = "text-xs leading-snug mb-1 py-1";
+            // TODO: switch to docBanner
             setBannerStyle(tt, BZ_ALERT.conqueror);
             tt.innerHTML = conquerorText;
             this.container.appendChild(tt);
@@ -1624,6 +1623,7 @@ class bzPlotTooltip {
             const ttDefense = document.createElement("div");
             ttDefense.classList.value = "text-xs leading-snug text-center mb-1";
             const style = currentHealth != maxHealth ? BZ_ALERT.danger : BZ_ALERT.note;
+            // TODO: switch to docBanner
             setBannerStyle(ttDefense, style, "py-1");
             for (const row of info) ttDefense.appendChild(row);
             this.container.appendChild(ttDefense);
@@ -1706,23 +1706,25 @@ class bzPlotTooltip {
         ttIndividualYieldFlex.appendChild(ttIndividualYieldValues);
         return ttIndividualYieldFlex;
     }
-    renderUnitSection() {
+    renderUnits() {
         // show unit section
-        if (this.isCompact || !this.unit) return;
+        if (this.isCompact || !this.units.length) return;
         this.renderDivider();
-        const unitName = this.unit.name;
-        const civName = this.getCivName(Players.get(this.unit.owner));
-        const unitInfo = [unitName, civName, this.unitRelationship?.type];
-        const banner = docBanner([dotJoinLocale(unitInfo)]);
-        banner.classList.add("bz-banner-unit");
-        banner.style.lineHeight = metrics.font('xs', 2).spacing.css;
+        const rows = [];
+        for (const unit of this.units) {
+            const info = [unit.name, unit.civ, unit.relationship.type];
+            rows.push(dotJoinLocale(info));
+        }
+        const style = this.units[0].relationship.isEnemy ? BZ_ALERT.enemy : null;
+        const banner = docBanner(rows, style);
+        banner.classList.add("py-1");
+        banner.style.lineHeight = 1.25;
         banner.style.marginBottom = `-${metrics.padding.y.css}`;
         if (!this.isShowingDebug) {
             // bottom bumper rounding
             const radius = metrics.radius.css;
             banner.style.borderRadius = `0 0 ${radius} ${radius}`;
         }
-        if (this.unitRelationship?.isEnemy) setStyle(banner, BZ_ALERT.enemy);
         this.container.appendChild(banner);
     }
     setWarningCursor() {
@@ -1731,8 +1733,8 @@ class bzPlotTooltip {
         // don't block cursor changes from interface-mode-acquire-tile
         if (InterfaceMode.getCurrent() == "INTERFACEMODE_ACQUIRE_TILE") return;
         const isEnemy =
-            this.unitRelationship?.isEnemy ??  // first check occupying unit
-            this.ownerRelationship?.isEnemy ??  // then hex ownership
+            this.units.at(0)?.relationship.isEnemy ??  // first check occupying unit
+            this.relationship?.isEnemy ??  // then hex ownership
             false;
         if (isEnemy) {
             UI.setCursorByType(UIHTMLCursorTypes.Enemy);
