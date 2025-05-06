@@ -179,10 +179,12 @@ const bzNameSort = (a, b) => {
     return aname.localeCompare(bname);
 }
 
-// box padding
-const BZ_PADDING = '0.5555555556rem';
-const BZ_PADDING_SM = `0.3888888889rem`;  // reduced for leading
-const BZ_PADDING_XS = `0.4444444444rem`;  // reduced for leading
+// box metrics (for initialization, tooltip can update)
+const BASE_FONT_SIZE = 18;
+const BZ_PADDING = 0.6666666667;
+const BZ_MARGIN = BZ_PADDING / 2;
+const BZ_BORDER = 0.1111111111;
+let metrics = getFontMetrics();
 
 // additional CSS definitions
 const BZ_HEAD_STYLE = [
@@ -192,10 +194,10 @@ const BZ_HEAD_STYLE = [
 //    2. #TOOLTIP-ROOT-CONTENT relative font-body text-xs
 `
 .bz-tooltip.tooltip.plot-tooltip .tooltip__content {
-    padding: ${BZ_PADDING_SM} ${BZ_PADDING} ${BZ_PADDING_XS};
+    padding: ${metrics.padding.y.css} ${metrics.padding.x.css};
 }
 .bz-tooltip.plot-tooltip .img-tooltip-border {
-    border-radius: 0.6666666667rem;
+    border-radius: ${metrics.radius.tooltip.css};
     border-image-source: none;
     border-width: 0.1111111111rem;
     border-style: solid;
@@ -227,26 +229,26 @@ const BZ_HEAD_STYLE = [
 `,  // renderDivider: imitate the bottom of the tooltip
 `
 .bz-tooltip .plot-tooltip__Divider {
-    margin-top: ${BZ_PADDING_SM};
+    margin-top: ${metrics.padding.y.css};
     background-image: linear-gradient(90deg, ${BZ_COLOR.bronze}00 0%, ${BZ_COLOR.bronze} 50%, ${BZ_COLOR.bronze}00 100%);
 }
 `,  // full-width banners: general, unit info, debug info
 `
 .plot-tooltip .bz-banner {
     text-align: center;
-    margin-left: -${BZ_PADDING};
-    margin-right: -${BZ_PADDING};
-    padding-left: ${BZ_PADDING};
-    padding-right: ${BZ_PADDING};
+    margin-left: -${metrics.padding.x.css};
+    margin-right: -${metrics.padding.x.css};
+    padding-left: ${metrics.padding.x.css};
+    padding-right: ${metrics.padding.x.css};
 }
 .bz-banner-unit {
-    margin-bottom: -${BZ_PADDING_XS};
+    margin-bottom: -${metrics.padding.y.css};
     padding-top: 0.2222222222rem;
     padding-bottom: 0.2777777778rem;
 }
 .bz-banner-debug {
-    margin-bottom: -${BZ_PADDING_XS};
-    padding-bottom: ${BZ_PADDING_XS};
+    margin-bottom: -${metrics.padding.y.css};
+    padding-bottom: ${metrics.padding.y.css};
 }
 `,  // centers blocks of rules text
     // IMPORTANT:
@@ -375,14 +377,57 @@ function getConnections(city) {
     if (towns.length + cities.length == 0) return null;
     return { cities, towns };
 }
-function getDigits(list, min=0) {
+function _getDigits(list, min=0) {
     return Math.max(min, ...list.map(n => n.length));
 }
-function getFigureWidth(size, digits=1) {
+function getFontMetrics() {
+    const sizes = (rem, round=Math.round) => {
+        const css = `${rem.toFixed(10)}rem`;
+        const base = round(rem * BASE_FONT_SIZE);
+        const scale = round(rem * GlobalScaling.currentScalePx);
+        const px = `${scale}px`;
+        return { rem, css, base, scale, px, };
+    }
+    // global metrics
+    const padding = sizes(BZ_PADDING);
+    const margin = sizes(BZ_MARGIN);  // top & bottom of each block
+    padding.x = sizes(padding.rem);
+    padding.y = sizes(padding.rem - margin.rem);  // room for end block margins
+    const border = sizes(BZ_BORDER);
+    // font metrics
+    const metrics = (name, ratio) => {
+        const rem = typeof name === "string" ?
+            getFontSizeBasePx(name) / BASE_FONT_SIZE : name;
+        const size = sizes(rem);  // font size
+        const spacing = sizes(size.rem * ratio);  // line height
+        const leading = sizes(spacing.rem - size.rem);  // interline spacing
+        const margin = sizes(BZ_MARGIN - leading.rem / 2);
+        const radius = sizes(spacing.rem / 2);
+        const figure = sizes(0.6 * size.rem, Math.ceil);  // figure width
+        const digits = (n) => sizes(n * figure.rem, Math.ceil);
+        return { size, ratio, spacing, leading, margin, radius, figure, digits, };
+    }
+    const body = metrics('xs', 1.25);
+    const rules = metrics('xs', 1.5);  // is this needed?
+    const table = metrics('xs', 1.5);
+    const yields = metrics(8/9, 1.5);
+    const head = metrics('sm', 1.5);
+    const radius = sizes(padding.rem);
+    radius.content = sizes(radius.rem);
+    radius.tooltip = sizes(radius.rem + border.rem);
+    // minimum end banner height to avoid radius glitches
+    const bumper = sizes(Math.max(table.spacing.rem, 2*radius.rem));
+    return {
+        padding, margin, border,
+        body, rules, table, yields, head,
+        radius, bumper,
+    };
+}
+function _getFigureWidth(size, digits=1) {
     const nwidth = 0.6 * getFontSizeScalePx(size);
     return Math.round(nwidth * digits);
 }
-function getFontHeight(size, leading) {
+function _getFontHeight(size, leading) {
     return Math.round(leading * getFontSizeScalePx(size));
 }
 function getFontSizeBasePx(size) {
@@ -926,9 +971,6 @@ class bzPlotTooltip {
         layout.appendChild(ttText);
         this.container.appendChild(layout);
     }
-    renderTitleDivider(text) {
-        this.renderTitleHeading(text, this.isCompact ? null : "mt-1\\.5");
-    }
     renderGeographySection() {
         if (this.isCompact) return;
         const loc = this.plotCoord;
@@ -947,9 +989,11 @@ class bzPlotTooltip {
         banners.push(...effects.banners);
         if (banners.length) {
             // round off topmost banner
-            banners.at(0).style.marginTop = `-${BZ_PADDING_SM}`;
-            banners.at(0).style.paddingTop = '0.0555555556rem';
-            banners.at(0).style.borderRadius = `${BZ_PADDING} ${BZ_PADDING} 0 0`;
+            const head = banners.at(0);
+            head.style.marginTop = `-${metrics.padding.y.css}`;
+            head.style.lineHeight = metrics.bumper.css;
+            head.style.borderRadius =
+                `${metrics.radius.css} ${metrics.radius.css} 0 0`;
             for (const banner of banners) {
                 this.container.appendChild(banner);
             }
@@ -1153,7 +1197,7 @@ class bzPlotTooltip {
             notes.push("LOC_BZ_PLOTKEY_NO_FRESHWATER");
         }
         // render headings and notes
-        this.renderTitleDivider(name);
+        this.renderTitleHeading(name);
         if (this.townFocus || notes.length) {
             // note: extra div layer here to align bz-debug levels
             const tt = document.createElement("div");
@@ -1293,24 +1337,11 @@ class bzPlotTooltip {
     renderUrbanSection() {
         const quarterOK = this.buildings.reduce((a, b) =>
             a + (b.isCurrent ? b.isLarge ? 2 : 1 : 0), 0);
-        let hexName = GameInfo.Districts.lookup(this.district.type).Name;
+        let hexName = this.city.name;
         let hexSubhead;
         let hexRules;
         // set name & description
-        if (quarterOK >= 2) {
-            const unique = this.buildings[0].uniqueTrait;
-            if (this.buildings.every(b => b.uniqueTrait = unique)) {
-                const uq = GameInfo.UniqueQuarters.find(e => e.TraitType == unique);
-                hexName = uq.Name;
-                // UQs don't have .Tooltip but most have parallel
-                // LOC_QUARTER_XXX_DESCRIPTION and
-                // LOC_QUARTER_XXX_TOOLTIP localization strings
-                const tooltip = uq.Description.replace("_DESCRIPTION", "_TOOLTIP");
-                hexRules = Locale.keyExists(tooltip) ? tooltip : uq.Description;
-            } else if (!this.isCompact) {
-                hexName = "LOC_DISTRICT_BZ_URBAN_QUARTER";
-            }
-        } else if (this.isCompact) {
+        if (this.isCompact) {
             // keep the city name
         } else if (this.district.type == DistrictTypes.CITY_CENTER) {
             const owner = Players.get(this.city.owner);
@@ -1325,6 +1356,21 @@ class bzPlotTooltip {
             } else if (this.city.isTown) {
                 // rename "City Center" to "Town Center" in towns
                 hexName = "LOC_DISTRICT_BZ_TOWN_CENTER";
+            } else {
+                hexName = GameInfo.Districts.lookup(this.district.type).Name;
+            }
+        } else if (quarterOK >= 2) {
+            const unique = this.buildings[0].uniqueTrait;
+            if (this.buildings.every(b => b.uniqueTrait = unique)) {
+                const uq = GameInfo.UniqueQuarters.find(e => e.TraitType == unique);
+                hexName = uq.Name;
+                // UQs don't have .Tooltip but most have parallel
+                // LOC_QUARTER_XXX_DESCRIPTION and
+                // LOC_QUARTER_XXX_TOOLTIP localization strings
+                const tooltip = uq.Description.replace("_DESCRIPTION", "_TOOLTIP");
+                hexRules = Locale.keyExists(tooltip) ? tooltip : uq.Description;
+            } else if (!this.isCompact) {
+                hexName = "LOC_DISTRICT_BZ_URBAN_QUARTER";
             }
         } else if (this.buildings.length == 0) {
             // urban tile with canceled production
@@ -1333,7 +1379,7 @@ class bzPlotTooltip {
             hexName = "LOC_DISTRICT_BZ_URBAN_DISTRICT";
         }
         // title bar
-        this.renderTitleDivider(Locale.compose(hexName));
+        this.renderTitleHeading(Locale.compose(hexName));
         this.renderDistrictDefense(this.plotCoord);
         // panel interior
         // show rules for city-states and unique quarters
@@ -1406,7 +1452,7 @@ class bzPlotTooltip {
         // avoid useless section headings
         if (!this.improvement && !this.totalYields && !this.isCompact) return;
         // title bar
-        if (hexName) this.renderTitleDivider(Locale.compose(hexName));
+        if (hexName) this.renderTitleHeading(Locale.compose(hexName));
         // optional description
         if (hexRules.length && !this.isCompact) {
             const title = "text-2xs leading-none mb-1";
@@ -1434,7 +1480,7 @@ class bzPlotTooltip {
     renderWonderSection() {
         if (!this.wonder) return;
         const info = this.wonder.info;
-        this.renderTitleDivider(Locale.compose(info.Name));
+        this.renderTitleHeading(Locale.compose(info.Name));
         let rulesStyle = "w-60";
         const notes = this.wonder.notes;
         if (notes.length) {
@@ -1641,7 +1687,8 @@ class bzPlotTooltip {
             "bz-banner-unit text-xs leading-snug text-center";
         if (!this.isShowingDebug) {
             // round off bottom banner
-            layout.style.borderRadius = `0 0 ${BZ_PADDING} ${BZ_PADDING}`;
+            layout.style.borderRadius =
+                `0 0 ${metrics.radius.css} ${metrics.radius.css}`;
         }
         const unitName = this.unit.name;
         const civName = this.getCivName(Players.get(this.unit.owner));
