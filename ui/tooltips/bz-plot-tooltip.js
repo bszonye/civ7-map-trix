@@ -1096,7 +1096,7 @@ class bzPlotTooltip {
         if (LensManager.getActiveLens() != "fxs-settler-lens") return banners;
         const warn = (text, style=BZ_ALERT.danger) => {
             const banner = docBanner([text], style);
-            banner.classList.value = "mb-1";
+            banner.style.marginTop = metrics.table.leading.half.css;
             banner.children[0].classList.value = "max-w-64";  // better word wrapping
             banners.push(banner);
         }
@@ -1144,7 +1144,7 @@ class bzPlotTooltip {
                 const text = effectInfo.Name;
                 const style = effectInfo.Damage ? BZ_ALERT.danger : BZ_ALERT.note;
                 const banner = docBanner([text], style);
-                banner.classList.value = "mb-1";
+                banner.style.marginTop = metrics.table.leading.half.css;
                 banners.push(banner);
             } else {
                 text.push(effectInfo.Name);
