@@ -875,7 +875,7 @@ class bzPlotTooltip {
                 this.totalYields += value;
             }
         });
-        if (!this.totalYields) return;
+        if (this.yields.length < 2) return;
         // total yield column
         const type = BZ_URBAN_TYPES.includes(this.district?.type) ?
             BZ_ICON_TOTAL_URBAN : BZ_ICON_TOTAL_RURAL;
