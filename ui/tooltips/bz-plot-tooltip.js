@@ -1671,7 +1671,7 @@ class bzPlotTooltip {
         const loc = this.plotCoord;
         const layout = document.createElement("div");
         layout.classList.value = "bz-banner bz-banner-debug";
-        layout.style.setProperty("background-color", "#8d97a633");  // gray
+        layout.style.setProperty("background-color", `${BZ_COLOR.bronze6}99`);
         const ownerID = GameplayMap.getOwner(loc.x, loc.y);
         const currHp = Players.Districts.get(ownerID)?.getDistrictHealth(loc);
         const maxHp = Players.Districts.get(ownerID)?.getDistrictMaxHealth(loc);
