@@ -320,11 +320,6 @@ function constructibleColors(info) {
     return [cbase, cbonus];
 }
 function docBanner(text, style) {
-    // text-align: center;
-    // margin-left: -${metrics.padding.x.css};
-    // margin-right: -${metrics.padding.x.css};
-    // padding-left: ${metrics.padding.x.css};
-    // padding-right: ${metrics.padding.x.css};
     // create a banner
     const banner = document.createElement("div");
     setStyle(banner, style);
