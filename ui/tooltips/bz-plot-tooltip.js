@@ -1734,22 +1734,23 @@ class bzPlotTooltip {
         // debug info
         this.renderDivider();
         const loc = this.plotCoord;
-        const rows = [];
         const ownerID = GameplayMap.getOwner(loc.x, loc.y);
         const currHp = Players.Districts.get(ownerID)?.getDistrictHealth(loc);
         const maxHp = Players.Districts.get(ownerID)?.getDistrictMaxHealth(loc);
-        rows.push("LOC_PLOT_TOOLTIP_DEBUG_TITLE");
-        rows.push(`${Locale.compose("LOC_PLOT_TOOLTIP_PLOT")}: (${loc.x},${loc.y})`);
-        rows.push(`${Locale.compose("LOC_PLOT_TOOLTIP_INDEX")}: ${this.plotIndex}`);
+        const rows = [
+            "LOC_PLOT_TOOLTIP_DEBUG_TITLE",
+            `${Locale.compose("LOC_PLOT_TOOLTIP_PLOT")}: (${loc.x},${loc.y})`,
+            `${Locale.compose("LOC_PLOT_TOOLTIP_INDEX")}: ${this.plotIndex}`,
+        ];
         if (maxHp) rows.push(`${currHp} / ${maxHp}`);
         const banner = docBanner(rows);
         banner.classList.value = "py-1";
-        banner.style.backgroundColor = `${BZ_COLOR.bronze6}99`;
         banner.style.lineHeight = metrics.body.ratio;
-        banner.children[0].classList.value = "text-secondary font-title uppercase";
         const radius = metrics.radius.css;
         banner.style.borderRadius = `0 0 ${radius} ${radius}`;
         banner.style.marginBottom = `-${metrics.padding.y.css}`;
+        banner.style.backgroundColor = `${BZ_COLOR.bronze6}99`;
+        banner.children[0].classList.value = "text-secondary font-title uppercase";
         this.container.appendChild(banner);
     }
     renderIcon(layout, info) {
