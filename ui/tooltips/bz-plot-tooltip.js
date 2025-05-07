@@ -1,5 +1,12 @@
 // TODO: update localization
 // TODO: switch Row data to Replace
+// TODO: fix margins:
+// TODO: - settlement
+// TODO: - district
+// TODO: - yield
+// TODO: test margins:
+// TODO: - geography
+// TODO: fix yield layout
 import bzMapTrixOptions, { bzVerbosity } from '/bz-map-trix/ui/options/bz-map-trix-options.js';
 import "/base-standard/ui/tooltips/plot-tooltip.js";
 
@@ -398,18 +405,18 @@ function getFontMetrics() {
     padding.banner = sizes(padding.rem / 3);  // extra padding for banners
     const border = sizes(BZ_BORDER);
     // font metrics
-    const font = (name, ratio=BZ_FONT_SPACING) => {
+    const font = (name, ratio=BZ_FONT_SPACING, cratio=3/4) => {
         const rem = typeof name === "string" ?
             getFontSizeBasePx(name) / BASE_FONT_SIZE : name;
         const size = sizes(rem);  // font size
+        const cap = sizes(size.rem * cratio);  // cap height
         const spacing = sizes(size.rem * ratio);  // line height
         const leading = sizes(spacing.rem - size.rem);  // interline spacing
         leading.half = sizes(leading.rem / 2);
-        const margin = sizes(BZ_MARGIN - leading.half.rem);
-        const radius = sizes(spacing.rem / 2);
+        const margin = sizes(BZ_MARGIN - (spacing.rem - cap.rem) / 2);
         const figure = sizes(0.6 * size.rem, Math.ceil);  // figure width
         const digits = (n) => sizes(n * figure.rem, Math.ceil);
-        return { size, ratio, spacing, leading, margin, radius, figure, digits, };
+        return { size, ratio, cap, spacing, leading, margin, figure, digits, };
     }
     const head = font('sm', 1.25);
     const body = font('xs', 1.25);
@@ -528,7 +535,7 @@ function setStyle(element, style, padding) {
             element.style.setProperty(property, value);
         }
     }
-    element.style.paddingTop = element.style.paddingBottom = padding;
+    if (padding) element.style.paddingTop = element.style.paddingBottom = padding;
 }
 function setBannerStyle(element, style=BZ_ALERT.danger, ...classes) {
     element.classList.add("bz-banner", ...classes);
@@ -1114,6 +1121,7 @@ class bzPlotTooltip {
         const thicken = (text) => {
             // add weight & leading to capsules
             text.style.lineHeight = metrics.rules.ratio;
+            // match leading to body text so the bottom margin works out
             text.style.marginTop = text.style.marginBottom =
                 metrics.body.leading.half.css;
         }
@@ -1154,6 +1162,8 @@ class bzPlotTooltip {
             tt.innerHTML = dotJoinLocale([continentName, hemisphereName]);
             layout.appendChild(tt);
         }
+        layout.style.marginBottom = layout.children.length ?
+            metrics.body.margin.css : metrics.head.margin.css;
         this.container.appendChild(layout);
     }
     obstacleStyle(obstacleType, ...fallbackStyles) {
@@ -1428,9 +1438,12 @@ class bzPlotTooltip {
             hexName = this.biome?.BiomeType == "BIOME_MARINE" ?
                 this.terrain.Name :
                 GameInfo.Districts.lookup(DistrictTypes.WILDERNESS).Name;
+            this.renderTitleHeading(Locale.compose(hexName));
+            this.container.lastChild.style.marginBottom = metrics.head.margin.css;
+            return;
         }
         // avoid useless section headings
-        if (!this.improvement && !this.totalYields && !this.isCompact) return;
+        if (!this.improvement && !this.totalYields) return;
         // title bar
         if (hexName) this.renderTitleHeading(Locale.compose(hexName));
         // optional description
