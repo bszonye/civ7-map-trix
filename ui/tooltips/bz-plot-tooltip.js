@@ -96,7 +96,8 @@ const BZ_COLOR = {
     hill: "#a9967066",  // Rough terrain = dark bronze 40% opacity
     vegetated: "#aaff0033",  // Vegetated features = green 20% opacity
     wet: "#55aaff66",  // Wet features = teal 40% opacity
-    road: "#f9ecd2cc",  // Roads & Railroads = pale bronze 80% opacity
+    road: "#e5d2accc",  // Roads = bronze 80% opacity
+    rail: "#c2c4cccc",  // Railroads = silver 80% opacity
     // yield types
     food: "#80b34d",        //  90° 40 50 green
     production: "#a33d29",  //  10° 60 40 red
@@ -124,6 +125,7 @@ const BZ_ALERT = {
 }
 const BZ_STYLE = {
     road: { "background-color": BZ_COLOR.road, color: BZ_COLOR.black },
+    rail: { "background-color": BZ_COLOR.rail, color: BZ_COLOR.black },
     volcano: BZ_ALERT.caution,
     // obstacle types
     TERRAIN_HILL: { "background-color": BZ_COLOR.hill },
@@ -1074,8 +1076,7 @@ class bzPlotTooltip {
         const river = this.getRiverInfo(loc);
         const effects = this.getPlotEffects(this.plotIndex);
         const continentName = this.getContinentName(loc);
-        const routes = this.getRouteList();
-        const hasRoad = routes.length != 0;
+        const routes = this.getRoutes();
         // alert banners: damaging & defense effects, settler warnings
         const banner = (text, style) => {
             const banner = docBanner([text], style);
@@ -1123,14 +1124,15 @@ class bzPlotTooltip {
             if (featureLabel.style) thicken(text);
             layout.appendChild(text);
         }
-        if (river) routes.push(river.name);
-        if (routes.length) {
+        if (river) routes.names.push(river.name);
+        if (routes.names.length) {
             // road, ferry, river info
-            const text = docText(dotJoinLocale(routes));
+            const text = docText(dotJoinLocale(routes.names));
             // highlight priority: navigable rivers, roads, other rivers
             const routeStyle =
                 river?.type == RiverTypes.RIVER_NAVIGABLE ? river.style :
-                hasRoad ? BZ_STYLE.road :
+                routes.isRoad ? BZ_STYLE.road :
+                routes.isRail ? BZ_STYLE.rail :
                 river.style;
             setCapsuleStyle(text, routeStyle);
             if (routeStyle) thicken(text);
@@ -1220,13 +1222,16 @@ class bzPlotTooltip {
         if (!continent?.Description) return null;
         return continent.Description;
     }
-    getRouteList() {
+    getRoutes() {
         const routeType = GameplayMap.getRouteType(this.plotCoord.x, this.plotCoord.y);
         const route = GameInfo.Routes.lookup(routeType);
-        if (!route) return [];
-        return GameplayMap.isFerry(this.plotCoord.x, this.plotCoord.y) ?
-            [route.Name, "LOC_NAVIGABLE_RIVER_FERRY"] :
-            [route.Name];
+        const names = [];
+        const isRail = !!route?.PlacementRequiresRoutePresent;
+        const isRoad = route && !isRail;
+        const isFerry = GameplayMap.isFerry(this.plotCoord.x, this.plotCoord.y);
+        if (route) names.push(route.Name);
+        if (isFerry) names.push("LOC_NAVIGABLE_RIVER_FERRY");
+        return { names, isRoad, isRail, isFerry, };
     }
     renderSettlement() {
         if (this.isCompact) return;
