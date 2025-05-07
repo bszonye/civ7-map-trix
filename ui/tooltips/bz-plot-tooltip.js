@@ -1089,8 +1089,8 @@ class bzPlotTooltip {
         // alert banners: damaging & defense effects, settler warnings
         const banner = (text, style) => {
             const banner = docBanner([text], style);
-            // leave a small gap between banners
-            banner.style.marginTop = metrics.table.leading.half.css;
+            // leave a small gap between & after banners
+            banner.style.marginBottom = metrics.padding.banner.css;
             // better wrapping for longer banners
             banner.children[0].classList.value = "max-w-64";
             return banner;
