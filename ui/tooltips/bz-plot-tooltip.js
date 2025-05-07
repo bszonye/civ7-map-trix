@@ -102,7 +102,8 @@ const BZ_COLOR = {
     // geographic colors
     hill: "#a9967066",  // Rough terrain = dark bronze 40% opacity
     vegetated: "#aaff0033",  // Vegetated features = green 20% opacity
-    wet: "#55aaff66",  // Wet features = teal 40% opacity
+    wet: "#55ffff33",  // Wet features = teal 20% opacity
+    river: "#55aaff66",  // Rivers = azure 40% opacity
     road: "#e5d2accc",  // Roads = bronze 80% opacity
     rail: "#c2c4cccc",  // Railroads = silver 80% opacity
     // yield types
@@ -140,8 +141,8 @@ const BZ_STYLE = {
     TERRAIN_OCEAN: {},  // don't need to highlight this
     FEATURE_CLASS_VEGETATED: { "background-color": BZ_COLOR.vegetated },
     FEATURE_CLASS_WET: { "background-color": BZ_COLOR.wet },
-    RIVER_MINOR: { "background-color": BZ_COLOR.wet },
-    RIVER_NAVIGABLE: { "background-color": BZ_COLOR.wet },
+    RIVER_MINOR: { "background-color": BZ_COLOR.river },
+    RIVER_NAVIGABLE: { "background-color": BZ_COLOR.river },
 }
 // accent colors for icon types
 const BZ_TYPE_COLOR = {
@@ -1080,11 +1081,11 @@ class bzPlotTooltip {
         const loc = this.plotCoord;
         // show geographical features
         const terrainLabel = this.getTerrainLabel(loc);
+        const continentName = this.getContinentName(loc);
         const biomeLabel = this.getBiomeLabel(loc);
         const featureLabel = this.getFeatureLabel(loc);
         const river = this.getRiverInfo(loc);
         const effects = this.plotEffects;
-        const continentName = this.getContinentName(loc);
         const routes = this.getRoutes();
         // alert banners: damaging & defense effects, settler warnings
         const banner = (text, style) => {
@@ -1128,12 +1129,27 @@ class bzPlotTooltip {
         const layout = document.createElement("div");
         layout.classList.value = "text-center";
         layout.style.lineHeight = metrics.body.ratio;
+        // continent + distant lands tag
+        // TODO: fix bottom margin when this is last
+        if (this.terrain && this.terrain.TerrainType != "TERRAIN_OCEAN") {
+            const hemisphereName =
+                this.isDistantLands ? "LOC_PLOT_TOOLTIP_HEMISPHERE_WEST" :
+                this.isDistantLands === false ? "LOC_PLOT_TOOLTIP_HEMISPHERE_EAST" :
+                null;  // autoplaying
+            const text = dotJoinLocale([continentName, hemisphereName]);
+            const row = docText(text, "text-2xs uppercase");
+            row.style.lineHeight = metrics.note.ratio;
+            row.style.marginBottom = metrics.padding.banner.css;
+            layout.appendChild(row);
+        }
+        // feature type
         if (featureLabel) {
             const text = docText(featureLabel.text);
             setCapsuleStyle(text, featureLabel.style);
             if (featureLabel.style) thicken(text);
             layout.appendChild(text);
         }
+        // routes and rivers
         if (river) routes.names.push(river.name);
         if (routes.names.length) {
             // road, ferry, river info
@@ -1148,19 +1164,10 @@ class bzPlotTooltip {
             if (routeStyle) thicken(text);
             layout.appendChild(text);
         }
+        // plot effects and fresh water
         if (effects.other.length) {
-            const text = docRules(effects.other);
+            const text = docText(dotJoinLocale(effects.other));
             layout.appendChild(text);
-        }
-        // continent + distant lands tag
-        if (this.terrain && this.terrain.TerrainType != "TERRAIN_OCEAN") {
-            const tt = document.createElement("div");
-            const hemisphereName =
-                this.isDistantLands ? "LOC_PLOT_TOOLTIP_HEMISPHERE_WEST" :
-                this.isDistantLands === false ? "LOC_PLOT_TOOLTIP_HEMISPHERE_EAST" :
-                null;  // autoplaying
-            tt.innerHTML = dotJoinLocale([continentName, hemisphereName]);
-            layout.appendChild(tt);
         }
         layout.style.marginBottom = layout.children.length ?
             metrics.body.margin.css : metrics.head.margin.css;
@@ -1250,12 +1257,12 @@ class bzPlotTooltip {
         // note: discoveries are owned by non-living "World" player
         if (!this.owner || !Players.isAlive(this.owner.id)) return;
         const name = this.city ? this.city.name : this.getCivName(this.owner);
-        // render headings
+        // render headings: settlement and type
         this.renderTitleHeading(name);
         const type = docRules([this.settlementType]);
         type.classList.value = "text-2xs uppercase";
         type.style.lineHeight = metrics.note.ratio;
-        type.style.marginBottom = metrics.table.leading.half.css;  // TODO: fine-tuning
+        type.style.marginBottom = metrics.padding.banner.css;
         this.container.appendChild(type);
         // owner info
         const rows = [];
@@ -1481,7 +1488,7 @@ class bzPlotTooltip {
         const notes = this.wonder.notes;
         if (notes.length) {
             const ttState = document.createElement("div");
-            ttState.classList.value = "text-2xs uppercase leading-none text-center";
+            ttState.classList.value = "text-2xs leading-none text-center";
             ttState.innerHTML = dotJoinLocale(notes);
             this.container.appendChild(ttState);
             rulesStyle = "w-60 mt-1";
@@ -1530,9 +1537,6 @@ class bzPlotTooltip {
         // expansion type for undeveloped & upgraded tiles
         if (this.freeConstructible) {
             const tt = document.createElement("div");
-            if (this.constructibles.length) {  // unique improvements
-                tt.classList.value = "text-2xs uppercase mt-1";
-            }
             tt.setAttribute("data-l10n-id", this.freeConstructible.text);
             ttList.appendChild(tt);
         }
