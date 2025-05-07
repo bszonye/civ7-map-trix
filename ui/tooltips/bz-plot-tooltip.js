@@ -1145,7 +1145,7 @@ class bzPlotTooltip {
             layout.appendChild(text);
         }
         // continent + distant lands tag
-        if (this.terrain.TerrainType != "TERRAIN_OCEAN") {
+        if (this.terrain && this.terrain.TerrainType != "TERRAIN_OCEAN") {
             const tt = document.createElement("div");
             const hemisphereName =
                 this.isDistantLands ? "LOC_PLOT_TOOLTIP_HEMISPHERE_WEST" :
