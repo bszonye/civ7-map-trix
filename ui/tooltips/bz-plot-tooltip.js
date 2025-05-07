@@ -740,8 +740,8 @@ class bzPlotTooltip {
         // general properties
         this.modelWorld();
         this.modelPlotEffects();
-        this.modelSettlement();
         this.modelConstructibles();
+        this.modelSettlement();
         this.modelWorkers();
         this.modelYields();
         this.modelUnits();
@@ -860,17 +860,17 @@ class bzPlotTooltip {
         const ownerID = GameplayMap.getOwner(loc.x, loc.y);
         this.owner = Players.get(ownerID);
         this.relationship = this.getCivRelationship(this.owner);
-        if (!this.city) return;
         // original owner
-        if (this.city.originalOwner != this.city.owner) {
+        if (this.city && this.city.originalOwner != this.city.owner) {
             this.originalOwner = Players.get(this.city.originalOwner);
         }
         // settlement type
-        if (this.owner.isIndependent) {
+        if (this.owner?.isIndependent) {
             // village or encampment
-            // TODO: model constructibles earlier?
-            const imp = null;   // getConstructibles(loc, "IMPROVEMENT").at(0);
-            this.settlementType = imp?.info.Name ?? null;
+            console.warn(`TRIX VILLAGE ${this.improvement?.info.Name} ${this.owner?.name}`);
+            this.settlementType = this.improvement?.info.Name ?? "FOO";
+        } else if (!this.city) {
+            // not a settlement
         } else if (this.owner.isMinor) {
             this.settlementType = "LOC_BZ_SETTLEMENT_CITY_STATE";
         } else if (this.city.isTown) {
@@ -1438,12 +1438,15 @@ class bzPlotTooltip {
             hexName = this.biome?.BiomeType == "BIOME_MARINE" ?
                 this.terrain.Name :
                 GameInfo.Districts.lookup(DistrictTypes.WILDERNESS).Name;
-            this.renderTitleHeading(Locale.compose(hexName));
-            this.container.lastChild.style.marginBottom = metrics.head.margin.css;
-            return;
         }
         // avoid useless section headings
-        if (!this.improvement && !this.totalYields) return;
+        if (!this.improvement && !this.totalYields) {
+            if (this.isCompact && hexName) {
+                this.renderTitleHeading(Locale.compose(hexName));
+                this.container.lastChild.style.marginBottom = metrics.head.margin.css;
+            }
+            return;
+        }
         // title bar
         if (hexName) this.renderTitleHeading(Locale.compose(hexName));
         // optional description
