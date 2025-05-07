@@ -1,5 +1,4 @@
-// TODO: update localization
-// TODO: switch Row data to Replace
+// TODO: separate road & obstacle info
 // TODO: fix margins:
 // TODO: - settlement
 // TODO: - district
@@ -7,6 +6,8 @@
 // TODO: test margins:
 // TODO: - geography
 // TODO: fix yield layout
+// TODO: update localization
+// TODO: switch Row data to Replace
 import bzMapTrixOptions, { bzVerbosity } from '/bz-map-trix/ui/options/bz-map-trix-options.js';
 import "/base-standard/ui/tooltips/plot-tooltip.js";
 
@@ -133,16 +134,17 @@ const BZ_ALERT = {
 }
 const BZ_STYLE = {
     debug: { "background-color": `${BZ_COLOR.bronze6}99` },
+    volcano: BZ_ALERT.caution,
+    // movement & obstacle types
     road: { "background-color": BZ_COLOR.road, color: BZ_COLOR.black },
     rail: { "background-color": BZ_COLOR.rail, color: BZ_COLOR.black },
-    volcano: BZ_ALERT.caution,
-    // obstacle types
     TERRAIN_HILL: { "background-color": BZ_COLOR.hill },
     TERRAIN_OCEAN: {},  // don't need to highlight this
     FEATURE_CLASS_VEGETATED: { "background-color": BZ_COLOR.vegetated },
     FEATURE_CLASS_WET: { "background-color": BZ_COLOR.wet },
     RIVER_MINOR: { "background-color": BZ_COLOR.river },
     RIVER_NAVIGABLE: { "background-color": BZ_COLOR.river },
+    river: { "background-color": BZ_COLOR.river },
 }
 // accent colors for icon types
 const BZ_TYPE_COLOR = {
@@ -334,6 +336,12 @@ function docBanner(text, style, padding) {
         banner.appendChild(row);
     }
     return banner;
+}
+function docCapsule(text, style) {
+    const capsule = document.createElement("div");
+    setCapsuleStyle(capsule, style);
+    capsule.setAttribute('data-l10n-id', text);
+    return capsule;
 }
 function docRules(text, style=null) {
     // create a paragraph of rules text
@@ -577,6 +585,7 @@ class bzPlotTooltip {
         this.biome = null;
         this.feature = null;
         this.river = null;
+        this.routes = null;
         this.plotEffects = null;
         this.isDistantLands = null;
         // settlement stats
@@ -689,6 +698,7 @@ class bzPlotTooltip {
         this.biome = null;
         this.feature = null;
         this.river = null;
+        this.routes = null;
         this.plotEffects = null;
         this.isDistantLands = null;
         // settlement
@@ -739,7 +749,7 @@ class bzPlotTooltip {
         const resourceType = GameplayMap.getResourceType(loc.x, loc.y);
         this.resource = GameInfo.Resources.lookup(resourceType);
         // general properties
-        this.modelWorld();
+        this.modelGeography();
         this.modelPlotEffects();
         this.modelConstructibles();
         this.modelSettlement();
@@ -751,13 +761,13 @@ class bzPlotTooltip {
         if (BZ_DUMP_ICONS) return this.dumpIcons();
         this.renderGeography();
         this.renderSettlement();
-        this.renderHexSection();
+        this.renderTile();
         this.renderYields();
         this.renderUnits();
         if (this.isDebug) this.renderDebugInfo();
     }
     // data modeling methods
-    modelWorld() {
+    modelGeography() {
         const loc = this.plotCoord;
         // (note: currently using "foot" instead of the selected unit)
         this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
@@ -788,6 +798,7 @@ class bzPlotTooltip {
                 this.river = null;
                 break;
         }
+        this.routes = this.getRoutes();
         this.isDistantLands = this.observer?.isDistantLands(loc) ?? null;
     }
     modelPlotEffects() {
@@ -868,7 +879,6 @@ class bzPlotTooltip {
         // settlement type
         if (this.owner?.isIndependent) {
             // village or encampment
-            console.warn(`TRIX VILLAGE ${this.improvement?.info.Name} ${this.owner?.name}`);
             this.settlementType = this.improvement?.info.Name ?? "FOO";
         } else if (!this.city) {
             // not a settlement
@@ -1059,19 +1069,13 @@ class bzPlotTooltip {
         if (lines) lineRight.style.setProperty("background-image", "linear-gradient(to right, #8D97A6, rgba(141, 151, 166, 0))");
         layout.appendChild(lineRight);
     }
-    renderTitleHeading(text, capsule=null) {
+    renderTitleHeading(text) {
         if (!text) return;
         const layout = document.createElement("div");
         layout.classList.value = "text-secondary font-title-sm uppercase text-center";
         layout.style.lineHeight = metrics.head.ratio;
         layout.style.marginTop = metrics.head.margin.css;
         const ttText = document.createElement("div");
-        setCapsuleStyle(ttText, capsule);
-        if (capsule) {
-            // add leading to capsules
-            layout.style.marginTop = metrics.margin.css;
-            layout.style.marginBottom = metrics.head.leading.half.css;
-        }
         ttText.setAttribute('data-l10n-id', text);
         layout.appendChild(ttText);
         this.container.appendChild(layout);
@@ -1086,7 +1090,7 @@ class bzPlotTooltip {
         const featureLabel = this.getFeatureLabel(loc);
         const river = this.getRiverInfo(loc);
         const effects = this.plotEffects;
-        const routes = this.getRoutes();
+        const routes = this.routes;
         // alert banners: damaging & defense effects, settler warnings
         const banner = (text, style) => {
             const banner = docBanner([text], style);
@@ -1114,64 +1118,85 @@ class bzPlotTooltip {
             }
         }
         // tooltip title: terrain & biome
-        const title = biomeLabel ?
-            Locale.compose("{1_TerrainName} {2_BiomeName}", terrainLabel.text, biomeLabel) :
-            terrainLabel.text;
-        this.renderTitleHeading(title, terrainLabel.style);
-        // other geographical info
-        const thicken = (text) => {
-            // add weight & leading to capsules
-            text.style.lineHeight = metrics.rules.ratio;
-            // match leading to body text so the bottom margin works out
-            text.style.marginTop = text.style.marginBottom =
-                metrics.body.leading.half.css;
-        }
-        const layout = document.createElement("div");
-        layout.classList.value = "text-center";
-        layout.style.lineHeight = metrics.body.ratio;
-        // continent + distant lands tag
-        // TODO: fix bottom margin when this is last
+        const title = [terrainLabel.text, biomeLabel]
+            .filter(e => e).map(loc => Locale.compose(loc)).join(' ');
+        this.renderTitleHeading(title);
+        // subtitle: continent + distant lands tag
         if (this.terrain && this.terrain.TerrainType != "TERRAIN_OCEAN") {
             const hemisphereName =
                 this.isDistantLands ? "LOC_PLOT_TOOLTIP_HEMISPHERE_WEST" :
                 this.isDistantLands === false ? "LOC_PLOT_TOOLTIP_HEMISPHERE_EAST" :
                 null;  // autoplaying
             const text = dotJoinLocale([continentName, hemisphereName]);
-            const row = docText(text, "text-2xs uppercase");
-            row.style.lineHeight = metrics.note.ratio;
-            row.style.marginBottom = metrics.padding.banner.css;
-            layout.appendChild(row);
+            const subtitle = docText(text, "text-2xs uppercase text-center");
+            subtitle.style.lineHeight = metrics.note.ratio;
+            subtitle.style.marginBottom = metrics.head.leading.half.css;
+            this.container.appendChild(subtitle);
         }
+        // other geographical info
+        const layout = document.createElement("div");
+        layout.classList.value = "text-center";
+        layout.style.lineHeight = metrics.body.ratio;
         // feature type
-        if (featureLabel) {
-            const text = docText(featureLabel.text);
-            setCapsuleStyle(text, featureLabel.style);
-            if (featureLabel.style) thicken(text);
-            layout.appendChild(text);
-        }
+        if (featureLabel) layout.appendChild(docText(featureLabel.text));
         // routes and rivers
-        if (river) routes.names.push(river.name);
-        if (routes.names.length) {
-            // road, ferry, river info
-            const text = docText(dotJoinLocale(routes.names));
-            // highlight priority: navigable rivers, roads, other rivers
-            const routeStyle =
-                river?.type == RiverTypes.RIVER_NAVIGABLE ? river.style :
-                routes.isRoad ? BZ_STYLE.road :
-                routes.isRail ? BZ_STYLE.rail :
-                river.style;
-            setCapsuleStyle(text, routeStyle);
-            if (routeStyle) thicken(text);
-            layout.appendChild(text);
+        if (river) {
+            const names = [river.name, routes?.ferry];
+            layout.appendChild(docText(dotJoinLocale(names)));
         }
         // plot effects and fresh water
         if (effects.other.length) {
             const text = docText(dotJoinLocale(effects.other));
             layout.appendChild(text);
         }
-        layout.style.marginBottom = layout.children.length ?
-            metrics.body.margin.css : metrics.head.margin.css;
+        // roads and obstacles
+        const obstacles = this.layoutObstacles();
+        layout.appendChild(obstacles);
+        // TODO: account for subtitle too
+        layout.style.marginBottom =
+            obstacles.children.length ? metrics.margin.css :  // flat bottom
+            layout.children.length ?  metrics.body.margin.css :  // body text
+            metrics.head.margin.css;
         this.container.appendChild(layout);
+    }
+    layoutObstacles() {
+        // TODO: move logic to modelGeography
+        const loc = this.plotCoord;
+        const layout = document.createElement("div");
+        layout.classList.value = "flex flex-wrap justify-center";
+        // offset outer capsule margins
+        layout.style.marginLeft = layout.style.marginRight =
+            `-${metrics.body.leading.half.css}`;
+        // capsule formatting
+        const capsule = (text, style) => {
+            const cap = docCapsule(text, style);
+            cap.style.lineHeight = metrics.rules.ratio;
+            cap.style.marginTop = metrics.padding.banner.css;
+            cap.style.marginLeft = cap.style.marginRight =
+                metrics.body.leading.half.css;
+            return cap;
+        }
+        // roads & rail
+        if (this.routes?.route) {
+            const r = this.routes;
+            const style = r.isRoad ? BZ_STYLE.road : r.isRail ? BZ_STYLE.rail : null;
+            layout.appendChild(capsule(r.route, style));
+        }
+        if (this.terrain && this.obstacles.has(this.terrain.TerrainType)) {
+            const info = this.terrain;
+            const style = BZ_STYLE[info.TerrainType];
+            layout.appendChild(capsule(info.Name, style));
+        }
+        if (this.feature && this.obstacles.has(this.feature.FeatureType)) {
+            const fc = this.feature.FeatureClassType;
+            const info = GameInfo.FeatureClasses.lookup(fc);
+            const style = BZ_STYLE[fc];
+            layout.appendChild(capsule(info.Name, style));
+        }
+        if (GameplayMap.getRiverType(loc.x, loc.y) != RiverTypes.NO_RIVER) {
+            layout.appendChild(capsule("LOC_RIVER_NAME", BZ_STYLE.river));
+        }
+        return layout;
     }
     obstacleStyle(obstacleType, ...fallbackStyles) {
         if (!this.obstacles.has(obstacleType)) return null;
@@ -1243,14 +1268,13 @@ class bzPlotTooltip {
     }
     getRoutes() {
         const routeType = GameplayMap.getRouteType(this.plotCoord.x, this.plotCoord.y);
-        const route = GameInfo.Routes.lookup(routeType);
-        const names = [];
-        const isRail = !!route?.PlacementRequiresRoutePresent;
-        const isRoad = route && !isRail;
+        const routeInfo = GameInfo.Routes.lookup(routeType);
+        const isRail = !!routeInfo?.PlacementRequiresRoutePresent;
+        const isRoad = routeInfo && !isRail;
         const isFerry = GameplayMap.isFerry(this.plotCoord.x, this.plotCoord.y);
-        if (route) names.push(route.Name);
-        if (isFerry) names.push("LOC_NAVIGABLE_RIVER_FERRY");
-        return { names, isRoad, isRail, isFerry, };
+        const route = routeInfo?.Name ?? null;
+        const ferry = isFerry ? "LOC_NAVIGABLE_RIVER_FERRY" : null;
+        return { route, ferry, isRoad, isRail, isFerry, };
     }
     renderSettlement() {
         if (this.isCompact) return;
@@ -1329,23 +1353,23 @@ class bzPlotTooltip {
         const type = owner.Diplomacy.getRelationshipLevelName(this.observerID);
         return { type, isEnemy: false };
     }
-    renderHexSection() {
+    renderTile() {
         switch (this.district?.type) {
             case DistrictTypes.CITY_CENTER:
             case DistrictTypes.URBAN:
-                this.renderUrbanSection();
+                this.renderUrban();
                 break;
             case DistrictTypes.RURAL:
             case DistrictTypes.WILDERNESS:
             default:
-                this.renderRuralSection();
+                this.renderRural();
                 break;
             case DistrictTypes.WONDER:
-                this.renderWonderSection();
+                this.renderWonder();
                 break;
         }
     }
-    renderUrbanSection() {
+    renderUrban() {
         const quarterOK = this.buildings.reduce((a, b) =>
             a + (b.isCurrent ? b.isLarge ? 2 : 1 : 0), 0);
         let hexName = this.city.name;
@@ -1396,7 +1420,7 @@ class bzPlotTooltip {
         // bottom bar
         this.renderUrbanDivider();
     }
-    renderRuralSection() {
+    renderRural() {
         let hexName;
         let hexSubtitle;
         let hexRules = [];
@@ -1480,7 +1504,7 @@ class bzPlotTooltip {
             this.renderIconDivider(icon, "mt-2");
         }
     }
-    renderWonderSection() {
+    renderWonder() {
         if (!this.wonder) return;
         const info = this.wonder.info;
         this.renderTitleHeading(Locale.compose(info.Name));
