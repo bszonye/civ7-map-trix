@@ -927,8 +927,6 @@ class bzPlotTooltip {
                 notes.push("LOC_UI_PRODUCTION_AGELESS");
             } else if (isOverbuildable) {
                 notes.push("LOC_PLOT_TOOLTIP_OVERBUILDABLE");
-                const ageName = GameInfo.Ages.lookup(info.Age).Name;
-                if (ageName) notes.push(Locale.compose(ageName));
             }
             const row = {
                 info, age, isCurrent, isExtra, isLarge, isDamaged, notes, uniqueTrait
@@ -979,8 +977,12 @@ class bzPlotTooltip {
         if (!info) return;  // mountains, open ocean
         const name = info.Name;
         if (name == this.improvement?.info?.Name) return;  // redundant
+        if (this.improvement) {
+            // add warehouse type to unique improvement
+            this.improvement.notes.push(name);
+            return;
+        }
         const format =
-            this.improvement ? "LOC_BZ_WAS_ICON_PREVIOUSLY" :
             this.resource ? "LOC_BZ_IMPROVEMENT_FOR_RESOURCE" :
             "LOC_BZ_IMPROVEMENT_FOR_TILE";
         const icon = `[icon:${info.ConstructibleType}]`;
@@ -1243,7 +1245,7 @@ class bzPlotTooltip {
         // render headings
         this.renderTitleHeading(name);
         const type = docRules([this.settlementType]);
-        type.classList.value = "text-2xs";
+        type.classList.value = "text-2xs uppercase";
         type.style.lineHeight = metrics.note.ratio;
         type.style.marginBottom = metrics.table.leading.half.css;  // TODO: fine-tuning
         this.container.appendChild(type);
@@ -1440,9 +1442,9 @@ class bzPlotTooltip {
         if (hexName) this.renderTitleHeading(Locale.compose(hexName));
         // optional description
         if (hexRules.length && !this.isCompact) {
-            const title = "text-2xs leading-none mb-1";
+            const title = "text-2xs uppercase leading-none mb-1";
             if (hexSubtitle) this.renderRules([hexSubtitle], null, title);
-            this.renderRules(hexRules, "w-60", "leading-snug mb-1");
+            this.renderRules(hexRules, "w-60", "leading-normal mb-1");
         }
         // constructibles
         this.renderConstructibles();
@@ -1470,7 +1472,7 @@ class bzPlotTooltip {
         const notes = this.wonder.notes;
         if (notes.length) {
             const ttState = document.createElement("div");
-            ttState.classList.value = "text-2xs leading-none text-center";
+            ttState.classList.value = "text-2xs uppercase leading-none text-center";
             ttState.innerHTML = dotJoinLocale(notes);
             this.container.appendChild(ttState);
             rulesStyle = "w-60 mt-1";
@@ -1491,23 +1493,25 @@ class bzPlotTooltip {
     }
     // lay out a column of constructibles and their construction notes
     renderConstructibles() {
+        // TODO: new leading system
         if (!this.constructibles.length && !this.freeConstructible) return;
         const ttList = document.createElement("div");
-        ttList.classList.value = "leading-snug text-center";
+        ttList.classList.value = "text-center";
+        ttList.style.lineHeight = metrics.body.ratio;
         for (const c of this.constructibles) {
             const ttConstructible = document.createElement("div");
             const ttName = document.createElement("div");
-            ttName.classList.value = "text-accent-2 font-title uppercase";
             ttName.setAttribute("data-l10n-id", c.info.Name);
             ttConstructible.appendChild(ttName);
             const notes = dotJoinLocale(c.notes);
             if (notes) {
                 const ttState = document.createElement("div");
-                ttState.classList.value = "text-2xs mb-0\\.5";
+                ttState.classList.value = "text-accent-3 text-2xs mb-0\\.5";
                 if (c.isDamaged) {
                     setCapsuleStyle(ttState, BZ_ALERT.caution);
                 } else {
-                    ttState.classList.add("leading-none");
+                    ttState.style.lineHeight = metrics.note.ratio;
+                    ttState.style.marginBottom = metrics.body.leading.half.css;
                 }
                 ttState.innerHTML = notes;
                 ttConstructible.appendChild(ttState);
@@ -1517,7 +1521,9 @@ class bzPlotTooltip {
         // expansion type for undeveloped & upgraded tiles
         if (this.freeConstructible) {
             const tt = document.createElement("div");
-            if (this.constructibles.length) tt.classList.value = "text-2xs mt-1";
+            if (this.constructibles.length) {  // unique improvements
+                tt.classList.value = "text-2xs uppercase mt-1";
+            }
             tt.setAttribute("data-l10n-id", this.freeConstructible.text);
             ttList.appendChild(tt);
         }
@@ -1531,7 +1537,7 @@ class bzPlotTooltip {
         ttText.classList.add("bz-rules-list");
         for (const item of text) {
             const ttItem = document.createElement("div");
-            ttItem.classList.value = itemStyle ?? "leading-snug";
+            ttItem.classList.value = itemStyle ?? "leading-normal";
             ttItem.classList.add("bz-rules-item");
             ttItem.setAttribute("data-l10n-id", item);
             ttText.appendChild(ttItem);
@@ -1546,7 +1552,7 @@ class bzPlotTooltip {
             const conquerorName = this.getCivName(conqueror, true);
             const conquerorText = Locale.compose("{1_Term} {2_Subject}", "LOC_PLOT_TOOLTIP_CONQUEROR", conquerorName);
             const tt = document.createElement("div");
-            tt.classList.value = "leading-snug mb-1 py-1";
+            tt.classList.value = "leading-tight mb-1 py-1";
             // TODO: switch to docBanner
             setBannerStyle(tt, BZ_ALERT.conqueror);
             tt.innerHTML = conquerorText;
@@ -1580,7 +1586,7 @@ class bzPlotTooltip {
         }
         if (info.length) {
             const ttDefense = document.createElement("div");
-            ttDefense.classList.value = "leading-snug text-center mb-1";
+            ttDefense.classList.value = "leading-tight text-center mb-1";
             const style = currentHealth != maxHealth ? BZ_ALERT.danger : BZ_ALERT.note;
             // TODO: switch to docBanner
             setBannerStyle(ttDefense, style, "py-1");
