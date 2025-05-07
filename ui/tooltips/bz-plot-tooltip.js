@@ -124,6 +124,7 @@ const BZ_ALERT = {
     DEBUG: { "background-color": "#80808080" },
 }
 const BZ_STYLE = {
+    debug: { "background-color": `${BZ_COLOR.bronze6}99` },
     road: { "background-color": BZ_COLOR.road, color: BZ_COLOR.black },
     rail: { "background-color": BZ_COLOR.rail, color: BZ_COLOR.black },
     volcano: BZ_ALERT.caution,
@@ -303,10 +304,10 @@ function constructibleColors(info) {
     }
     return [cbase, cbonus];
 }
-function docBanner(text, style) {
+function docBanner(text, style, padding) {
     // create a banner
     const banner = document.createElement("div");
-    setStyle(banner, style);
+    setStyle(banner, style, padding);
     // extend banner to full width
     banner.style.paddingLeft = banner.style.paddingRight = metrics.padding.x.css;
     banner.style.marginLeft = banner.style.marginRight = `-${metrics.padding.x.css}`;
@@ -394,6 +395,7 @@ function getFontMetrics() {
     const margin = sizes(BZ_MARGIN);  // top & bottom of each block
     padding.x = sizes(padding.rem);
     padding.y = sizes(padding.rem - margin.rem);  // room for end block margins
+    padding.banner = sizes(padding.rem / 3);  // extra padding for banners
     const border = sizes(BZ_BORDER);
     // font metrics
     const font = (name, ratio=BZ_FONT_SPACING) => {
@@ -517,7 +519,7 @@ function preloadIcon(icon, context) {
     BZ_PRELOADED_ICONS[name] = true;
     Controls.preloadImage(name, 'plot-tooltip');
 }
-function setStyle(element, style) {
+function setStyle(element, style, padding) {
     if (!element || !style) return;
     for (const [property, value] of Object.entries(style)) {
         if (property == "classList") {
@@ -526,6 +528,7 @@ function setStyle(element, style) {
             element.style.setProperty(property, value);
         }
     }
+    element.style.paddingTop = element.style.paddingBottom = padding;
 }
 function setBannerStyle(element, style=BZ_ALERT.danger, ...classes) {
     element.classList.add("bz-banner", ...classes);
@@ -555,35 +558,33 @@ class bzPlotTooltip {
         // point-of-view info
         this.observerID = GameContext.localObserverID;
         this.observer = Players.get(this.observerID);
-        // selection-dependent info
-        this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
-        // world
+        // core properties
         this.age = null;
+        this.city = null;
+        this.district = null;
+        this.resource = null;
+        // world
+        this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
         this.terrain = null;
         this.biome = null;
         this.feature = null;
         this.river = null;
         this.plotEffects = null;
-        this.resource = null;
         this.isDistantLands = null;
-        // settlement
-        this.city = null;
-        this.district = null;
-        // ownership
+        // settlement stats
         this.owner = null;
         this.relationship = null;
         this.originalOwner = null;
-        // settlement stats
         this.settlementType = null;
         this.townFocus = null;
         this.religions = null;  // TODO: redesign
-        this.connections = null;  // TODO: remove
         // constructibles
         this.constructibles = [];
         this.buildings = [];  // omits walls
-        this.specialists = null;  // { workers, maximum }
         this.improvement = null;
         this.wonder = null;
+        // workers
+        this.specialists = null;  // { workers, maximum }
         this.freeConstructible = null;  // standard improvement type
         // yields
         this.yields = [];
@@ -669,35 +670,33 @@ class bzPlotTooltip {
         // point-of-view info
         this.observerID = GameContext.localObserverID;
         this.observer = Players.get(this.observerID);
-        // selection-dependent info
-        this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
-        // world
+        // core
         this.age = null;
+        this.city = null;
+        this.district = null;
+        this.resource = null;
+        // world
+        this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
         this.terrain = null;
         this.biome = null;
         this.feature = null;
         this.river = null;
         this.plotEffects = null;
-        this.resource = null;
         this.isDistantLands = null;
         // settlement
-        this.city = null;
-        this.district = null;
-        // ownership
         this.owner = null;
         this.relationship = null;
         this.originalOwner = null;
-        // settlement stats
         this.settlementType = null;
         this.townFocus = null;
-        this.religions = null;
-        this.connections = null;
+        this.religions = null;  // TODO: redesign
         // constructibles
         this.constructibles = [];
-        this.buildings = [];
-        this.specialists = null;  // { workers, maximum }
+        this.buildings = [];  // omits walls
         this.improvement = null;
         this.wonder = null;
+        // workers
+        this.specialists = null;  // { workers, maximum }
         this.freeConstructible = null;  // standard improvement type
         // yields
         this.yields = [];
@@ -722,13 +721,21 @@ class bzPlotTooltip {
         // update point-of-view info
         this.observerID = GameContext.localObserverID;
         this.observer = Players.get(this.observerID);
-        // update selection-dependent info
-        // (note: currently using "foot" instead of the selected unit)
-        this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
-        this.modelSettlement();  // needed before world plot effects
+        // core properties
+        this.age = GameInfo.Ages.lookup(Game.age);
+        const loc = this.plotCoord;
+        const cityID = GameplayMap.getOwningCityFromXY(loc.x, loc.y);
+        this.city = cityID ? Cities.get(cityID) : null;
+        const districtID = MapCities.getDistrict(loc.x, loc.y);
+        this.district = districtID ? Districts.get(districtID) : null;
+        const resourceType = GameplayMap.getResourceType(loc.x, loc.y);
+        this.resource = GameInfo.Resources.lookup(resourceType);
+        // general properties
         this.modelWorld();
-        this.modelOwnership();
-        this.modelConstructibles();  // TODO: refactor
+        this.modelPlotEffects();
+        this.modelSettlement();
+        this.modelConstructibles();
+        this.modelWorkers();
         this.modelYields();
         this.modelUnits();
     }
@@ -742,16 +749,10 @@ class bzPlotTooltip {
         if (this.isDebug) this.renderDebugInfo();
     }
     // data modeling methods
-    modelSettlement() {
-        const loc = this.plotCoord;
-        const cityID = GameplayMap.getOwningCityFromXY(loc.x, loc.y);
-        this.city = cityID ? Cities.get(cityID) : null;
-        const districtID = MapCities.getDistrict(loc.x, loc.y);
-        this.district = districtID ? Districts.get(districtID) : null;
-    }
     modelWorld() {
         const loc = this.plotCoord;
-        this.age = GameInfo.Ages.lookup(Game.age);
+        // (note: currently using "foot" instead of the selected unit)
+        this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
         const terrainType = GameplayMap.getTerrainType(loc.x, loc.y);
         this.terrain = GameInfo.Terrains.lookup(terrainType);
         const biomeType = GameplayMap.getBiomeType(loc.x, loc.y);
@@ -779,14 +780,12 @@ class bzPlotTooltip {
                 this.river = null;
                 break;
         }
-        this.plotEffects = this.getPlotEffects(loc);
-        const resourceType = GameplayMap.getResourceType(loc.x, loc.y);
-        this.resource = GameInfo.Resources.lookup(resourceType);
         this.isDistantLands = this.observer?.isDistantLands(loc) ?? null;
     }
-    getPlotEffects() {
+    modelPlotEffects() {
+        // requires: this.city, this.resource
         const loc = this.plotCoord;
-        const effects = {
+        this.plotEffects = {
             danger: [],
             caution: [],
             note: [],
@@ -798,11 +797,11 @@ class bzPlotTooltip {
             const effectInfo = GameInfo.PlotEffects.lookup(item.effectType);
             if (!effectInfo) return;
             if (effectInfo.Damage) {
-                effects.danger.push(effectInfo.Name);
+                this.plotEffects.danger.push(effectInfo.Name);
             } else if (effectInfo.Defense) {
-                effects.note.push(effectInfo.Name);
+                this.plotEffects.note.push(effectInfo.Name);
             } else {
-                effects.other.push(effectInfo.Name);
+                this.plotEffects.other.push(effectInfo.Name);
             }
         }
         // no further effects needed for impassible or offshore tiles
@@ -811,7 +810,7 @@ class bzPlotTooltip {
             GameplayMap.isWater(loc.x, loc.y)) {
             // no need here for settlement advice, including
             // Dont't add any extra tooltip to mountains, oceans, or navigable rivers, should be obvious enough w/o them
-            return effects;
+            return;
         }
 
         // check fresh water
@@ -820,36 +819,35 @@ class bzPlotTooltip {
         if (wloc.x != loc.x || wloc.y != loc.y) {
             // ignore city water out side of the city center
         } else if (GameplayMap.isFreshWater(wloc.x, wloc.y)) {
-            effects.other.push("LOC_PLOTKEY_FRESHWATER");
+            this.plotEffects.other.push("LOC_PLOTKEY_FRESHWATER");
         } else if (!this.city && lens == "fxs-settler-lens") {
-            effects.caution.push("LOC_PLOT_TOOLTIP_NO_FRESH_WATER");
+            this.plotEffects.caution.push("LOC_PLOT_TOOLTIP_NO_FRESH_WATER");
         }
         // remainder is for settler lens only
-        if (lens != "fxs-settler-lens") return effects;
+        if (lens != "fxs-settler-lens") return;
         // show limits of the advanced start area
         if (this.observer?.AdvancedStart &&
             !this.observer.AdvancedStart.getPlacementComplete() &&
             !GameplayMap.isPlotInAdvancedStartRegion(this.observerID, loc.x, loc.y)) {
-            effects.danger.push("LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_FAR");
+            this.plotEffects.danger.push("LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_FAR");
         }
         // show blocked tiles
         if (this.observer?.Diplomacy &&
             !this.observer.Diplomacy.isValidLandClaimLocation(loc, true)) {
             if (GameplayMap.isCityWithinMinimumDistance(loc.x, loc.y)) {
                 // settlement too close
-                effects.danger.push("LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_CLOSE");
+                this.plotEffects.danger.push("LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_CLOSE");
             } else if (!this.resource) {
                 // village too close (implied)
-                effects.danger.push("LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_CLOSE");
+                this.plotEffects.danger.push("LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_CLOSE");
             }
             if (this.resource) {
                 // resource too close
-                effects.danger.push("LOC_PLOT_TOOLTIP_CANT_SETTLE_RESOURCES");
+                this.plotEffects.danger.push("LOC_PLOT_TOOLTIP_CANT_SETTLE_RESOURCES");
             }
         }
-        return effects;
     }
-    modelOwnership() {
+    modelSettlement() {
         // owner, civ, city, district
         const loc = this.plotCoord;
         const ownerID = GameplayMap.getOwner(loc.x, loc.y);
@@ -947,7 +945,9 @@ class bzPlotTooltip {
                 console.warn(`bz-plot-tooltip: expected 1 constructible, not ${n} (${types})`);
             }
         }
-        // TODO: refactor this part into a separate method
+    }
+    modelWorkers() {
+        const loc = this.plotCoord;
         this.specialists = getSpecialists(this.plotCoord, this.city);
         if (this.improvement) {
             // set up icons and special district names for improvements
@@ -1076,7 +1076,7 @@ class bzPlotTooltip {
         const biomeLabel = this.getBiomeLabel(loc);
         const featureLabel = this.getFeatureLabel(loc);
         const river = this.getRiverInfo(loc);
-        const effects = this.getPlotEffects(this.plotIndex);
+        const effects = this.plotEffects;
         const continentName = this.getContinentName(loc);
         const routes = this.getRoutes();
         // alert banners: damaging & defense effects, settler warnings
@@ -1237,11 +1237,9 @@ class bzPlotTooltip {
     }
     renderSettlement() {
         if (this.isCompact) return;
-        if (!this.owner) return;
-        const name = this.city ? this.city.name :  // city or town
-            this.owner.isAlive ? this.getCivName(this.owner) :  // village
-            null;  // discoveries are owned by a placeholder "World" player
-        if (!name) return;
+        // note: discoveries are owned by non-living "World" player
+        if (!this.owner || !Players.isAlive(this.owner.id)) return;
+        const name = this.city ? this.city.name : this.getCivName(this.owner);
         // render headings
         this.renderTitleHeading(name);
         const type = docRules([this.settlementType]);
@@ -1250,10 +1248,6 @@ class bzPlotTooltip {
         type.style.marginBottom = metrics.table.leading.half.css;  // TODO: fine-tuning
         this.container.appendChild(type);
         // owner info
-        this.renderOwnerInfo();
-    }
-    renderOwnerInfo() {
-        if (!this.owner || !Players.isAlive(this.owner.id)) return;
         const rows = [];
         // show name, relationship, and civ
         const ownerName = this.getOwnerName(this.owner);
@@ -1262,13 +1256,12 @@ class bzPlotTooltip {
         rows.push(this.getCivName(this.owner, true));  // full name
         // show original owner
         if (this.originalOwner) {
-            const adjective = this.originalOwner.civilizationAdjective;
-            const text = Locale.compose("LOC_BZ_WAS_PREVIOUSLY", adjective);
+            const was = this.originalOwner.civilizationName;
+            const text = Locale.compose("LOC_BZ_WAS_PREVIOUSLY", was);
             rows.push(text);
         }
-        const style = this.relationship?.isEnemy ?
-            { ...BZ_ALERT.danger, classList: "py-1" } : null;
-        const banner = docBanner(rows, style);
+        const style = this.relationship?.isEnemy ?  BZ_ALERT.danger : null;
+        const banner = docBanner(rows, style, metrics.padding.banner.css);
         banner.style.lineHeight = metrics.body.ratio;
         banner.style.marginBottom = metrics.body.margin.css;
         this.container.appendChild(banner);
@@ -1682,7 +1675,8 @@ class bzPlotTooltip {
         }
         const style = this.units[0].relationship.isEnemy ? BZ_ALERT.enemy : null;
         const banner = docBanner(rows, style);
-        banner.classList.add("py-1");
+        banner.style.paddingTop = banner.style.paddingBottom =
+            metrics.padding.banner.css;
         banner.style.lineHeight = metrics.body.ratio;
         banner.style.marginBottom = `-${metrics.padding.y.css}`;
         if (!this.isDebug) {
@@ -1720,13 +1714,11 @@ class bzPlotTooltip {
             `${Locale.compose("LOC_PLOT_TOOLTIP_INDEX")}: ${this.plotIndex}`,
         ];
         if (maxHp) rows.push(`${currHp} / ${maxHp}`);
-        const banner = docBanner(rows);
-        banner.classList.value = "py-1";
+        const banner = docBanner(rows, BZ_STYLE.debug, metrics.padding.banner.css);
         banner.style.lineHeight = metrics.body.ratio;
         const radius = metrics.radius.css;
         banner.style.borderRadius = `0 0 ${radius} ${radius}`;
         banner.style.marginBottom = `-${metrics.padding.y.css}`;
-        banner.style.backgroundColor = `${BZ_COLOR.bronze6}99`;
         banner.children[0].classList.value = "text-secondary font-title uppercase";
         this.container.appendChild(banner);
     }
