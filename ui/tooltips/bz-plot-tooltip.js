@@ -188,6 +188,7 @@ const BZ_FONT_SPACING = 1.5;
 const BZ_PADDING = 0.6666666667;
 const BZ_MARGIN = BZ_PADDING / 2;
 const BZ_BORDER = 0.1111111111;
+const BZ_RULES_WIDTH = 13.3333333333;
 let metrics = getFontMetrics();
 
 // additional CSS definitions
@@ -266,7 +267,7 @@ BZ_HEAD_STYLE.map(style => {
 document.body.classList.toggle("bz-yield-banner", bzMapTrixOptions.yieldBanner);
 
 // debug style (manually enable)
-document.body.classList.toggle("bz-debug", true);
+document.body.classList.toggle("bz-debug", false);
 
 function baseYields(info) {
     if (!info) return null;
@@ -361,8 +362,9 @@ function docRules(text, style=null) {
     // create a paragraph of rules text
     // font icons are squirrely!  only center them at top level
     const tt = document.createElement("div");
+    tt.style.alignSelf = 'center';
     tt.style.textAlign = 'center';
-    tt.style.widthPERCENT = 100;
+    tt.style.width = metrics.rules.width.css;
     for (const item of text) {
         const row = document.createElement("div");
         if (style) row.classList.value = style;
@@ -454,6 +456,7 @@ function getFontMetrics() {
     const body = font('xs', 1.25);
     const note = font('2xs', 1);
     const rules = font('xs');  // is this needed?
+    rules.width = sizes(BZ_RULES_WIDTH);
     const table = font('xs');
     const yields = font(8/9);
     const radius = sizes(2/3 * padding.rem);  // TODO: fine-tuning
@@ -1042,7 +1045,7 @@ class bzPlotTooltip {
         GameInfo.Yields.forEach(info => {
             const name = info.Name;
             const type = info.YieldType;
-            const yvalue = 99.5;  // TODO: GameplayMap.getYield(loc.x, loc.y, type, this.observerID);
+            const yvalue = GameplayMap.getYield(loc.x, loc.y, type, this.observerID);
             if (yvalue) {
                 const value = (Math.round(10 * yvalue) / 10).toString();
                 const column = { name, type, value, };
@@ -1555,8 +1558,7 @@ class bzPlotTooltip {
         }
         const rules = this.isVerbose ? info.Description : info.Tooltip;
         if (rules && !this.isCompact) {
-            const tt = docRules([rules]);
-            tt.style.width = `13.3333333333rem`;
+            const tt = docRules([rules], rulesStyle);
             this.container.appendChild(tt);
         }
         const colors = constructibleColors(this.wonder.info);
@@ -1719,6 +1721,11 @@ class bzPlotTooltip {
             if (i) y.style.marginLeft = '0.3333333333rem';  // all but first column
             tt.appendChild(y);
         }
+        if (2 <= this.yields.length) {
+            // adjust total column
+            tt.lastChild.classList.add("text-secondary");
+            tt.lastChild.style.marginLeft = '0.4444444444rem';
+        }
         tt.style.marginTop = metrics.yields.margin.css;
         tt.style.marginBottom = metrics.yields.margin.css;
         this.container.appendChild(tt);
@@ -1727,7 +1734,6 @@ class bzPlotTooltip {
         const tt = document.createElement("div");
         tt.classList.value = "flex-col justify-start font-body";
         const ariaLabel = `${col.value} ${Locale.compose(col.name)}`;
-        console.warn(`TRIX ARIA ${ariaLabel}`);
         tt.ariaLabel = ariaLabel;
         const size = metrics.yields.spacing.css;
         const iconCSS = UI.getIconCSS(col.type, "YIELD");
@@ -1735,33 +1741,10 @@ class bzPlotTooltip {
         tt.appendChild(icon);
         const value = docText(col.value, "self-center text-center");
         value.style.fontSize = metrics.yields.size.css;
-        value.style.lineHeight = metrics.yields.spacing.css;
+        value.style.lineHeight = metrics.yields.ratio;
         value.style.width = width;
         tt.appendChild(value);
         return tt;
-    }
-    TODOyieldColumn(col) {
-        const isTotal = col.name == "LOC_YIELD_BZ_TOTAL";
-        const ttIndividualYieldFlex = document.createElement("div");
-        ttIndividualYieldFlex.classList.add("plot-tooltip__IndividualYieldFlex");
-        if (isTotal) ttIndividualYieldFlex.classList.add("ml-0\\.5");  // extra room
-        const ariaLabel = `${Locale.toNumber(col.value)} ${Locale.compose(col.name)}`;
-        ttIndividualYieldFlex.ariaLabel = ariaLabel;
-        const yieldIconCSS = UI.getIconCSS(col.type, "YIELD");
-        const yieldIconShadow = document.createElement("div");
-        yieldIconShadow.classList.add("plot-tooltip__IndividualYieldIcons-Shadow");
-        yieldIconShadow.style.backgroundImage = yieldIconCSS;
-        ttIndividualYieldFlex.appendChild(yieldIconShadow);
-        const yieldIcon = document.createElement("div");
-        yieldIcon.classList.add("plot-tooltip__IndividualYieldIcons");
-        yieldIcon.style.backgroundImage = yieldIconCSS;
-        yieldIconShadow.appendChild(yieldIcon);
-        const ttIndividualYieldValues = document.createElement("div");
-        ttIndividualYieldValues.classList.add("plot-tooltip__IndividualYieldValues", "font-body");
-        if (isTotal) ttIndividualYieldValues.classList.add("text-secondary");
-        ttIndividualYieldValues.textContent = col.value.toString();
-        ttIndividualYieldFlex.appendChild(ttIndividualYieldValues);
-        return ttIndividualYieldFlex;
     }
     renderUnits() {
         // show unit section
