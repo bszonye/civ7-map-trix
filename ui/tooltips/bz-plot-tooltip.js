@@ -358,6 +358,21 @@ function docIcon(image, size, resize, ...style) {
         image.startsWith("url(") ? image : UI.getIconCSS(image);
     return icon;
 }
+function docList(text, style=null) {
+    // create a list of plain text (use docRules for font icons)
+    const tt = document.createElement("div");
+    tt.style.alignSelf = 'center';
+    tt.style.textAlign = 'center';
+    tt.style.lineHeight = metrics.body.ratio;
+    for (const item of text) {
+        const row = document.createElement("div");
+        if (style) row.classList.value = style;
+        row.classList.add("bz-rules-item");
+        row.setAttribute("data-l10n-id", item);
+        tt.appendChild(row);
+    }
+    return tt;
+}
 function docRules(text, style=null) {
     // create a paragraph of rules text
     // font icons are squirrely!  only center them at top level
@@ -1322,7 +1337,7 @@ class bzPlotTooltip {
         const name = this.city ? this.city.name : this.getCivName(this.owner);
         // render headings: settlement and type
         this.renderTitleHeading(name);
-        const type = docRules([this.settlementType]);
+        const type = docList([this.settlementType]);
         type.classList.value = "text-2xs uppercase";
         type.style.lineHeight = metrics.note.ratio;
         type.style.marginBottom = metrics.padding.banner.css;
