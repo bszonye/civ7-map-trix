@@ -341,11 +341,10 @@ function docBanner(text, style, padding) {
 }
 function docCapsule(text, style, size=metrics.rules) {
     const cap = document.createElement("div");
-    setCapsuleStyle(cap, style);
     if (style) {
-        cap.lineHeight = size.ratio;
-        cap.paddingLeft = cap.paddingRight = size.leading.internal.css;
-        cap.classList.add("px-2", "rounded-full");
+        cap.style.lineHeight = size.ratio;
+        cap.style.paddingLeft = cap.style.paddingRight = `${3/4*size.radius.rem}rem`;
+        cap.style.borderRadius = size.radius.css;
         setStyle(cap, style);
     }
     cap.setAttribute('data-l10n-id', text);
@@ -464,9 +463,12 @@ function getFontMetrics() {
         leading.half = sizes(leading.rem / 2);  // half-leading
         leading.internal = sizes((spacing.rem - cap.rem) / 2);  // space above caps
         const margin = sizes(BZ_MARGIN - leading.internal.rem);
+        const radius = sizes(spacing.rem / 2);  // capsule radius
         const figure = sizes(0.6 * size.rem, Math.ceil);  // figure width
         const digits = (n) => sizes(n * figure.rem, Math.ceil);
-        return { size, ratio, cap, spacing, leading, margin, figure, digits, };
+        return {
+            size, ratio, cap, spacing, leading, margin, radius, figure, digits,
+        };
     }
     const head = font('sm', 1.25);
     const body = font('xs', 1.25);
@@ -592,13 +594,6 @@ function setBannerStyle(element, style=BZ_ALERT.danger, ...classes) {
     element.classList.add("bz-banner", ...classes);
     setStyle(element, style);
 }
-function setCapsuleStyle(element, style, ...classes) {
-    // TODO: revise
-    if (!style) return;
-    if (classes.length) element.classList.add(...classes);
-    element.classList.add("px-2", "rounded-full");
-    setStyle(element, style);
-}
 class bzPlotTooltip {
     constructor() {
         this.plotCoord = null;
@@ -626,8 +621,8 @@ class bzPlotTooltip {
         this.banners = null;
         this.title = null;
         // world
-        this.obstacleTypes = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
-        this.obstacles = [];
+        this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
+        this.highlights = [];
         this.terrain = null;
         this.biome = null;
         this.feature = null;
@@ -743,8 +738,8 @@ class bzPlotTooltip {
         this.banners = null;
         this.title = null;
         // world
-        this.obstacleTypes = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
-        this.obstacles = [];
+        this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
+        this.highlights = [];
         this.terrain = null;
         this.biome = null;
         this.feature = null;
@@ -896,12 +891,11 @@ class bzPlotTooltip {
     modelGeography() {
         const loc = this.plotCoord;
         // (note: currently using "foot" instead of the selected unit)
-        this.obstacleTypes = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
-        this.obstacles = [];
+        this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
+        this.highlights = [];
         this.terrain = this.getTerrain();
         this.biome = this.getBiome();
-        const featureType = GameplayMap.getFeatureType(loc.x, loc.y);
-        this.feature = GameInfo.Features.lookup(featureType);
+        this.feature = this.getFeature();
         const riverType = GameplayMap.getRiverType(loc.x, loc.y);
         const riverName = GameplayMap.getRiverName(loc.x, loc.y);
         switch (riverType) {
@@ -934,9 +928,9 @@ class bzPlotTooltip {
         const isLake = GameplayMap.isLake(loc.x, loc.y);
         const name = isLake ? "LOC_TERRAIN_LAKE_NAME" : info.Name;
         const type = info.TerrainType;
-        const obstacle = this.obstacleTypes.has(type) ?  type : null;
-        const terrain = { name, type, obstacle, info, };
-        if (obstacle) this.obstacles.push(terrain);
+        const highlight = this.obstacles.has(type) ?  type : null;
+        const terrain = { name, type, highlight, info, };
+        if (highlight) this.highlights.push(terrain);
         return terrain;
     }
     getBiome() {
@@ -946,9 +940,32 @@ class bzPlotTooltip {
         if (!info) return null;
         const name = info.Name;
         const type = info.BiomeType;
-        const obstacle = null;  // biomes aren't obstacles
-        const biome = { name, type, obstacle, info, };
+        const highlight = null;  // biomes aren't obstacles
+        const biome = { name, type, highlight, info, };
         return biome;
+    }
+    getFeature() {
+        const loc = this.plotCoord;
+        const id = GameplayMap.getFeatureType(loc.x, loc.y);
+        const info = GameInfo.Features.lookup(id);
+        if (!info) return null;
+        const name = info.Name;
+        const type = info.FeatureType;
+        const ctype = info.FeatureClassType;
+        const highlight = this.obstacles.has(type) ? ctype : null;
+        const feature = { name, type, ctype, highlight, info, };
+        if (highlight) this.highlights.push(feature)
+        return feature;
+        if (GameplayMap.isVolcano(loc.x, loc.y)) {
+            const active = GameplayMap.isVolcanoActive(loc.x, loc.y);
+            const volcanoStatus = (active) ? 'LOC_VOLCANO_ACTIVE' : 'LOC_VOLCANO_NOT_ACTIVE';
+            const volcanoName = GameplayMap.getVolcanoName(loc.x, loc.y);
+            const volcanoDetailsKey = (volcanoName) ? 'LOC_UI_NAMED_VOLCANO_DETAILS' : 'LOC_UI_VOLCANO_DETAILS';
+            name = Locale.compose(volcanoDetailsKey, name, volcanoStatus, volcanoName);
+            // highlight active volcanoes
+            if (active) style = BZ_STYLE.volcano;
+        }
+        return { name, style };
     }
     modelSettlement() {
         // owner, civ, city, district
@@ -1233,12 +1250,12 @@ class bzPlotTooltip {
             const names = [this.terrain.name];
             if (this.biome.type != "BIOME_MARINE") names.push(this.biome.name);
             const text = joinLocale(names);
-            const style = BZ_STYLE[this.terrain.obstacle];
+            const style = BZ_STYLE[this.terrain.highlight];
             layout.appendChild(capsule(text, style));
         }
         // feature type
         if (this.feature) {
-            const style = BZ_STYLE[this.feature.obstacle];
+            const style = BZ_STYLE[this.feature.highlight];
             layout.appendChild(capsule(this.feature.name, style));
         }
         // rivers
@@ -1246,7 +1263,7 @@ class bzPlotTooltip {
             // TODO: bridges
             const names = [this.river.name, this.river.crossing];
             const text = dotJoinLocale(names);
-            const style = BZ_STYLE[this.river.obstacle];
+            const style = BZ_STYLE[this.river.highlight];
             layout.appendChild(capsule(text, style));
         }
         // roads & railroads
@@ -1264,21 +1281,6 @@ class bzPlotTooltip {
             layout.children.length ?  metrics.body.margin.css :  // body text
             metrics.head.margin.css;
         this.container.appendChild(layout);
-    }
-    getFeatureLabel(loc) {
-        if (!this.feature) return null;
-        let text = this.feature.Name;
-        let style = this.obstacleStyle(this.feature.FeatureType, this.feature.FeatureClassType);
-        if (GameplayMap.isVolcano(loc.x, loc.y)) {
-            const active = GameplayMap.isVolcanoActive(loc.x, loc.y);
-            const volcanoStatus = (active) ? 'LOC_VOLCANO_ACTIVE' : 'LOC_VOLCANO_NOT_ACTIVE';
-            const volcanoName = GameplayMap.getVolcanoName(loc.x, loc.y);
-            const volcanoDetailsKey = (volcanoName) ? 'LOC_UI_NAMED_VOLCANO_DETAILS' : 'LOC_UI_VOLCANO_DETAILS';
-            text = Locale.compose(volcanoDetailsKey, text, volcanoStatus, volcanoName);
-            // highlight active volcanoes
-            if (active) style = BZ_STYLE.volcano;
-        }
-        return { text, style };
     }
     getRiverInfo(loc) {
         const riverType = GameplayMap.getRiverType(loc.x, loc.y);
@@ -1581,16 +1583,12 @@ class bzPlotTooltip {
             ttConstructible.appendChild(ttName);
             const notes = dotJoinLocale(c.notes);
             if (notes) {
-                const ttState = document.createElement("div");
-                ttState.classList.value = "text-accent-3 text-2xs mb-0\\.5";
-                if (c.isDamaged) {
-                    setCapsuleStyle(ttState, BZ_ALERT.caution);
-                } else {
-                    ttState.style.lineHeight = metrics.note.ratio;
-                    ttState.style.marginBottom = metrics.body.leading.half.css;
-                }
-                ttState.innerHTML = notes;
-                ttConstructible.appendChild(ttState);
+                const style = c.isDamaged ? BZ_ALERT.caution : null;
+                const sub = docCapsule(notes, style, metrics.font('2xs', 1.25));
+                sub.classList.value = "text-accent-3 text-2xs";
+                sub.style.marginBottom = metrics.body.leading.half.css;
+                if (!c.isDamaged) sub.style.lineHeight = metrics.note.ratio;
+                ttConstructible.appendChild(sub);
             }
             ttList.appendChild(ttConstructible);
         }
