@@ -8,34 +8,6 @@
 // TODO: fix yield layout
 // TODO: update localization
 // TODO: switch Row data to Replace
-// TODO: building Tag system
-// TODO: tag priority & name
-// - RAIL_CONNECTION Cargo? Shipping? Industrial?
-// - MILL       Mill            ?
-// - WAREHOUSE  Warehouse       ?
-// - BRIDGE     ?               ?
-// - WATER      Marine          LOC_BIOME_MARINE_NAME
-// - DIPLOMACY  Diplomatic      LOC_TRAIT_POLITICAL
-// - RELIGIOUS  Temple          LOC_BUILDING_TEMPLE_NAME
-// - HAPPINESS  Entertainment   LOC_CIVIC_ENTERTAINMENT_NAME
-// - CULTURE    Cultural        LOC_TRAIT_CULTURAL
-// - SCIENCE    Scientific      LOC_TRAIT_SCIENTIFIC
-// - TRADE      Trade? Market?  LOC_BUILDING_MARKET_NAME / LOC_TAG_CONSTRUCTIBLE_TRADE
-// - GOLD       Economic        LOC_TAG_TRAIT_ECONOMIC
-// - MILITARY   Military        LOC_VICTORY_PROGRESS_MILITARY_VICTORY
-// - PRODUCTION Production      LOC_UI_PRODUCTION_TITLE
-// - FOOD       ?
-// TODO: any use for these tags?
-// Tag="AGELESS"
-// Tag="CRISIS"
-// Tag="DISTRICT_WALL"
-// Tag="FORTIFICATION"
-// Tag="FULL_TILE"
-// Tag="GREATWORK"
-// Tag="IGNORE_DISTRICT_PLACEMENT_CAP"
-// Tag="LINK_ADJACENT"
-// Tag="PERSISTENT"
-// Tag="UNIQUE"
 import bzMapTrixOptions, { bzVerbosity } from '/bz-map-trix/ui/options/bz-map-trix-options.js';
 import "/base-standard/ui/tooltips/plot-tooltip.js";
 
