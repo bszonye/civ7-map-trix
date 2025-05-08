@@ -252,8 +252,8 @@ const BZ_HEAD_STYLE = [
 .bz-tooltip .bz-rules-list {
     text-align: center;
 }
-.bz-tooltip .bz-rules-item,
-.bz-tooltip .bz-rules-item p {
+.bz-tooltip .bz-list-item,
+.bz-tooltip .bz-list-item p {
     width: 100%;
 }
 `,
@@ -361,13 +361,14 @@ function docIcon(image, size, resize, ...style) {
 function docList(text, style=null) {
     // create a list of plain text (use docRules for font icons)
     const tt = document.createElement("div");
+    tt.style.position = 'relative';
     tt.style.alignSelf = 'center';
     tt.style.textAlign = 'center';
     tt.style.lineHeight = metrics.body.ratio;
     for (const item of text) {
         const row = document.createElement("div");
         if (style) row.classList.value = style;
-        row.classList.add("bz-rules-item");
+        row.classList.add("bz-list-item");
         row.setAttribute("data-l10n-id", item);
         tt.appendChild(row);
     }
@@ -376,17 +377,9 @@ function docList(text, style=null) {
 function docRules(text, style=null) {
     // create a paragraph of rules text
     // font icons are squirrely!  only center them at top level
-    const tt = document.createElement("div");
-    tt.style.alignSelf = 'center';
-    tt.style.textAlign = 'center';
+    const tt = docList(text, style);
+    tt.style.lineHeight = metrics.rules.ratio;
     tt.style.width = metrics.rules.width.css;
-    for (const item of text) {
-        const row = document.createElement("div");
-        if (style) row.classList.value = style;
-        row.classList.add("bz-rules-item");
-        row.setAttribute("data-l10n-id", item);
-        tt.appendChild(row);
-    }
     return tt;
 }
 function docText(text, style) {
@@ -1632,7 +1625,7 @@ class bzPlotTooltip {
         for (const item of text) {
             const ttItem = document.createElement("div");
             ttItem.classList.value = itemStyle ?? "leading-normal";
-            ttItem.classList.add("bz-rules-item");
+            ttItem.classList.add("bz-list-item");
             ttItem.setAttribute("data-l10n-id", item);
             ttText.appendChild(ttItem);
         }
