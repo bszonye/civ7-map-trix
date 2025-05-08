@@ -1,12 +1,11 @@
 // TODO: new titles
 // TODO: refactor model vs render
-// TODO: separate road & obstacle info
 // TODO: fix margins:
 // TODO: - settlement
 // TODO: - district
-// TODO: - yield
 // TODO: test margins:
 // TODO: - geography
+// TODO: - yield
 // TODO: update localization
 // TODO: switch Row data to Replace
 import bzMapTrixOptions, { bzVerbosity } from '/bz-map-trix/ui/options/bz-map-trix-options.js';
@@ -271,7 +270,7 @@ BZ_HEAD_STYLE.map(style => {
 document.body.classList.toggle("bz-yield-banner", bzMapTrixOptions.yieldBanner);
 
 // debug style (manually enable)
-document.body.classList.toggle("bz-debug", true);
+document.body.classList.toggle("bz-debug", false);
 
 function baseYields(info) {
     if (!info) return null;
@@ -623,6 +622,13 @@ class bzPlotTooltip {
         // title
         this.banners = null;
         this.title = null;
+        // constructibles
+        this.constructibles = [];
+        this.buildings = [];  // omits walls
+        this.improvement = null;
+        this.wonder = null;
+        this.quarter = null;
+        this.bridge = null;
         // world
         this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
         this.highlights = [];
@@ -630,7 +636,7 @@ class bzPlotTooltip {
         this.biome = null;
         this.feature = null;
         this.river = null;
-        this.routes = null;
+        this.route = null;
         this.plotEffects = null;
         this.isDistantLands = null;
         // settlement stats
@@ -640,12 +646,6 @@ class bzPlotTooltip {
         this.settlementType = null;
         this.townFocus = null;
         this.religions = null;  // TODO: redesign
-        // constructibles
-        this.constructibles = [];
-        this.buildings = [];  // omits walls
-        this.improvement = null;
-        this.wonder = null;
-        this.quarter = null;
         // workers
         this.specialists = null;  // { workers, maximum }
         this.freeConstructible = null;  // standard improvement type
@@ -656,6 +656,7 @@ class bzPlotTooltip {
         this.units = [];
         // lookup tables
         this.agelessBuildings = gatherBuildingsTagged("AGELESS");
+        this.bridgeBuildings = gatherBuildingsTagged("BRIDGE");
         this.extraBuildings = gatherBuildingsTagged("IGNORE_DISTRICT_PLACEMENT_CAP");
         this.largeBuildings = gatherBuildingsTagged("FULL_TILE");
         Loading.runWhenFinished(() => {
@@ -741,6 +742,13 @@ class bzPlotTooltip {
         // title
         this.banners = null;
         this.title = null;
+        // constructibles
+        this.constructibles = [];
+        this.buildings = [];  // omits walls
+        this.improvement = null;
+        this.wonder = null;
+        this.quarter = null;
+        this.bridge = null;
         // world
         this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
         this.highlights = [];
@@ -748,7 +756,7 @@ class bzPlotTooltip {
         this.biome = null;
         this.feature = null;
         this.river = null;
-        this.routes = null;
+        this.route = null;
         this.plotEffects = null;
         this.isDistantLands = null;
         // settlement
@@ -758,12 +766,6 @@ class bzPlotTooltip {
         this.settlementType = null;
         this.townFocus = null;
         this.religions = null;  // TODO: redesign
-        // constructibles
-        this.constructibles = [];
-        this.buildings = [];  // omits walls
-        this.improvement = null;
-        this.wonder = null;
-        this.quarter = null;
         // workers
         this.specialists = null;  // { workers, maximum }
         this.freeConstructible = null;  // standard improvement type
@@ -799,10 +801,10 @@ class bzPlotTooltip {
         this.district = districtID ? Districts.get(districtID) : null;
         const resourceType = GameplayMap.getResourceType(loc.x, loc.y);
         this.resource = GameInfo.Resources.lookup(resourceType);
+        this.modelConstructibles();
         // general properties
         this.modelBanners();
         this.modelGeography();
-        this.modelConstructibles();
         this.modelSettlement();
         this.modelWorkers();
         this.modelYields();
@@ -812,6 +814,8 @@ class bzPlotTooltip {
             // already set
         } else if (this.district?.isUniqueQuarter) {
             this.title = this.quarter.Name;
+        } else if (this.bridge) {
+            this.title = this.bridge.name;
         } else if (this.resource) {
             this.title = this.resource.Name;
         } else if (this.feature?.info.Tooltip) {  // natural wonder
@@ -820,6 +824,8 @@ class bzPlotTooltip {
             this.title = this.wonder.info.Name;
         } else if (this.city) {
             this.title = this.city.name;
+        } else if (this.river?.type == "RIVER_NAVIGABLE") {
+            this.title = this.river.name;
         } else if (this.biome.type == "BIOME_MARINE") {
             this.title = this.terrain.name;
         } else {
@@ -907,28 +913,8 @@ class bzPlotTooltip {
         this.terrain = this.getTerrain();
         this.biome = this.getBiome();
         this.feature = this.getFeature();
-        const riverType = GameplayMap.getRiverType(loc.x, loc.y);
-        const riverName = GameplayMap.getRiverName(loc.x, loc.y);
-        switch (riverType) {
-            case RiverTypes.RIVER_NAVIGABLE:
-                this.river = {
-                    Name: riverName || "LOC_NAVIGABLE_RIVER_NAME",
-                    RiverType: "RIVER_NAVIGABLE",  // type string
-                    type: riverType,  // type ID
-                };
-                break;
-            case RiverTypes.RIVER_MINOR:
-                this.river = {
-                    Name: riverName || "LOC_MINOR_RIVER_NAME",
-                    RiverType: "RIVER_MINOR",  // type string
-                    type: riverType,  // type ID
-                };
-                break;
-            default:
-                this.river = null;
-                break;
-        }
-        this.routes = this.getRoutes();
+        this.river = this.getRiver();
+        this.route = this.getRoute();
         this.isDistantLands = this.observer?.isDistantLands(loc) ?? null;
     }
     getTerrain() {
@@ -940,7 +926,7 @@ class bzPlotTooltip {
         const name = isLake ? "LOC_TERRAIN_LAKE_NAME" : info.Name;
         const type = info.TerrainType;
         const highlight = this.obstacles.has(type) ?  type : null;
-        const terrain = { name, type, highlight, info, };
+        const terrain = { name, type, isLake, highlight, info, };
         if (highlight) this.highlights.push(terrain);
         return terrain;
     }
@@ -978,6 +964,46 @@ class bzPlotTooltip {
         }
         if (highlight) this.highlights.push(feature)
         return feature;
+    }
+    getRiver() {
+        const loc = this.plotCoord;
+        const id = GameplayMap.getRiverType(loc.x, loc.y);
+        if (id == RiverTypes.NO_RIVER) return null;
+        const name = GameplayMap.getRiverName(loc.x, loc.y);
+        const bridge = this.bridge?.name;
+        const ferry = GameplayMap.isFerry(loc.x, loc.y) ?
+            "LOC_NAVIGABLE_RIVER_FERRY" : null;
+        const crossing = bridge ?? ferry ?? null;
+        const river = { name, type: null, crossing, highlight: null, };
+        switch (id) {
+            case RiverTypes.RIVER_NAVIGABLE:
+                river.name = name || "LOC_NAVIGABLE_RIVER_NAME";
+                river.type = "RIVER_NAVIGABLE";
+                break;
+            case RiverTypes.RIVER_MINOR:
+                river.name = name || "LOC_MINOR_RIVER_NAME";
+                river.type = "RIVER_MINOR";
+                break;
+        }
+        if (this.obstacles.has(river.type)) {
+            river.highlight = river.type;
+            this.highlights.push(river.type);
+        }
+        return river;
+    }
+    getRoute() {
+        const loc = this.plotCoord;
+        const id = GameplayMap.getRouteType(loc.x, loc.y);
+        const info = GameInfo.Routes.lookup(id);
+        if (!info) return null;
+        const name = info.Name;
+        const type = info.RouteType;
+        const isRoad = !info?.PlacementRequiresRoutePresent;
+        const isRail = !isRoad;
+        const highlight = isRail ? "ROUTE_RAILROAD" : "ROUTE_ROAD";
+        const route = { name, type, isRoad, isRail, highlight, info, };
+        this.highlights.push(route.highlight);
+        return route;
     }
     modelSettlement() {
         // owner, civ, city, district
@@ -1032,6 +1058,7 @@ class bzPlotTooltip {
             if (!(isWonder || isBuilding || isImprovement)) continue;
             const isAgeless = isWonder ||
                 this.agelessBuildings.has(info.ConstructibleType);
+            const isBridge = this.bridgeBuildings.has(info.ConstructibleType);
             const isComplete = item.complete;
             const isDamaged = item.damaged;
             const isExtra = this.extraBuildings.has(info.ConstructibleType);
@@ -1062,13 +1089,15 @@ class bzPlotTooltip {
             const row = {
                 name, notes, age,
                 isBuilding, isImprovement, isWonder,
-                isAgeless, isComplete, isDamaged, isExtra, isLarge, isOverbuildable,
+                isAgeless, isBridge, isComplete, isDamaged, isExtra,
+                isLarge, isOverbuildable,
                 item, info, xinfo,
             };
             this.constructibles.push(row);
             if (isBuilding && !isExtra) this.buildings.push(row);
             if (isImprovement) this.improvement = row;
             if (isWonder) this.wonder = row;
+            if (isBridge) this.bridge = row;
         };
         const n = this.constructibles.length;
         if (n > 1) {
@@ -1244,7 +1273,7 @@ class bzPlotTooltip {
         layout.classList.value = "text-center";
         layout.style.lineHeight = metrics.body.ratio;
         const capsule = (text, style) => {
-            const cap = docCapsule(text, style);
+            const cap = docCapsule(text, style, metrics.body);
             if (style) {
                 cap.style.marginTop = cap.style.marginBottom =
                     metrics.body.leading.half.css;
@@ -1270,7 +1299,7 @@ class bzPlotTooltip {
             layout.appendChild(capsule(text, style));
         }
         // feature type
-        if (this.feature) {
+        if (this.feature && !this.feature.info.Tooltip) {
             const style = BZ_STYLE[this.feature.highlight];
             layout.appendChild(capsule(this.feature.name, style));
         }
@@ -1284,7 +1313,7 @@ class bzPlotTooltip {
         }
         // roads & railroads
         if (this.route) {
-            const style = BZ_STYLE[this.route.style];
+            const style = BZ_STYLE[this.route.highlight];
             layout.appendChild(capsule(this.route.name, style));
         }
         // plot effects and fresh water
@@ -1298,38 +1327,10 @@ class bzPlotTooltip {
             metrics.head.margin.css;
         this.container.appendChild(layout);
     }
-    getRiverInfo(loc) {
-        const riverType = GameplayMap.getRiverType(loc.x, loc.y);
-        if (riverType == RiverTypes.NO_RIVER) return null;
-        let name = GameplayMap.getRiverName(loc.x, loc.y);
-        let style;
-        switch (riverType) {
-            case RiverTypes.RIVER_MINOR:
-                if (!name) name = "LOC_MINOR_RIVER_NAME";
-                style = this.obstacleStyle("RIVER_MINOR");
-                break;
-            case RiverTypes.RIVER_NAVIGABLE:
-                if (!name) name = "LOC_NAVIGABLE_RIVER_NAME";
-                style = this.obstacleStyle("RIVER_NAVIGABLE");
-                break;
-        }
-        if (!name) return null;
-        return { name, style, type: riverType };
-    }
     getContinentName(loc) {
         const continentType = GameplayMap.getContinentType(loc.x, loc.y);
         const continent = GameInfo.Continents.lookup(continentType);
         return continent?.Description ?? null;
-    }
-    getRoutes() {
-        const routeType = GameplayMap.getRouteType(this.plotCoord.x, this.plotCoord.y);
-        const routeInfo = GameInfo.Routes.lookup(routeType);
-        const isRail = !!routeInfo?.PlacementRequiresRoutePresent;
-        const isRoad = routeInfo && !isRail;
-        const isFerry = GameplayMap.isFerry(this.plotCoord.x, this.plotCoord.y);
-        const route = routeInfo?.Name ?? null;
-        const ferry = isFerry ? "LOC_NAVIGABLE_RIVER_FERRY" : null;
-        return { route, ferry, isRoad, isRail, isFerry, };
     }
     renderSettlement() {
         if (this.isCompact) return;
@@ -1425,17 +1426,13 @@ class bzPlotTooltip {
         }
     }
     renderUrban() {
-        let hexName = this.city.name;
+        let hexName = GameInfo.Districts.lookup(this.district.type).Name;
         let hexRules;
         // set name & description
-        if (this.isCompact) {
-            // keep the city name
-        } else if (this.district.type == DistrictTypes.CITY_CENTER) {
+        if (this.district.type == DistrictTypes.CITY_CENTER) {
             if (this.city.isTown && !this.owner.isMinor) {
                 // rename "City Center" to "Town Center" in towns
                 hexName = "LOC_DISTRICT_BZ_TOWN_CENTER";
-            } else {
-                hexName = GameInfo.Districts.lookup(this.district.type).Name;
             }
         } else if (this.district.isUniqueQuarter) {
             hexName = "LOC_PLOT_TOOLTIP_UNIQUE_QUARTER";
@@ -1454,7 +1451,7 @@ class bzPlotTooltip {
             hexName = "LOC_DISTRICT_BZ_URBAN_DISTRICT";
         }
         // title bar
-        this.renderTitleHeading(Locale.compose(hexName));
+        if (!this.isCompact) this.renderTitleHeading(hexName);
         this.renderDistrictDefense(this.plotCoord);
         // panel interior
         // show rules for unique quarters
@@ -1517,15 +1514,9 @@ class bzPlotTooltip {
                 GameInfo.Districts.lookup(DistrictTypes.WILDERNESS).Name;
         }
         // avoid useless section headings
-        if (!this.improvement && !this.totalYields) {
-            if (this.isCompact && hexName) {
-                this.renderTitleHeading(Locale.compose(hexName));
-                this.container.lastChild.style.marginBottom = metrics.head.margin.css;
-            }
-            return;
-        }
+        if (!this.improvement && !this.totalYields) return;
         // title bar
-        if (hexName) this.renderTitleHeading(Locale.compose(hexName));
+        if (hexName && !this.isCompact) this.renderTitleHeading(hexName);
         // optional description
         if (hexRules.length && !this.isCompact) {
             const title = "text-2xs uppercase leading-none mb-1";
@@ -1553,7 +1544,7 @@ class bzPlotTooltip {
     renderWonder() {
         if (!this.wonder) return;
         const info = this.wonder.info;
-        this.renderTitleHeading(Locale.compose(info.Name));
+        if (!this.isCompact) this.renderTitleHeading("LOC_DISTRICT_WONDER_NAME");
         let rulesStyle = null;
         const notes = this.wonder.notes;
         if (notes.length) {
