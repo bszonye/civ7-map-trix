@@ -1,3 +1,4 @@
+// TODO: hide redundant walls
 // TODO: new titles
 // TODO: refactor model vs render
 // TODO: fix margins:
@@ -101,7 +102,7 @@ const BZ_COLOR = {
     caution: "#cea92f",  // caution = healthbar-medium
     note: "#ff800033",  // note = orange 20% opacity
     // geographic colors
-    hill: "#a9967066",  // Rough terrain = dark bronze 40% opacity
+    hill: "#c7b28a66",  // Rough terrain = medium bronze 40% opacity
     vegetated: "#aaff0033",  // Vegetated features = green 20% opacity
     wet: "#55ffff33",  // Wet features = teal 20% opacity
     river: "#55aaff66",  // Rivers = azure 40% opacity
@@ -122,32 +123,32 @@ const BZ_COLOR = {
     cultural: "#892bb3",
 };
 const BZ_ALERT = {
-    primary: { "background-color": BZ_COLOR.primary },
-    secondary: { "background-color": BZ_COLOR.secondary, color: BZ_COLOR.black },
-    black: { "background-color": BZ_COLOR.black },
-    danger: { "background-color": BZ_COLOR.danger },
-    enemy: { "background-color": BZ_COLOR.danger },
-    conqueror: { "background-color": BZ_COLOR.danger, color: BZ_COLOR.caution },
-    caution: { "background-color": BZ_COLOR.caution, color: BZ_COLOR.black },
-    note: { "background-color": BZ_COLOR.note },
-    DEBUG: { "background-color": "#80808080" },
+    primary: { "background-color": BZ_COLOR.primary, },
+    secondary: { "background-color": BZ_COLOR.secondary, color: BZ_COLOR.black, },
+    black: { "background-color": BZ_COLOR.black, },
+    danger: { "background-color": BZ_COLOR.danger, },
+    enemy: { "background-color": BZ_COLOR.danger, },
+    conqueror: { "background-color": BZ_COLOR.danger, color: BZ_COLOR.caution, },
+    caution: { "background-color": BZ_COLOR.caution, color: BZ_COLOR.black, },
+    note: { "background-color": BZ_COLOR.note, },
+    DEBUG: { "background-color": "#80808080", },
 }
 const BZ_STYLE = {
-    debug: { "background-color": `${BZ_COLOR.bronze6}99` },
+    debug: { "background-color": `${BZ_COLOR.bronze6}99`, },
     // movement & obstacle types
-    TERRAIN_HILL: { "background-color": BZ_COLOR.hill },
+    TERRAIN_HILL: { "background-color": BZ_COLOR.hill, },
     TERRAIN_OCEAN: {},  // don't need to highlight this
     FEATURE_VOLCANO: BZ_ALERT.caution,
-    FEATURE_CLASS_VEGETATED: { "background-color": BZ_COLOR.vegetated },
-    FEATURE_CLASS_WET: { "background-color": BZ_COLOR.wet },
-    RIVER_MINOR: { "background-color": BZ_COLOR.river },
-    RIVER_NAVIGABLE: { "background-color": BZ_COLOR.river },
-    ROUTE_ROAD: { "background-color": BZ_COLOR.road, color: BZ_COLOR.black },
-    ROUTE_RAILROAD: { "background-color": BZ_COLOR.rail, color: BZ_COLOR.black },
+    FEATURE_CLASS_VEGETATED: { "background-color": BZ_COLOR.vegetated, },
+    FEATURE_CLASS_WET: { "background-color": BZ_COLOR.wet, },
+    RIVER_MINOR: { "background-color": BZ_COLOR.river, },
+    RIVER_NAVIGABLE: { "background-color": BZ_COLOR.river, },
+    ROUTE_ROAD: { "background-color": BZ_COLOR.road, color: BZ_COLOR.black, },
+    ROUTE_RAILROAD: { "background-color": BZ_COLOR.rail, color: BZ_COLOR.black, },
     // TODO: remove these?
-    river: { "background-color": BZ_COLOR.river },
-    road: { "background-color": BZ_COLOR.road, color: BZ_COLOR.black },
-    rail: { "background-color": BZ_COLOR.rail, color: BZ_COLOR.black },
+    river: { "background-color": BZ_COLOR.river, },
+    road: { "background-color": BZ_COLOR.road, color: BZ_COLOR.black, },
+    rail: { "background-color": BZ_COLOR.rail, color: BZ_COLOR.black, },
 }
 // accent colors for icon types
 const BZ_TYPE_COLOR = {
@@ -822,10 +823,12 @@ class bzPlotTooltip {
             this.title = this.feature.info.Name;
         } else if (this.wonder) {
             this.title = this.wonder.info.Name;
-        } else if (this.city) {
+        } else if (this.city && this.isCompact) {
             this.title = this.city.name;
-        } else if (this.river?.type == "RIVER_NAVIGABLE") {
+        } else if (this.river?.type == "RIVER_NAVIGABLE" && !this.district) {
             this.title = this.river.name;
+        } else if (this.settlementType) {
+            this.title = this.settlementType;
         } else if (this.biome.type == "BIOME_MARINE") {
             this.title = this.terrain.name;
         } else {
@@ -1339,11 +1342,6 @@ class bzPlotTooltip {
         const name = this.city ? this.city.name : this.getCivName(this.owner);
         // render headings: settlement and type
         this.renderTitleHeading(name);
-        const type = docList([this.settlementType]);
-        type.classList.value = "text-2xs uppercase";
-        type.style.lineHeight = metrics.note.ratio;
-        type.style.marginBottom = metrics.padding.banner.css;
-        this.container.appendChild(type);
         // owner info
         const rows = [];
         // show name, relationship, and civ
