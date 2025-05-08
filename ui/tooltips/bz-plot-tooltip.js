@@ -135,17 +135,20 @@ const BZ_ALERT = {
 }
 const BZ_STYLE = {
     debug: { "background-color": `${BZ_COLOR.bronze6}99` },
-    volcano: BZ_ALERT.caution,
     // movement & obstacle types
-    road: { "background-color": BZ_COLOR.road, color: BZ_COLOR.black },
-    rail: { "background-color": BZ_COLOR.rail, color: BZ_COLOR.black },
     TERRAIN_HILL: { "background-color": BZ_COLOR.hill },
     TERRAIN_OCEAN: {},  // don't need to highlight this
+    FEATURE_VOLCANO: BZ_ALERT.caution,
     FEATURE_CLASS_VEGETATED: { "background-color": BZ_COLOR.vegetated },
     FEATURE_CLASS_WET: { "background-color": BZ_COLOR.wet },
     RIVER_MINOR: { "background-color": BZ_COLOR.river },
     RIVER_NAVIGABLE: { "background-color": BZ_COLOR.river },
+    ROUTE_ROAD: { "background-color": BZ_COLOR.road, color: BZ_COLOR.black },
+    ROUTE_RAILROAD: { "background-color": BZ_COLOR.rail, color: BZ_COLOR.black },
+    // TODO: remove these?
     river: { "background-color": BZ_COLOR.river },
+    road: { "background-color": BZ_COLOR.road, color: BZ_COLOR.black },
+    rail: { "background-color": BZ_COLOR.rail, color: BZ_COLOR.black },
 }
 // accent colors for icon types
 const BZ_TYPE_COLOR = {
@@ -268,7 +271,7 @@ BZ_HEAD_STYLE.map(style => {
 document.body.classList.toggle("bz-yield-banner", bzMapTrixOptions.yieldBanner);
 
 // debug style (manually enable)
-document.body.classList.toggle("bz-debug", false);
+document.body.classList.toggle("bz-debug", true);
 
 function baseYields(info) {
     if (!info) return null;
@@ -642,6 +645,7 @@ class bzPlotTooltip {
         this.buildings = [];  // omits walls
         this.improvement = null;
         this.wonder = null;
+        this.quarter = null;
         // workers
         this.specialists = null;  // { workers, maximum }
         this.freeConstructible = null;  // standard improvement type
@@ -759,6 +763,7 @@ class bzPlotTooltip {
         this.buildings = [];  // omits walls
         this.improvement = null;
         this.wonder = null;
+        this.quarter = null;
         // workers
         this.specialists = null;  // { workers, maximum }
         this.freeConstructible = null;  // standard improvement type
@@ -805,6 +810,12 @@ class bzPlotTooltip {
         // set title
         if (this.title) {
             // already set
+        } else if (this.district?.isUniqueQuarter) {
+            this.title = this.quarter.Name;
+        } else if (this.resource) {
+            this.title = this.resource.Name;
+        } else if (this.feature?.info.Tooltip) {  // natural wonder
+            this.title = this.feature.info.Name;
         } else if (this.wonder) {
             this.title = this.wonder.info.Name;
         } else if (this.city) {
@@ -954,18 +965,19 @@ class bzPlotTooltip {
         const ctype = info.FeatureClassType;
         const highlight = this.obstacles.has(type) ? ctype : null;
         const feature = { name, type, ctype, highlight, info, };
+        if (GameplayMap.isVolcano(loc.x, loc.y)) {
+            // get extra info about volcano features
+            const isActive = GameplayMap.isVolcanoActive(loc.x, loc.y);
+            const vname = GameplayMap.getVolcanoName(loc.x, loc.y);
+            const vstatus = isActive ?
+                'LOC_VOLCANO_ACTIVE' : 'LOC_VOLCANO_NOT_ACTIVE';
+            const key = vname ?
+                'LOC_UI_NAMED_VOLCANO_DETAILS' : 'LOC_UI_VOLCANO_DETAILS';
+            feature.name = Locale.compose(key, name, vstatus, vname);
+            if (isActive) feature.highlight = "FEATURE_VOLCANO";
+        }
         if (highlight) this.highlights.push(feature)
         return feature;
-        if (GameplayMap.isVolcano(loc.x, loc.y)) {
-            const active = GameplayMap.isVolcanoActive(loc.x, loc.y);
-            const volcanoStatus = (active) ? 'LOC_VOLCANO_ACTIVE' : 'LOC_VOLCANO_NOT_ACTIVE';
-            const volcanoName = GameplayMap.getVolcanoName(loc.x, loc.y);
-            const volcanoDetailsKey = (volcanoName) ? 'LOC_UI_NAMED_VOLCANO_DETAILS' : 'LOC_UI_VOLCANO_DETAILS';
-            name = Locale.compose(volcanoDetailsKey, name, volcanoStatus, volcanoName);
-            // highlight active volcanoes
-            if (active) style = BZ_STYLE.volcano;
-        }
-        return { name, style };
     }
     modelSettlement() {
         // owner, civ, city, district
@@ -1031,6 +1043,10 @@ class bzPlotTooltip {
                 isImprovement ?  GameInfo.Improvements.lookup(info.ConstructibleType) :
                 isWonder ?  GameInfo.Wonders.lookup(info.ConstructibleType) :
                 null;
+            if (xinfo.TraitType && !this.quarter && this.district.isUniqueQuarter) {
+                this.quarter = GameInfo.UniqueQuarters
+                    .find(e => e.TraitType == xinfo.TraitType);
+            }
 
             if (isDamaged) notes.push("LOC_PLOT_TOOLTIP_DAMAGED");
             if (!isComplete) notes.push("LOC_PLOT_TOOLTIP_IN_PROGRESS");
@@ -1422,14 +1438,13 @@ class bzPlotTooltip {
                 hexName = GameInfo.Districts.lookup(this.district.type).Name;
             }
         } else if (this.district.isUniqueQuarter) {
-            const unique = this.buildings[0].xinfo.TraitType;
-            const uq = GameInfo.UniqueQuarters.find(e => e.TraitType == unique);
-            hexName = uq.Name;
+            hexName = "LOC_PLOT_TOOLTIP_UNIQUE_QUARTER";
             // UQs don't have .Tooltip but most have parallel
             // LOC_QUARTER_XXX_DESCRIPTION and
             // LOC_QUARTER_XXX_TOOLTIP localization strings
-            const tooltip = uq.Description.replace("_DESCRIPTION", "_TOOLTIP");
-            hexRules = Locale.keyExists(tooltip) ? tooltip : uq.Description;
+            const tooltip = this.quarter.Description
+                .replace("_DESCRIPTION", "_TOOLTIP");
+            hexRules = Locale.keyExists(tooltip) ? tooltip : this.quarter.Description;
         } else if (this.district.isQuarter) {
             hexName = "LOC_DISTRICT_BZ_URBAN_QUARTER";
         } else if (this.buildings.length == 0) {
@@ -1467,22 +1482,18 @@ class bzPlotTooltip {
             hexName = this.isCompact && this.owner?.isAlive ?
                 this.getCivName(this.owner) :
                 this.improvement?.districtName;
-        } else if (this.feature?.Tooltip) {
+        } else if (this.feature?.info.Tooltip) {
             // natural wonder
-            hexName = this.feature.Name;
+            hexName = "LOC_PLOT_TOOLTIP_NATURAL_WONDER";
             if (!this.improvement || this.isVerbose) {
-                hexRules.push(this.feature.Tooltip);
+                hexRules.push(this.feature.info.Tooltip);
             }
         } else if (this.resource) {
             // resource
-            hexName = this.resource.Name;
+            const rctype = this.resource.ResourceClassType;
+            const rcinfo = GameInfo.ResourceClasses.lookup(rctype);
+            hexName = rcinfo.Name + "_BZ";
             if (this.freeConstructible || this.isVerbose) {
-                const rctype = this.resource.ResourceClassType;
-                const rc = rctype && GameInfo.ResourceClasses.lookup(rctype);
-                if (rc?.Name) {
-                    let rcname = rc.Name + "_BZ";
-                    hexSubtitle = Locale.keyExists(rcname) ? rcname : rc.Name;
-                }
                 hexRules.push(this.resource.Tooltip);
                 if (this.isDistantLands &&
                     this.resource.ResourceClassType == "RESOURCECLASS_TREASURE") {
