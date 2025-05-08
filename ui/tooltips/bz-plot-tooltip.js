@@ -266,7 +266,7 @@ BZ_HEAD_STYLE.map(style => {
 document.body.classList.toggle("bz-yield-banner", bzMapTrixOptions.yieldBanner);
 
 // debug style (manually enable)
-document.body.classList.toggle("bz-debug", false);
+document.body.classList.toggle("bz-debug", true);
 
 function baseYields(info) {
     if (!info) return null;
@@ -343,6 +343,20 @@ function docCapsule(text, style) {
     capsule.setAttribute('data-l10n-id', text);
     return capsule;
 }
+function docIcon(image, size, resize, ...style) {
+    // create an icon to fit size (with optional image resizing)
+    const icon = document.createElement("div");
+    icon.classList.value = "relative bg-contain bg-no-repeat shadow";
+    if (style.length) icon.classList.add(...style);
+    icon.style.height = size;
+    icon.style.width = size;
+    // note: this sets image width and auto height
+    if (resize && resize != size) icon.style.backgroundSize = resize;
+    icon.style.backgroundPosition = "center";
+    icon.style.backgroundImage =
+        image.startsWith("url(") ? image : UI.getIconCSS(image);
+    return icon;
+}
 function docRules(text, style=null) {
     // create a paragraph of rules text
     // font icons are squirrely!  only center them at top level
@@ -398,8 +412,14 @@ function gatherMovementObstacles(mclass) {
     // set the cache and return it
     return BZ_OBSTACLES[mclass] = obstacles;
 }
-function _getDigits(list, min=0) {
-    return Math.max(min, ...list.map(n => n.length));
+function getDigits(list, min=0) {
+    const digits = list.map(n => {
+        const s = n.toString();
+        let d = s.length;
+        if (s.includes('.')) d-= 4/9;  // trim decimals
+        return d;
+    });
+    return Math.max(min, ...digits);
 }
 function getFontMetrics() {
     const sizes = (rem, round=Math.round) => {
@@ -1015,22 +1035,30 @@ class bzPlotTooltip {
         this.freeConstructible = { info, name, format, icon, text };
     }
     modelYields() {
+        const loc = this.plotCoord;
         this.yields = [];
         this.totalYields = 0;
         // one column per yield type
         GameInfo.Yields.forEach(info => {
-            const value = GameplayMap.getYield(this.plotCoord.x, this.plotCoord.y, info.YieldType, this.observerID);
-            if (value) {
-                const column = { name: info.Name, type: info.YieldType, value };
+            const name = info.Name;
+            const type = info.YieldType;
+            const yvalue = 99.5;  // TODO: GameplayMap.getYield(loc.x, loc.y, type, this.observerID);
+            if (yvalue) {
+                const value = (Math.round(10 * yvalue) / 10).toString();
+                const column = { name, type, value, };
                 this.yields.push(column);
-                this.totalYields += value;
+                this.totalYields += yvalue;
             }
         });
         if (this.yields.length < 2) return;
-        // total yield column
+        // total
+        const name = "LOC_YIELD_BZ_TOTAL";
         const type = BZ_URBAN_TYPES.includes(this.district?.type) ?
             BZ_ICON_TOTAL_URBAN : BZ_ICON_TOTAL_RURAL;
-        const column = { name: "LOC_YIELD_BZ_TOTAL", type, value: this.totalYields };
+        // avoid fractions in total to avoid extra-wide columns
+        // round down to avoid inflating totals (for science legacy)
+        const value = Math.floor(this.totalYields).toString();
+        const column = { name, type, value, };
         this.yields.push(column);
     }
     modelUnits() {
@@ -1516,17 +1544,21 @@ class bzPlotTooltip {
         if (!this.wonder) return;
         const info = this.wonder.info;
         this.renderTitleHeading(Locale.compose(info.Name));
-        let rulesStyle = "w-60";
+        let rulesStyle = null;
         const notes = this.wonder.notes;
         if (notes.length) {
             const ttState = document.createElement("div");
             ttState.classList.value = "text-2xs leading-none text-center";
             ttState.innerHTML = dotJoinLocale(notes);
             this.container.appendChild(ttState);
-            rulesStyle = "w-60 mt-1";
+            rulesStyle = "mt-1";
         }
         const rules = this.isVerbose ? info.Description : info.Tooltip;
-        if (rules && !this.isCompact) this.renderRules([rules], rulesStyle);
+        if (rules && !this.isCompact) {
+            const tt = docRules([rules]);
+            tt.style.width = `13.3333333333rem`;
+            this.container.appendChild(tt);
+        }
         const colors = constructibleColors(this.wonder.info);
         const icon = {
             icon: info.ConstructibleType,
@@ -1676,24 +1708,39 @@ class bzPlotTooltip {
     }
     renderYields() {
         if (!this.totalYields) return;  // no yields to show
+        // set column width based on number of digits (at least three)
+        const digits = getDigits(this.yields.map(y => y.value), 2);
+        const width = metrics.yields.digits(digits).css;
         const tt = document.createElement('div');
-        tt.classList.value = "plot-tooltip__resourcesFlex mt-1\\.5";
+        tt.classList.value = "self-center flex flex-wrap justify-center w-full";
         // one column per yield type
-        for (const column of this.yields) {
-            tt.appendChild(this.yieldColumn(column));
+        for (const [i, column] of this.yields.entries()) {
+            const y = this.yieldColumn(column, width);
+            if (i) y.style.marginLeft = '0.3333333333rem';  // all but first column
+            tt.appendChild(y);
         }
-        // set column width based on number of digits (at least two)
-        const numWidth = (n) => {
-            const frac = n % 1 != 0;
-            // decimal points need a little less room
-            return n.toString().length - (frac ? 0.4 : 0);
-        };
-        const maxWidth = Math.max(2, ...this.yields.map(y => numWidth(y.value)));
-        const yieldWidth = 1 + maxWidth / 3;  // width in rem
-        tt.style.setProperty("--yield-width", `${yieldWidth}rem`);
+        tt.style.marginTop = metrics.yields.margin.css;
+        tt.style.marginBottom = metrics.yields.margin.css;
         this.container.appendChild(tt);
     }
-    yieldColumn(col) {
+    yieldColumn(col, width) {
+        const tt = document.createElement("div");
+        tt.classList.value = "flex-col justify-start font-body";
+        const ariaLabel = `${col.value} ${Locale.compose(col.name)}`;
+        console.warn(`TRIX ARIA ${ariaLabel}`);
+        tt.ariaLabel = ariaLabel;
+        const size = metrics.yields.spacing.css;
+        const iconCSS = UI.getIconCSS(col.type, "YIELD");
+        const icon = docIcon(iconCSS, size, size, "self-center", "shadow");
+        tt.appendChild(icon);
+        const value = docText(col.value, "self-center text-center");
+        value.style.fontSize = metrics.yields.size.css;
+        value.style.lineHeight = metrics.yields.spacing.css;
+        value.style.width = width;
+        tt.appendChild(value);
+        return tt;
+    }
+    TODOyieldColumn(col) {
         const isTotal = col.name == "LOC_YIELD_BZ_TOTAL";
         const ttIndividualYieldFlex = document.createElement("div");
         ttIndividualYieldFlex.classList.add("plot-tooltip__IndividualYieldFlex");
