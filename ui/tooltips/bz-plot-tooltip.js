@@ -136,7 +136,7 @@ const BZ_ALERT = {
 const BZ_STYLE = {
     debug: { "background-color": `${BZ_COLOR.bronze6}99`, },
     // movement & obstacle types
-    TERRAIN_HILL: { "background-color": BZ_COLOR.hill, },
+    TERRAIN_HILL: { "background-color": BZ_COLOR.hill, color: BZ_COLOR.bronze, },
     TERRAIN_OCEAN: {},  // don't need to highlight this
     FEATURE_VOLCANO: BZ_ALERT.caution,
     FEATURE_CLASS_VEGETATED: { "background-color": BZ_COLOR.vegetated, },
@@ -815,8 +815,6 @@ class bzPlotTooltip {
             // already set
         } else if (this.district?.isUniqueQuarter) {
             this.title = this.quarter.Name;
-        } else if (this.bridge) {
-            this.title = this.bridge.name;
         } else if (this.resource) {
             this.title = this.resource.Name;
         } else if (this.feature?.info.Tooltip) {  // natural wonder
@@ -880,7 +878,7 @@ class bzPlotTooltip {
         if (wloc.x != loc.x || wloc.y != loc.y) {
             // ignore city water out side of the city center
         } else if (GameplayMap.isFreshWater(wloc.x, wloc.y)) {
-            this.plotEffects.text.push("LOC_PLOTKEY_FRESHWATER");
+            if (this.isVerbose) this.plotEffects.text.push("LOC_PLOTKEY_FRESHWATER");
         } else if (!this.city && lens == "fxs-settler-lens") {
             this.banners.caution.push("LOC_PLOT_TOOLTIP_NO_FRESH_WATER");
         }
@@ -1284,7 +1282,7 @@ class bzPlotTooltip {
             return cap;
         };
         // continent & hemisphere
-        if (this.terrain && this.terrain.type != "TERRAIN_OCEAN") {
+        if (this.terrain && this.terrain.type != "TERRAIN_OCEAN" && this.isVerbose) {
             const continentName = this.getContinentName(loc);
             const hemisphereName =
                 this.isDistantLands ? "LOC_PLOT_TOOLTIP_HEMISPHERE_WEST" :
