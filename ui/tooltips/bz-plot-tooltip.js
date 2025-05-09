@@ -20,9 +20,6 @@ import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
 // horizontal list separator
 const BZ_DOT_DIVIDER = Locale.compose("LOC_PLOT_DIVIDER_DOT");
 
-// all urban DistrictTypes
-const BZ_URBAN_TYPES = [DistrictTypes.CITY_CENTER, DistrictTypes.URBAN];
-
 // custom & adapted icons
 const BZ_ICON_SIZE = 12;
 const BZ_ICON_DISCOVERY = "url('blp:tech_cartography')";
@@ -489,34 +486,19 @@ function getFontMetrics() {
 }
 function getReligionInfo(id) {
     // find a matching player religion, to get custom names
-    let religion = GameInfo.Religions.lookup(id);
-    const icon = `[icon:${religion.ReligionType}]`;
-    let name = religion.Name;
+    const info = GameInfo.Religions.lookup(id);
+    if (!info) return null;
     // find custom religion name, if any
-    for (const founder of Players.getEverAlive()) {
-        if (founder.Religion?.getReligionType() != id) continue;
-        name = founder.Religion.getReligionName();
-        break;
+    const customName = (info) => {
+        for (const founder of Players.getEverAlive()) {
+            if (founder.Religion?.getReligionType() != id) continue;
+            return founder.Religion.getReligionName();
+        }
+        return info.Name;
     }
-    return { name, icon };
-}
-function _getReligions(city) {  // TODO: remove?
-    const religion = city?.Religion;
-    if (!religion) return null;
-    const list = [];
-    if (religion.majorityReligion != -1) {
-        const info = getReligionInfo(religion.majorityReligion);
-        list.push(Locale.compose("LOC_BZ_RELIGION_MAJORITY", info.icon, info.name));
-    }
-    if (religion.urbanReligion != religion.majorityReligion) {
-        const info = getReligionInfo(religion.urbanReligion);
-        list.push(Locale.compose("LOC_BZ_RELIGION_URBAN", info.icon, info.name));
-    }
-    if (religion.ruralReligion != religion.majorityReligion) {
-        const info = getReligionInfo(religion.ruralReligion);
-        list.push(Locale.compose("LOC_BZ_RELIGION_RURAL", info.icon, info.name));
-    }
-    return list.length ? list : null;
+    const name = customName(info);
+    const icon = info.ReligionType;
+    return { name, icon, info, };
 }
 function getSpecialists(loc, city) {
     if (!city || city.isTown) return null;  // no specialists in towns
@@ -624,7 +606,7 @@ class bzPlotTooltip {
         this.townFocus = null;
         this.religions = null;  // TODO: redesign
         // workers
-        this.specialists = null;  // { workers, maximum }
+        this.population = null;  // { workers, maximum }
         this.freeConstructible = null;  // standard improvement type
         // yields
         this.yields = [];
@@ -743,7 +725,7 @@ class bzPlotTooltip {
         this.townFocus = null;
         this.religions = null;  // TODO: redesign
         // workers
-        this.specialists = null;  // { workers, maximum }
+        this.population = null;  // { workers, maximum }
         this.freeConstructible = null;  // standard improvement type
         // yields
         this.yields = [];
@@ -1126,7 +1108,25 @@ class bzPlotTooltip {
     }
     modelWorkers() {
         const loc = this.plotCoord;
-        this.specialists = getSpecialists(this.plotCoord, this.city);
+        if (this.city && this.district) {
+            // get populaton & religion info
+            const isUrban = this.district.isUrbanCore;
+            const pop = this.constructibles
+                .map(c => c.info.Population)
+                .reduce((a, b) => a + b, 0);
+            const urban = isUrban ? pop : 0;
+            const rural = !isUrban ? pop : 0;
+            const special = getSpecialists(loc, this.city);
+            // religion
+            const religion = { majority: null, urban: null, rural: null, };
+            if (this.city.Religion) {
+                const info = this.city.Religion;
+                religion.majority = getReligionInfo(info.majorityReligion);
+                religion.urban = getReligionInfo(info.urbanReligion);
+                religion.rural = getReligionInfo(info.ruralReligion);
+            }
+            this.population = { urban, rural, special, religion, };
+        }
         if (this.improvement) {
             // set up icons and special district names for improvements
             const info = this.improvement.info;
@@ -1186,7 +1186,7 @@ class bzPlotTooltip {
         if (this.yields.length < 2) return;
         // total
         const name = "LOC_YIELD_BZ_TOTAL";
-        const type = BZ_URBAN_TYPES.includes(this.district?.type) ?
+        const type = this.district?.isUrbanCore ?
             BZ_ICON_TOTAL_URBAN : BZ_ICON_TOTAL_RURAL;
         // avoid fractions in total to avoid extra-wide columns
         // round down to avoid inflating totals (for science legacy)
@@ -1342,6 +1342,83 @@ class bzPlotTooltip {
         banner.style.lineHeight = metrics.body.ratio;
         banner.style.marginBottom = metrics.body.margin.css;
         this.container.appendChild(banner);
+        // report population, religion, and specialists
+        this.renderPopulation();
+    }
+    renderPopulation() {
+        // TODO: simplify
+        // TODO: hide zero rows
+        if (!this.population) return;
+        console.warn(`TRIX POP ${JSON.stringify(this.population)}`);
+        const { urban, rural, special, religion, } = this.population;
+        const layout = [
+            {
+                icon: religion.urban?.icon ?? "CITY_URBAN",
+                label: "LOC_UI_CITY_STATUS_URBAN_POPULATION",
+                value: urban,
+            },
+            {
+                icon: religion.rural?.icon ?? "CITY_RURAL",
+                label: "LOC_UI_CITY_STATUS_RURAL_POPULATION",
+                value: rural,
+            },
+            {
+                icon: "CITY_SPECIAL_BASE",
+                label: "LOC_UI_SPECIALISTS_SUBTITLE",
+                value: special?.maximum ?? 0,
+                frac: special?.workers ?? 0,
+            },
+        ];
+        const size = metrics.table.spacing.css;
+        const small = metrics.sizes(5/6 * metrics.table.spacing.rem).css;
+        const rows = [];
+        for (const item of layout) {
+            // don't show zero pop, or zero specialists (unless verbose)
+            if (!item.value) continue;
+            if (item.frac == 0 && !this.isVerbose) continue;
+            // build row
+            // TODO: improve layout, especially for single rows
+            const row = document.createElement("div");
+            row.classList.value = "flex justify-start px-1";
+            row.style.minHeight = size;
+            row.appendChild(docIcon(item.icon, size, small, "-mx-1"));
+            row.appendChild(docText(item.label, "text-left flex-auto mx-2"));
+            const vtext = item.value.toFixed();
+            const ftext = item.frac?.toFixed();
+            const value = ftext ? `${ftext} / ${vtext}` : vtext;
+            row.appendChild(docText(value, "text-right"));
+            rows.push(row);
+        }
+        this.renderTable(rows, null, true);
+    }
+    renderTable(rows, color, narrow=false) {
+        // TODO: simplify
+        const table = document.createElement("div");
+        table.classList.value = "flex-table justify-start text-xs";
+        // collect rows into the table
+        for (const [i, row] of rows.entries()) {
+            // add stripes to multi-row tables
+            if (color && !(i % 2)) {
+                row.classList.add("rounded-2xl");
+                row.style.backgroundColor = color;
+            }
+            table.appendChild(row);
+        }
+        if (narrow) {
+            // optionally prevent single-row tables from
+            // expanding to the full width of the tooltip
+            // TODO: why does this work?
+            const tt = document.createElement("div");
+            tt.classList.value = "flex justify-center";
+            tt.style.marginBottom = 0;
+            tt.append(table);
+            tt.style.marginBottom = metrics.margin.css;
+            this.container.appendChild(tt);
+            return;
+        }
+        // full-width table
+        table.style.marginBottom = metrics.margin.css;
+        this.container.appendChild(table);
     }
     getOwnerName(owner) {
         if (!owner) return "";
@@ -1438,12 +1515,6 @@ class bzPlotTooltip {
         if (hexRules && this.isVerbose) this.renderRules([hexRules], "w-60 mb-1");
         // constructibles
         this.renderConstructibles();
-        // report specialists
-        if (this.specialists && (this.specialists.workers || this.isVerbose)) {
-            const text = Locale.compose("LOC_DISTRICT_BZ_SPECIALISTS",
-                this.specialists.workers, this.specialists.maximum);
-            this.renderRules([text], "w-full mt-1");
-        }
         // bottom bar
         this.renderUrbanDivider();
     }
