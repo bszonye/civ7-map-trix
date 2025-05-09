@@ -139,16 +139,13 @@ const BZ_STYLE = {
     TERRAIN_HILL: { "background-color": BZ_COLOR.hill, color: BZ_COLOR.bronze, },
     TERRAIN_OCEAN: {},  // don't need to highlight this
     FEATURE_VOLCANO: BZ_ALERT.caution,
+    LOC_VOLCANO_NOT_ACTIVE: BZ_ALERT.note,
     FEATURE_CLASS_VEGETATED: { "background-color": BZ_COLOR.vegetated, },
     FEATURE_CLASS_WET: { "background-color": BZ_COLOR.wet, },
     RIVER_MINOR: { "background-color": BZ_COLOR.river, },
     RIVER_NAVIGABLE: { "background-color": BZ_COLOR.river, },
     ROUTE_ROAD: { "background-color": BZ_COLOR.road, color: BZ_COLOR.black, },
     ROUTE_RAILROAD: { "background-color": BZ_COLOR.rail, color: BZ_COLOR.black, },
-    // TODO: remove these?
-    river: { "background-color": BZ_COLOR.river, },
-    road: { "background-color": BZ_COLOR.road, color: BZ_COLOR.black, },
-    rail: { "background-color": BZ_COLOR.rail, color: BZ_COLOR.black, },
 }
 // accent colors for icon types
 const BZ_TYPE_COLOR = {
@@ -404,9 +401,6 @@ function dotJoin(list, dot=BZ_DOT_DIVIDER) {
 function dotJoinLocale(list, dot=BZ_DOT_DIVIDER) {
     return dotJoin(list.map(s => s && Locale.compose(s)), dot);
 }
-function joinLocale(list, joiner=" ") {
-    return list.map(s => s && Locale.compose(s)).join(joiner);
-}
 function gatherBuildingsTagged(tag) {
     return new Set(GameInfo.TypeTags.filter(e => e.Tag == tag).map(e => e.Type));
 }
@@ -492,11 +486,11 @@ function getFontMetrics() {
         radius, bumper,
     };
 }
-function _getFigureWidth(size, digits=1) {
+function _getFigureWidth(size, digits=1) {  // TODO: remove?
     const nwidth = 0.6 * getFontSizeScalePx(size);
     return Math.round(nwidth * digits);
 }
-function _getFontHeight(size, leading) {
+function _getFontHeight(size, leading) {  // TODO: remove?
     return Math.round(leading * getFontSizeScalePx(size));
 }
 function getFontSizeBasePx(size) {
@@ -523,7 +517,7 @@ function getReligionInfo(id) {
     }
     return { name, icon };
 }
-function _getReligions(city) {
+function _getReligions(city) {  // TODO: remove?
     const religion = city?.Religion;
     if (!religion) return null;
     const list = [];
@@ -632,14 +626,13 @@ class bzPlotTooltip {
         this.bridge = null;
         // world
         this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
-        this.highlights = [];
-        this.terrain = null;
-        this.biome = null;
-        this.feature = null;
-        this.river = null;
         this.route = null;
+        this.river = null;
+        this.feature = null;
+        this.biome = null;
+        this.terrain = null;
         this.plotEffects = null;
-        this.isDistantLands = null;
+        this.continent = null;
         // settlement stats
         this.owner = null;
         this.relationship = null;
@@ -752,14 +745,13 @@ class bzPlotTooltip {
         this.bridge = null;
         // world
         this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
-        this.highlights = [];
-        this.terrain = null;
-        this.biome = null;
-        this.feature = null;
-        this.river = null;
         this.route = null;
+        this.river = null;
+        this.feature = null;
+        this.biome = null;
+        this.terrain = null;
         this.plotEffects = null;
-        this.isDistantLands = null;
+        this.continent = null;
         // settlement
         this.owner = null;
         this.relationship = null;
@@ -821,14 +813,14 @@ class bzPlotTooltip {
             this.title = this.feature.info.Name;
         } else if (this.wonder) {
             this.title = this.wonder.info.Name;
+        } else if (this.river?.type == "RIVER_NAVIGABLE") {
+            this.title = this.river.name;
         } else if (this.city && this.isCompact) {
             this.title = this.city.name;
-        } else if (this.river?.type == "RIVER_NAVIGABLE" && !this.district) {
-            this.title = this.river.name;
+        } else if (this.biome?.type == "BIOME_MARINE") {
+            this.title = this.terrain.name;
         } else if (this.settlementType) {
             this.title = this.settlementType;
-        } else if (this.biome.type == "BIOME_MARINE") {
-            this.title = this.terrain.name;
         } else {
             this.title = GameInfo.Districts.lookup(DistrictTypes.WILDERNESS).Name;
         }
@@ -848,37 +840,39 @@ class bzPlotTooltip {
         // requires: this.city, this.resource
         const loc = this.plotCoord;
         this.banners = { danger: [], caution: [], note: [], };
-        this.plotEffects = { info: [], text: [], };
+        this.plotEffects = { text: null, names: [], info: [], };
         const plotEffects = MapPlotEffects.getPlotEffects(this.plotIndex) ?? [];
         for (const item of plotEffects) {
             if (item.onlyVisibleToOwner && item.owner != this.observerID) continue;
             const info = GameInfo.PlotEffects.lookup(item.effectType);
             if (!info) continue;
             this.plotEffects.info.push(item);
-            if (info.Damage) {
+            if (info.OnlyVisibleToOwner) {  // dig site, jaguar trap
+                this.banners.note.push(info.Name);
+            } else if (info.Damage) {  // burning, fallout, plague
                 this.banners.danger.push(info.Name);
-            } else if (info.Defense) {
+            } else if (info.Defense) {  // fortifications
                 this.banners.note.push(info.Name);
             } else {
-                this.plotEffects.text.push(info.name);
+                this.plotEffects.names.push(info.name);
             }
         }
+        this.plotEffects.text = dotJoinLocale(this.plotEffects.names);
         // no further effects needed for impassible or offshore tiles
         if (GameplayMap.isImpassable(loc.x, loc.y) ||
             GameplayMap.isNavigableRiver(loc.x, loc.y) ||
             GameplayMap.isWater(loc.x, loc.y)) {
-            // no need here for settlement advice, including
-            // Dont't add any extra tooltip to mountains, oceans, or navigable rivers, should be obvious enough w/o them
+            // no need here for settlement advice
             return;
         }
-
         // check fresh water
         const lens = LensManager.getActiveLens();
         const wloc = this.city ? this.city.location : loc;
         if (wloc.x != loc.x || wloc.y != loc.y) {
             // ignore city water out side of the city center
         } else if (GameplayMap.isFreshWater(wloc.x, wloc.y)) {
-            if (this.isVerbose) this.plotEffects.text.push("LOC_PLOTKEY_FRESHWATER");
+            this.plotEffects.names.push("LOC_PLOTKEY_FRESHWATER");
+            this.plotEffects.text = dotJoinLocale(this.plotEffects.names);
         } else if (!this.city && lens == "fxs-settler-lens") {
             this.banners.caution.push("LOC_PLOT_TOOLTIP_NO_FRESH_WATER");
         }
@@ -907,40 +901,50 @@ class bzPlotTooltip {
         }
     }
     modelGeography() {
-        const loc = this.plotCoord;
         // (note: currently using "foot" instead of the selected unit)
         this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
-        this.highlights = [];
-        this.terrain = this.getTerrain();
-        this.biome = this.getBiome();
-        this.feature = this.getFeature();
-        this.river = this.getRiver();
         this.route = this.getRoute();
-        this.isDistantLands = this.observer?.isDistantLands(loc) ?? null;
+        this.river = this.getRiver();
+        this.feature = this.getFeature();
+        this.biome = this.getBiome();
+        this.terrain = this.getTerrain();
+        this.continent = this.getContinent();
     }
-    getTerrain() {
+    getRoute() {
         const loc = this.plotCoord;
-        const id = GameplayMap.getTerrainType(loc.x, loc.y);
-        const info = GameInfo.Terrains.lookup(id);
-        if (!info) return null;
-        const isLake = GameplayMap.isLake(loc.x, loc.y);
-        const name = isLake ? "LOC_TERRAIN_LAKE_NAME" : info.Name;
-        const type = info.TerrainType;
-        const highlight = this.obstacles.has(type) ?  type : null;
-        const terrain = { name, type, isLake, highlight, info, };
-        if (highlight) this.highlights.push(terrain);
-        return terrain;
-    }
-    getBiome() {
-        const loc = this.plotCoord;
-        const id = GameplayMap.getBiomeType(loc.x, loc.y);
-        const info = GameInfo.Biomes.lookup(id);
+        const id = GameplayMap.getRouteType(loc.x, loc.y);
+        const info = GameInfo.Routes.lookup(id);
         if (!info) return null;
         const name = info.Name;
-        const type = info.BiomeType;
-        const highlight = null;  // biomes aren't obstacles
-        const biome = { name, type, highlight, info, };
-        return biome;
+        const type = info.RouteType;
+        const bridge = this.bridge?.name;
+        const ferry = GameplayMap.isFerry(loc.x, loc.y) ?
+            "LOC_NAVIGABLE_RIVER_FERRY" : null;
+        const crossing = bridge ?? ferry ?? null;
+        const text = dotJoinLocale([name, crossing]);
+        const highlight =
+            ferry ? "RIVER_NAVIGABLE" :
+            info?.PlacementRequiresRoutePresent ? "ROUTE_RAILROAD" :
+            "ROUTE_ROAD";
+        const route = { text, name, crossing, highlight, type, info, };
+        return route;
+    }
+    getRiver() {
+        const loc = this.plotCoord;
+        const id = GameplayMap.getRiverType(loc.x, loc.y);
+        const info =  // rivers don't have GameInfo, so synthesize it
+            id == RiverTypes.RIVER_NAVIGABLE ?
+            { Name: "LOC_NAVIGABLE_RIVER_NAME", RiverType: "RIVER_NAVIGABLE", } :
+            id == RiverTypes.RIVER_MINOR ?
+            { Name: "LOC_MINOR_RIVER_NAME", RiverType: "RIVER_MINOR", } :
+            null;
+        if (!info) return null;
+        const name = GameplayMap.getRiverName(loc.x, loc.y) || info.Name;;
+        const type = info.RiverType;
+        const text = name;
+        const highlight = this.obstacles.has(type) ? type : null;
+        const river = { text, name, highlight, type, info, };
+        return river;
     }
     getFeature() {
         const loc = this.plotCoord;
@@ -950,61 +954,74 @@ class bzPlotTooltip {
         const name = info.Name;
         const type = info.FeatureType;
         const ctype = info.FeatureClassType;
+        // defer floodplains to biome
+        const text = ctype == "FEATURE_CLASS_FLOODPLAIN" ? null : name;
         const highlight = this.obstacles.has(type) ? ctype : null;
-        const feature = { name, type, ctype, highlight, info, };
+        const feature = { text, name, volcano: null, highlight, type, ctype, info, };
         if (GameplayMap.isVolcano(loc.x, loc.y)) {
             // get extra info about volcano features
+            const vname = GameplayMap.getVolcanoName(loc.x, loc.y) ?? name;
             const isActive = GameplayMap.isVolcanoActive(loc.x, loc.y);
-            const vname = GameplayMap.getVolcanoName(loc.x, loc.y);
-            const vstatus = isActive ?
-                'LOC_VOLCANO_ACTIVE' : 'LOC_VOLCANO_NOT_ACTIVE';
-            const key = vname ?
-                'LOC_UI_NAMED_VOLCANO_DETAILS' : 'LOC_UI_VOLCANO_DETAILS';
-            feature.name = Locale.compose(key, name, vstatus, vname);
-            if (isActive) feature.highlight = "FEATURE_VOLCANO";
+            const status = isActive ? 'LOC_VOLCANO_ACTIVE' : 'LOC_VOLCANO_NOT_ACTIVE';
+            feature.text = Locale.compose("LOC_UI_VOLCANO_DETAILS", vname, status);
+            feature.highlight = isActive ? type : status;
+            feature.volcano = { name: vname, status, isActive, };
         }
-        if (highlight) this.highlights.push(feature)
         return feature;
     }
-    getRiver() {
+    getBiome() {
         const loc = this.plotCoord;
-        const id = GameplayMap.getRiverType(loc.x, loc.y);
-        if (id == RiverTypes.NO_RIVER) return null;
-        const name = GameplayMap.getRiverName(loc.x, loc.y);
-        const bridge = this.bridge?.name;
-        const ferry = GameplayMap.isFerry(loc.x, loc.y) ?
-            "LOC_NAVIGABLE_RIVER_FERRY" : null;
-        const crossing = bridge ?? ferry ?? null;
-        const river = { name, type: null, crossing, highlight: null, };
-        switch (id) {
-            case RiverTypes.RIVER_NAVIGABLE:
-                river.name = name || "LOC_NAVIGABLE_RIVER_NAME";
-                river.type = "RIVER_NAVIGABLE";
-                break;
-            case RiverTypes.RIVER_MINOR:
-                river.name = name || "LOC_MINOR_RIVER_NAME";
-                river.type = "RIVER_MINOR";
-                break;
-        }
-        if (this.obstacles.has(river.type)) {
-            river.highlight = river.type;
-            this.highlights.push(river.type);
-        }
-        return river;
-    }
-    getRoute() {
-        const loc = this.plotCoord;
-        const id = GameplayMap.getRouteType(loc.x, loc.y);
-        const info = GameInfo.Routes.lookup(id);
+        const id = GameplayMap.getBiomeType(loc.x, loc.y);
+        const info = GameInfo.Biomes.lookup(id);
         if (!info) return null;
         const name = info.Name;
-        const type = info.RouteType;
-        const isRoad = !info?.PlacementRequiresRoutePresent;
-        const isRail = !isRoad;
-        const highlight = isRail ? "ROUTE_RAILROAD" : "ROUTE_ROAD";
-        const route = { name, type, isRoad, isRail, highlight, info, };
-        this.highlights.push(route.highlight);
-        return route;
+        const type = info.BiomeType;
+        const text =  // biome name is redundant with floodplains description
+            this.feature?.ctype == "FEATURE_CLASS_FLOODPLAIN" ? this.feature.name :
+            type == "BIOME_MARINE" ? null :
+            name;
+        const highlight = null;  // biomes aren't obstacles
+        const biome = { text, name, highlight, type, info, };
+        return biome;
+    }
+    getTerrain() {
+        const loc = this.plotCoord;
+        const id = GameplayMap.getTerrainType(loc.x, loc.y);
+        const info = GameInfo.Terrains.lookup(id);
+        if (!info) return null;
+        const isLake = GameplayMap.isLake(loc.x, loc.y);
+        const isRiver = info.TerrainType == "TERRAIN_NAVIGABLE_RIVER";
+        const name =  // TODO: decide how to display navigable rivers
+            isLake ? "LOC_TERRAIN_LAKE_NAME" :
+            isRiver ? "LOC_PLOT_TOOLTIP_RIVER" :
+            info.Name;
+        const type = info.TerrainType;
+        const biome = this.biome.text;
+        const text = dotJoinLocale([name, biome]);
+        const otype = isRiver ? "RIVER_NAVIGABLE" : type;
+        const highlight = this.obstacles.has(otype) ? otype : null;
+        const terrain = { text, name, biome, isLake, isRiver, highlight, type, info, };
+        return terrain;
+    }
+    getContinent() {
+        const loc = this.plotCoord;
+        const id = GameplayMap.getContinentType(loc.x, loc.y);
+        const info = GameInfo.Continents.lookup(id);
+        if (!info) return null;
+        const name = info.Description;
+        const type = info.ContinentType;
+        const isDistant = this.observer && this.observer.isDistantLands(loc);
+        const hemisphere =
+            isDistant ? "LOC_PLOT_TOOLTIP_HEMISPHERE_WEST" :
+            isDistant === false ? "LOC_PLOT_TOOLTIP_HEMISPHERE_EAST" :
+            null;  // autoplaying
+        const text = dotJoinLocale([name, hemisphere]);
+        const highlight = null;
+        const verbosity = bzVerbosity.VERBOSE;
+        const continent = {
+            text, isDistant, name, hemisphere, type, highlight, verbosity, info,
+        };
+        return continent;
     }
     modelSettlement() {
         // owner, civ, city, district
@@ -1067,9 +1084,9 @@ class bzPlotTooltip {
             const isOverbuildable = isBuilding && isComplete && !isAgeless &&
                 age?.AgeType != this.age.AgeType;
             const xinfo =  // subtype-specific info
-                isBuilding ?  GameInfo.Buildings.lookup(info.ConstructibleType) :
-                isImprovement ?  GameInfo.Improvements.lookup(info.ConstructibleType) :
-                isWonder ?  GameInfo.Wonders.lookup(info.ConstructibleType) :
+                isBuilding ? GameInfo.Buildings.lookup(info.ConstructibleType) :
+                isImprovement ? GameInfo.Improvements.lookup(info.ConstructibleType) :
+                isWonder ? GameInfo.Wonders.lookup(info.ConstructibleType) :
                 null;
             if (xinfo.TraitType && !this.quarter && this.district.isUniqueQuarter) {
                 this.quarter = GameInfo.UniqueQuarters
@@ -1266,72 +1283,43 @@ class bzPlotTooltip {
         this.renderTitleHeading(this.title);
     }
     renderGeography() {
-        if (this.isCompact) return;
-        const loc = this.plotCoord;
-        // TODO: collect all of the labels & obstacles in model
         // show geographical features
         const layout = document.createElement("div");
         layout.classList.value = "text-center";
         layout.style.lineHeight = metrics.body.ratio;
-        const capsule = (text, style) => {
-            const cap = docCapsule(text, style, metrics.body);
+        // formatter
+        const capsule = (item) => {
+            if (!item?.text || item.text == this.title) return null;
+            const verbosity = item.verbosity ??
+                // default: standard verbosity, compact for highlights
+                (item.highlight ? bzVerbosity.COMPACT : bzVerbosity.STANDARD);
+            if (this.verbosity < verbosity) return null;
+            const style = BZ_STYLE[item.highlight];
+            const cap = docCapsule(item.text, style, metrics.body);
             if (style) {
                 cap.style.marginTop = cap.style.marginBottom =
                     metrics.body.leading.half.css;
             }
             return cap;
         };
-        // continent & hemisphere
-        if (this.terrain && this.terrain.type != "TERRAIN_OCEAN" && this.isVerbose) {
-            const continentName = this.getContinentName(loc);
-            const hemisphereName =
-                this.isDistantLands ? "LOC_PLOT_TOOLTIP_HEMISPHERE_WEST" :
-                this.isDistantLands === false ? "LOC_PLOT_TOOLTIP_HEMISPHERE_EAST" :
-                null;  // autoplaying
-            const text = dotJoinLocale([continentName, hemisphereName]);
-            if (text) layout.appendChild(docText(text));
-        }
-        // terrain & biome
-        if (this.terrain && this.terrain.name != this.title) {
-            const names = [this.terrain.name];
-            if (this.biome.type != "BIOME_MARINE") names.push(this.biome.name);
-            const text = joinLocale(names);
-            const style = BZ_STYLE[this.terrain.highlight];
-            layout.appendChild(capsule(text, style));
-        }
-        // feature type
-        if (this.feature && !this.feature.info.Tooltip) {
-            const style = BZ_STYLE[this.feature.highlight];
-            layout.appendChild(capsule(this.feature.name, style));
-        }
-        // rivers
-        if (this.river) {
-            // TODO: bridges
-            const names = [this.river.name, this.river.crossing];
-            const text = dotJoinLocale(names);
-            const style = BZ_STYLE[this.river.highlight];
-            layout.appendChild(capsule(text, style));
-        }
-        // roads & railroads
-        if (this.route) {
-            const style = BZ_STYLE[this.route.highlight];
-            layout.appendChild(capsule(this.route.name, style));
-        }
-        // plot effects and fresh water
-        if (this.plotEffects?.text.length) {
-            const text = capsule(dotJoinLocale(this.plotEffects.text));
-            layout.appendChild(text);
+        // display rows
+        const geography = [
+            this.plotEffects,
+            this.route,
+            this.river,
+            this.feature,
+            this.terrain,
+            this.continent,
+        ];
+        for (const row of geography) {
+            const cap = capsule(row);
+            if (cap) layout.appendChild(cap);
         }
         // finish section with appropriate margin
         layout.style.marginBottom =
-            layout.children.length ?  metrics.body.margin.css :  // body text
+            layout.children.length ? metrics.body.margin.css :  // body text
             metrics.head.margin.css;
         this.container.appendChild(layout);
-    }
-    getContinentName(loc) {
-        const continentType = GameplayMap.getContinentType(loc.x, loc.y);
-        const continent = GameInfo.Continents.lookup(continentType);
-        return continent?.Description ?? null;
     }
     renderSettlement() {
         if (this.isCompact) return;
@@ -1353,7 +1341,7 @@ class bzPlotTooltip {
             const text = Locale.compose("LOC_BZ_WAS_PREVIOUSLY", was);
             rows.push(text);
         }
-        const style = this.relationship?.isEnemy ?  BZ_ALERT.danger : null;
+        const style = this.relationship?.isEnemy ? BZ_ALERT.danger : null;
         const banner = docBanner(rows, style, metrics.padding.banner.css);
         banner.style.lineHeight = metrics.body.ratio;
         banner.style.marginBottom = metrics.body.margin.css;
@@ -1488,7 +1476,7 @@ class bzPlotTooltip {
             hexName = rcinfo.Name + "_BZ";
             if (this.freeConstructible || this.isVerbose) {
                 hexRules.push(this.resource.Tooltip);
-                if (this.isDistantLands &&
+                if (this.continent?.isDistant &&
                     this.resource.ResourceClassType == "RESOURCECLASS_TREASURE") {
                     // also show treasure fleet rules
                     hexRules.push("LOC_CAN_CREATE_TREASURE_FLEET");
