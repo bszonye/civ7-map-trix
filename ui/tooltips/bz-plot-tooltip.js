@@ -814,8 +814,8 @@ class bzPlotTooltip {
             this.title = this.feature.info.Name;
         } else if (this.wonder) {
             this.title = this.wonder.info.Name;
-        } else if (this.terrain.isNavigable) {
-            this.title = this.terrain.river;
+        } else if (this.river?.isNavigable) {
+            this.title = this.river.name;
         } else if (this.city && this.isCompact) {
             this.title = this.city.name;
         } else if (this.biome?.type == "BIOME_MARINE") {
@@ -906,6 +906,7 @@ class bzPlotTooltip {
         this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
         this.route = this.getRoute();
         this.feature = this.getFeature();
+        this.river = this.getRiver();
         this.terrain = this.getTerrain();
         this.biome = this.getBiome();
         if (this.feature?.isFloodplain) {
@@ -913,11 +914,16 @@ class bzPlotTooltip {
             this.biome.text = this.feature.text;
             this.biome.highlight = this.feature.ctype;
             this.feature.text = null;
-        } else if (!this.terrain.river && this.biome.text) {
-            // merge terrain & biome
-            this.terrain.text = dotJoinLocale([this.terrain.text, this.biome.text]);
-            this.biome.text = null;
         }
+        if (this.river?.isNavigable) {
+            // clear redundant terrain
+            this.terrain.text = null;
+            this.terrain.highlight = null;
+        }
+        // merge terrain & biome
+        this.terrain.text = dotJoinLocale([this.terrain.text, this.biome.text]);
+        this.terrain.highlight = this.terrain.highlight ?? this.biome.highlight;
+        this.biome.text = null;
         this.continent = this.getContinent();
     }
     getRoute() {
@@ -963,31 +969,36 @@ class bzPlotTooltip {
         }
         return feature;
     }
+    getRiver() {
+        const loc = this.plotCoord;
+        const id = GameplayMap.getRiverType(loc.x, loc.y);
+        // get river & lake info
+        if (id == RiverTypes.NO_RIVER) return null;
+        const isNavigable = id == RiverTypes.RIVER_NAVIGABLE;
+        const isMinor = id == RiverTypes.RIVER_MINOR;
+        const info = {
+            Name: isMinor ? "LOC_MINOR_RIVER_NAME" : "LOC_NAVIGABLE_RIVER_NAME",
+            RiverType: isMinor ? "RIVER_MINOR" : "RIVER_NAVIGABLE",
+        };
+        const name = GameplayMap.getRiverName(loc.x, loc.y) ?? info.Name;
+        const type = info.RiverType;
+        const text = isMinor ? name : info.Name;
+        const highlight = this.obstacles.has(type) ? type : null;
+        const river = { text, name, isNavigable, isMinor, highlight, type, info, };
+        return river;
+    }
     getTerrain() {
         const loc = this.plotCoord;
         const id = GameplayMap.getTerrainType(loc.x, loc.y);
         const info = GameInfo.Terrains.lookup(id);
         if (!info) return null;
-        const rtid = GameplayMap.getRiverType(loc.x, loc.y);
-        // get river & lake info
-        const isNavigable = rtid == RiverTypes.RIVER_NAVIGABLE;
-        const isMinor = rtid == RiverTypes.RIVER_MINOR;
-        const rtype = isMinor ? "RIVER_MINOR" : isNavigable ? "RIVER_NAVIGABLE" : null;
-        const river = GameplayMap.getRiverName(loc.x, loc.y) ??
-            (isMinor ? "LOC_MINOR_RIVER_NAME" : isNavigable ? info.Name : null);
         const isLake = GameplayMap.isLake(loc.x, loc.y);
         // assemble info
         const name = isLake ? "LOC_TERRAIN_LAKE_NAME" : info.Name;
         const type = info.TerrainType;
-        const text = isMinor ? dotJoinLocale([name, river]) : name;
-        const highlight =
-            this.obstacles.has(type) ? type :
-            this.obstacles.has(rtype) ? rtype :
-            null;
-        const terrain = {
-            text, name, river, isLake, isNavigable, isMinor, highlight, type, info,
-        };
-        console.warn(`TRIX TERRAIN ${JSON.stringify(terrain)}`);
+        const text = name;
+        const highlight = this.obstacles.has(type) ? type : null;
+        const terrain = { text, name, isLake, highlight, type, info, };
         return terrain;
     }
     getBiome() {
@@ -1306,6 +1317,7 @@ class bzPlotTooltip {
             this.plotEffects,
             this.route,
             this.feature,
+            this.river,
             this.terrain,
             this.biome,
             this.continent,
