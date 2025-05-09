@@ -140,6 +140,7 @@ const BZ_STYLE = {
     TERRAIN_OCEAN: {},  // don't need to highlight this
     FEATURE_VOLCANO: BZ_ALERT.caution,
     LOC_VOLCANO_NOT_ACTIVE: BZ_ALERT.note,
+    FEATURE_CLASS_FLOODPLAIN: BZ_ALERT.note,
     FEATURE_CLASS_VEGETATED: { "background-color": BZ_COLOR.vegetated, },
     FEATURE_CLASS_WET: { "background-color": BZ_COLOR.wet, },
     RIVER_MINOR: { "background-color": BZ_COLOR.river, },
@@ -633,7 +634,7 @@ class bzPlotTooltip {
         this.terrain = null;
         this.plotEffects = null;
         this.continent = null;
-        // settlement stats
+        // settlement
         this.owner = null;
         this.relationship = null;
         this.originalOwner = null;
@@ -813,8 +814,8 @@ class bzPlotTooltip {
             this.title = this.feature.info.Name;
         } else if (this.wonder) {
             this.title = this.wonder.info.Name;
-        } else if (this.river?.type == "RIVER_NAVIGABLE") {
-            this.title = this.river.name;
+        } else if (this.terrain.isNavigable) {
+            this.title = this.terrain.river;
         } else if (this.city && this.isCompact) {
             this.title = this.city.name;
         } else if (this.biome?.type == "BIOME_MARINE") {
@@ -904,10 +905,19 @@ class bzPlotTooltip {
         // (note: currently using "foot" instead of the selected unit)
         this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
         this.route = this.getRoute();
-        this.river = this.getRiver();
         this.feature = this.getFeature();
-        this.biome = this.getBiome();
         this.terrain = this.getTerrain();
+        this.biome = this.getBiome();
+        if (this.feature?.isFloodplain) {
+            // merge redundant floodplain & biome
+            this.biome.text = this.feature.text;
+            this.biome.highlight = this.feature.ctype;
+            this.feature.text = null;
+        } else if (!this.terrain.river && this.biome.text) {
+            // merge terrain & biome
+            this.terrain.text = dotJoinLocale([this.terrain.text, this.biome.text]);
+            this.biome.text = null;
+        }
         this.continent = this.getContinent();
     }
     getRoute() {
@@ -923,28 +933,10 @@ class bzPlotTooltip {
         const crossing = bridge ?? ferry ?? null;
         const text = dotJoinLocale([name, crossing]);
         const highlight =
-            ferry ? "RIVER_NAVIGABLE" :
             info?.PlacementRequiresRoutePresent ? "ROUTE_RAILROAD" :
             "ROUTE_ROAD";
         const route = { text, name, crossing, highlight, type, info, };
         return route;
-    }
-    getRiver() {
-        const loc = this.plotCoord;
-        const id = GameplayMap.getRiverType(loc.x, loc.y);
-        const info =  // rivers don't have GameInfo, so synthesize it
-            id == RiverTypes.RIVER_NAVIGABLE ?
-            { Name: "LOC_NAVIGABLE_RIVER_NAME", RiverType: "RIVER_NAVIGABLE", } :
-            id == RiverTypes.RIVER_MINOR ?
-            { Name: "LOC_MINOR_RIVER_NAME", RiverType: "RIVER_MINOR", } :
-            null;
-        if (!info) return null;
-        const name = GameplayMap.getRiverName(loc.x, loc.y) || info.Name;;
-        const type = info.RiverType;
-        const text = name;
-        const highlight = this.obstacles.has(type) ? type : null;
-        const river = { text, name, highlight, type, info, };
-        return river;
     }
     getFeature() {
         const loc = this.plotCoord;
@@ -954,10 +946,12 @@ class bzPlotTooltip {
         const name = info.Name;
         const type = info.FeatureType;
         const ctype = info.FeatureClassType;
-        // defer floodplains to biome
-        const text = ctype == "FEATURE_CLASS_FLOODPLAIN" ? null : name;
+        const isFloodplain = ctype == "FEATURE_CLASS_FLOODPLAIN";
+        const text = name;
         const highlight = this.obstacles.has(type) ? ctype : null;
-        const feature = { text, name, volcano: null, highlight, type, ctype, info, };
+        const feature = {
+            text, name, volcano: null, isFloodplain, highlight, type, ctype, info,
+        };
         if (GameplayMap.isVolcano(loc.x, loc.y)) {
             // get extra info about volcano features
             const vname = GameplayMap.getVolcanoName(loc.x, loc.y) ?? name;
@@ -969,6 +963,33 @@ class bzPlotTooltip {
         }
         return feature;
     }
+    getTerrain() {
+        const loc = this.plotCoord;
+        const id = GameplayMap.getTerrainType(loc.x, loc.y);
+        const info = GameInfo.Terrains.lookup(id);
+        if (!info) return null;
+        const rtid = GameplayMap.getRiverType(loc.x, loc.y);
+        // get river & lake info
+        const isNavigable = rtid == RiverTypes.RIVER_NAVIGABLE;
+        const isMinor = rtid == RiverTypes.RIVER_MINOR;
+        const rtype = isMinor ? "RIVER_MINOR" : isNavigable ? "RIVER_NAVIGABLE" : null;
+        const river = GameplayMap.getRiverName(loc.x, loc.y) ??
+            (isMinor ? "LOC_MINOR_RIVER_NAME" : isNavigable ? info.Name : null);
+        const isLake = GameplayMap.isLake(loc.x, loc.y);
+        // assemble info
+        const name = isLake ? "LOC_TERRAIN_LAKE_NAME" : info.Name;
+        const type = info.TerrainType;
+        const text = isMinor ? dotJoinLocale([name, river]) : name;
+        const highlight =
+            this.obstacles.has(type) ? type :
+            this.obstacles.has(rtype) ? rtype :
+            null;
+        const terrain = {
+            text, name, river, isLake, isNavigable, isMinor, highlight, type, info,
+        };
+        console.warn(`TRIX TERRAIN ${JSON.stringify(terrain)}`);
+        return terrain;
+    }
     getBiome() {
         const loc = this.plotCoord;
         const id = GameplayMap.getBiomeType(loc.x, loc.y);
@@ -976,32 +997,10 @@ class bzPlotTooltip {
         if (!info) return null;
         const name = info.Name;
         const type = info.BiomeType;
-        const text =  // biome name is redundant with floodplains description
-            this.feature?.ctype == "FEATURE_CLASS_FLOODPLAIN" ? this.feature.name :
-            type == "BIOME_MARINE" ? null :
-            name;
+        const text = type == "BIOME_MARINE" ? null : name;
         const highlight = null;  // biomes aren't obstacles
         const biome = { text, name, highlight, type, info, };
         return biome;
-    }
-    getTerrain() {
-        const loc = this.plotCoord;
-        const id = GameplayMap.getTerrainType(loc.x, loc.y);
-        const info = GameInfo.Terrains.lookup(id);
-        if (!info) return null;
-        const isLake = GameplayMap.isLake(loc.x, loc.y);
-        const isRiver = info.TerrainType == "TERRAIN_NAVIGABLE_RIVER";
-        const name =  // TODO: decide how to display navigable rivers
-            isLake ? "LOC_TERRAIN_LAKE_NAME" :
-            isRiver ? "LOC_PLOT_TOOLTIP_RIVER" :
-            info.Name;
-        const type = info.TerrainType;
-        const biome = this.biome.text;
-        const text = dotJoinLocale([name, biome]);
-        const otype = isRiver ? "RIVER_NAVIGABLE" : type;
-        const highlight = this.obstacles.has(otype) ? otype : null;
-        const terrain = { text, name, biome, isLake, isRiver, highlight, type, info, };
-        return terrain;
     }
     getContinent() {
         const loc = this.plotCoord;
@@ -1306,9 +1305,9 @@ class bzPlotTooltip {
         const geography = [
             this.plotEffects,
             this.route,
-            this.river,
             this.feature,
             this.terrain,
+            this.biome,
             this.continent,
         ];
         for (const row of geography) {
