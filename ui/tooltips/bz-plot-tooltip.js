@@ -909,6 +909,8 @@ class bzPlotTooltip {
         this.river = this.getRiver();
         this.terrain = this.getTerrain();
         this.biome = this.getBiome();
+        this.continent = this.getContinent();
+        // tighten up loose & redundant text
         if (this.feature?.isFloodplain) {
             // merge redundant floodplain & biome
             this.biome.text = this.feature.text;
@@ -921,10 +923,11 @@ class bzPlotTooltip {
             this.terrain.highlight = null;
         }
         // merge terrain & biome
-        this.terrain.text = dotJoinLocale([this.terrain.text, this.biome.text]);
-        this.terrain.highlight = this.terrain.highlight ?? this.biome.highlight;
-        this.biome.text = null;
-        this.continent = this.getContinent();
+        if (this.biome.text) {
+            this.terrain.text = dotJoinLocale([this.terrain.text, this.biome.text]);
+            this.terrain.highlight = this.terrain.highlight ?? this.biome.highlight;
+            this.biome.text = null;
+        }
     }
     getRoute() {
         const loc = this.plotCoord;
@@ -1464,7 +1467,6 @@ class bzPlotTooltip {
     }
     renderRural() {
         let hexName;
-        let hexSubtitle;
         let hexRules = [];
         let hexIcon = this.improvement?.icon;
         let resourceIcon;
@@ -1514,8 +1516,6 @@ class bzPlotTooltip {
         if (hexName && !this.isCompact) this.renderTitleHeading(hexName);
         // optional description
         if (hexRules.length && !this.isCompact) {
-            const title = "text-2xs uppercase leading-none mb-1";
-            if (hexSubtitle) this.renderRules([hexSubtitle], null, title);
             this.renderRules(hexRules, "w-60", "leading-normal mb-1");
         }
         // constructibles
