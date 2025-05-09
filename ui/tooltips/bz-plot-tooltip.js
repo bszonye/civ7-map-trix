@@ -453,7 +453,7 @@ function getFontMetrics() {
     // font metrics
     const font = (name, ratio=BZ_FONT_SPACING, cratio=3/4) => {
         const rem = typeof name === "string" ?
-            getFontSizeBasePx(name) / BASE_FONT_SIZE : name;
+            GlobalScaling.getFontSizePx(name) / BASE_FONT_SIZE : name;
         const size = sizes(rem);  // font size
         const cap = sizes(size.rem * cratio);  // cap height
         const spacing = sizes(size.rem * ratio);  // line height
@@ -486,24 +486,6 @@ function getFontMetrics() {
         head, body, note, rules, table, yields,
         radius, bumper,
     };
-}
-function _getFigureWidth(size, digits=1) {  // TODO: remove?
-    const nwidth = 0.6 * getFontSizeScalePx(size);
-    return Math.round(nwidth * digits);
-}
-function _getFontHeight(size, leading) {  // TODO: remove?
-    return Math.round(leading * getFontSizeScalePx(size));
-}
-function getFontSizeBasePx(size) {
-    return GlobalScaling.getFontSizePx(size);
-}
-function getFontSizeRem(size) {
-    const fpx = getFontSizeBasePx(size);
-    return GlobalScaling.pixelsToRem(fpx);
-}
-function getFontSizeScalePx(size) {
-    if (typeof size === "string") size = getFontSizeRem(size);
-    return size * GlobalScaling.currentScalePx;
 }
 function getReligionInfo(id) {
     // find a matching player religion, to get custom names
