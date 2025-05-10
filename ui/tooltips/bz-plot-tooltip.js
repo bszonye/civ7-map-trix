@@ -228,7 +228,7 @@ const BZ_HEAD_STYLE = [
 .bz-debug .bz-tooltip > div > div > div > div {
     background-color: #00c0c080;  /* DEBUG */
 }
-.bz-debug .bz-tooltip > div > div > div > div p {
+.bz-debug .bz-tooltip p {
     background-color: #808080c0;  /* DEBUG */
 }
 `,  // full-width banners: general, unit info, debug info
@@ -249,11 +249,12 @@ const BZ_HEAD_STYLE = [
     // with all combinations (with/without icons, single/multiple
     // lines).
 `
-.bz-tooltip .bz-rules-list {
-    text-align: center;
+.bz-tooltip .bz-list-item {
+    position: relative;
+    width: 100%;
 }
-.bz-tooltip .bz-list-item,
 .bz-tooltip .bz-list-item p {
+    position: relative;
     width: 100%;
 }
 `,
@@ -267,7 +268,7 @@ BZ_HEAD_STYLE.map(style => {
 document.body.classList.toggle("bz-yield-banner", bzMapTrixOptions.yieldBanner);
 
 // debug style (manually enable)
-document.body.classList.toggle("bz-debug", false);
+document.body.classList.toggle("bz-debug", true);
 
 function baseYields(info) {
     if (!info) return null;
@@ -365,28 +366,28 @@ function docIcon(image, size, resize, ...style) {
 }
 function docList(text, style=null) {
     // create a list of plain text (use docRules for font icons)
-    const tt = document.createElement("div");
-    tt.style.position = 'relative';
-    tt.style.alignSelf = 'center';
-    tt.style.textAlign = 'center';
-    tt.style.lineHeight = metrics.body.ratio;
+    const list = document.createElement("div");
+    list.style.position = 'relative';
+    list.style.alignSelf = 'center';
+    list.style.textAlign = 'center';
+    list.style.lineHeight = metrics.body.ratio;
     for (const item of text) {
         const row = document.createElement("div");
         if (style) row.classList.value = style;
         row.classList.add("bz-list-item");
         row.setAttribute("data-l10n-id", item);
-        tt.appendChild(row);
+        list.appendChild(row);
     }
-    return tt;
+    return list;
 }
 function docRules(text, style=null) {
     // create a paragraph of rules text
     // font icons are squirrely!  only center them at top level
     // TODO: make maxWidth work, if possible
-    const tt = docList(text, style);
-    tt.style.lineHeight = metrics.rules.ratio;
-    tt.style.width = metrics.rules.width.css;
-    return tt;
+    const list = docList(text, style);
+    list.style.lineHeight = metrics.rules.ratio;
+    list.style.width = metrics.rules.width.css;
+    return list;
 }
 function docText(text, style) {
     const e = document.createElement("div");
