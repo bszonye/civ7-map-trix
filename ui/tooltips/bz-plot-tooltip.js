@@ -91,6 +91,8 @@ const BZ_COLOR = {
     bronze4: "#a99670",
     bronze5: "#8c7e62",  // = secondary 2
     bronze6: "#4c473d",  // = secondary 3
+    // rules background
+    rules: "#8c7e6233",
     // alert colors
     black: "#000000",
     danger: "#af1b1c99",  // danger = militaristic 60% opacity
@@ -372,7 +374,7 @@ function docList(text, style=null, size=metrics.body) {
     wrap.appendChild(list);
     return wrap;
 }
-function docRules(text, style=null) {
+function docRules(text, style=null, bg=BZ_COLOR.rules) {
     // IMPORTANT:
     // Locale.stylize wraps text in an extra <p> element when it
     // contains styling, which interferes with text-align and max-width.
@@ -383,6 +385,14 @@ function docRules(text, style=null) {
     const isPlain = !text.some(t => Locale.stylize(t).includes('<fxs-font-icon'));
     const list = docList(text, style, metrics.rules);
     if (isPlain) list.style.lineHeight = metrics.body.ratio;
+    if (bg) {
+        list.style.paddingTop = list.style.paddingBottom =
+            list.style.paddingLeft = list.style.paddingRight =
+            metrics.padding.banner.css;
+        list.style.backgroundColor = bg;
+        list.style.borderRadius = metrics.radius.css;
+        list.style.marginBottom = metrics.padding.banner.css;
+    }
     return list;
 }
 function docText(text, style) {
@@ -1409,13 +1419,12 @@ class bzPlotTooltip {
         }
         // title bar
         if (!this.isCompact) this.renderTitleHeading(hexName);
+        this.renderDistrictDefense(this.plotCoord);
         // rules for unique quarters
         if (hexRules && this.isVerbose) {
             const rules = docRules([hexRules]);
-            rules.style.marginBottom = metrics.rules.margin.css;
             this.container.appendChild(rules);
         }
-        this.renderDistrictDefense(this.plotCoord);
         // constructibles
         this.renderConstructibles();
         // bottom bar
@@ -1465,10 +1474,9 @@ class bzPlotTooltip {
         if (!this.improvement && !this.totalYields) return;
         // title bar
         if (hexName && !this.isCompact) this.renderTitleHeading(hexName);
-        // resource & wonder descriptions
+        // resource & natural wonder descriptions
         if (hexRules.length && !this.isCompact) {
             const rules = docRules(hexRules);
-            rules.style.marginBottom = metrics.rules.margin.css;
             this.container.appendChild(rules);
         }
         // constructibles
@@ -1572,6 +1580,7 @@ class bzPlotTooltip {
             label: "LOC_UI_SPECIALISTS_SUBTITLE",
             value: `${special.workers.toFixed()}/${special.maximum.toFixed()}`,
         });
+        if (!layout.length) return;
         const size = metrics.table.spacing.css;
         const small = metrics.sizes(5/6 * metrics.table.spacing.rem).css;
         const table = document.createElement("div");
