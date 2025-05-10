@@ -14,8 +14,10 @@ import { ComponentID } from '/core/ui/utilities/utilities-component-id.js';
 import LensManager from '/core/ui/lenses/lens-manager.js';
 import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
 
-// horizontal list separator
+// horizontal list separator (spaced in all locales except zh)
 const BZ_DOT_DIVIDER = Locale.compose("LOC_PLOT_DIVIDER_DOT");
+const BZ_DOT_JOINER = Locale.getCurrentDisplayLocale().startsWith('zh_') ?
+    BZ_DOT_DIVIDER : `&nbsp;${BZ_DOT_DIVIDER} `;
 
 // custom & adapted icons
 const BZ_ICON_SIZE = 12;
@@ -401,15 +403,11 @@ function docText(text, style) {
     e.setAttribute('data-l10n-id', text);
     return e;
 }
-function dotJoin(list, dot=BZ_DOT_DIVIDER) {
-    // join text with dots after removing empty elements
-    return list.filter(e => e).join("&nbsp;" + dot + " ");
-}
-function dotJoinLocale(list, dot=BZ_DOT_DIVIDER) {
-    return dotJoin(list.map(s => s && Locale.compose(s)), dot);
+function dotJoin(list) {
+    return joinLocale(list, BZ_DOT_JOINER);
 }
 function joinLocale(list, divider=" ") {
-    return list.map(s => s && Locale.compose(s)).join(divider);
+    return list.map(s => s && Locale.compose(s)).filter(e => e).join(divider);
 }
 function gatherBuildingsTagged(tag) {
     return new Set(GameInfo.TypeTags.filter(e => e.Tag == tag).map(e => e.Type));
@@ -827,7 +825,7 @@ class bzPlotTooltip {
                 this.plotEffects.names.push(info.name);
             }
         }
-        this.plotEffects.text = dotJoinLocale(this.plotEffects.names);
+        this.plotEffects.text = dotJoin(this.plotEffects.names);
         // no further effects needed for impassible or offshore tiles
         if (GameplayMap.isImpassable(loc.x, loc.y) ||
             GameplayMap.isNavigableRiver(loc.x, loc.y) ||
@@ -842,7 +840,7 @@ class bzPlotTooltip {
             // ignore city water out side of the city center
         } else if (GameplayMap.isFreshWater(wloc.x, wloc.y)) {
             this.plotEffects.names.push("LOC_PLOTKEY_FRESHWATER");
-            this.plotEffects.text = dotJoinLocale(this.plotEffects.names);
+            this.plotEffects.text = dotJoin(this.plotEffects.names);
         } else if (!this.city && lens == "fxs-settler-lens") {
             this.banners.caution.push("LOC_PLOT_TOOLTIP_NO_FRESH_WATER");
         }
@@ -893,7 +891,7 @@ class bzPlotTooltip {
         }
         // merge terrain & biome
         if (this.biome?.text) {
-            this.terrain.text = dotJoinLocale([this.terrain.text, this.biome.text]);
+            this.terrain.text = dotJoin([this.terrain.text, this.biome.text]);
             this.terrain.highlight = this.terrain.highlight ?? this.biome.highlight;
             this.biome.text = null;
         }
@@ -909,7 +907,7 @@ class bzPlotTooltip {
         const ferry = GameplayMap.isFerry(loc.x, loc.y) ?
             "LOC_NAVIGABLE_RIVER_FERRY" : null;
         const crossing = bridge ?? ferry ?? null;
-        const text = dotJoinLocale([name, crossing]);
+        const text = dotJoin([name, crossing]);
         const highlight =
             info?.PlacementRequiresRoutePresent ? "ROUTE_RAILROAD" :
             "ROUTE_ROAD";
@@ -968,7 +966,7 @@ class bzPlotTooltip {
         // assemble info
         const name = isLake ? "LOC_TERRAIN_LAKE_NAME" : info.Name;
         const type = info.TerrainType;
-        const text = name;
+        const text = type != "TERRAIN_FLAT" || this.isVerbose ? name : null;
         const highlight = this.obstacles.has(type) ? type : null;
         const terrain = { text, name, isLake, highlight, type, info, };
         return terrain;
@@ -997,7 +995,7 @@ class bzPlotTooltip {
             isDistant ? "LOC_PLOT_TOOLTIP_HEMISPHERE_WEST" :
             isDistant === false ? "LOC_PLOT_TOOLTIP_HEMISPHERE_EAST" :
             null;  // autoplaying
-        const text = dotJoinLocale([name, hemisphere]);
+        const text = dotJoin([name, hemisphere]);
         const highlight = null;
         const verbosity = bzVerbosity.VERBOSE;
         const continent = {
@@ -1314,8 +1312,7 @@ class bzPlotTooltip {
         const rows = [];
         // show name, relationship, and civ
         const ownerName = this.getOwnerName(this.owner);
-        const relType = Locale.compose(this.relationship.type ?? "");
-        rows.push(dotJoin([ownerName, relType]));
+        rows.push(dotJoin([ownerName, this.relationship.type]));
         rows.push(this.getCivName(this.owner, true));  // full name
         // show original owner
         if (this.originalOwner) {
@@ -1507,7 +1504,7 @@ class bzPlotTooltip {
             const ttState = document.createElement("div");
             ttState.classList.value = "text-2xs text-center";
             ttState.style.lineHeight = metrics.note.ratio;
-            ttState.innerHTML = dotJoinLocale(notes);
+            ttState.innerHTML = dotJoin(notes);
             this.container.appendChild(ttState);
         }
         const rules = this.isVerbose ? info.Description : info.Tooltip;
@@ -1541,7 +1538,7 @@ class bzPlotTooltip {
             const ttName = document.createElement("div");
             ttName.setAttribute("data-l10n-id", c.info.Name);
             ttConstructible.appendChild(ttName);
-            const notes = dotJoinLocale(c.notes);
+            const notes = dotJoin(c.notes);
             if (notes) {
                 const style = c.isDamaged ? BZ_ALERT.caution : null;
                 const sub = docCapsule(notes, style, metrics.font('2xs', 1.25));
@@ -1729,7 +1726,7 @@ class bzPlotTooltip {
         const rows = [];
         for (const unit of this.units) {
             const info = [unit.name, unit.civ, unit.relationship.type];
-            rows.push(dotJoinLocale(info));
+            rows.push(dotJoin(info));
         }
         const style = this.units[0].relationship.isEnemy ? BZ_ALERT.enemy : null;
         const banner = docBanner(rows, style);
