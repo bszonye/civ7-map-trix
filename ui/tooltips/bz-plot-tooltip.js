@@ -881,7 +881,7 @@ class bzPlotTooltip {
             this.terrain.highlight = null;
         }
         // merge terrain & biome
-        if (this.biome.text) {
+        if (this.biome?.text) {
             this.terrain.text = dotJoinLocale([this.terrain.text, this.biome.text]);
             this.terrain.highlight = this.terrain.highlight ?? this.biome.highlight;
             this.biome.text = null;
@@ -1526,6 +1526,7 @@ class bzPlotTooltip {
         const ttList = document.createElement("div");
         ttList.classList.value = "text-center";
         ttList.style.lineHeight = metrics.body.ratio;
+        ttList.style.marginBottom = metrics.body.margin.css;
         for (const c of this.constructibles) {
             const ttConstructible = document.createElement("div");
             const ttName = document.createElement("div");
@@ -1556,17 +1557,17 @@ class bzPlotTooltip {
         if (!this.population) return;
         const { urban, rural, special, religion, } = this.population;
         const layout = [];
-        if (urban) layout.push({
+        if (urban && this.isVerbose) layout.push({
             icon: religion.urban?.icon ?? BZ_ICON_URBAN,
             label: "LOC_UI_CITY_STATUS_URBAN_POPULATION",
             value: urban.toFixed(),
         });
-        if (rural) layout.push({
+        if (rural && this.isVerbose) layout.push({
             icon: religion.rural?.icon ?? BZ_ICON_RURAL,
             label: "LOC_UI_CITY_STATUS_RURAL_POPULATION",
             value: rural.toFixed(),
         });
-        if (special?.maximum && (special?.workers || this.isVerbose)) layout.push({
+        if (special?.maximum && !this.isCompact) layout.push({
             icon: BZ_ICON_SPECIAL,
             label: "LOC_UI_SPECIALISTS_SUBTITLE",
             value: `${special.workers.toFixed()}/${special.maximum.toFixed()}`,
@@ -1666,7 +1667,7 @@ class bzPlotTooltip {
             const icon = slot?.info.ConstructibleType ?? BZ_ICON_EMPTY_SLOT;
             const colors = constructibleColors(slot?.info);
             const glow = slot && slot.isComplete && !slot.isOverbuildable;
-            const info = { icon, colors, glow, collapse: false, style: ["-mb-1"], };
+            const info = { icon, colors, glow, collapse: false, style: ["-my-0\\.5"], };
             this.renderIcon(layout, info);
         }
         this.container.appendChild(layout);
