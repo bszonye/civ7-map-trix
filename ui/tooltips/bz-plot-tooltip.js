@@ -1808,7 +1808,6 @@ class bzPlotTooltip {
         const glowSize = frameSize + blurRadius + 2*spreadRadius;
         const groundSize = Math.max(baseSize, glowSize, minsize);
         const rem = (d) => `${2/9*d}rem`;
-        layout.style.minHeight = groundSize;
         const setDimensions = (e, inside, shift) => {
             const offset = (groundSize - inside) / 2;
             const dx = shift?.x ?? 0;
