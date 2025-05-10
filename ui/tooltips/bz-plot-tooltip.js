@@ -263,7 +263,7 @@ BZ_HEAD_STYLE.map(style => {
 document.body.classList.toggle("bz-yield-banner", bzMapTrixOptions.yieldBanner);
 
 // debug style (manually enable)
-document.body.classList.toggle("bz-debug", true);
+document.body.classList.toggle("bz-debug", false);
 
 function baseYields(info) {
     if (!info) return null;
@@ -381,21 +381,18 @@ function docRules(text, style=null) {
     // TODO: make maxWidth work, if possible
     const wrap = document.createElement("div");
     wrap.style.display = 'flex';
-    wrap.style.position = 'relative';
     wrap.style.alignSelf = 'center';
     wrap.style.textAlign = 'center';
     wrap.style.lineHeight = metrics.rules.ratio;
     const list = document.createElement("div");
     list.style.display = 'flex';
     list.style.flexDirection = 'column';
-    list.style.position = 'relative';
+    list.style.maxWidth = metrics.rules.width.css;
     for (const item of text) {
         const row = document.createElement("div");
         if (style) row.classList.value = style;
-        row.style.position = 'relative';
         row.classList.add("bz-list-item");
         row.setAttribute("data-l10n-id", item);
-        row.style.maxWidth = metrics.rules.width.css;
         list.appendChild(row);
     }
     wrap.appendChild(list);
@@ -1517,18 +1514,18 @@ class bzPlotTooltip {
         if (!this.wonder) return;
         const info = this.wonder.info;
         if (!this.isCompact) this.renderTitleHeading("LOC_DISTRICT_WONDER_NAME");
-        let rulesStyle = null;
         const notes = this.wonder.notes;
         if (notes.length) {
             const ttState = document.createElement("div");
-            ttState.classList.value = "text-2xs leading-none text-center";
+            ttState.classList.value = "text-2xs text-center";
+            ttState.style.lineHeight = metrics.note.ratio;
             ttState.innerHTML = dotJoinLocale(notes);
             this.container.appendChild(ttState);
-            rulesStyle = "mt-1";
         }
         const rules = this.isVerbose ? info.Description : info.Tooltip;
         if (rules && !this.isCompact) {
-            const tt = docRules([rules], rulesStyle);
+            const tt = docRules([rules]);
+            if (notes.length) tt.style.marginTop = metrics.margin.css;
             this.container.appendChild(tt);
         }
         const colors = constructibleColors(this.wonder.info);
