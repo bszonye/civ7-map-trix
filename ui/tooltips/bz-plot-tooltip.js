@@ -25,8 +25,9 @@ const BZ_ICON_SIZE = 12;
 const BZ_ICON_DISCOVERY = "url('blp:tech_cartography')";
 const BZ_ICON_EMPTY_SLOT = "BUILDING_OPEN";
 const BZ_ICON_FRAME = "url('hud_sub_circle_bk')";
-const BZ_ICON_TOTAL_RURAL = "CITY_RURAL";  // total yield (rural)
-const BZ_ICON_TOTAL_URBAN = "CITY_URBAN";  // total yield (urban)
+const BZ_ICON_RURAL = "CITY_RURAL";  // urban population/yield
+const BZ_ICON_URBAN = "CITY_URBAN";  // rural population/yield
+const BZ_ICON_SPECIAL = "CITY_SPECIAL_BASE";  // specialists
 const BZ_ICON_VILLAGE_TYPES = {  // by city-state type and age
     CULTURAL: [
         "IMPROVEMENT_MEGALITH",
@@ -624,11 +625,9 @@ class bzPlotTooltip {
                 // Controls.preloadImage(url, 'plot-tooltip');
                 preloadIcon(`${y.YieldType}`, "YIELD");
             }
-            for (const y of [BZ_ICON_TOTAL_RURAL, BZ_ICON_TOTAL_URBAN]) {
-                preloadIcon(y, "YIELD");
+            for (const y of [BZ_ICON_RURAL, BZ_ICON_URBAN, BZ_ICON_SPECIAL]) {
+                preloadIcon(y);
             }
-            // stop flicker in Sukritact's city banner tooltip
-            Controls.preloadImage("hud_sub_circle_bk", "city-banner");
         });
     }
     static get instance() { return bzPlotTooltip._instance; }
@@ -1187,8 +1186,7 @@ class bzPlotTooltip {
         if (this.yields.length < 2) return;
         // total
         const name = "LOC_YIELD_BZ_TOTAL";
-        const type = this.district?.isUrbanCore ?
-            BZ_ICON_TOTAL_URBAN : BZ_ICON_TOTAL_RURAL;
+        const type = this.district?.isUrbanCore ? BZ_ICON_URBAN : BZ_ICON_RURAL;
         // avoid fractions in total to avoid extra-wide columns
         // round down to avoid inflating totals (for science legacy)
         const value = Math.floor(this.totalYields).toString();
@@ -1571,17 +1569,17 @@ class bzPlotTooltip {
         const { urban, rural, special, religion, } = this.population;
         const layout = [];
         if (urban) layout.push({
-            icon: religion.urban?.icon ?? "CITY_URBAN",
+            icon: religion.urban?.icon ?? BZ_ICON_URBAN,
             label: "LOC_UI_CITY_STATUS_URBAN_POPULATION",
             value: urban,
         });
         if (rural) layout.push({
-            icon: religion.rural?.icon ?? "CITY_RURAL",
+            icon: religion.rural?.icon ?? BZ_ICON_RURAL,
             label: "LOC_UI_CITY_STATUS_RURAL_POPULATION",
             value: rural,
         });
         if (special?.maximum && (special?.workers || this.isVerbose)) layout.push({
-            icon: "CITY_SPECIAL_BASE",
+            icon: BZ_ICON_SPECIAL,
             label: "LOC_UI_SPECIALISTS_SUBTITLE",
             value: `${special.workers.toFixed()}/${special.maximum.toFixed()}`,
         });
