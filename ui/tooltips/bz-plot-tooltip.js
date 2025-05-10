@@ -1342,83 +1342,6 @@ class bzPlotTooltip {
         banner.style.lineHeight = metrics.body.ratio;
         banner.style.marginBottom = metrics.body.margin.css;
         this.container.appendChild(banner);
-        // report population, religion, and specialists
-        this.renderPopulation();
-    }
-    renderPopulation() {
-        // TODO: simplify
-        // TODO: hide zero rows
-        if (!this.population) return;
-        console.warn(`TRIX POP ${JSON.stringify(this.population)}`);
-        const { urban, rural, special, religion, } = this.population;
-        const layout = [
-            {
-                icon: religion.urban?.icon ?? "CITY_URBAN",
-                label: "LOC_UI_CITY_STATUS_URBAN_POPULATION",
-                value: urban,
-            },
-            {
-                icon: religion.rural?.icon ?? "CITY_RURAL",
-                label: "LOC_UI_CITY_STATUS_RURAL_POPULATION",
-                value: rural,
-            },
-            {
-                icon: "CITY_SPECIAL_BASE",
-                label: "LOC_UI_SPECIALISTS_SUBTITLE",
-                value: special?.maximum ?? 0,
-                frac: special?.workers ?? 0,
-            },
-        ];
-        const size = metrics.table.spacing.css;
-        const small = metrics.sizes(5/6 * metrics.table.spacing.rem).css;
-        const rows = [];
-        for (const item of layout) {
-            // don't show zero pop, or zero specialists (unless verbose)
-            if (!item.value) continue;
-            if (item.frac == 0 && !this.isVerbose) continue;
-            // build row
-            // TODO: improve layout, especially for single rows
-            const row = document.createElement("div");
-            row.classList.value = "flex justify-start px-1";
-            row.style.minHeight = size;
-            row.appendChild(docIcon(item.icon, size, small, "-mx-1"));
-            row.appendChild(docText(item.label, "text-left flex-auto mx-2"));
-            const vtext = item.value.toFixed();
-            const ftext = item.frac?.toFixed();
-            const value = ftext ? `${ftext} / ${vtext}` : vtext;
-            row.appendChild(docText(value, "text-right"));
-            rows.push(row);
-        }
-        this.renderTable(rows, null, true);
-    }
-    renderTable(rows, color, narrow=false) {
-        // TODO: simplify
-        const table = document.createElement("div");
-        table.classList.value = "flex-table justify-start text-xs";
-        // collect rows into the table
-        for (const [i, row] of rows.entries()) {
-            // add stripes to multi-row tables
-            if (color && !(i % 2)) {
-                row.classList.add("rounded-2xl");
-                row.style.backgroundColor = color;
-            }
-            table.appendChild(row);
-        }
-        if (narrow) {
-            // optionally prevent single-row tables from
-            // expanding to the full width of the tooltip
-            // TODO: why does this work?
-            const tt = document.createElement("div");
-            tt.classList.value = "flex justify-center";
-            tt.style.marginBottom = 0;
-            tt.append(table);
-            tt.style.marginBottom = metrics.margin.css;
-            this.container.appendChild(tt);
-            return;
-        }
-        // full-width table
-        table.style.marginBottom = metrics.margin.css;
-        this.container.appendChild(table);
     }
     getOwnerName(owner) {
         if (!owner) return "";
@@ -1481,6 +1404,8 @@ class bzPlotTooltip {
                 this.renderWonder();
                 break;
         }
+        // report population, religion, and specialists
+        this.renderPopulation();
     }
     renderUrban() {
         let hexName = GameInfo.Districts.lookup(this.district.type).Name;
@@ -1649,6 +1574,49 @@ class bzPlotTooltip {
             ttList.appendChild(tt);
         }
         this.container.appendChild(ttList);
+    }
+    renderPopulation() {
+        // TODO: simplify
+        // TODO: hide zero rows
+        if (!this.population) return;
+        const { urban, rural, special, religion, } = this.population;
+        const layout = [];
+        if (urban) layout.push({
+            icon: religion.urban?.icon ?? "CITY_URBAN",
+            label: "LOC_UI_CITY_STATUS_URBAN_POPULATION",
+            value: urban,
+        });
+        if (rural) layout.push({
+            icon: religion.rural?.icon ?? "CITY_RURAL",
+            label: "LOC_UI_CITY_STATUS_RURAL_POPULATION",
+            value: rural,
+        });
+        if (special?.maximum && (special?.workers || this.isVerbose)) layout.push({
+            icon: "CITY_SPECIAL_BASE",
+            label: "LOC_UI_SPECIALISTS_SUBTITLE",
+            value: `${special.workers.toFixed()}/${special.maximum.toFixed()}`,
+        });
+        const size = metrics.table.spacing.css;
+        const small = metrics.sizes(5/6 * metrics.table.spacing.rem).css;
+        const table = document.createElement("div");
+        table.classList.value = "flex-table justify-start text-xs";
+        for (const item of layout) {
+            // TODO: improve layout, especially for single rows
+            const row = document.createElement("div");
+            row.classList.value = "flex justify-start";
+            row.style.minHeight = size;
+            row.appendChild(docIcon(item.icon, size, small, "-mx-0\\.5"));
+            row.appendChild(docText(item.label, "text-left flex-auto mx-1\\.5"));
+            const value = docText(item.value, "text-right");
+            row.appendChild(value);
+            table.appendChild(row);
+        }
+        // wrap table to keep it from expanding to full width
+        const wrap = document.createElement("div");
+        wrap.classList.value = "flex justify-center";
+        wrap.style.marginBottom = metrics.table.margin.css;
+        wrap.appendChild(table);
+        this.container.appendChild(wrap);
     }
     // lay out paragraphs of rules text
     renderRules(text, listStyle=null, itemStyle=null) {
