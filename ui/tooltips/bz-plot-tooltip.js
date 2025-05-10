@@ -1563,12 +1563,12 @@ class bzPlotTooltip {
         if (urban) layout.push({
             icon: religion.urban?.icon ?? BZ_ICON_URBAN,
             label: "LOC_UI_CITY_STATUS_URBAN_POPULATION",
-            value: urban,
+            value: urban.toFixed(),
         });
         if (rural) layout.push({
             icon: religion.rural?.icon ?? BZ_ICON_RURAL,
             label: "LOC_UI_CITY_STATUS_RURAL_POPULATION",
-            value: rural,
+            value: rural.toFixed(),
         });
         if (special?.maximum && (special?.workers || this.isVerbose)) layout.push({
             icon: BZ_ICON_SPECIAL,
@@ -1677,7 +1677,7 @@ class bzPlotTooltip {
             const icon = slot?.info.ConstructibleType ?? BZ_ICON_EMPTY_SLOT;
             const colors = constructibleColors(slot?.info);
             const glow = slot && slot.isComplete && !slot.isOverbuildable;
-            const info = { icon, colors, glow, collapse: false, style: ["-my-1"], };
+            const info = { icon, colors, glow, collapse: false, style: ["-my-2"], };
             this.renderIcon(layout, info);
         }
         this.container.appendChild(layout);
