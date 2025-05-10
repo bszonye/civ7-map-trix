@@ -1,6 +1,3 @@
-// TODO: hide redundant walls
-// TODO: new titles
-// TODO: refactor model vs render
 // TODO: fix margins:
 // TODO: - settlement
 // TODO: - district
@@ -220,7 +217,6 @@ const BZ_HEAD_STYLE = [
     color: ${BZ_COLOR.bronze2};
 }
 `,  // debug highlighting for content boxes
-    // TODO: don't tie this to debug mode
 `
 .bz-debug .bz-tooltip > div > div > div {
     background-color: #80808040;  /* DEBUG */
@@ -319,9 +315,14 @@ function docBanner(text, style, padding) {
     banner.style.minHeight = metrics.bumper.css;
     // set the text
     for (const item of text) {
-        const row = document.createElement("div");
-        row.setAttribute("data-l10n-id", item);
-        banner.appendChild(row);
+        console.warn(`TRIX TYPE ${typeof item}`);
+        if (typeof item === "object") {
+            banner.appendChild(item);
+        } else {
+            const row = document.createElement("div");
+            row.setAttribute("data-l10n-id", item);
+            banner.appendChild(row);
+        }
     }
     return banner;
 }
@@ -397,6 +398,9 @@ function dotJoin(list, dot=BZ_DOT_DIVIDER) {
 }
 function dotJoinLocale(list, dot=BZ_DOT_DIVIDER) {
     return dotJoin(list.map(s => s && Locale.compose(s)), dot);
+}
+function joinLocale(list, divider=" ") {
+    return list.map(s => s && Locale.compose(s)).join(divider);
 }
 function gatherBuildingsTagged(tag) {
     return new Set(GameInfo.TypeTags.filter(e => e.Tag == tag).map(e => e.Type));
@@ -551,10 +555,6 @@ function setStyle(element, style, padding) {
     }
     if (padding) element.style.paddingTop = element.style.paddingBottom = padding;
 }
-function setBannerStyle(element, style=BZ_ALERT.danger, ...classes) {
-    element.classList.add("bz-banner", ...classes);
-    setStyle(element, style);
-}
 class bzPlotTooltip {
     constructor() {
         this.plotCoord = null;
@@ -603,9 +603,8 @@ class bzPlotTooltip {
         this.originalOwner = null;
         this.settlementType = null;
         this.townFocus = null;
-        this.religions = null;  // TODO: redesign
         // workers
-        this.population = null;  // { workers, maximum }
+        this.population = null;  // { urban, rural, special, religion, }
         this.freeConstructible = null;  // standard improvement type
         // yields
         this.yields = [];
@@ -720,9 +719,8 @@ class bzPlotTooltip {
         this.originalOwner = null;
         this.settlementType = null;
         this.townFocus = null;
-        this.religions = null;  // TODO: redesign
         // workers
-        this.population = null;  // { workers, maximum }
+        this.population = null;  // { urban, rural, special, religion, }
         this.freeConstructible = null;  // standard improvement type
         // yields
         this.yields = [];
@@ -1525,7 +1523,6 @@ class bzPlotTooltip {
     }
     // lay out a column of constructibles and their construction notes
     renderConstructibles() {
-        // TODO: new leading system
         if (!this.constructibles.length && !this.freeConstructible) return;
         const ttList = document.createElement("div");
         ttList.classList.value = "text-center";
@@ -1601,14 +1598,11 @@ class bzPlotTooltip {
         // occupation status
         if (this.district.owner != this.district.controllingPlayer) {
             const conqueror = Players.get(this.district.controllingPlayer);
-            const conquerorName = this.getCivName(conqueror, true);
-            const conquerorText = Locale.compose("{1_Term} {2_Subject}", "LOC_PLOT_TOOLTIP_CONQUEROR", conquerorName);
-            const tt = document.createElement("div");
-            tt.classList.value = "leading-tight mb-1 py-1";
-            // TODO: switch to docBanner
-            setBannerStyle(tt, BZ_ALERT.conqueror);
-            tt.innerHTML = conquerorText;
-            this.container.appendChild(tt);
+            const cname = this.getCivName(conqueror, true);
+            const ctext = joinLocale(["LOC_PLOT_TOOLTIP_CONQUEROR", cname]);
+            const banner = docBanner([ctext], BZ_ALERT.conqueror);
+            banner.style.marginBottom = metrics.padding.banner.css;
+            this.container.appendChild(banner);
         }
         // district health
         const loc = this.plotCoord;
@@ -1637,13 +1631,10 @@ class bzPlotTooltip {
             info.push(ttHealth);
         }
         if (info.length) {
-            const ttDefense = document.createElement("div");
-            ttDefense.classList.value = "leading-tight text-center mb-1";
             const style = currentHealth != maxHealth ? BZ_ALERT.danger : BZ_ALERT.note;
-            // TODO: switch to docBanner
-            setBannerStyle(ttDefense, style, "py-1");
-            for (const row of info) ttDefense.appendChild(row);
-            this.container.appendChild(ttDefense);
+            const banner = docBanner(info, style);
+            banner.style.marginBottom = metrics.padding.banner.css;
+            this.container.appendChild(banner);
         }
     }
     renderIconDivider(info, margin=metrics.margin.css) {
