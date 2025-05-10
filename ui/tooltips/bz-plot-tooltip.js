@@ -473,7 +473,7 @@ function getFontMetrics() {
     rules.width = sizes(BZ_RULES_WIDTH);
     const table = font('xs');
     const yields = font(8/9);
-    const radius = sizes(2/3 * padding.rem);  // TODO: fine-tuning
+    const radius = sizes(2/3 * padding.rem);
     radius.content = sizes(radius.rem);
     radius.tooltip = sizes(radius.rem + border.rem);
     // minimum end banner height to avoid radius glitches
@@ -1530,7 +1530,8 @@ class bzPlotTooltip {
             collapse: false,
             style: ["-my-0\\.5"],
         };
-        this.renderIconDivider(icon);
+        const margin = "0.1111111111rem";  // tighter icon margin
+        this.renderIconDivider(icon, margin);
     }
     // lay out a column of constructibles and their construction notes
     renderConstructibles() {
@@ -1655,7 +1656,7 @@ class bzPlotTooltip {
             this.container.appendChild(ttDefense);
         }
     }
-    renderIconDivider(info) {
+    renderIconDivider(info, margin=metrics.margin.css) {
         // icon divider with optional overlay
         if (info.icon.search(/blp:tech_/) != -1) {
             // tech icons need a frame
@@ -1667,7 +1668,7 @@ class bzPlotTooltip {
         }
         const layout = document.createElement("div");
         layout.classList.value = "self-center flex relative mx-2";
-        layout.style.marginTop = layout.style.marginBottom = metrics.margin.css;
+        layout.style.marginTop = layout.style.marginBottom = margin;
         this.renderIcon(layout, info);
         this.container.appendChild(layout);
     }
@@ -1693,6 +1694,8 @@ class bzPlotTooltip {
     }
     renderYields() {
         if (!this.totalYields) return;  // no yields to show
+        // hide wonder yields (they're awkward and mostly useless)
+        if (this.wonder && !this.isVerbose) return;
         // set column width based on number of digits (at least three)
         const digits = getDigits(this.yields.map(y => y.value), 2);
         const width = metrics.yields.digits(digits).css;
