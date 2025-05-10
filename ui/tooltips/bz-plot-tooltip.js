@@ -188,7 +188,7 @@ const BZ_FONT_SPACING = 1.5;
 const BZ_PADDING = 0.6666666667;
 const BZ_MARGIN = BZ_PADDING / 2;
 const BZ_BORDER = 0.1111111111;
-const BZ_RULES_WIDTH = 13.3333333333;
+const BZ_RULES_WIDTH = 12;
 let metrics = getFontMetrics();
 
 // additional CSS definitions
@@ -240,18 +240,9 @@ const BZ_HEAD_STYLE = [
     padding-left: ${metrics.padding.x.css};
     padding-right: ${metrics.padding.x.css};
 }
-`,  // centers blocks of rules text
-    // IMPORTANT:
-    // Locale.stylize wraps text in an extra <p> element when it
-    // contains styling, which interferes with text-align and max-width.
-    // the result also changes with single- vs multi-line text.  these
-    // rules apply the properties in the correct order and scope to work
-    // with all combinations (with/without icons, single/multiple
-    // lines).
+`,  // helps center blocks of rules text (see docRules)
 `
-.bz-tooltip .bz-list-item p {
-    width: 100%;
-}
+.bz-tooltip .bz-list-item p { width: 100%; }
 `,
 ];
 BZ_HEAD_STYLE.map(style => {
@@ -359,35 +350,18 @@ function docIcon(image, size, resize, ...style) {
         image.startsWith("url(") ? image : UI.getIconCSS(image);
     return icon;
 }
-function docList(text, style=null) {
-    // create a list of plain text (use docRules for font icons)
-    const list = document.createElement("div");
-    list.style.position = 'relative';
-    list.style.alignSelf = 'center';
-    list.style.textAlign = 'center';
-    list.style.lineHeight = metrics.body.ratio;
-    for (const item of text) {
-        const row = document.createElement("div");
-        if (style) row.classList.value = style;
-        row.classList.add("bz-list-item");
-        row.setAttribute("data-l10n-id", item);
-        list.appendChild(row);
-    }
-    return list;
-}
-function docRules(text, style=null) {
+function docList(text, style=null, size=metrics.body) {
     // create a paragraph of rules text
-    // font icons are squirrely!  only center them at top level
-    // TODO: make maxWidth work, if possible
+    // note: very finicky! test changes thoroughly (see docRules)
     const wrap = document.createElement("div");
     wrap.style.display = 'flex';
     wrap.style.alignSelf = 'center';
     wrap.style.textAlign = 'center';
-    wrap.style.lineHeight = metrics.rules.ratio;
+    wrap.style.lineHeight = size.ratio;
     const list = document.createElement("div");
     list.style.display = 'flex';
     list.style.flexDirection = 'column';
-    list.style.maxWidth = metrics.rules.width.css;
+    if (size.width) list.style.maxWidth = size.width.css;
     for (const item of text) {
         const row = document.createElement("div");
         if (style) row.classList.value = style;
@@ -397,6 +371,19 @@ function docRules(text, style=null) {
     }
     wrap.appendChild(list);
     return wrap;
+}
+function docRules(text, style=null) {
+    // IMPORTANT:
+    // Locale.stylize wraps text in an extra <p> element when it
+    // contains styling, which interferes with text-align and max-width.
+    // the result also changes with single- vs multi-line text.  this 
+    // function and docList set up flex boxes and style properties to
+    // center text with all combinations (with/without styling and
+    // wrapped/unwrapped text).
+    const isPlain = !text.some(t => Locale.stylize(t).includes('<fxs-font-icon'));
+    const list = docList(text, style, metrics.rules);
+    if (isPlain) list.style.lineHeight = metrics.body.ratio;
+    return list;
 }
 function docText(text, style) {
     const e = document.createElement("div");
@@ -1461,11 +1448,6 @@ class bzPlotTooltip {
             hexName = rcinfo.Name + "_BZ";
             if (this.freeConstructible || this.isVerbose) {
                 hexRules.push(this.resource.Tooltip);
-                if (this.continent?.isDistant &&
-                    this.resource.ResourceClassType == "RESOURCECLASS_TREASURE") {
-                    // also show treasure fleet rules
-                    hexRules.push("LOC_CAN_CREATE_TREASURE_FLEET");
-                }
             }
             resourceIcon = this.resource.ResourceType;
         } else if (this.isCompact && this.city) {
