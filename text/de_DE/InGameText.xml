@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Database>
     <LocalizedText>
-        <Replace Tag="LOC_BZ_GROUPED_DIGITS" Language="de_DE">
-            <Text>{1_amount: number #,###;-#,###}</Text>
-        </Replace>
-        <Replace Tag="LOC_BZ_GROUPED_MODIFIER" Language="de_DE">
-            <Text>{1_amount: number +#,###;-#,###}</Text>
-        </Replace>
         <Replace Tag="LOC_BZ_PEOPLE_NAME" Language="de_DE">
             <Text>Volk der {1_name}</Text>
         </Replace>
@@ -16,104 +10,80 @@
         <Replace Tag="LOC_BZ_SETTLEMENT_CITY_STATE" Language="de_DE">
             <Text>Stadtstaat</Text>
         </Replace>
-        <Replace Tag="LOC_BZ_SETTLEMENT_CONNECTIONS" Language="de_DE">
-            <Text>Verbindungen</Text>
-        </Replace>
-        <Replace Tag="LOC_BZ_SETTLEMENT_NO_FRESHWATER" Language="de_DE">
-            <Text>Kein Süßwasser</Text>
-        </Replace>
         <Replace Tag="LOC_BZ_WAS_PREVIOUSLY" Language="de_DE">
             <Text>(War {1_name})</Text>
         </Replace>
-        <Replace Tag="LOC_BZ_WAS_ICON_PREVIOUSLY" Language="de_DE">
-            <Text>(War {1_icon} {2_name})</Text>
-        </Replace>
-        <Row Tag="LOC_BZ_CITY_CONNECTIONS" Language="de_DE">
-            <Text>Verbindungen • {1_cities}[icon:YIELD_CITIES] {2_towns}[icon:YIELD_TOWNS]</Text>
-        </Row>
-        <Row Tag="LOC_BZ_IMPROVEMENT_FOR_TILE" Language="de_DE">
+        <Replace Tag="LOC_BZ_IMPROVEMENT_FOR_TILE" Language="de_DE">
             <Text>Erlaubt {1_icon} {2_name}</Text>
-        </Row>
-        <Row Tag="LOC_BZ_IMPROVEMENT_FOR_RESOURCE" Language="de_DE">
+        </Replace>
+        <Replace Tag="LOC_BZ_IMPROVEMENT_FOR_RESOURCE" Language="de_DE">
             <Text>Benötigt {1_icon} {2_name}</Text>
-        </Row>
-        <Row Tag="LOC_BZ_RELIGION_MAJORITY" Language="de_DE">
-            <Text>Mehrheit {1_icon} {2_name}</Text>
-        </Row>
-        <Row Tag="LOC_BZ_RELIGION_RURAL" Language="de_DE">
-            <Text>Ländlich {1_icon} {2_name}</Text>
-        </Row>
-        <Row Tag="LOC_BZ_RELIGION_URBAN" Language="de_DE">
-            <Text>Städtisch {1_icon} {2_name}</Text>
-        </Row>
-        <Row Tag="LOC_DISTRICT_BZ_DISCOVERY" Language="de_DE">
+        </Replace>
+        <Replace Tag="LOC_DISTRICT_BZ_DISCOVERY" Language="de_DE">
             <Text>Entdeckung</Text>
-        </Row>
-        <Row Tag="LOC_DISTRICT_BZ_INDEPENDENT" Language="de_DE">
+        </Replace>
+        <Replace Tag="LOC_DISTRICT_BZ_INDEPENDENT" Language="de_DE">
             <Text>Unabhängig</Text>
-        </Row>
-        <Row Tag="LOC_DISTRICT_BZ_SPECIALISTS" Language="de_DE">
-            <Text>Spezialist [icon:CITY_SPECIAL_BASE] {1_number}/{2_maximum}</Text>
-        </Row>
-        <Row Tag="LOC_DISTRICT_BZ_TOWN_CENTER" Language="de_DE">
+        </Replace>
+        <Replace Tag="LOC_DISTRICT_BZ_TOWN_CENTER" Language="de_DE">
             <Text>Stadtzentrum</Text>
-        </Row>
-        <Row Tag="LOC_DISTRICT_BZ_URBAN_DISTRICT" Language="de_DE">
+        </Replace>
+        <Replace Tag="LOC_DISTRICT_BZ_URBAN_DISTRICT" Language="de_DE">
             <Text>Bezirk</Text>
-        </Row>
-        <Row Tag="LOC_DISTRICT_BZ_URBAN_QUARTER" Language="de_DE">
+        </Replace>
+        <Replace Tag="LOC_DISTRICT_BZ_URBAN_QUARTER" Language="de_DE">
             <Text>Quartier</Text>
-        </Row>
-        <Row Tag="LOC_DISTRICT_BZ_URBAN_VACANT" Language="de_DE">
+        </Replace>
+        <Replace Tag="LOC_DISTRICT_BZ_URBAN_VACANT" Language="de_DE">
             <Text>Freier Bezirk</Text>
-        </Row>
-        <Row Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE" Language="de_DE">
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE" Language="de_DE">
             <Text>Map Trix • Detaillierungsgrad</Text>
-        </Row>
-        <Row Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE_DESCRIPTION" Language="de_DE">
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE_DESCRIPTION" Language="de_DE">
             <Text>Detaillierungsgrad für die Kartentools.[N] [N][B]Tastenkombination[/B][N]Kurz • Strg[N]Detailliert • Umschalt[N]Verborgen • Strg+Umschalt</Text>
-        </Row>
-        <Row Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER" Language="de_DE">
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER" Language="de_DE">
             <Text>Map Trix • gestaltet das Ertragsbanner neu</Text>
-        </Row>
-        <Row Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER_DESCRIPTION" Language="de_DE">
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER_DESCRIPTION" Language="de_DE">
             <Text>Ändert die obere Leiste so, dass sie den abgerundeten Farbhervorhebungen in Trixies Mods entspricht.</Text>
-        </Row>
-        <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_HIDDEN" Language="de_DE">
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_VERBOSITY_HIDDEN" Language="de_DE">
             <Text>Verborgen</Text>
-        </Row>
-        <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_COMPACT" Language="de_DE">
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_VERBOSITY_COMPACT" Language="de_DE">
             <Text>Kurz</Text>
-        </Row>
-        <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_STANDARD" Language="de_DE">
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_VERBOSITY_STANDARD" Language="de_DE">
             <Text>Standard</Text>
-        </Row>
-        <Row Tag="LOC_OPTIONS_BZ_VERBOSITY_VERBOSE" Language="de_DE">
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_VERBOSITY_VERBOSE" Language="de_DE">
             <Text>Detailliert</Text>
-        </Row>
+        </Replace>
         <Replace Tag="LOC_OPTIONS_GROUP_BZ_MODS" Language="de_DE">
             <Text>Trixies mods</Text>
         </Replace>
-        <Row Tag="LOC_RESOURCECLASS_BONUS_NAME_BZ" Language="de_DE">
+        <Replace Tag="LOC_RESOURCECLASS_BONUS_NAME_BZ" Language="de_DE">
             <Text>Bonus-Ressource</Text>
-        </Row>
-        <Row Tag="LOC_RESOURCECLASS_CITY_NAME_BZ" Language="de_DE">
+        </Replace>
+        <Replace Tag="LOC_RESOURCECLASS_CITY_NAME_BZ" Language="de_DE">
             <Text>Stadtressource</Text>
-        </Row>
-        <Row Tag="LOC_RESOURCECLASS_EMPIRE_NAME_BZ" Language="de_DE">
+        </Replace>
+        <Replace Tag="LOC_RESOURCECLASS_EMPIRE_NAME_BZ" Language="de_DE">
             <Text>Reich-Ressource</Text>
-        </Row>
-        <Row Tag="LOC_RESOURCECLASS_FACTORY_NAME_BZ" Language="de_DE">
+        </Replace>
+        <Replace Tag="LOC_RESOURCECLASS_FACTORY_NAME_BZ" Language="de_DE">
             <Text>Fabrikressource</Text>
-        </Row>
-        <Row Tag="LOC_RESOURCECLASS_TREASURE_NAME_BZ" Language="de_DE">
+        </Replace>
+        <Replace Tag="LOC_RESOURCECLASS_TREASURE_NAME_BZ" Language="de_DE">
             <Text>Schatzressource</Text>
-        </Row>
-        <Row Tag="LOC_STATE_BZ_UNIQUE" Language="de_DE">
+        </Replace>
+        <Replace Tag="LOC_STATE_BZ_UNIQUE" Language="de_DE">
             <Text>Einzigartig</Text>
-        </Row>
-        <Row Tag="LOC_YIELD_BZ_TOTAL" Language="de_DE">
+        </Replace>
+        <Replace Tag="LOC_YIELD_BZ_TOTAL" Language="de_DE">
             <Text>Gesamtertrag</Text>
-        </Row>
+        </Replace>
     </LocalizedText>
 </Database>
