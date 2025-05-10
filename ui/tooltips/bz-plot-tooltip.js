@@ -266,7 +266,7 @@ BZ_HEAD_STYLE.map(style => {
 document.body.classList.toggle("bz-yield-banner", bzMapTrixOptions.yieldBanner);
 
 // debug style (manually enable)
-document.body.classList.toggle("bz-debug", false);
+document.body.classList.toggle("bz-debug", true);
 
 function baseYields(info) {
     if (!info) return null;
@@ -1405,7 +1405,7 @@ class bzPlotTooltip {
                 break;
         }
         // report population, religion, and specialists
-        this.renderPopulation();
+        if (!this.isCompact) this.renderPopulation();
     }
     renderUrban() {
         let hexName = GameInfo.Districts.lookup(this.district.type).Name;
@@ -1576,8 +1576,6 @@ class bzPlotTooltip {
         this.container.appendChild(ttList);
     }
     renderPopulation() {
-        // TODO: simplify
-        // TODO: hide zero rows
         if (!this.population) return;
         const { urban, rural, special, religion, } = this.population;
         const layout = [];
@@ -1601,7 +1599,6 @@ class bzPlotTooltip {
         const table = document.createElement("div");
         table.classList.value = "flex-table justify-start text-xs";
         for (const item of layout) {
-            // TODO: improve layout, especially for single rows
             const row = document.createElement("div");
             row.classList.value = "flex justify-start";
             row.style.minHeight = size;
@@ -1741,7 +1738,7 @@ class bzPlotTooltip {
     }
     yieldColumn(col, width) {
         const tt = document.createElement("div");
-        tt.classList.value = "flex-col justify-start font-body";
+        tt.classList.value = "flex-col justify-start font-body -mt-0\\.5";
         const ariaLabel = `${col.value} ${Locale.compose(col.name)}`;
         tt.ariaLabel = ariaLabel;
         const size = metrics.yields.spacing.css;
