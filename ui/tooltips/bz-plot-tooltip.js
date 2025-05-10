@@ -315,7 +315,6 @@ function docBanner(text, style, padding) {
     banner.style.minHeight = metrics.bumper.css;
     // set the text
     for (const item of text) {
-        console.warn(`TRIX TYPE ${typeof item}`);
         if (typeof item === "object") {
             banner.appendChild(item);
         } else {
@@ -1661,14 +1660,13 @@ class bzPlotTooltip {
         // render the icons
         const layout = document.createElement("div");
         layout.classList.value = "self-center flex relative mx-2";
-        layout.style.marginTop = layout.style.marginBottom = metrics.margin.css;
         for (const slot of slots) {
             // if the building has more than one yield type, like the
             // Palace, use one type for the ring and one for the glow
             const icon = slot?.info.ConstructibleType ?? BZ_ICON_EMPTY_SLOT;
             const colors = constructibleColors(slot?.info);
             const glow = slot && slot.isComplete && !slot.isOverbuildable;
-            const info = { icon, colors, glow, collapse: false, style: ["-my-2"], };
+            const info = { icon, colors, glow, collapse: false, style: ["-mb-1"], };
             this.renderIcon(layout, info);
         }
         this.container.appendChild(layout);
