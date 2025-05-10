@@ -526,8 +526,9 @@ function getTownFocus(city) {
     const ptype = city.Growth?.projectType ?? null;
     const info = ptype && GameInfo.Projects.lookup(ptype);
     const isGrowing = !info || city.Growth?.growthType == GrowthTypes.EXPAND;
+    const town = "LOC_CAPITAL_SELECT_PROMOTION_NONE";
     const growth = "LOC_UI_FOOD_CHOOSER_FOCUS_GROWTH";
-    const name = info?.Name ?? growth;
+    const name = info?.Name ?? town;
     const note = isGrowing && name != growth ? growth : null;
     const icon = isGrowing ? "PROJECT_GROWTH" : info.ProjectType;
     return { isGrowing, name, note, icon, info, };
@@ -1562,7 +1563,7 @@ class bzPlotTooltip {
         this.container.appendChild(ttList);
     }
     renderPopulation() {
-        if (!this.population) return;
+        if (!this.population || this.isCompact) return;
         const { urban, rural, special, religion, } = this.population;
         const layout = [];
         if (urban && this.isVerbose) layout.push({
@@ -1575,7 +1576,7 @@ class bzPlotTooltip {
             label: "LOC_UI_CITY_STATUS_RURAL_POPULATION",
             value: rural.toFixed(),
         });
-        if (special?.maximum && !this.isCompact) layout.push({
+        if (special?.maximum && (special?.workers || this.isVerbose)) layout.push({
             icon: BZ_ICON_SPECIAL,
             label: "LOC_UI_SPECIALISTS_SUBTITLE",
             value: `${special.workers.toFixed()}/${special.maximum.toFixed()}`,
