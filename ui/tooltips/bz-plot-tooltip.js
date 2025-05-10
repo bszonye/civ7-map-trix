@@ -249,12 +249,7 @@ const BZ_HEAD_STYLE = [
     // with all combinations (with/without icons, single/multiple
     // lines).
 `
-.bz-tooltip .bz-list-item {
-    position: relative;
-    width: 100%;
-}
 .bz-tooltip .bz-list-item p {
-    position: relative;
     width: 100%;
 }
 `,
@@ -384,10 +379,27 @@ function docRules(text, style=null) {
     // create a paragraph of rules text
     // font icons are squirrely!  only center them at top level
     // TODO: make maxWidth work, if possible
-    const list = docList(text, style);
-    list.style.lineHeight = metrics.rules.ratio;
-    list.style.width = metrics.rules.width.css;
-    return list;
+    const wrap = document.createElement("div");
+    wrap.style.display = 'flex';
+    wrap.style.position = 'relative';
+    wrap.style.alignSelf = 'center';
+    wrap.style.textAlign = 'center';
+    wrap.style.lineHeight = metrics.rules.ratio;
+    const list = document.createElement("div");
+    list.style.display = 'flex';
+    list.style.flexDirection = 'column';
+    list.style.position = 'relative';
+    for (const item of text) {
+        const row = document.createElement("div");
+        if (style) row.classList.value = style;
+        row.style.position = 'relative';
+        row.classList.add("bz-list-item");
+        row.setAttribute("data-l10n-id", item);
+        row.style.maxWidth = metrics.rules.width.css;
+        list.appendChild(row);
+    }
+    wrap.appendChild(list);
+    return wrap;
 }
 function docText(text, style) {
     const e = document.createElement("div");
