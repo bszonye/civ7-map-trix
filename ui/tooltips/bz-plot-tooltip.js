@@ -381,6 +381,7 @@ function docList(text, style=null) {
 function docRules(text, style=null) {
     // create a paragraph of rules text
     // font icons are squirrely!  only center them at top level
+    // TODO: make maxWidth work, if possible
     const tt = docList(text, style);
     tt.style.lineHeight = metrics.rules.ratio;
     tt.style.width = metrics.rules.width.css;
@@ -1219,24 +1220,6 @@ class bzPlotTooltip {
         divider.style.backgroundImage = `linear-gradient(90deg, ${BZ_COLOR.bronze}55 0%, ${BZ_COLOR.bronze} 50%, ${BZ_COLOR.bronze}55 100%)`;
         this.container.appendChild(divider);
     }
-    renderFlexDivider(center, lines, ...style) {
-        const layout = document.createElement("div");
-        layout.classList.value = "flex-auto flex justify-between items-center -mx-6";
-        if (style.length) layout.classList.add(...style);
-        this.container.appendChild(layout);
-        // left frame
-        const lineLeft = document.createElement("div");
-        lineLeft.classList.value = "flex-auto h-0\\.5 min-w-6 ml-1\\.5";
-        if (lines) lineLeft.style.setProperty("background-image", "linear-gradient(to left, #8D97A6, rgba(141, 151, 166, 0))");
-        layout.appendChild(lineLeft);
-        // content
-        layout.appendChild(center);
-        // right frame
-        const lineRight = document.createElement("div");
-        lineRight.classList.value = "flex-auto h-0\\.5 min-w-6 mr-1\\.5";
-        if (lines) lineRight.style.setProperty("background-image", "linear-gradient(to right, #8D97A6, rgba(141, 151, 166, 0))");
-        layout.appendChild(lineRight);
-    }
     renderTitleHeading(text) {
         if (!text) return;
         const layout = document.createElement("div");
@@ -1434,10 +1417,13 @@ class bzPlotTooltip {
         }
         // title bar
         if (!this.isCompact) this.renderTitleHeading(hexName);
+        // rules for unique quarters
+        if (hexRules && this.isVerbose) {
+            const rules = docRules([hexRules]);
+            rules.style.marginBottom = metrics.rules.margin.css;
+            this.container.appendChild(rules);
+        }
         this.renderDistrictDefense(this.plotCoord);
-        // panel interior
-        // show rules for unique quarters
-        if (hexRules && this.isVerbose) this.renderRules([hexRules], "w-60 mb-1");
         // constructibles
         this.renderConstructibles();
         // bottom bar
@@ -1492,9 +1478,11 @@ class bzPlotTooltip {
         if (!this.improvement && !this.totalYields) return;
         // title bar
         if (hexName && !this.isCompact) this.renderTitleHeading(hexName);
-        // optional description
+        // resource & wonder descriptions
         if (hexRules.length && !this.isCompact) {
-            this.renderRules(hexRules, "w-60", "leading-normal mb-1");
+            const rules = docRules(hexRules);
+            rules.style.marginBottom = metrics.rules.margin.css;
+            this.container.appendChild(rules);
         }
         // constructibles
         this.renderConstructibles();
@@ -1511,7 +1499,7 @@ class bzPlotTooltip {
             } else {
                 icon.icon = resourceIcon;
             }
-            this.renderIconDivider(icon, "mt-2");
+            this.renderIconDivider(icon);
         }
     }
     renderWonder() {
@@ -1542,7 +1530,7 @@ class bzPlotTooltip {
             collapse: false,
             style: ["-my-0\\.5"],
         };
-        this.renderIconDivider(icon, "mt-1");
+        this.renderIconDivider(icon);
     }
     // lay out a column of constructibles and their construction notes
     renderConstructibles() {
@@ -1571,6 +1559,8 @@ class bzPlotTooltip {
         if (this.freeConstructible) {
             const tt = document.createElement("div");
             tt.setAttribute("data-l10n-id", this.freeConstructible.text);
+            tt.style.lineHeight = metrics.rules.ratio;
+            tt.style.marginBottom = metrics.rules.margin.css;
             ttList.appendChild(tt);
         }
         this.container.appendChild(ttList);
@@ -1614,21 +1604,6 @@ class bzPlotTooltip {
         wrap.style.marginBottom = metrics.table.margin.css;
         wrap.appendChild(table);
         this.container.appendChild(wrap);
-    }
-    // lay out paragraphs of rules text
-    renderRules(text, listStyle=null, itemStyle=null) {
-        // text with icons is squirrelly, only format it at top level!
-        const ttText = document.createElement("div");
-        ttText.classList.value = listStyle ?? "w-full";
-        ttText.classList.add("bz-rules-list");
-        for (const item of text) {
-            const ttItem = document.createElement("div");
-            ttItem.classList.value = itemStyle ?? "leading-normal";
-            ttItem.classList.add("bz-list-item");
-            ttItem.setAttribute("data-l10n-id", item);
-            ttText.appendChild(ttItem);
-        }
-        this.container.appendChild(ttText);
     }
     renderDistrictDefense() {
         if (!this.district) return;
@@ -1680,7 +1655,7 @@ class bzPlotTooltip {
             this.container.appendChild(ttDefense);
         }
     }
-    renderIconDivider(info, ...style) {
+    renderIconDivider(info) {
         // icon divider with optional overlay
         if (info.icon.search(/blp:tech_/) != -1) {
             // tech icons need a frame
@@ -1691,9 +1666,10 @@ class bzPlotTooltip {
             info.ringsize = 12;
         }
         const layout = document.createElement("div");
-        layout.classList.value = "flex relative mx-2";
+        layout.classList.value = "self-center flex relative mx-2";
+        layout.style.marginTop = layout.style.marginBottom = metrics.margin.css;
         this.renderIcon(layout, info);
-        this.renderFlexDivider(layout, false, ...style);
+        this.container.appendChild(layout);
     }
     renderUrbanDivider() {
         // there are at least two building slots (unless one is large)
@@ -1702,7 +1678,8 @@ class bzPlotTooltip {
             slots.push(...[null, null].slice(this.buildings.length));
         // render the icons
         const layout = document.createElement("div");
-        layout.classList.value = "flex relative mx-2";
+        layout.classList.value = "self-center flex relative mx-2";
+        layout.style.marginTop = layout.style.marginBottom = metrics.margin.css;
         for (const slot of slots) {
             // if the building has more than one yield type, like the
             // Palace, use one type for the ring and one for the glow
@@ -1712,7 +1689,7 @@ class bzPlotTooltip {
             const info = { icon, colors, glow, collapse: false, style: ["-my-1"], };
             this.renderIcon(layout, info);
         }
-        this.renderFlexDivider(layout, false, "mt-1");
+        this.container.appendChild(layout);
     }
     renderYields() {
         if (!this.totalYields) return;  // no yields to show
@@ -1831,20 +1808,21 @@ class bzPlotTooltip {
         const glowSize = frameSize + blurRadius + 2*spreadRadius;
         const groundSize = Math.max(baseSize, glowSize, minsize);
         const rem = (d) => `${2/9*d}rem`;
+        layout.style.minHeight = groundSize;
         const setDimensions = (e, inside, shift) => {
             const offset = (groundSize - inside) / 2;
             const dx = shift?.x ?? 0;
             const dy = shift?.y ?? 0;
-            e.style.setProperty("width", rem(inside));
-            e.style.setProperty("height", rem(inside));
-            e.style.setProperty("left", rem(offset + dx));
-            e.style.setProperty("top", rem(offset + dy));
+            e.style.width = rem(inside);
+            e.style.height = rem(inside);
+            e.style.left = rem(offset + dx);
+            e.style.top = rem(offset + dy);
         };
         const setIcon = (icon, size, shift, z) => {
             if (!icon) return;
             const e = document.createElement("div");
             e.classList.value = "absolute bg-contain bg-center";
-            e.style.setProperty("z-index", z);
+            e.style.zIndex = z;
             setDimensions(e, size, shift);
             if (!icon.startsWith("url(")) icon = UI.getIconCSS(icon);
             preloadIcon(icon);
@@ -1873,15 +1851,15 @@ class bzPlotTooltip {
             // create ring
             const e = document.createElement("div");
             e.classList.value = "absolute border-0";
-            e.style.setProperty("border-radius", borderRadius);
-            e.style.setProperty("z-index", "1");
-            if (isTurned) e.style.setProperty("transform", "rotate(-45deg)");
+            e.style.borderRadius = borderRadius;
+            e.style.zIndex = 1;
+            if (isTurned) e.style.transform = "rotate(-45deg)";
             setDimensions(e, turnSize + 2*borderWidth);
-            e.style.setProperty("border-width", rem(borderWidth));
-            e.style.setProperty("border-color", slotColor);
+            e.style.borderWidth = rem(borderWidth);
+            e.style.borderColor = slotColor;
             // optionally also glow
-            if (info.glow) e.style.setProperty("box-shadow",
-                `0rem 0rem ${rem(blurRadius)} ${rem(spreadRadius)} ${glowColor}`);
+            if (info.glow) e.style.boxShadow =
+                `0rem 0rem ${rem(blurRadius)} ${rem(spreadRadius)} ${glowColor}`;
             ttIcon.appendChild(e);
         }
         layout.appendChild(ttIcon);
@@ -1903,7 +1881,7 @@ class bzPlotTooltip {
             const dump = document.createElement("div");
             dump.classList.value =
                 "self-center flex flex-wrap justify-center items-center";
-            dump.style.setProperty("width", "106rem");
+            dump.style.width = "106rem";
             for (const item of list) {
                 const info = { ...item };
                 info.collapse = false;
