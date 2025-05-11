@@ -590,17 +590,17 @@ class bzPlotTooltip {
         this.bridge = null;
         // world
         this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
+        this.plotEffects = null;
         this.route = null;
         this.river = null;
         this.feature = null;
         this.biome = null;
         this.terrain = null;
-        this.plotEffects = null;
         this.continent = null;
         // settlement
         this.owner = null;
-        this.relationship = null;
         this.originalOwner = null;
+        this.relationship = null;
         this.settlementType = null;
         this.townFocus = null;
         // workers
@@ -705,17 +705,17 @@ class bzPlotTooltip {
         this.bridge = null;
         // world
         this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
+        this.plotEffects = null;
         this.route = null;
         this.river = null;
         this.feature = null;
         this.biome = null;
         this.terrain = null;
-        this.plotEffects = null;
         this.continent = null;
         // settlement
         this.owner = null;
-        this.relationship = null;
         this.originalOwner = null;
+        this.relationship = null;
         this.settlementType = null;
         this.townFocus = null;
         // workers
@@ -971,7 +971,8 @@ class bzPlotTooltip {
         const type = info.BiomeType;
         const text = type == "BIOME_MARINE" ? null : name;
         const highlight = null;  // biomes aren't obstacles
-        const biome = { text, name, highlight, type, info, };
+        const verbosity = bzVerbosity.COMPACT;  // always show biome
+        const biome = { text, name, highlight, verbosity, type, info, };
         return biome;
     }
     getContinent() {
@@ -990,7 +991,7 @@ class bzPlotTooltip {
         const highlight = null;
         const verbosity = bzVerbosity.VERBOSE;
         const continent = {
-            text, isDistant, name, hemisphere, type, highlight, verbosity, info,
+            text, isDistant, name, hemisphere, highlight, verbosity, type, info,
         };
         return continent;
     }
