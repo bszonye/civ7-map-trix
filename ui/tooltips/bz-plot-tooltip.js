@@ -621,9 +621,8 @@ class bzPlotTooltip {
                 // Controls.preloadImage(url, 'plot-tooltip');
                 preloadIcon(`${y.YieldType}`, "YIELD");
             }
-            for (const y of [BZ_ICON_RURAL, BZ_ICON_URBAN, BZ_ICON_SPECIAL]) {
-                preloadIcon(y);
-            }
+            const icons = [ BZ_ICON_RURAL, BZ_ICON_URBAN, BZ_ICON_SPECIAL, ];
+            for (const y of icons) preloadIcon(y);
         });
     }
     static get instance() { return bzPlotTooltip._instance; }
