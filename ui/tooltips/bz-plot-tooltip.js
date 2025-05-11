@@ -376,13 +376,13 @@ function docRules(text, style=null, bg=BZ_COLOR.rules) {
     // function and docList set up flex boxes and style properties to
     // center text with all combinations (with/without styling and
     // wrapped/unwrapped text).
-    const isPlain = !text.some(t => Locale.stylize(t).includes('<fxs-font-icon'));
+    const size = !text.some(t => Locale.stylize(t).includes('<fxs-font-icon')) ?
+        metrics.body : metrics.rules;
     const list = docList(text, style, metrics.rules);
-    if (isPlain) list.style.lineHeight = metrics.body.ratio;
+    list.style.lineHeight = size.ratio;
     if (bg) {
-        list.style.paddingTop = list.style.paddingBottom =
-            list.style.paddingLeft = list.style.paddingRight =
-            metrics.padding.banner.px;
+        list.style.paddingTop = list.style.paddingBottom = size.margin.px;
+        list.style.paddingLeft = list.style.paddingRight = metrics.padding.banner.px;
         list.style.backgroundColor = bg;
         list.style.borderRadius = metrics.radius.css;
         list.style.marginBottom = metrics.padding.banner.px;
@@ -1255,7 +1255,9 @@ class bzPlotTooltip {
             this.route, this.feature, this.river, this.terrain, this.biome,
         ].filter(item => item?.text && item.text != this.title);
         // plot effects
-        if (!this.isCompact) layout.appendChild(docText(this.plotEffects.text));
+        if (!this.isCompact && this.plotEffects?.text) {
+            layout.appendChild(docText(this.plotEffects.text));
+        }
         // highlighted rows
         for (const row of geography.filter(row => row.highlight)) {
             const cap = docCapsule(row.text, BZ_STYLE[row.highlight], metrics.body);
@@ -1267,10 +1269,12 @@ class bzPlotTooltip {
         if (!this.isCompact) {
             const rows = geography.filter(row => row && !row.highlight);
             const text = dotJoin(rows.map(row => row.text));
-            layout.appendChild(docText(text));
+            if (text) layout.appendChild(docText(text));
         }
         // continent & hemisphere
-        if (this.isVerbose) layout.appendChild(docText(this.continent.text));
+        if (this.isVerbose && this.continent?.text) {
+            layout.appendChild(docText(this.continent.text));
+        }
         // finish section with appropriate margin
         layout.style.marginBottom =
             layout.children.length ? metrics.body.margin.px :  // body text
