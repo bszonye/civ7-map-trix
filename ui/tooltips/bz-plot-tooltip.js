@@ -881,7 +881,7 @@ class bzPlotTooltip {
             this.terrain.highlight = null;
         }
         // merge terrain & biome
-        if (this.biome?.text) {
+        if (this.terrain?.text && this.biome?.text) {
             this.terrain.text = dotJoin([this.terrain.text, this.biome.text]);
             this.terrain.highlight = this.terrain.highlight ?? this.biome.highlight;
             this.biome.text = null;
@@ -971,8 +971,8 @@ class bzPlotTooltip {
         const type = info.BiomeType;
         const text = type == "BIOME_MARINE" ? null : name;
         const highlight = null;  // biomes aren't obstacles
-        const verbosity = bzVerbosity.COMPACT;  // always show biome
-        const biome = { text, name, highlight, verbosity, type, info, };
+        const biome = { text, name, highlight, type, info, };
+        console.warn(`TRIX BIOME ${JSON.stringify(biome)}`);
         return biome;
     }
     getContinent() {
@@ -1264,6 +1264,7 @@ class bzPlotTooltip {
             const verbosity = item.verbosity ??
                 // default: standard verbosity, compact for highlights
                 (item.highlight ? bzVerbosity.COMPACT : bzVerbosity.STANDARD);
+            console.warn(`TRIX V ${item.text} ${item.verbosity} ${verbosity}`);
             if (this.verbosity < verbosity) return null;
             const style = BZ_STYLE[item.highlight];
             const cap = docCapsule(item.text, style, metrics.body);
@@ -1454,11 +1455,6 @@ class bzPlotTooltip {
         } else if (this.city && this.freeConstructible) {
             // claimed but undeveloped
             hexName = "LOC_PLOT_TOOLTIP_UNIMPROVED";
-        } else if (this.isCompact) {
-            // unclaimed wilderness only needs a title in compact mode
-            hexName = this.biome?.BiomeType == "BIOME_MARINE" ?
-                this.terrain.Name :
-                GameInfo.Districts.lookup(DistrictTypes.WILDERNESS).Name;
         }
         // avoid useless section headings
         if (!this.improvement && !this.totalYields) return;
