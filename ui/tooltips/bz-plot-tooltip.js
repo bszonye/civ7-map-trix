@@ -129,15 +129,15 @@ const BZ_STYLE = {
     // movement & obstacle types
     TERRAIN_HILL: { "background-color": BZ_COLOR.hill, color: BZ_COLOR.bronze, },
     TERRAIN_OCEAN: {},  // don't need to highlight this
-    FEATURE_VOLCANO: BZ_ALERT.caution,
-    LOC_VOLCANO_NOT_ACTIVE: BZ_ALERT.note,
     FEATURE_CLASS_FLOODPLAIN: BZ_ALERT.note,
     FEATURE_CLASS_VEGETATED: { "background-color": BZ_COLOR.vegetated, },
     FEATURE_CLASS_WET: { "background-color": BZ_COLOR.wet, },
+    FEATURE_VOLCANO: BZ_ALERT.caution,
+    LOC_VOLCANO_NOT_ACTIVE: BZ_ALERT.note,
     RIVER_MINOR: { "background-color": BZ_COLOR.river, },
     RIVER_NAVIGABLE: { "background-color": BZ_COLOR.river, },
-    ROUTE_ROAD: { "background-color": BZ_COLOR.road, color: BZ_COLOR.black, },
     ROUTE_RAILROAD: { "background-color": BZ_COLOR.rail, color: BZ_COLOR.black, },
+    ROUTE_ROAD: { "background-color": BZ_COLOR.road, color: BZ_COLOR.black, },
 }
 // accent colors for icon types
 const BZ_TYPE_COLOR = {
@@ -396,9 +396,9 @@ function docText(text, style) {
     return e;
 }
 function dotJoin(list) {
-    return joinLocale(list, BZ_DOT_JOINER);
+    return localeJoin(list, BZ_DOT_JOINER);
 }
-function joinLocale(list, divider=" ") {
+function localeJoin(list, divider=" ") {
     return list.map(s => s && Locale.compose(s)).filter(e => e).join(divider);
 }
 function gatherBuildingsTagged(tag) {
@@ -1598,7 +1598,7 @@ class bzPlotTooltip {
         if (this.district.owner != this.district.controllingPlayer) {
             const conqueror = Players.get(this.district.controllingPlayer);
             const cname = this.getCivName(conqueror, true);
-            const ctext = joinLocale(["LOC_PLOT_TOOLTIP_CONQUEROR", cname]);
+            const ctext = localeJoin(["LOC_PLOT_TOOLTIP_CONQUEROR", cname]);
             const banner = docBanner([ctext], BZ_ALERT.conqueror);
             banner.style.marginBottom = metrics.padding.banner.px;
             this.container.appendChild(banner);
