@@ -880,12 +880,6 @@ class bzPlotTooltip {
             this.terrain.text = null;
             this.terrain.highlight = null;
         }
-        // merge terrain & biome
-        if (this.terrain?.text && this.biome?.text) {
-            this.terrain.text = dotJoin([this.terrain.text, this.biome.text]);
-            this.terrain.highlight = this.terrain.highlight ?? this.biome.highlight;
-            this.biome.text = null;
-        }
     }
     getRoute() {
         const loc = this.plotCoord;
@@ -972,7 +966,6 @@ class bzPlotTooltip {
         const text = type == "BIOME_MARINE" ? null : name;
         const highlight = null;  // biomes aren't obstacles
         const biome = { text, name, highlight, type, info, };
-        console.warn(`TRIX BIOME ${JSON.stringify(biome)}`);
         return biome;
     }
     getContinent() {
@@ -989,9 +982,8 @@ class bzPlotTooltip {
             null;  // autoplaying
         const text = dotJoin([name, hemisphere]);
         const highlight = null;
-        const verbosity = bzVerbosity.VERBOSE;
         const continent = {
-            text, isDistant, name, hemisphere, highlight, verbosity, type, info,
+            text, isDistant, name, hemisphere, highlight, type, info,
         };
         return continent;
     }
@@ -1258,36 +1250,27 @@ class bzPlotTooltip {
         const layout = document.createElement("div");
         layout.classList.value = "text-center";
         layout.style.lineHeight = metrics.body.ratio;
-        // formatter
-        const capsule = (item) => {
-            if (!item?.text || item.text == this.title) return null;
-            const verbosity = item.verbosity ??
-                // default: standard verbosity, compact for highlights
-                (item.highlight ? bzVerbosity.COMPACT : bzVerbosity.STANDARD);
-            console.warn(`TRIX V ${item.text} ${item.verbosity} ${verbosity}`);
-            if (this.verbosity < verbosity) return null;
-            const style = BZ_STYLE[item.highlight];
-            const cap = docCapsule(item.text, style, metrics.body);
-            if (style) {
-                cap.style.marginTop = cap.style.marginBottom =
-                    metrics.body.leading.half.px;
-            }
-            return cap;
-        };
         // display rows
         const geography = [
-            this.plotEffects,
-            this.route,
-            this.feature,
-            this.river,
-            this.terrain,
-            this.biome,
-            this.continent,
-        ];
-        for (const row of geography) {
-            const cap = capsule(row);
-            if (cap) layout.appendChild(cap);
+            this.route, this.feature, this.river, this.terrain, this.biome,
+        ].filter(item => item?.text && item.text != this.title);
+        // plot effects
+        if (!this.isCompact) layout.appendChild(docText(this.plotEffects.text));
+        // highlighted rows
+        for (const row of geography.filter(row => row.highlight)) {
+            const cap = docCapsule(row.text, BZ_STYLE[row.highlight], metrics.body);
+            cap.style.marginTop = cap.style.marginBottom =
+                metrics.body.leading.half.px;
+            layout.appendChild(cap);
         }
+        // non-highlighted rows (merged)
+        if (!this.isCompact) {
+            const rows = geography.filter(row => row && !row.highlight);
+            const text = dotJoin(rows.map(row => row.text));
+            layout.appendChild(docText(text));
+        }
+        // continent & hemisphere
+        if (this.isVerbose) layout.appendChild(docText(this.continent.text));
         // finish section with appropriate margin
         layout.style.marginBottom =
             layout.children.length ? metrics.body.margin.px :  // body text
