@@ -1368,7 +1368,7 @@ class bzPlotTooltip {
     }
     renderUrban() {
         let hexName = GameInfo.Districts.lookup(this.district.type).Name;
-        let hexRules;
+        let hexRules = [];
         // set name & description
         if (this.district.type == DistrictTypes.CITY_CENTER) {
             if (this.city.isTown && !this.owner.isMinor) {
@@ -1382,7 +1382,8 @@ class bzPlotTooltip {
             // LOC_QUARTER_XXX_TOOLTIP localization strings
             const tooltip = this.quarter.Description
                 .replace("_DESCRIPTION", "_TOOLTIP");
-            hexRules = Locale.keyExists(tooltip) ? tooltip : this.quarter.Description;
+            const rule = Locale.keyExists(tooltip) ? tooltip : this.quarter.Description;
+            hexRules.push(rule);
         } else if (this.district.isQuarter) {
             hexName = "LOC_DISTRICT_BZ_URBAN_QUARTER";
         } else if (this.buildings.length == 0) {
@@ -1391,12 +1392,12 @@ class bzPlotTooltip {
         } else {
             hexName = "LOC_DISTRICT_BZ_URBAN_DISTRICT";
         }
-        // title bar
+        // title bar & district defense
         if (!this.isCompact) this.renderTitleHeading(hexName);
-        this.renderDistrictDefense(this.plotCoord);
+        this.renderDistrictDefense();
         // rules for unique quarters
-        if (hexRules && this.isVerbose) {
-            const rules = docRules([hexRules]);
+        if (hexRules.length && this.isVerbose) {
+            const rules = docRules(hexRules);
             this.container.appendChild(rules);
         }
         // constructibles
