@@ -1,11 +1,3 @@
-// TODO: fix margins:
-// TODO: - settlement
-// TODO: - district
-// TODO: test margins:
-// TODO: - geography
-// TODO: - yield
-// TODO: update localization
-// TODO: switch Row data to Replace
 import bzMapTrixOptions, { bzVerbosity } from '/bz-map-trix/ui/options/bz-map-trix-options.js';
 import "/base-standard/ui/tooltips/plot-tooltip.js";
 
@@ -390,10 +382,10 @@ function docRules(text, style=null, bg=BZ_COLOR.rules) {
     if (bg) {
         list.style.paddingTop = list.style.paddingBottom =
             list.style.paddingLeft = list.style.paddingRight =
-            metrics.padding.banner.css;
+            metrics.padding.banner.px;
         list.style.backgroundColor = bg;
         list.style.borderRadius = metrics.radius.css;
-        list.style.marginBottom = metrics.padding.banner.css;
+        list.style.marginBottom = metrics.padding.banner.px;
     }
     return list;
 }
@@ -1226,7 +1218,7 @@ class bzPlotTooltip {
         const layout = document.createElement("div");
         layout.classList.value = "text-secondary font-title-sm uppercase text-center";
         layout.style.lineHeight = metrics.head.ratio;
-        layout.style.marginTop = metrics.head.margin.css;
+        layout.style.marginTop = metrics.head.margin.px;
         const ttText = document.createElement("div");
         ttText.setAttribute('data-l10n-id', text);
         layout.appendChild(ttText);
@@ -1237,7 +1229,7 @@ class bzPlotTooltip {
         const banner = (text, style) => {
             const banner = docBanner([text], style);
             // leave a small gap between & after banners
-            banner.style.marginBottom = metrics.padding.banner.css;
+            banner.style.marginBottom = metrics.padding.banner.px;
             // better wrapping for longer banners
             banner.children[0].classList.value = "max-w-64";
             return banner;
@@ -1277,7 +1269,7 @@ class bzPlotTooltip {
             const cap = docCapsule(item.text, style, metrics.body);
             if (style) {
                 cap.style.marginTop = cap.style.marginBottom =
-                    metrics.body.leading.half.css;
+                    metrics.body.leading.half.px;
             }
             return cap;
         };
@@ -1297,8 +1289,8 @@ class bzPlotTooltip {
         }
         // finish section with appropriate margin
         layout.style.marginBottom =
-            layout.children.length ? metrics.body.margin.css :  // body text
-            metrics.head.margin.css;
+            layout.children.length ? metrics.body.margin.px :  // body text
+            metrics.head.margin.px;
         this.container.appendChild(layout);
     }
     renderSettlement() {
@@ -1321,9 +1313,9 @@ class bzPlotTooltip {
             rows.push(text);
         }
         const style = this.relationship?.isEnemy ? BZ_ALERT.danger : null;
-        const banner = docBanner(rows, style, metrics.padding.banner.css);
+        const banner = docBanner(rows, style, metrics.padding.banner.px);
         banner.style.lineHeight = metrics.body.ratio;
-        banner.style.marginBottom = metrics.body.margin.css;
+        banner.style.marginBottom = metrics.body.margin.px;
         this.container.appendChild(banner);
     }
     getOwnerName(owner) {
@@ -1510,7 +1502,7 @@ class bzPlotTooltip {
         const rules = this.isVerbose ? info.Description : info.Tooltip;
         if (rules && !this.isCompact) {
             const tt = docRules([rules]);
-            if (notes.length) tt.style.marginTop = metrics.margin.css;
+            if (notes.length) tt.style.marginTop = metrics.margin.px;
             this.container.appendChild(tt);
         }
         const colors = constructibleColors(this.wonder.info);
@@ -1532,7 +1524,7 @@ class bzPlotTooltip {
         const ttList = document.createElement("div");
         ttList.classList.value = "text-center";
         ttList.style.lineHeight = metrics.body.ratio;
-        ttList.style.marginBottom = metrics.body.margin.css;
+        ttList.style.marginBottom = metrics.body.margin.px;
         for (const c of this.constructibles) {
             const ttConstructible = document.createElement("div");
             const ttName = document.createElement("div");
@@ -1543,7 +1535,7 @@ class bzPlotTooltip {
                 const style = c.isDamaged ? BZ_ALERT.caution : null;
                 const sub = docCapsule(notes, style, metrics.font('2xs', 1.25));
                 sub.classList.value = "text-accent-3 text-2xs";
-                sub.style.marginBottom = metrics.body.leading.half.css;
+                sub.style.marginBottom = metrics.body.leading.half.px;
                 if (!c.isDamaged) sub.style.lineHeight = metrics.note.ratio;
                 ttConstructible.appendChild(sub);
             }
@@ -1554,7 +1546,7 @@ class bzPlotTooltip {
             const tt = document.createElement("div");
             tt.setAttribute("data-l10n-id", this.freeConstructible.text);
             tt.style.lineHeight = metrics.rules.ratio;
-            tt.style.marginBottom = metrics.rules.margin.css;
+            tt.style.marginBottom = metrics.rules.margin.px;
             ttList.appendChild(tt);
         }
         this.container.appendChild(ttList);
@@ -1596,7 +1588,7 @@ class bzPlotTooltip {
         // wrap table to keep it from expanding to full width
         const wrap = document.createElement("div");
         wrap.classList.value = "flex justify-center";
-        wrap.style.marginBottom = metrics.table.margin.css;
+        wrap.style.marginTop = wrap.style.marginBottom = metrics.table.margin.px;
         wrap.appendChild(table);
         this.container.appendChild(wrap);
     }
@@ -1608,7 +1600,7 @@ class bzPlotTooltip {
             const cname = this.getCivName(conqueror, true);
             const ctext = joinLocale(["LOC_PLOT_TOOLTIP_CONQUEROR", cname]);
             const banner = docBanner([ctext], BZ_ALERT.conqueror);
-            banner.style.marginBottom = metrics.padding.banner.css;
+            banner.style.marginBottom = metrics.padding.banner.px;
             this.container.appendChild(banner);
         }
         // district health
@@ -1640,11 +1632,11 @@ class bzPlotTooltip {
         if (info.length) {
             const style = currentHealth != maxHealth ? BZ_ALERT.danger : BZ_ALERT.note;
             const banner = docBanner(info, style);
-            banner.style.marginBottom = metrics.padding.banner.css;
+            banner.style.marginBottom = metrics.padding.banner.px;
             this.container.appendChild(banner);
         }
     }
-    renderIconDivider(info, margin=metrics.margin.css) {
+    renderIconDivider(info, margin=metrics.margin.px) {
         // icon divider with optional overlay
         if (info.icon.search(/blp:tech_/) != -1) {
             // tech icons need a frame
@@ -1699,8 +1691,8 @@ class bzPlotTooltip {
             tt.lastChild.classList.add("text-secondary");
             tt.lastChild.style.marginLeft = '0.4444444444rem';
         }
-        tt.style.marginTop = metrics.margin.css;
-        tt.style.marginBottom = metrics.yields.margin.css;
+        tt.style.marginTop = metrics.margin.px;
+        tt.style.marginBottom = metrics.yields.margin.px;
         this.container.appendChild(tt);
     }
     yieldColumn(col, width) {
@@ -1731,7 +1723,7 @@ class bzPlotTooltip {
         const style = this.units[0].relationship.isEnemy ? BZ_ALERT.enemy : null;
         const banner = docBanner(rows, style);
         banner.style.paddingTop = banner.style.paddingBottom =
-            metrics.padding.banner.css;
+            metrics.padding.banner.px;
         banner.style.lineHeight = metrics.body.ratio;
         banner.style.marginBottom = `-${metrics.padding.y.css}`;
         if (!this.isDebug) {
@@ -1769,7 +1761,7 @@ class bzPlotTooltip {
             `${Locale.compose("LOC_PLOT_TOOLTIP_INDEX")}: ${this.plotIndex}`,
         ];
         if (maxHp) rows.push(`${currHp} / ${maxHp}`);
-        const banner = docBanner(rows, BZ_STYLE.debug, metrics.padding.banner.css);
+        const banner = docBanner(rows, BZ_STYLE.debug, metrics.padding.banner.px);
         banner.style.lineHeight = metrics.body.ratio;
         const radius = metrics.radius.css;
         banner.style.borderRadius = `0 0 ${radius} ${radius}`;
