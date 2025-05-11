@@ -830,7 +830,7 @@ class bzPlotTooltip {
         if (wloc.x != loc.x || wloc.y != loc.y) {
             // ignore city water out side of the city center
         } else if (GameplayMap.isFreshWater(wloc.x, wloc.y)) {
-            this.plotEffects.names.push("LOC_PLOTKEY_FRESHWATER");
+            this.plotEffects.names.unshift("LOC_PLOTKEY_FRESHWATER");
             this.plotEffects.text = dotJoin(this.plotEffects.names);
         } else if (!this.city && lens == "fxs-settler-lens") {
             this.banners.caution.push("LOC_PLOT_TOOLTIP_NO_FRESH_WATER");
@@ -1250,14 +1250,9 @@ class bzPlotTooltip {
         const layout = document.createElement("div");
         layout.classList.value = "text-center";
         layout.style.lineHeight = metrics.body.ratio;
-        // display rows
         const geography = [
-            this.route, this.feature, this.river, this.terrain, this.biome,
+            this.route, this.river, this.feature, this.terrain, this.biome,
         ].filter(item => item?.text && item.text != this.title);
-        // plot effects
-        if (!this.isCompact && this.plotEffects?.text) {
-            layout.appendChild(docText(this.plotEffects.text));
-        }
         // highlighted rows
         for (const row of geography.filter(row => row.highlight)) {
             const cap = docCapsule(row.text, BZ_STYLE[row.highlight], metrics.body);
@@ -1268,6 +1263,7 @@ class bzPlotTooltip {
         // non-highlighted rows (merged)
         if (!this.isCompact) {
             const rows = geography.filter(row => row && !row.highlight);
+            if (this.plotEffects) rows.unshift(this.plotEffects);
             const text = dotJoin(rows.map(row => row.text));
             if (text) layout.appendChild(docText(text));
         }
