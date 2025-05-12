@@ -813,7 +813,7 @@ class bzPlotTooltip {
             } else if (info.Defense) {  // fortifications
                 this.banners.note.push(info.Name);
             } else {
-                this.plotEffects.names.push(info.name);
+                this.plotEffects.names.push(info.Name);
             }
         }
         this.plotEffects.text = dotJoin(this.plotEffects.names);
@@ -869,16 +869,17 @@ class bzPlotTooltip {
         this.biome = this.getBiome();
         this.continent = this.getContinent();
         // tighten up loose & redundant text
+        if (this.terrain?.type == "TERRAIN_NAVIGABLE_RIVER" ||
+            this.terrain?.type == "TERRAIN_FLAT" && this.feature) {
+            // clear redundant & unremarkable terrain
+            this.terrain.text = null;
+            this.terrain.highlight = null;
+        }
         if (this.feature?.isFloodplain) {
             // merge redundant floodplain & biome
             this.biome.text = this.feature.text;
             this.biome.highlight = this.feature.ctype;
             this.feature.text = null;
-        }
-        if (this.river?.isNavigable) {
-            // clear redundant terrain
-            this.terrain.text = null;
-            this.terrain.highlight = null;
         }
     }
     getRoute() {
@@ -951,7 +952,7 @@ class bzPlotTooltip {
         // assemble info
         const name = isLake ? "LOC_TERRAIN_LAKE_NAME" : info.Name;
         const type = info.TerrainType;
-        const text = type != "TERRAIN_FLAT" || this.isVerbose ? name : null;
+        const text = name;
         const highlight = this.obstacles.has(type) ? type : null;
         const terrain = { text, name, isLake, highlight, type, info, };
         return terrain;
@@ -1260,10 +1261,13 @@ class bzPlotTooltip {
                 metrics.body.leading.half.px;
             layout.appendChild(cap);
         }
-        // non-highlighted rows (merged)
+        // plot effects
+        if (!this.isCompact && this.plotEffects?.text) {
+            layout.appendChild(docText(this.plotEffects.text));
+        }
+        // other geography (merged)
         if (!this.isCompact) {
             const rows = geography.filter(row => row && !row.highlight);
-            if (this.plotEffects) rows.unshift(this.plotEffects);
             const text = dotJoin(rows.map(row => row.text));
             if (text) layout.appendChild(docText(text));
         }
