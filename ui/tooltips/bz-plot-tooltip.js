@@ -816,36 +816,29 @@ class bzPlotTooltip {
                 this.plotEffects.names.push(info.Name);
             }
         }
+        // check fresh water
+        const isFreshWater = GameplayMap.isFreshWater(loc.x, loc.y);
+        const wloc = this.city?.location ?? loc;  // only check city water at center
+        if (isFreshWater && wloc.x == loc.x && wloc.y == loc.y) {
+            this.plotEffects.names.unshift("LOC_PLOTKEY_FRESHWATER");
+        }
+        // merge all plot effects + fresh water indicator
         this.plotEffects.text = dotJoin(this.plotEffects.names);
-        // no further effects needed for impassible or offshore tiles
-        if (GameplayMap.isImpassable(loc.x, loc.y) ||
+        // remainder is for settler lens only, on habitable land
+        if (LensManager.getActiveLens() != "fxs-settler-lens" ||
+            GameplayMap.isImpassable(loc.x, loc.y) ||
             GameplayMap.isNavigableRiver(loc.x, loc.y) ||
             GameplayMap.isWater(loc.x, loc.y)) {
-            // no need here for settlement advice
             return;
         }
-        // check fresh water
-        const lens = LensManager.getActiveLens();
-        const wloc = this.city ? this.city.location : loc;
-        if (wloc.x != loc.x || wloc.y != loc.y) {
-            // ignore city water out side of the city center
-        } else if (GameplayMap.isFreshWater(wloc.x, wloc.y)) {
-            this.plotEffects.names.unshift("LOC_PLOTKEY_FRESHWATER");
-            this.plotEffects.text = dotJoin(this.plotEffects.names);
-        } else if (!this.city && lens == "fxs-settler-lens") {
-            this.banners.caution.push("LOC_PLOT_TOOLTIP_NO_FRESH_WATER");
-        }
-        // remainder is for settler lens only
-        if (lens != "fxs-settler-lens") return;
-        // show limits of the advanced start area
         if (this.observer?.AdvancedStart &&
             !this.observer.AdvancedStart.getPlacementComplete() &&
             !GameplayMap.isPlotInAdvancedStartRegion(this.observerID, loc.x, loc.y)) {
+            // show limits of the advanced start area
             this.banners.danger.push("LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_FAR");
-        }
-        // show blocked tiles
-        if (this.observer?.Diplomacy &&
+        } else if (this.observer?.Diplomacy &&
             !this.observer.Diplomacy.isValidLandClaimLocation(loc, true)) {
+            // show blocked tiles
             if (GameplayMap.isCityWithinMinimumDistance(loc.x, loc.y)) {
                 // settlement too close
                 this.banners.danger.push("LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_CLOSE");
@@ -857,6 +850,9 @@ class bzPlotTooltip {
                 // resource too close
                 this.banners.danger.push("LOC_PLOT_TOOLTIP_CANT_SETTLE_RESOURCES");
             }
+        } else if (!isFreshWater && !this.city) {
+            // show fresh water warning
+            this.banners.caution.push("LOC_PLOT_TOOLTIP_NO_FRESH_WATER");
         }
     }
     modelGeography() {
@@ -1248,38 +1244,34 @@ class bzPlotTooltip {
     }
     renderGeography() {
         // show geographical features
-        const layout = document.createElement("div");
-        layout.classList.value = "text-center";
-        layout.style.lineHeight = metrics.body.ratio;
+        const tt = document.createElement("div");
+        tt.classList.value = "text-center";
+        tt.style.lineHeight = metrics.body.ratio;
         const geography = [
             this.route, this.river, this.feature, this.terrain, this.biome,
         ].filter(item => item?.text && item.text != this.title);
         // highlighted rows
-        for (const row of geography.filter(row => row.highlight)) {
-            const cap = docCapsule(row.text, BZ_STYLE[row.highlight], metrics.body);
+        for (const item of geography.filter(item => item.highlight)) {
+            const cap = docCapsule(item.text, BZ_STYLE[item.highlight], metrics.body);
             cap.style.marginTop = cap.style.marginBottom =
                 metrics.body.leading.half.px;
-            layout.appendChild(cap);
+            tt.appendChild(cap);
         }
-        // plot effects
-        if (!this.isCompact && this.plotEffects?.text) {
-            layout.appendChild(docText(this.plotEffects.text));
-        }
-        // other geography (merged)
         if (!this.isCompact) {
-            const rows = geography.filter(row => row && !row.highlight);
-            const text = dotJoin(rows.map(row => row.text));
-            if (text) layout.appendChild(docText(text));
-        }
-        // continent & hemisphere
-        if (this.isVerbose && this.continent?.text) {
-            layout.appendChild(docText(this.continent.text));
+            // plot effects
+            if (this.plotEffects?.text) tt.appendChild(docText(this.plotEffects.text));
+            // other geography (merged)
+            const items = geography.filter(item => item && !item.highlight);
+            const merge = dotJoin(items.map(item => item.text));
+            if (merge) tt.appendChild(docText(merge));
+            // continent & hemisphere
+            if (this.continent?.text) tt.appendChild(docText(this.continent.text));
         }
         // finish section with appropriate margin
-        layout.style.marginBottom =
-            layout.children.length ? metrics.body.margin.px :  // body text
+        tt.style.marginBottom =
+            tt.children.length ? metrics.body.margin.px :  // body text
             metrics.head.margin.px;
-        this.container.appendChild(layout);
+        this.container.appendChild(tt);
     }
     renderSettlement() {
         if (this.isCompact) return;
