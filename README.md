@@ -8,7 +8,7 @@ Map Trix shows you what you're pointing at:
 - cities and towns
 - buildings, improvements, and wonders
 - resources and yields
-- rival units
+- units present
 
 ## geography
 the top of the tooltip describes the land, with emphasis on hazards and
