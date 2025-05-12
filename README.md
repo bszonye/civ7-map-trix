@@ -15,24 +15,26 @@ the top of the tooltip describes the land, with emphasis on hazards and
 obstacles.  color highlights warn you of fortifications, damaging
 effects, and terrain features that can stop your movement.
 
-## civilization
+## settlements
 see which settlement claims each tile, who owns it, and their atttitude
-toward you.  hover over the city center to see additional information
-about town focus, fresh water, religion, and connected settlements.
-hold Shift for more details.
+toward you.  enemy territory appears in red.
 
 ## buildings
 everything constructible goes here: buildings, improvements, and
-wonders.  city-states, unique quarters, and wonders show their names and
-special abilities.  buildings show their yield types as colored rings
-around the building icons:  **green** for food, **yellow** for gold, and
-so on.  a glowing ring means that a building is eligible for adjacency
-bonuses and counts toward a quarter.
+wonders.  unique quarters and wonders show their special abilities.
+buildings show their yield types as colored rings around the building
+icons:  **green** for food, **yellow** for gold, and so on.  ageless and
+current-age buildings have glowing rings.
 
 ## improvements
 unimproved tiles show which basic improvement type the land supports,
 and resources show which improvements unlock them.  unique improvements
 show which basic improvement they replaced (for warehouse bonuses).
+
+## population
+a small table shows the local population of each district and rural
+improvement.  verbose mode lists the full population and their religious
+beliefs.  standard mode only shows specialist workers.
 
 ## yields
 the last column shows the total of all yields under a bronze hexagon.
