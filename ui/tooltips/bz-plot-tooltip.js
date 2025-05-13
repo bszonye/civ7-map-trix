@@ -181,7 +181,8 @@ let metrics = getFontMetrics();
 
 // horizontal list separator (spaced in non-ideographic locales)
 const BZ_DOT_DIVIDER = Locale.compose("LOC_PLOT_DIVIDER_DOT");
-const BZ_DOT_JOINER = metrics.isIdeographic ?  BZ_DOT_DIVIDER : `&nbsp;${BZ_DOT_DIVIDER} `;
+const BZ_DOT_JOINER = metrics.isIdeographic ?
+    BZ_DOT_DIVIDER : `&nbsp;${BZ_DOT_DIVIDER} `;
 
 // additional CSS definitions
 const BZ_HEAD_STYLE = [
