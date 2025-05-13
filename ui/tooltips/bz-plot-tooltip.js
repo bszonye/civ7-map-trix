@@ -1240,7 +1240,10 @@ class bzPlotTooltip {
                 this.container.appendChild(banner);
             }
         }
-        this.renderTitleHeading(this.title);
+        // expand the main title instead of using the LOC tag, to work
+        // around a conflict with Enhanced Town Focus Info
+        const title = Locale.compose(this.title);
+        this.renderTitleHeading(title);
     }
     renderGeography() {
         // show geographical features
