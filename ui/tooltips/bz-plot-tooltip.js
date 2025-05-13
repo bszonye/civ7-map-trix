@@ -1553,7 +1553,7 @@ class bzPlotTooltip {
         const size = metrics.table.spacing.css;
         const small = metrics.sizes(5/6 * metrics.table.spacing.rem).css;
         const table = document.createElement("div");
-        table.classList.value = "flex-table justify-start text-xs";
+        table.classList.value = "flex-col justify-start text-xs";
         for (const item of layout) {
             const row = document.createElement("div");
             row.classList.value = "flex justify-start";
