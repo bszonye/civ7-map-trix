@@ -1368,7 +1368,7 @@ class bzPlotTooltip {
     }
     renderUrban() {
         let hexName = GameInfo.Districts.lookup(this.district.type).Name;
-        let hexRules = [];
+        const hexRules = [];
         // set name & description
         if (this.district.type == DistrictTypes.CITY_CENTER) {
             if (this.city.isTown && !this.owner.isMinor) {
@@ -1407,7 +1407,7 @@ class bzPlotTooltip {
     }
     renderRural() {
         let hexName;
-        let hexRules = [];
+        const hexRules = [];
         let hexIcon = this.improvement?.icon;
         let resourceIcon;
         // set name & description
