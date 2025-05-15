@@ -234,7 +234,14 @@ const BZ_HEAD_STYLE = [
 }
 `,  // helps center blocks of rules text (see docRules)
 `
-.bz-tooltip .bz-list-item p { width: 100%; }
+.bz-tooltip .bz-list-item p {
+    width: 100%;
+}
+`,  // workaround for Enhanced Town Focus Info conflict
+`
+.plot-tooltip .additional-info {
+    display: none !important;
+}
 `,
 ];
 BZ_HEAD_STYLE.map(style => {
@@ -1241,10 +1248,7 @@ class bzPlotTooltip {
                 this.container.appendChild(banner);
             }
         }
-        // expand the main title instead of using the LOC tag, to work
-        // around a conflict with Enhanced Town Focus Info
-        const title = Locale.compose(this.title);
-        this.renderTitleHeading(title);
+        this.renderTitleHeading(this.title);
     }
     renderGeography() {
         // show geographical features
