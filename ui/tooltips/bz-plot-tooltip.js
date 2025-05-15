@@ -6,11 +6,6 @@ import { ComponentID } from '/core/ui/utilities/utilities-component-id.js';
 import LensManager from '/core/ui/lenses/lens-manager.js';
 import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
 
-// horizontal list separator (spaced in all locales except zh)
-const BZ_DOT_DIVIDER = Locale.compose("LOC_PLOT_DIVIDER_DOT");
-const BZ_DOT_JOINER = Locale.getCurrentDisplayLocale().startsWith('zh_') ?
-    BZ_DOT_DIVIDER : `&nbsp;${BZ_DOT_DIVIDER} `;
-
 // custom & adapted icons
 const BZ_ICON_SIZE = 12;
 const BZ_ICON_DISCOVERY = "url('blp:tech_cartography')";
@@ -184,6 +179,11 @@ const BZ_BORDER = 0.1111111111;
 const BZ_RULES_WIDTH = 12;
 let metrics = getFontMetrics();
 
+// horizontal list separator (spaced in non-ideographic locales)
+const BZ_DOT_DIVIDER = Locale.compose("LOC_PLOT_DIVIDER_DOT");
+const BZ_DOT_JOINER = metrics.isIdeographic ?
+    BZ_DOT_DIVIDER : `&nbsp;${BZ_DOT_DIVIDER} `;
+
 // additional CSS definitions
 const BZ_HEAD_STYLE = [
 // 1. #TOOLTIP-ROOT.NEW-TOOLTIP--ROOT absolute max-w-96 p-3
@@ -234,7 +234,14 @@ const BZ_HEAD_STYLE = [
 }
 `,  // helps center blocks of rules text (see docRules)
 `
-.bz-tooltip .bz-list-item p { width: 100%; }
+.bz-tooltip .bz-list-item p {
+    width: 100%;
+}
+`,  // workaround for Enhanced Town Focus Info conflict
+`
+.plot-tooltip .additional-info {
+    display: none !important;
+}
 `,
 ];
 BZ_HEAD_STYLE.map(style => {
@@ -479,11 +486,12 @@ function getFontMetrics() {
     radius.tooltip = sizes(radius.rem + border.rem);
     // minimum end banner height to avoid radius glitches
     const bumper = sizes(Math.max(table.spacing.rem, 2*radius.rem));
+    const isIdeographic = Locale.getCurrentDisplayLocale().startsWith('zh_');
     return {
         sizes, font,
         padding, margin, border,
         head, body, note, rules, table, yields,
-        radius, bumper,
+        radius, bumper, isIdeographic,
     };
 }
 function getReligionInfo(id) {
@@ -1364,7 +1372,7 @@ class bzPlotTooltip {
     }
     renderUrban() {
         let hexName = GameInfo.Districts.lookup(this.district.type).Name;
-        let hexRules = [];
+        const hexRules = [];
         // set name & description
         if (this.district.type == DistrictTypes.CITY_CENTER) {
             if (this.city.isTown && !this.owner.isMinor) {
@@ -1403,7 +1411,7 @@ class bzPlotTooltip {
     }
     renderRural() {
         let hexName;
-        let hexRules = [];
+        const hexRules = [];
         let hexIcon = this.improvement?.icon;
         let resourceIcon;
         // set name & description
@@ -1550,7 +1558,7 @@ class bzPlotTooltip {
         const size = metrics.table.spacing.css;
         const small = metrics.sizes(5/6 * metrics.table.spacing.rem).css;
         const table = document.createElement("div");
-        table.classList.value = "flex-table justify-start text-xs";
+        table.classList.value = "flex-col justify-start text-xs";
         for (const item of layout) {
             const row = document.createElement("div");
             row.classList.value = "flex justify-start";
