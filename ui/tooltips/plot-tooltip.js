@@ -10,6 +10,10 @@ import LensManager from '/core/ui/lenses/lens-manager.js';
 class PlotTooltipType {
     constructor() {
         this.plotCoord = null;
+        // TODO these variables should be removed and this functionality should be handled by the tooltip manager
+        this.plotCoordTimeoutId = -1;
+        this.updateReady = false;
+        this.incomingPlotCoord = null;
         this.isShowingDebug = false;
         this.tooltip = document.createElement('fxs-tooltip');
         this.container = document.createElement('div');
@@ -35,8 +39,32 @@ class PlotTooltipType {
                 return false;
             }
         }
-        this.plotCoord = plotCoord; // May be cleaner to recompute in update but at cost of computing 2nd time.
-        return true;
+        // TODO: Remove this and respect the tooltipDelay in the tooltip manager.
+        const tooltipDelay = Math.max(50, Configuration.getUser().tooltipDelay);
+        if (tooltipDelay > 0) {
+            if (this.incomingPlotCoord === null || (this.incomingPlotCoord.x != plotCoord.x || this.incomingPlotCoord.y != plotCoord.y)) {
+                this.incomingPlotCoord = plotCoord;
+                clearTimeout(this.plotCoordTimeoutId);
+                this.plotCoordTimeoutId = setTimeout(() => {
+                    this.updateReady = true;
+                }, tooltipDelay);
+            }
+            if (this.incomingPlotCoord.x == plotCoord.x && this.incomingPlotCoord.y == plotCoord.y && this.updateReady) {
+                this.plotCoord = plotCoord;
+                this.updateReady = false;
+                this.incomingPlotCoord = null;
+                clearTimeout(this.plotCoordTimeoutId);
+                this.plotCoordTimeoutId = -1;
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        else {
+            this.plotCoord = plotCoord;
+            return true;
+        }
     }
     reset() {
         this.container.innerHTML = '';
@@ -288,6 +316,9 @@ class PlotTooltipType {
         if (this.plotCoord == null) {
             return true;
         }
+        if (this.incomingPlotCoord !== null) {
+            return true;
+        }
         const localPlayerID = GameContext.localPlayerID;
         const revealedState = GameplayMap.getRevealedState(localPlayerID, this.plotCoord.x, this.plotCoord.y);
         if (revealedState == RevealedStates.HIDDEN) {
@@ -410,7 +441,7 @@ class PlotTooltipType {
         const plotConstructibles = MapConstructibles.getHiddenFilteredConstructibles(plotCoordinate.x, plotCoordinate.y);
         const constructibles = plotConstructibles
             .map(constructible => this.getConstructibleInfo(constructible, plotCoordinate))
-            .filter(c => c != null)
+            .filter((c) => c != null)
             .sort((a, b) => a.sortOrder - b.sortOrder);
         const isNaturalWonder = GameplayMap.isNaturalWonder(plotCoordinate.x, plotCoordinate.y);
         if (constructibles.length > 0) {
@@ -899,4 +930,5 @@ class PlotTooltipType {
     }
 }
 TooltipManager.registerPlotType('plot', PlotTooltipPriority.LOW, new PlotTooltipType());
+
 //# sourceMappingURL=file:///base-standard/ui/tooltips/plot-tooltip.js.map
