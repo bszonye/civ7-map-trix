@@ -111,6 +111,7 @@ const BZ_COLOR = {
 const BZ_ALERT = {
     primary: { "background-color": BZ_COLOR.primary, },
     secondary: { "background-color": BZ_COLOR.secondary, color: BZ_COLOR.black, },
+    title: { "fxs-font-gradient-color": BZ_COLOR.bronze1, color: BZ_COLOR.bronze2, },
     black: { "background-color": BZ_COLOR.black, },
     danger: { "background-color": BZ_COLOR.danger, },
     enemy: { "background-color": BZ_COLOR.danger, },
@@ -1583,7 +1584,9 @@ class bzPlotTooltip {
             const conqueror = Players.get(this.district.controllingPlayer);
             const cname = this.getCivName(conqueror, true);
             const ctext = localeJoin(["LOC_PLOT_TOOLTIP_CONQUEROR", cname]);
-            const banner = docBanner([ctext], BZ_ALERT.conqueror);
+            const cstyle = conqueror.id != this.observerID ?
+                BZ_ALERT.conqueror : BZ_ALERT.note;
+            const banner = docBanner([ctext], cstyle);
             banner.style.marginBottom = metrics.padding.banner.px;
             this.container.appendChild(banner);
         }
