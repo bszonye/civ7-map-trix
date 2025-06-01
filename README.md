@@ -1,4 +1,4 @@
-# Map Trix 2.0.2
+# Map Trix 2.1.0
 better map tools for Civilization VII
 
 ## spot important map details
