@@ -115,7 +115,6 @@ const BZ_ALERT = {
     black: { "background-color": BZ_COLOR.black, },
     danger: { "background-color": BZ_COLOR.danger, },
     enemy: { "background-color": BZ_COLOR.danger, },
-    conqueror: { "background-color": BZ_COLOR.danger, color: BZ_COLOR.caution, },
     caution: { "background-color": BZ_COLOR.caution, color: BZ_COLOR.black, },
     note: { "background-color": BZ_COLOR.note, },
     DEBUG: { "background-color": "#80808080", },
@@ -1585,7 +1584,7 @@ class bzPlotTooltip {
             const cname = this.getCivName(conqueror, true);
             const ctext = localeJoin(["LOC_PLOT_TOOLTIP_CONQUEROR", cname]);
             const cstyle = conqueror.id != this.observerID ?
-                BZ_ALERT.conqueror : BZ_ALERT.note;
+                BZ_ALERT.caution : BZ_ALERT.note;
             const banner = docBanner([ctext], cstyle);
             banner.style.marginBottom = metrics.padding.banner.px;
             this.container.appendChild(banner);
