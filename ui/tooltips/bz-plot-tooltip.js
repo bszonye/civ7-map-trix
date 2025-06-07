@@ -94,6 +94,7 @@ const BZ_COLOR = {
     river: "#55aaff66",  // Rivers = azure 40% opacity
     road: "#e5d2accc",  // Roads = bronze 80% opacity
     rail: "#c2c4cccc",  // Railroads = silver 80% opacity
+    bridge: "#d4c9c4cc",  // Bridges = warm gray 80% opacity
     // yield types
     food: "#80b34d",        //  90° 40 50 green
     production: "#a33d29",  //  10° 60 40 red
@@ -131,6 +132,7 @@ const BZ_STYLE = {
     LOC_VOLCANO_NOT_ACTIVE: BZ_ALERT.note,
     RIVER_MINOR: { "background-color": BZ_COLOR.river, },
     RIVER_NAVIGABLE: { "background-color": BZ_COLOR.river, },
+    ROUTE_BRIDGE: { "background-color": BZ_COLOR.bridge, color: BZ_COLOR.black, },
     ROUTE_RAILROAD: { "background-color": BZ_COLOR.rail, color: BZ_COLOR.black, },
     ROUTE_ROAD: { "background-color": BZ_COLOR.road, color: BZ_COLOR.black, },
 }
@@ -890,15 +892,16 @@ class bzPlotTooltip {
         const loc = this.plotCoord;
         const id = GameplayMap.getRouteType(loc.x, loc.y);
         const info = GameInfo.Routes.lookup(id);
-        if (!info) return null;
-        const name = info.Name;
-        const type = info.RouteType;
+        if (!info && !this.bridge) return null;
+        const name = info?.Name;
+        const type = info?.RouteType;
         const bridge = this.bridge?.name;
         const ferry = GameplayMap.isFerry(loc.x, loc.y) ?
             "LOC_NAVIGABLE_RIVER_FERRY" : null;
         const crossing = bridge ?? ferry ?? null;
         const text = dotJoin([name, crossing]);
         const highlight =
+            bridge ? "ROUTE_BRIDGE" :
             info?.PlacementRequiresRoutePresent ? "ROUTE_RAILROAD" :
             "ROUTE_ROAD";
         const route = { text, name, crossing, highlight, type, info, };
