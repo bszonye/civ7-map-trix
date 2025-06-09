@@ -1478,13 +1478,14 @@ class bzPlotTooltip {
         if (!this.wonder) return;
         const info = this.wonder.info;
         if (!this.isCompact) this.renderTitleHeading("LOC_DISTRICT_WONDER_NAME");
-        const notes = this.wonder.notes;
-        if (notes.length) {
-            const ttState = document.createElement("div");
-            ttState.classList.value = "text-2xs text-center";
-            ttState.style.lineHeight = metrics.note.ratio;
-            ttState.innerHTML = dotJoin(notes);
-            this.container.appendChild(ttState);
+        const notes = dotJoin(this.wonder.notes);
+        if (notes) {
+            // this.wonder.isDamaged = false;
+            const style = this.wonder.isDamaged ? BZ_ALERT.caution : null;
+            const sub = docCapsule(notes, style, metrics.font('2xs', 1.25));
+            sub.classList.value = "text-2xs self-center";
+            if (!style) sub.style.lineHeight = metrics.note.ratio;
+            this.container.appendChild(sub);
         }
         const rules = this.isVerbose ? info.Description : info.Tooltip;
         if (rules && !this.isCompact) {
@@ -1523,7 +1524,7 @@ class bzPlotTooltip {
                 const sub = docCapsule(notes, style, metrics.font('2xs', 1.25));
                 sub.classList.value = "text-accent-3 text-2xs";
                 sub.style.marginBottom = metrics.body.leading.half.px;
-                if (!c.isDamaged) sub.style.lineHeight = metrics.note.ratio;
+                if (!style) sub.style.lineHeight = metrics.note.ratio;
                 ttConstructible.appendChild(sub);
             }
             ttList.appendChild(ttConstructible);
