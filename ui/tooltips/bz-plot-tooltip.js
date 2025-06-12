@@ -94,6 +94,7 @@ const BZ_COLOR = {
     river: "#55aaff66",  // Rivers = azure 40% opacity
     road: "#e5d2accc",  // Roads = bronze 80% opacity
     rail: "#c2c4cccc",  // Railroads = silver 80% opacity
+    bridge: "#d4c9c4cc",  // Bridges = warm gray 80% opacity
     // yield types
     food: "#80b34d",        //  90° 40 50 green
     production: "#a33d29",  //  10° 60 40 red
@@ -131,6 +132,7 @@ const BZ_STYLE = {
     LOC_VOLCANO_NOT_ACTIVE: BZ_ALERT.note,
     RIVER_MINOR: { "background-color": BZ_COLOR.river, },
     RIVER_NAVIGABLE: { "background-color": BZ_COLOR.river, },
+    ROUTE_BRIDGE: { "background-color": BZ_COLOR.bridge, color: BZ_COLOR.black, },
     ROUTE_RAILROAD: { "background-color": BZ_COLOR.rail, color: BZ_COLOR.black, },
     ROUTE_ROAD: { "background-color": BZ_COLOR.road, color: BZ_COLOR.black, },
 }
@@ -890,15 +892,16 @@ class bzPlotTooltip {
         const loc = this.plotCoord;
         const id = GameplayMap.getRouteType(loc.x, loc.y);
         const info = GameInfo.Routes.lookup(id);
-        if (!info) return null;
-        const name = info.Name;
-        const type = info.RouteType;
+        if (!info && !this.bridge) return null;
+        const name = info?.Name;
+        const type = info?.RouteType;
         const bridge = this.bridge?.name;
         const ferry = GameplayMap.isFerry(loc.x, loc.y) ?
             "LOC_NAVIGABLE_RIVER_FERRY" : null;
         const crossing = bridge ?? ferry ?? null;
         const text = dotJoin([name, crossing]);
         const highlight =
+            bridge ? "ROUTE_BRIDGE" :
             info?.PlacementRequiresRoutePresent ? "ROUTE_RAILROAD" :
             "ROUTE_ROAD";
         const route = { text, name, crossing, highlight, type, info, };
@@ -1475,13 +1478,14 @@ class bzPlotTooltip {
         if (!this.wonder) return;
         const info = this.wonder.info;
         if (!this.isCompact) this.renderTitleHeading("LOC_DISTRICT_WONDER_NAME");
-        const notes = this.wonder.notes;
-        if (notes.length) {
-            const ttState = document.createElement("div");
-            ttState.classList.value = "text-2xs text-center";
-            ttState.style.lineHeight = metrics.note.ratio;
-            ttState.innerHTML = dotJoin(notes);
-            this.container.appendChild(ttState);
+        const notes = dotJoin(this.wonder.notes);
+        if (notes) {
+            // this.wonder.isDamaged = false;
+            const style = this.wonder.isDamaged ? BZ_ALERT.caution : null;
+            const sub = docCapsule(notes, style, metrics.font('2xs', 1.25));
+            sub.classList.value = "text-2xs self-center";
+            if (!style) sub.style.lineHeight = metrics.note.ratio;
+            this.container.appendChild(sub);
         }
         const rules = this.isVerbose ? info.Description : info.Tooltip;
         if (rules && !this.isCompact) {
@@ -1520,7 +1524,7 @@ class bzPlotTooltip {
                 const sub = docCapsule(notes, style, metrics.font('2xs', 1.25));
                 sub.classList.value = "text-accent-3 text-2xs";
                 sub.style.marginBottom = metrics.body.leading.half.px;
-                if (!c.isDamaged) sub.style.lineHeight = metrics.note.ratio;
+                if (!style) sub.style.lineHeight = metrics.note.ratio;
                 ttConstructible.appendChild(sub);
             }
             ttList.appendChild(ttConstructible);
