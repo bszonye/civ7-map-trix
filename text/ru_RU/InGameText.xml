@@ -14,10 +14,10 @@
             <Text>(Раньше {1_name})</Text>
         </Replace>
         <Replace Tag="LOC_BZ_IMPROVEMENT_FOR_TILE" Language="ru_RU">
-            <Text>Позволяет {1_icon} {2_name}</Text>
+            <Text>Улучшает {1_icon} {2_name}</Text>
         </Replace>
         <Replace Tag="LOC_BZ_IMPROVEMENT_FOR_RESOURCE" Language="ru_RU">
-            <Text>Требуется {1_icon} {2_name}</Text>
+            <Text>Улучшает {1_icon} {2_name}</Text>
         </Replace>
         <Replace Tag="LOC_DISTRICT_BZ_DISCOVERY" Language="ru_RU">
             <Text>Открытие</Text>
@@ -29,7 +29,7 @@
             <Text>Центр Города </Text>
         </Replace>
         <Replace Tag="LOC_DISTRICT_BZ_URBAN_DISTRICT" Language="ru_RU">
-            <Text>Район</Text>
+            <Text>Городской Район</Text>
         </Replace>
         <Replace Tag="LOC_DISTRICT_BZ_URBAN_QUARTER" Language="ru_RU">
             <Text>Квартал</Text>
@@ -38,46 +38,31 @@
             <Text>Свободный Район</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE" Language="ru_RU">
-            <Text>Map Trix • уровень детализации</Text>
+            <Text>Map Trix • Степень детализации подсказок</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE_DESCRIPTION" Language="ru_RU">
-            <Text>Насколько подробно отображать.[N] [N][B]Сочетания клавиш[/B][N]Краткий • Ctrl[N]Подробный • Shift[N]Скрытое • Ctrl+Shift</Text>
+            <Text>Насколько подробно отображать информацию в подсказках.[N] [N][B]Сочетания клавиш:[/B][N]Кратко • Ctrl[N]Подробно • Shift[N]Скрыть подсказки • Ctrl+Shift</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER" Language="ru_RU">
-            <Text>Map Trix • изменить внешний вид верхнего баннера</Text>
+            <Text>Map Trix • Изменить оформление верхней панели доходов</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER_DESCRIPTION" Language="ru_RU">
-            <Text>Изменяет верхнюю панель в соответствии с Моды от Trixie.</Text>
+            <Text>Изменяет верхнюю панель в соответствии со стилистикой других модов от Trixie.</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_VERBOSITY_HIDDEN" Language="ru_RU">
-            <Text>Скрытое</Text>
+            <Text>Скрыть подсказки</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_VERBOSITY_COMPACT" Language="ru_RU">
-            <Text>Краткий</Text>
+            <Text>Кратко</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_VERBOSITY_STANDARD" Language="ru_RU">
-            <Text>Стандартная</Text>
+            <Text>Стандартно</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_VERBOSITY_VERBOSE" Language="ru_RU">
-            <Text>Подробный</Text>
+            <Text>Подробно</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_GROUP_BZ_MODS" Language="ru_RU">
             <Text>Моды от Trixie</Text>
-        </Replace>
-        <Replace Tag="LOC_RESOURCECLASS_BONUS_NAME_BZ" Language="ru_RU">
-            <Text>Бонусный Ресурс</Text>
-        </Replace>
-        <Replace Tag="LOC_RESOURCECLASS_CITY_NAME_BZ" Language="ru_RU">
-            <Text>Городской Ресурс</Text>
-        </Replace>
-        <Replace Tag="LOC_RESOURCECLASS_EMPIRE_NAME_BZ" Language="ru_RU">
-            <Text>Имперский Ресурс</Text>
-        </Replace>
-        <Replace Tag="LOC_RESOURCECLASS_FACTORY_NAME_BZ" Language="ru_RU">
-            <Text>Ресурс Фабрики</Text>
-        </Replace>
-        <Replace Tag="LOC_RESOURCECLASS_TREASURE_NAME_BZ" Language="ru_RU">
-            <Text>Ресурс Сокровище</Text>
         </Replace>
         <Replace Tag="LOC_STATE_BZ_UNIQUE" Language="ru_RU">
             <Text>Уникальное</Text>

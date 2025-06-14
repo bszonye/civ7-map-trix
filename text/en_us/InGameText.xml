@@ -64,21 +64,6 @@
         <Replace Tag="LOC_OPTIONS_GROUP_BZ_MODS">
             <Text>trixie's mods</Text>
         </Replace>
-        <Replace Tag="LOC_RESOURCECLASS_BONUS_NAME_BZ">
-            <Text>Bonus Resource</Text>
-        </Replace>
-        <Replace Tag="LOC_RESOURCECLASS_CITY_NAME_BZ">
-            <Text>City Resource</Text>
-        </Replace>
-        <Replace Tag="LOC_RESOURCECLASS_EMPIRE_NAME_BZ">
-            <Text>Empire Resource</Text>
-        </Replace>
-        <Replace Tag="LOC_RESOURCECLASS_FACTORY_NAME_BZ">
-            <Text>Factory Resource</Text>
-        </Replace>
-        <Replace Tag="LOC_RESOURCECLASS_TREASURE_NAME_BZ">
-            <Text>Treasure Resource</Text>
-        </Replace>
         <Replace Tag="LOC_STATE_BZ_UNIQUE">
             <Text>Unique</Text>
         </Replace>
