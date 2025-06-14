@@ -64,21 +64,6 @@
         <Replace Tag="LOC_OPTIONS_GROUP_BZ_MODS" Language="it_IT">
             <Text>mod di Trixie</Text>
         </Replace>
-        <Replace Tag="LOC_RESOURCECLASS_BONUS_NAME_BZ" Language="it_IT">
-            <Text>Risorsa Bonus</Text>
-        </Replace>
-        <Replace Tag="LOC_RESOURCECLASS_CITY_NAME_BZ" Language="it_IT">
-            <Text>Risorsa Cittadina</Text>
-        </Replace>
-        <Replace Tag="LOC_RESOURCECLASS_EMPIRE_NAME_BZ" Language="it_IT">
-            <Text>Risorsa dell'Impero</Text>
-        </Replace>
-        <Replace Tag="LOC_RESOURCECLASS_FACTORY_NAME_BZ" Language="it_IT">
-            <Text>Risorsa Fabbrica</Text>
-        </Replace>
-        <Replace Tag="LOC_RESOURCECLASS_TREASURE_NAME_BZ" Language="it_IT">
-            <Text>Risorsa Tesoro</Text>
-        </Replace>
         <Replace Tag="LOC_STATE_BZ_UNIQUE" Language="it_IT">
             <Text>Unico</Text>
         </Replace>
