@@ -1433,7 +1433,8 @@ class bzPlotTooltip {
             // resource
             const rctype = this.resource.ResourceClassType;
             const rcinfo = GameInfo.ResourceClasses.lookup(rctype);
-            hexName = rcinfo.Name + "_BZ";
+            const rcname = Locale.compose(rcinfo.Name);
+            hexName = Locale.stylize("LOC_RESOURCECLASS_TOOLTIP_NAME", rcname);
             if (this.freeConstructible || this.isVerbose) {
                 hexRules.push(this.resource.Tooltip);
             }

@@ -64,21 +64,6 @@
         <Replace Tag="LOC_OPTIONS_GROUP_BZ_MODS" Language="zh_Hant_HK">
             <Text>trixie 系列模組</Text>
         </Replace>
-        <Replace Tag="LOC_RESOURCECLASS_BONUS_NAME_BZ" Language="zh_Hant_HK">
-            <Text>加成資源</Text>
-        </Replace>
-        <Replace Tag="LOC_RESOURCECLASS_CITY_NAME_BZ" Language="zh_Hant_HK">
-            <Text>城市資源</Text>
-        </Replace>
-        <Replace Tag="LOC_RESOURCECLASS_EMPIRE_NAME_BZ" Language="zh_Hant_HK">
-            <Text>帝國資源</Text>
-        </Replace>
-        <Replace Tag="LOC_RESOURCECLASS_FACTORY_NAME_BZ" Language="zh_Hant_HK">
-            <Text>工廠資源</Text>
-        </Replace>
-        <Replace Tag="LOC_RESOURCECLASS_TREASURE_NAME_BZ" Language="zh_Hant_HK">
-            <Text>寶藏資源</Text>
-        </Replace>
         <Replace Tag="LOC_STATE_BZ_UNIQUE" Language="zh_Hant_HK">
             <Text>獨特</Text>
         </Replace>
