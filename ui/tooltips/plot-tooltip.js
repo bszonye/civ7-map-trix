@@ -80,7 +80,7 @@ class PlotTooltipType {
         const plotCoord = this.plotCoord;
         const terrainLabel = this.getTerrainLabel(plotCoord);
         const biomeLabel = this.getBiomeLabel(plotCoord);
-        const featureLabel = this.getFeatureLabel(plotCoord);
+        const { featureLabel, featureTooltip } = this.getFeatureLabel(plotCoord);
         const continentName = this.getContinentName(plotCoord);
         const riverLabel = this.getRiverLabel(plotCoord);
         const routeName = this.getRouteName();
@@ -149,6 +149,12 @@ class PlotTooltipType {
             tooltipSecondLine.classList.add("plot-tooltip__line");
             tooltipSecondLine.setAttribute('data-l10n-id', featureLabel);
             this.container.appendChild(tooltipSecondLine);
+            if (featureTooltip) {
+                const tooltipSecondLineAddendum = document.createElement("div");
+                tooltipSecondLineAddendum.classList.add("plot-tooltip__line", "my-2");
+                tooltipSecondLineAddendum.setAttribute('data-l10n-id', featureTooltip);
+                this.container.appendChild(tooltipSecondLineAddendum);
+            }
         }
         if (continentName) {
             if (riverLabel) {
@@ -763,15 +769,14 @@ class PlotTooltipType {
         }
     }
     getFeatureLabel(location) {
-        let label = '';
+        let featureLabel = '';
+        let featureTooltip = '';
         const featureType = GameplayMap.getFeatureType(location.x, location.y);
         const feature = GameInfo.Features.lookup(featureType);
         if (feature) {
+            featureLabel = feature.Name;
             if (feature.Tooltip) {
-                label = Locale.compose("{1_FeatureName}: {2_FeatureTooltip}", feature.Name, feature.Tooltip);
-            }
-            else {
-                label = feature.Name;
+                featureTooltip = feature.Tooltip;
             }
         }
         if (GameplayMap.isVolcano(location.x, location.y)) {
@@ -779,9 +784,9 @@ class PlotTooltipType {
             const volcanoStatus = (active) ? 'LOC_VOLCANO_ACTIVE' : 'LOC_VOLCANO_NOT_ACTIVE';
             const volcanoName = GameplayMap.getVolcanoName(location.x, location.y);
             const volcanoDetailsKey = (volcanoName) ? 'LOC_UI_NAMED_VOLCANO_DETAILS' : 'LOC_UI_VOLCANO_DETAILS';
-            label = Locale.compose(volcanoDetailsKey, label, volcanoStatus, volcanoName);
+            featureLabel = Locale.compose(volcanoDetailsKey, featureLabel, volcanoStatus, volcanoName);
         }
-        return label;
+        return { featureLabel, featureTooltip };
     }
     addUnitInfo(location) {
         const localPlayerID = GameContext.localObserverID;
