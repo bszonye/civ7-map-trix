@@ -97,41 +97,7 @@ class PlotTooltipType {
         // Top Section
         if (LensManager.getActiveLens() == "fxs-settler-lens") {
             //Add more details to the tooltip if we are in the settler lens
-            const localPlayerDiplomacy = localPlayer?.Diplomacy;
-            if (localPlayerDiplomacy === undefined) {
-                console.error("plot-tooltip: Attempting to update settler tooltip, but no valid local player Diplomacy object!");
-                return;
-            }
-            else if (!GameplayMap.isWater(this.plotCoord.x, this.plotCoord.y) && !GameplayMap.isImpassable(this.plotCoord.x, this.plotCoord.y) && !GameplayMap.isNavigableRiver(this.plotCoord.x, this.plotCoord.y)) {
-                //Dont't add any extra tooltip to mountains, oceans, or navigable rivers, should be obvious enough w/o them
-                const settlerTooltip = document.createElement("div");
-                settlerTooltip.classList.add("plot-tooltip__settler-tooltip");
-                const localPlayerAdvancedStart = localPlayer?.AdvancedStart;
-                if (localPlayerAdvancedStart === undefined) {
-                    console.error("plot-tooltip: Attempting to update settler tooltip, but no valid local player advanced start object!");
-                    return;
-                }
-                //Show why we can't settle here
-                if (!GameplayMap.isPlotInAdvancedStartRegion(GameContext.localPlayerID, this.plotCoord.x, this.plotCoord.y) && !localPlayerAdvancedStart?.getPlacementComplete()) {
-                    settlerTooltip.classList.add("blocked-location");
-                    settlerTooltip.innerHTML = Locale.compose("LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_FAR");
-                }
-                else if (!localPlayerDiplomacy.isValidLandClaimLocation(this.plotCoord, true /*bIgnoreFriendlyUnitRequirement*/)) {
-                    settlerTooltip.classList.add("blocked-location");
-                    if (GameplayMap.isCityWithinMinimumDistance(this.plotCoord.x, this.plotCoord.y)) {
-                        settlerTooltip.innerHTML = Locale.compose("LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_CLOSE");
-                    }
-                    else if (GameplayMap.getResourceType(this.plotCoord.x, this.plotCoord.y) != ResourceTypes.NO_RESOURCE) {
-                        settlerTooltip.innerHTML = Locale.compose("LOC_PLOT_TOOLTIP_CANT_SETTLE_RESOURCES");
-                    }
-                }
-                else if (!GameplayMap.isFreshWater(this.plotCoord.x, this.plotCoord.y)) {
-                    settlerTooltip.classList.add("okay-location");
-                    settlerTooltip.innerHTML = Locale.compose("LOC_PLOT_TOOLTIP_NO_FRESH_WATER");
-                }
-                this.container.appendChild(settlerTooltip);
-                this.appendDivider();
-            }
+            this.addSettlingInformation(localPlayer, plotCoord);
         }
         const tooltipFirstLine = document.createElement("div");
         tooltipFirstLine.classList.add('text-secondary', 'text-center', 'uppercase', 'font-title');
@@ -932,6 +898,66 @@ class PlotTooltipType {
         districtContainer.appendChild(districtTitle);
         districtContainer.appendChild(districtHealth);
         this.container.appendChild(districtContainer);
+    }
+    /**
+     * Add information (typically at the top of the tooltip) for when selling a plot.
+     * @param location
+     * @returns
+     */
+    addSettlingInformation(localPlayer, location) {
+        const localPlayerDiplomacy = localPlayer.Diplomacy;
+        if (localPlayerDiplomacy === undefined) {
+            console.error(`plot-tooltip: Attempting to update settler info, but no valid Diplomacy object. LocalPlayer: ${localPlayer}`);
+            return;
+        }
+        const isLand = !GameplayMap.isWater(location.x, location.y);
+        const isPassable = !GameplayMap.isImpassable(location.x, location.y);
+        const isNotRiver = !GameplayMap.isNavigableRiver(location.x, location.y);
+        //Dont't add any extra tooltip to mountains, oceans, or navigable rivers, should be obvious enough w/o them
+        if (isLand && isPassable && isNotRiver) {
+            const settlerTooltip = document.createElement("div");
+            settlerTooltip.classList.add("plot-tooltip__settler-tooltip");
+            let addDivider = true;
+            const localPlayerAdvancedStart = localPlayer?.AdvancedStart;
+            if (localPlayerAdvancedStart === undefined) {
+                console.error("plot-tooltip: Attempting to update settler tooltip, but no valid local player advanced start object!");
+                return;
+            }
+            let tooltipReason = "";
+            //Show why we can't settle here
+            if (!GameplayMap.isPlotInAdvancedStartRegion(GameContext.localPlayerID, location.x, location.y) && !localPlayerAdvancedStart?.getPlacementComplete()) {
+                settlerTooltip.classList.add("blocked-location");
+                tooltipReason = Locale.compose("LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_FAR");
+            }
+            else if (!localPlayerDiplomacy.isValidLandClaimLocation(location, true /*bIgnoreFriendlyUnitRequirement*/)) {
+                settlerTooltip.classList.add("blocked-location");
+                if (GameplayMap.isCityWithinMinimumDistance(location.x, location.y)) {
+                    tooltipReason = Locale.compose("LOC_PLOT_TOOLTIP_CANT_SETTLE_TOO_CLOSE");
+                }
+                else if (GameplayMap.getResourceType(location.x, location.y) != ResourceTypes.NO_RESOURCE) {
+                    tooltipReason = Locale.compose("LOC_PLOT_TOOLTIP_CANT_SETTLE_RESOURCES");
+                }
+                else {
+                    addDivider = false; // No additional information, no divider to show.
+                }
+            }
+            else if (!GameplayMap.isFreshWater(location.x, location.y)) {
+                settlerTooltip.classList.add("okay-location");
+                tooltipReason = Locale.compose("LOC_PLOT_TOOLTIP_NO_FRESH_WATER");
+            }
+            else {
+                addDivider = false; // No additional information, no divider to show.
+            }
+            if (tooltipReason.length <= 0) {
+                // There's no reason text available for the settling information
+                return;
+            }
+            settlerTooltip.innerHTML = tooltipReason;
+            this.container.appendChild(settlerTooltip);
+            if (addDivider) {
+                this.appendDivider();
+            }
+        }
     }
 }
 TooltipManager.registerPlotType('plot', PlotTooltipPriority.LOW, new PlotTooltipType());
