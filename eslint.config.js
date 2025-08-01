@@ -29,6 +29,7 @@ export default [
                 GrowthTypes: "readonly",
                 IndependentRelationship: "readonly",
                 Input: "readonly",
+                InputActionStatuses: "readonly",
                 Loading: "readonly",
                 Locale: "readonly",
                 MapCities: "readonly",
@@ -40,6 +41,7 @@ export default [
                 ResourceTypes: "readonly",
                 RevealedStates: "readonly",
                 RiverTypes: "readonly",
+                SpriteMode: "readonly",
                 UI: "readonly",
                 UIHTMLCursorTypes: "readonly",
                 Units: "readonly",
@@ -48,6 +50,7 @@ export default [
                 document: "readonly",
                 engine: "readonly",
                 localStorage: "readonly",
+                window: "readonly",
             }
         }
 

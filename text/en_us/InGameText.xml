@@ -67,6 +67,27 @@
         <Replace Tag="LOC_STATE_BZ_UNIQUE">
             <Text>Unique</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_DISCOVERY_ICONS">
+            <Text>Toggle Discovery Icons</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_DISCOVERY_ICONS_TT">
+            <Text>Toggles visibility of discovery icons</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_FORTIFICATION_ICONS">
+            <Text>Toggle Fortification Icons</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_FORTIFICATION_ICONS_TT">
+            <Text>Toggles visibility of fortification icons</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_RELIGION_ICONS">
+            <Text>Toggle Religion Icons</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_RELIGION_ICONS_TT">
+            <Text>Toggles visibility of religion icons</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_MINI_MAP_BZ_DISCOVERY">
+            <Text>Discoveries</Text>
+        </Replace>
         <Replace Tag="LOC_YIELD_BZ_TOTAL">
             <Text>Total Yield</Text>
         </Replace>

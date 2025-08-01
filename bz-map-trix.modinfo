@@ -25,9 +25,13 @@
             </Properties>
             <Actions>
                 <UIScripts>
+                    <Item>ui/options/editors/bz-editor-keyboard-mapping.js</Item>
                     <Item>ui/options/bz-map-trix-options.js</Item>
                     <Item>ui/options/mod-options-decorator.js</Item>
                 </UIScripts>
+                <UpdateDatabase>
+                    <Item>config/bz-input.xml</Item>
+                </UpdateDatabase>
                 <UpdateText>
                     <Item>text/en_us/InGameText.xml</Item>
                     <Item locale="de_DE">text/de_DE/InGameText.xml</Item>
@@ -50,6 +54,12 @@
                 </ImportFiles>
                 <UIScripts>
                     <Item>ui/diplo-ribbon/bz-panel-yield-banner.js</Item>
+                    <Item>ui/input/bz-hotkey-manager.js</Item>
+                    <Item>ui/lenses/layer/bz-discovery-layer.js</Item>
+                    <Item>ui/lenses/layer/bz-fortification-layer.js</Item>
+                    <Item>ui/lenses/layer/bz-religion-layer.js</Item>
+                    <Item>ui/mini-map/bz-panel-mini-map.js</Item>
+                    <Item>ui/options/editors/bz-editor-keyboard-mapping.js</Item>
                     <Item>ui/options/bz-map-trix-options.js</Item>
                     <Item>ui/options/mod-options-decorator.js</Item>
                     <Item>ui/tooltips/bz-plot-tooltip.js</Item>

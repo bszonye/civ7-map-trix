@@ -8,7 +8,7 @@ import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
 
 // custom & adapted icons
 const BZ_ICON_SIZE = 12;
-const BZ_ICON_DISCOVERY = "url('blp:tech_cartography')";
+const BZ_ICON_DISCOVERY = "NAR_REW_DEFAULT";
 const BZ_ICON_EMPTY_SLOT = "BUILDING_OPEN";
 const BZ_ICON_FRAME = "url('hud_sub_circle_bk')";
 const BZ_ICON_RURAL = "CITY_RURAL";  // urban population/yield
