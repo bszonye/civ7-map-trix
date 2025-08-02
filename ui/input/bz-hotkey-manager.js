@@ -7,6 +7,8 @@ HotkeyManager.handleInput = function(...args) {
     if (status == InputActionStatuses.FINISH) {
         const name = inputEvent.detail.name;
         switch (name) {
+            case "toggle-fxs-culture-borders-layer":
+            case "toggle-bz-city-borders-layer":
             case "toggle-bz-discovery-layer":
             case "toggle-bz-fortification-layer":
             case "toggle-bz-religion-layer":

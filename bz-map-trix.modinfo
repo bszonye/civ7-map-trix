@@ -55,6 +55,7 @@
                 <UIScripts>
                     <Item>ui/diplo-ribbon/bz-panel-yield-banner.js</Item>
                     <Item>ui/input/bz-hotkey-manager.js</Item>
+                    <Item>ui/lenses/layer/bz-city-borders-layer.js</Item>
                     <Item>ui/lenses/layer/bz-discovery-layer.js</Item>
                     <Item>ui/lenses/layer/bz-fortification-layer.js</Item>
                     <Item>ui/lenses/layer/bz-religion-layer.js</Item>
