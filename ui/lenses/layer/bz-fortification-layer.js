@@ -42,12 +42,10 @@ class bzFortificationLensLayer extends BaseSpriteGridLensLayer {
         const district = Districts.get(districtID);
         if (!district.cityId) return;  // village
         if (district.type == DistrictTypes.RURAL) return;  // rural
-        // console.warn(`TRIX DISTRICT=${JSON.stringify(district)}`);
         const cons = MapConstructibles.getHiddenFilteredConstructibles(loc.x, loc.y);
         for (const con of cons) {
             const item = Constructibles.getByComponentID(con);
             if (!item) continue;
-            // console.warn(`TRIX CON=${JSON.stringify(item)}`);
             const info = GameInfo.Constructibles.lookup(item.type);
             if (!info.DistrictDefense) continue;
             const controller = Players.get(district.controllingPlayer);
