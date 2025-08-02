@@ -35,15 +35,27 @@ class bzCityBordersLayer {
             const plotIndex = GameplayMap.getIndexFromLocation(data.location);
             // Remove plot from prior owner if valid
             if (data.priorOwner != PlayerIds.NO_PLAYER) {
-                const previousOverlay = this.getBorderOverlay(plotIndex);
-                previousOverlay.clearPlotGroups(plotIndex);
-                this.ownedPlotMap.delete(plotIndex);
+                const owningPlot = this.ownedPlotMap.get(plotIndex);
+                console.warn(`TRIX DEL ${plotIndex} from ${owningPlot} for ${JSON.stringify(data)}`);
+                // TODO: remove stale borderOverlayMap entries
+                if (owningPlot) {
+                    this.ownedPlotMap.delete(plotIndex);
+                    const previousOverlay = this.borderOverlayMap.get(owningPlot);
+                    if (previousOverlay) previousOverlay.clearPlotGroups(plotIndex);
+                }
             }
             // Add plot to new owner
-            if (data.owner != PlayerIds.NO_PLAYER) {
-                this.ownedPlotMap.set(plotIndex, this.findCityCenterIndexForPlotIndex(plotIndex));
-                const newOverlay = this.getBorderOverlay(plotIndex);
-                newOverlay.setPlotGroups(plotIndex, 0);
+            if (data.owner != PlayerIds.NO_PLAYER && Players.isAlive(data.owner)) {
+                const cityPlot = this.findCityCenterIndexForPlotIndex(plotIndex);
+                if (cityPlot != -1) {
+                    this.ownedPlotMap.set(plotIndex, cityPlot);
+                    const newOverlay = this.getBorderOverlay(plotIndex);
+                    console.warn(`TRIX SET ${JSON.stringify(data)}`);
+                    newOverlay.setPlotGroups(plotIndex, 0);
+                    if (cityPlot == plotIndex) {
+                        // TODO: update border style
+                    }
+                }
             }
         };
         this.onCameraChanged = (camera) => {
@@ -212,7 +224,6 @@ class bzCityBordersLayer {
         this.cityOverlayGroup.setVisible(false);
     }
     onLayerHotkey(hotkey) {
-        console.warn(`TRIX ${hotkey.detail.name}`);
         if (hotkey.detail.name == 'toggle-bz-city-borders-layer') {
             LensManager.toggleLayer('bz-city-borders-layer');
         } else if (hotkey.detail.name == 'toggle-fxs-culture-borders-layer') {
