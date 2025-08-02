@@ -5,12 +5,13 @@ const SPRITE_PLOT_POSITION = { x: 0, y: 25, z: 5 };
 const SPRITE_SIZE = 64; // pixels wide
 var SpriteGroup;
 (function (SpriteGroup) {
-    SpriteGroup[SpriteGroup["All"] = 0] = "All";
+    SpriteGroup[SpriteGroup["bzDiscovery"] = 0] = "bzDiscovery";
+    SpriteGroup[SpriteGroup["All"] = Number.MAX_VALUE] = "All";
 })(SpriteGroup || (SpriteGroup = {}));
 class bzDiscoveryLensLayer extends BaseSpriteGridLensLayer {
     constructor() {
         super([
-            { handle: SpriteGroup.All, name: "bzDiscoveryLayer_SpriteGroup", spriteMode: SpriteMode.FixedBillboard },
+            { handle: SpriteGroup.bzDiscovery, name: "bzDiscoveryLayer_SpriteGroup", spriteMode: SpriteMode.FixedBillboard },
         ]);
         this.onLayerHotkeyListener = this.onLayerHotkey.bind(this);
         this.onLensActivationListener = this.onLensActivation.bind(this);
@@ -45,7 +46,7 @@ class bzDiscoveryLensLayer extends BaseSpriteGridLensLayer {
             const info = GameInfo.Constructibles.lookup(item.type);
             if (!info?.Discovery) continue;
             const asset = UI.getIconBLP(BZ_ICON_DISCOVERY);
-            this.addSprite(SpriteGroup.All, loc, asset, SPRITE_PLOT_POSITION, { scale: SPRITE_SIZE });
+            this.addSprite(SpriteGroup.bzDiscovery, loc, asset, SPRITE_PLOT_POSITION, { scale: SPRITE_SIZE });
             return;
         }
     }

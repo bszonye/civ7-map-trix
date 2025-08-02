@@ -1,14 +1,16 @@
 import LensManager, { BaseSpriteGridLensLayer, LensActivationEventName } from '/core/ui/lenses/lens-manager.js';
 ;
 const SPRITE_PLOT_POSITION = { x: 0, y: 0, z: 10 };
+const SPRITE_SIZE = 1;
 var SpriteGroup;
 (function (SpriteGroup) {
-    SpriteGroup[SpriteGroup["All"] = 0] = "All";
+    SpriteGroup[SpriteGroup["bzFortification"] = 0] = "bzFortification";
+    SpriteGroup[SpriteGroup["All"] = Number.MAX_VALUE] = "All";
 })(SpriteGroup || (SpriteGroup = {}));
 class bzFortificationLensLayer extends BaseSpriteGridLensLayer {
     constructor() {
         super([
-            { handle: SpriteGroup.All, name: "bzFortificationLayer_SpriteGroup", spriteMode: SpriteMode.Default },
+            { handle: SpriteGroup.bzFortification, name: "bzFortificationLayer_SpriteGroup", spriteMode: SpriteMode.Default },
         ]);
         this.onLayerHotkeyListener = this.onLayerHotkey.bind(this);
         this.onLensActivationListener = this.onLensActivation.bind(this);
@@ -51,7 +53,7 @@ class bzFortificationLensLayer extends BaseSpriteGridLensLayer {
             const controller = Players.get(district.controllingPlayer);
             const civ = GameInfo.Civilizations.lookup(controller.civilizationType);
             const asset = UI.getIconBLP(civ.CivilizationType);
-            this.addSprite(SpriteGroup.All, loc, asset, SPRITE_PLOT_POSITION, { scale: 1 });
+            this.addSprite(SpriteGroup.bzFortification, loc, asset, SPRITE_PLOT_POSITION, { scale: SPRITE_SIZE });
             return;
         }
     }

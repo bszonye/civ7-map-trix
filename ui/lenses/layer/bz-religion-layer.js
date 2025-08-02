@@ -2,14 +2,16 @@ import '/bz-map-trix/ui/lenses/layer/bz-fortification-layer.js';  // force layer
 import LensManager, { BaseSpriteGridLensLayer, LensActivationEventName } from '/core/ui/lenses/lens-manager.js';
 ;
 const SPRITE_PLOT_POSITION = { x: 0, y: -18, z: 5 };
+const SPRITE_SIZE = 0.5;
 var SpriteGroup;
 (function (SpriteGroup) {
-    SpriteGroup[SpriteGroup["All"] = 0] = "All";
+    SpriteGroup[SpriteGroup["bzReligion"] = 0] = "bzReligion";
+    SpriteGroup[SpriteGroup["All"] = Number.MAX_VALUE] = "All";
 })(SpriteGroup || (SpriteGroup = {}));
 class bzReligionLensLayer extends BaseSpriteGridLensLayer {
     constructor() {
         super([
-            { handle: SpriteGroup.All, name: "bzReligionLayer_SpriteGroup", spriteMode: SpriteMode.Billboard },
+            { handle: SpriteGroup.bzReligion, name: "bzReligionLayer_SpriteGroup", spriteMode: SpriteMode.Billboard },
         ]);
         this.onLayerHotkeyListener = this.onLayerHotkey.bind(this);
         this.onLensActivationListener = this.onLensActivation.bind(this);
@@ -57,7 +59,7 @@ class bzReligionLensLayer extends BaseSpriteGridLensLayer {
         if (religionID == -1) return;
         const info = GameInfo.Religions.lookup(religionID);
         const asset = UI.getIconBLP(info.ReligionType);
-        this.addSprite(SpriteGroup.All, loc, asset, SPRITE_PLOT_POSITION, { scale: 0.5 });
+        this.addSprite(SpriteGroup.bzReligion, loc, asset, SPRITE_PLOT_POSITION, { scale: SPRITE_SIZE });
     }
     onMapChange() {
         this.updateMap();
