@@ -67,6 +67,27 @@
         <Replace Tag="LOC_STATE_BZ_UNIQUE" Language="zh_Hant_HK">
             <Text>獨特</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_DISCOVERY_ICONS" Language="zh_Hant_HK">
+            <Text>Toggle Discovery Icons</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_DISCOVERY_ICONS_TT" Language="zh_Hant_HK">
+            <Text>Toggles visibility of discovery icons</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_FORTIFICATION_ICONS" Language="zh_Hant_HK">
+            <Text>Toggle Fortification Icons</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_FORTIFICATION_ICONS_TT" Language="zh_Hant_HK">
+            <Text>Toggles visibility of fortification icons</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_RELIGION_ICONS" Language="zh_Hant_HK">
+            <Text>Toggle Religion Icons</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_RELIGION_ICONS_TT" Language="zh_Hant_HK">
+            <Text>Toggles visibility of religion icons</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_MINI_MAP_BZ_DISCOVERY" Language="zh_Hant_HK">
+            <Text>Discoveries</Text>
+        </Replace>
         <Replace Tag="LOC_YIELD_BZ_TOTAL" Language="zh_Hant_HK">
             <Text>總產出</Text>
         </Replace>
