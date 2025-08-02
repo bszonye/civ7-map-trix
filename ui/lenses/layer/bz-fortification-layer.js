@@ -53,10 +53,17 @@ class bzFortificationLensLayer extends BaseSpriteGridLensLayer {
             if (!info.DistrictDefense) continue;
             const controller = Players.get(district.controllingPlayer);
             const civ = GameInfo.Civilizations.lookup(controller.civilizationType);
-            const asset = UI.getIconBLP(civ.CivilizationType);
+            const asset = this.getCivilizationIcon(civ.CivilizationType);
             this.addSprite(SpriteGroup.bzFortification, loc, asset, SPRITE_PLOT_POSITION, { scale: SPRITE_SCALE });
             return;
         }
+    }
+    getCivilizationIcon(icon) {
+        const blp = UI.getIconBLP(icon);
+        const url = UI.getIconURL(icon);
+        // sprites only support built-in BLPs, for now
+        if (url == `blp:${blp}` || url == `fs://game/${blp}`) return blp;
+        return "Action_Fortify";
     }
     onPlotChange(data) {
         this.updatePlot(data.location);
