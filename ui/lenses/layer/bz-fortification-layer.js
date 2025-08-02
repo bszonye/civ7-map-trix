@@ -1,6 +1,6 @@
 import LensManager, { BaseSpriteGridLensLayer, LensActivationEventName } from '/core/ui/lenses/lens-manager.js';
 ;
-const SPRITE_PLOT_POSITION = { x: 0, y: 0, z: 0 };
+const SPRITE_PLOT_POSITION = { x: 0, y: 0, z: 10 };
 var SpriteGroup;
 (function (SpriteGroup) {
     SpriteGroup[SpriteGroup["All"] = 0] = "All";
