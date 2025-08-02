@@ -5,50 +5,52 @@ const SPRITE_PLOT_POSITION = { x: 0, y: 25, z: 5 };
 const SPRITE_SIZE = 42; // pixels wide
 var SpriteGroup;
 (function (SpriteGroup) {
-    SpriteGroup[SpriteGroup["All_Discoveries"] = 0] = "All_Discoveries";
+    SpriteGroup[SpriteGroup["All"] = 0] = "All";
 })(SpriteGroup || (SpriteGroup = {}));
 class bzDiscoveryLensLayer extends BaseSpriteGridLensLayer {
     constructor() {
         super([
-            { handle: SpriteGroup.All_Discoveries, name: "AllDiscoveries_SpriteGroup", spriteMode: SpriteMode.FixedBillboard },
+            { handle: SpriteGroup.All, name: "bzDiscoveryLayer_SpriteGroup", spriteMode: SpriteMode.FixedBillboard },
         ]);
         this.onLayerHotkeyListener = this.onLayerHotkey.bind(this);
         this.onLensActivationListener = this.onLensActivation.bind(this);
     }
-    /**
-     * @implements ILensLayer
-     */
     initLayer() {
-        const player = Players.get(GameContext.localPlayerID);
-        if (!player) {
-            console.log(`bz-discovery-layer: initLayer() Failed to find player for ${GameContext.localPlayerID}`);
-            return;
-        }
+        this.updateMap();
+        this.setVisible(SpriteGroup.All, false);
+        engine.on('PlotVisibilityChanged', this.onPlotChange, this);
+        engine.on('ConstructibleAddedToMap', this.onPlotChange, this);
+        engine.on('ConstructibleRemovedFromMap', this.onPlotChange, this);
+        window.addEventListener('layer-hotkey', this.onLayerHotkeyListener);
+        window.addEventListener(LensActivationEventName, this.onLensActivationListener);
+    }
+    updateMap() {
         const width = GameplayMap.getGridWidth();
         const height = GameplayMap.getGridHeight();
         for (let x = 0; x < width; x++) {
             for (let y = 0; y < height; y++) {
-                const resource = GameplayMap.getResourceType(x, y);
-                if (resource == ResourceTypes.NO_RESOURCE) {
-                    continue;
-                }
-                const resourceDefinition = GameInfo.Resources.lookup(resource);
-                if (resourceDefinition) {
-                    // If we're a treasure resource in a distant land we can create treasure fleets
-                    this.addResourceSprites({ location: { x: x, y: y }, resource: resourceDefinition.ResourceType, class: resourceDefinition.ResourceClassType, canCreatetreasureFleet: false });
-                }
-                else {
-                    console.error(`Could not find resource with type ${resource}.`);
-                }
+                this.updatePlot({ x, y });
             }
         }
-        this.spriteGrids.forEach(grid => grid.setVisible(false)); // Not shown until requested to be visible.
-        window.addEventListener('layer-hotkey', this.onLayerHotkeyListener);
-        window.addEventListener(LensActivationEventName, this.onLensActivationListener);
     }
-    addResourceSprites(entry) {
-        const asset = UI.getIconBLP(BZ_ICON_DISCOVERY);
-        this.addSprite(SpriteGroup.All_Discoveries, entry.location, asset, SPRITE_PLOT_POSITION, { scale: SPRITE_SIZE });
+    updatePlot(loc) {
+        this.clearPlot(SpriteGroup.All, loc);
+        const observer = GameContext.localObserverID;
+        const revealed = GameplayMap.getRevealedState(observer, loc.x, loc.y);
+        if (revealed == RevealedStates.HIDDEN) return;
+        const cons = MapConstructibles.getHiddenFilteredConstructibles(loc.x, loc.y);
+        for (const con of cons) {
+            const item = Constructibles.getByComponentID(con);
+            if (!item) continue;
+            const info = GameInfo.Constructibles.lookup(item.type);
+            if (!info?.Discovery) continue;
+            const asset = UI.getIconBLP(BZ_ICON_DISCOVERY);
+            this.addSprite(SpriteGroup.All, loc, asset, SPRITE_PLOT_POSITION, { scale: SPRITE_SIZE });
+            return;
+        }
+    }
+    onPlotChange(data) {
+        this.updatePlot(data.location);
     }
     onLayerHotkey(hotkey) {
         if (hotkey.detail.name == 'toggle-bz-discovery-layer') {

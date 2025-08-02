@@ -3,50 +3,62 @@ import LensManager, { BaseSpriteGridLensLayer, LensActivationEventName } from '/
 const SPRITE_PLOT_POSITION = { x: 0, y: 0, z: 0 };
 var SpriteGroup;
 (function (SpriteGroup) {
-    SpriteGroup[SpriteGroup["All_Fortification"] = 0] = "All_Fortification";
+    SpriteGroup[SpriteGroup["All"] = 0] = "All";
 })(SpriteGroup || (SpriteGroup = {}));
 class bzFortificationLensLayer extends BaseSpriteGridLensLayer {
     constructor() {
         super([
-            { handle: SpriteGroup.All_Fortification, name: "AllFortification_SpriteGroup", spriteMode: SpriteMode.Default },
+            { handle: SpriteGroup.All, name: "bzFortificationLayer_SpriteGroup", spriteMode: SpriteMode.Default },
         ]);
         this.onLayerHotkeyListener = this.onLayerHotkey.bind(this);
         this.onLensActivationListener = this.onLensActivation.bind(this);
     }
-    /**
-     * @implements ILensLayer
-     */
     initLayer() {
-        const player = Players.get(GameContext.localPlayerID);
-        if (!player) {
-            console.log(`bz-fortification-layer: initLayer() Failed to find player for ${GameContext.localPlayerID}`);
-            return;
-        }
+        this.updateMap();
+        this.setVisible(SpriteGroup.All, false);
+        engine.on('PlotVisibilityChanged', this.onPlotChange, this);
+        engine.on('ConstructibleAddedToMap', this.onPlotChange, this);
+        engine.on('ConstructibleRemovedFromMap', this.onPlotChange, this);
+        engine.on('DistrictControlChanged', this.onPlotChange, this);
+        window.addEventListener('layer-hotkey', this.onLayerHotkeyListener);
+        window.addEventListener(LensActivationEventName, this.onLensActivationListener);
+    }
+    updateMap() {
         const width = GameplayMap.getGridWidth();
         const height = GameplayMap.getGridHeight();
         for (let x = 0; x < width; x++) {
             for (let y = 0; y < height; y++) {
-                const resource = GameplayMap.getResourceType(x, y);
-                if (resource == ResourceTypes.NO_RESOURCE) {
-                    continue;
-                }
-                const resourceDefinition = GameInfo.Resources.lookup(resource);
-                if (resourceDefinition) {
-                    // If we're a treasure resource in a distant land we can create treasure fleets
-                    this.addResourceSprites({ location: { x: x, y: y }, resource: resourceDefinition.ResourceType, class: resourceDefinition.ResourceClassType, canCreatetreasureFleet: false });
-                }
-                else {
-                    console.error(`Could not find resource with type ${resource}.`);
-                }
+                this.updatePlot({ x, y });
             }
         }
-        this.spriteGrids.forEach(grid => grid.setVisible(false)); // Not shown until requested to be visible.
-        window.addEventListener('layer-hotkey', this.onLayerHotkeyListener);
-        window.addEventListener(LensActivationEventName, this.onLensActivationListener);
     }
-    addResourceSprites(entry) {
-        const asset = UI.getIconBLP("CIVILIZATION_AMERICA");
-        this.addSprite(SpriteGroup.All_Fortification, entry.location, asset, SPRITE_PLOT_POSITION, { scale: 2 });
+    updatePlot(loc) {
+        this.clearPlot(SpriteGroup.All, loc);
+        const observer = GameContext.localObserverID;
+        const revealed = GameplayMap.getRevealedState(observer, loc.x, loc.y);
+        if (revealed == RevealedStates.HIDDEN) return;
+        const districtID = MapCities.getDistrict(loc.x, loc.y);
+        if (!districtID) return;  // wilderness
+        const district = Districts.get(districtID);
+        if (!district.cityId) return;  // village
+        if (district.type == DistrictTypes.RURAL) return;  // rural
+        // console.warn(`TRIX DISTRICT=${JSON.stringify(district)}`);
+        const cons = MapConstructibles.getHiddenFilteredConstructibles(loc.x, loc.y);
+        for (const con of cons) {
+            const item = Constructibles.getByComponentID(con);
+            if (!item) continue;
+            // console.warn(`TRIX CON=${JSON.stringify(item)}`);
+            const info = GameInfo.Constructibles.lookup(item.type);
+            if (!info.DistrictDefense) continue;
+            const controller = Players.get(district.controllingPlayer);
+            const civ = GameInfo.Civilizations.lookup(controller.civilizationType);
+            const asset = UI.getIconBLP(civ.CivilizationType);
+            this.addSprite(SpriteGroup.All, loc, asset, SPRITE_PLOT_POSITION, { scale: 1 });
+            return;
+        }
+    }
+    onPlotChange(data) {
+        this.updatePlot(data.location);
     }
     onLayerHotkey(hotkey) {
         if (hotkey.detail.name == 'toggle-bz-fortification-layer') {
