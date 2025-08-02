@@ -1,7 +1,8 @@
 import LensManager, { BaseSpriteGridLensLayer, LensActivationEventName } from '/core/ui/lenses/lens-manager.js';
 ;
 const SPRITE_PLOT_POSITION = { x: 0, y: 0, z: 10 };
-const SPRITE_SIZE = 1;
+const SPRITE_SCALE = 1;
+const _SPRITE_SIZE = 64 * SPRITE_SCALE;
 var SpriteGroup;
 (function (SpriteGroup) {
     SpriteGroup[SpriteGroup["bzFortification"] = 0] = "bzFortification";
@@ -53,7 +54,7 @@ class bzFortificationLensLayer extends BaseSpriteGridLensLayer {
             const controller = Players.get(district.controllingPlayer);
             const civ = GameInfo.Civilizations.lookup(controller.civilizationType);
             const asset = UI.getIconBLP(civ.CivilizationType);
-            this.addSprite(SpriteGroup.bzFortification, loc, asset, SPRITE_PLOT_POSITION, { scale: SPRITE_SIZE });
+            this.addSprite(SpriteGroup.bzFortification, loc, asset, SPRITE_PLOT_POSITION, { scale: SPRITE_SCALE });
             return;
         }
     }

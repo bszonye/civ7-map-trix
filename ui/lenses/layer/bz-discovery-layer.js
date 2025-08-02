@@ -2,7 +2,8 @@ import LensManager, { BaseSpriteGridLensLayer, LensActivationEventName } from '/
 ;
 const BZ_ICON_DISCOVERY = "NAR_REW_DEFAULT";
 const SPRITE_PLOT_POSITION = { x: 0, y: 25, z: 5 };
-const SPRITE_SIZE = 64; // pixels wide
+const SPRITE_SCALE = 3/4;
+const SPRITE_SIZE = 64 * SPRITE_SCALE; // pixels wide
 var SpriteGroup;
 (function (SpriteGroup) {
     SpriteGroup[SpriteGroup["bzDiscovery"] = 0] = "bzDiscovery";

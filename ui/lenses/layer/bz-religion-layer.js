@@ -2,7 +2,8 @@ import '/bz-map-trix/ui/lenses/layer/bz-fortification-layer.js';  // force layer
 import LensManager, { BaseSpriteGridLensLayer, LensActivationEventName } from '/core/ui/lenses/lens-manager.js';
 ;
 const SPRITE_PLOT_POSITION = { x: 0, y: -18, z: 5 };
-const SPRITE_SIZE = 0.5;
+const SPRITE_SCALE = 0.5;
+const _SPRITE_SIZE = 64 * SPRITE_SCALE;
 var SpriteGroup;
 (function (SpriteGroup) {
     SpriteGroup[SpriteGroup["bzReligion"] = 0] = "bzReligion";
@@ -59,7 +60,7 @@ class bzReligionLensLayer extends BaseSpriteGridLensLayer {
         if (religionID == -1) return;
         const info = GameInfo.Religions.lookup(religionID);
         const asset = UI.getIconBLP(info.ReligionType);
-        this.addSprite(SpriteGroup.bzReligion, loc, asset, SPRITE_PLOT_POSITION, { scale: SPRITE_SIZE });
+        this.addSprite(SpriteGroup.bzReligion, loc, asset, SPRITE_PLOT_POSITION, { scale: SPRITE_SCALE });
     }
     onMapChange() {
         this.updateMap();
