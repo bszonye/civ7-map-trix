@@ -2,7 +2,7 @@ import LensManager, { BaseSpriteGridLensLayer, LensActivationEventName } from '/
 ;
 const BZ_ICON_DISCOVERY = "NAR_REW_DEFAULT";
 const SPRITE_PLOT_POSITION = { x: 0, y: 25, z: 5 };
-const SPRITE_SIZE = 42; // pixels wide
+const SPRITE_SIZE = 64; // pixels wide
 var SpriteGroup;
 (function (SpriteGroup) {
     SpriteGroup[SpriteGroup["All"] = 0] = "All";
