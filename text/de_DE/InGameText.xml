@@ -67,6 +67,27 @@
         <Replace Tag="LOC_STATE_BZ_UNIQUE" Language="de_DE">
             <Text>Einzigartig</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_DISCOVERY_ICONS" Language="de_DE">
+            <Text>Entdeckungssymbole umschalten</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_DISCOVERY_ICONS_TT" Language="de_DE">
+            <Text>Sichtbarkeit der Entdeckungssymbole umschalten</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_FORTIFICATION_ICONS" Language="de_DE">
+            <Text>Befestigungssymbole umschalten</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_FORTIFICATION_ICONS_TT" Language="de_DE">
+            <Text>Sichtbarkeit der Befestigungssymbole umschalten</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_RELIGION_ICONS" Language="de_DE">
+            <Text>Religionssymbole umschalten</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_RELIGION_ICONS_TT" Language="de_DE">
+            <Text>Sichtbarkeit der Religionssymbole umschalten</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_MINI_MAP_BZ_DISCOVERY" Language="de_DE">
+            <Text>Entdeckungen</Text>
+        </Replace>
         <Replace Tag="LOC_YIELD_BZ_TOTAL" Language="de_DE">
             <Text>Gesamtertrag</Text>
         </Replace>
