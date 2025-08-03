@@ -1,5 +1,6 @@
 import LensManager, { BaseSpriteGridLensLayer, LensActivationEventName } from '/core/ui/lenses/lens-manager.js';
 ;
+const BZ_DEFAULT_LENSES = ['fxs-default-lens'];
 const BZ_ICON_DISCOVERY = "NAR_REW_DEFAULT";
 const SPRITE_PLOT_POSITION = { x: 0, y: 25, z: 5 };
 const SPRITE_SCALE = 3/4;
@@ -14,6 +15,7 @@ class bzDiscoveryLensLayer extends BaseSpriteGridLensLayer {
         super([
             { handle: SpriteGroup.bzDiscovery, name: "bzDiscoveryLayer_SpriteGroup", spriteMode: SpriteMode.FixedBillboard },
         ]);
+        this.defaultLenses = new Set(BZ_DEFAULT_LENSES);  // initialization tracker
         this.onLayerHotkeyListener = this.onLayerHotkey.bind(this);
         this.onLensActivationListener = this.onLensActivation.bind(this);
     }
@@ -60,8 +62,9 @@ class bzDiscoveryLensLayer extends BaseSpriteGridLensLayer {
         }
     }
     onLensActivation(event) {
-        if (event.detail.activeLens == 'fxs-default-lens' && !event.detail.prevLens) {
+        if (this.defaultLenses.has(event.detail.activeLens)) {
             LensManager.enableLayer('bz-discovery-layer');
+            this.defaultLenses.delete(event.detail.activeLens);
         }
     }
 }

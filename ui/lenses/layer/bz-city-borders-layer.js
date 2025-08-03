@@ -4,7 +4,7 @@
  * @description Lens layer for city borders where individual city bounds are represented if two cities are adjacent
  */
 import { ComponentID } from '/core/ui/utilities/utilities-component-id.js';
-import LensManager from '/core/ui/lenses/lens-manager.js';
+import LensManager, { LensActivationEventName } from '/core/ui/lenses/lens-manager.js';
 import { OVERLAY_PRIORITY } from '/base-standard/ui/utilities/utilities-overlay.js';
 var BorderStyleTypes;
 (function (BorderStyleTypes) {
@@ -12,6 +12,10 @@ var BorderStyleTypes;
     BorderStyleTypes["CityStateClosed"] = "CultureBorder_CityState_Closed";
     BorderStyleTypes["CityStateOpen"] = "CultureBorder_CityState_Open";
 })(BorderStyleTypes || (BorderStyleTypes = {}));
+
+const BZ_DEFAULT_LENSES = ['dmt-map-tack-lens', 'fxs-trade-lens'];
+const BZ_GRID_SIZE = GameplayMap.getGridWidth() * GameplayMap.getGridHeight();
+
 // TODO: Pull from database or gamecore when implemented
 const independentPrimaryColor = 0xFF333333;
 const independentSecondaryColor = 0xFFCCFFFF;
@@ -24,13 +28,21 @@ const defaultStyle = {
 const thicknessZoomMultiplier = 3;
 class bzCityBordersLayer {
     constructor() {
-        this.cityOverlayGroup = WorldUI.createOverlayGroup("CityBorderOverlayGroup", OVERLAY_PRIORITY.CULTURE_BORDER);
-        /** Map of border overlays keyed by the PlotIndex of the city */
+        this.defaultLenses = new Set(BZ_DEFAULT_LENSES);  // initialization tracker
+        this.cityOverlayGroup = WorldUI.createOverlayGroup("bzCityBorderOverlayGroup", OVERLAY_PRIORITY.CULTURE_BORDER);
+        // border overlay storage
+        this.cityCenters = new Map();  // plot -> center plot
+        this.cityOverlays = new Map();  // center plot -> overlay
+        this.villageOverlays = new Map();  // player ID -> overlay
+        this.plotOwners = new Array(BZ_GRID_SIZE).fill(-1);
+        console.warn(`TRIX GRID ${this.plotOwners}`);
+        // Map of border overlays keyed by the PlotIndex of the city
         this.borderOverlayMap = new Map();
-        /** Map of city center plot indexes keyed by plot indexes owned by that city */
+        // Map of city center plot indexes keyed by plot indexes owned by that city
         this.ownedPlotMap = new Map();
         this.lastZoomLevel = -1;
         this.onLayerHotkeyListener = this.onLayerHotkey.bind(this);
+        this.onLensActivationListener = this.onLensActivation.bind(this);
         this.onPlotOwnershipChanged = (data) => {
             const plotIndex = GameplayMap.getIndexFromLocation(data.location);
             console.warn(`TRIX CHANGE ${JSON.stringify(data)}`);
@@ -61,6 +73,7 @@ class bzCityBordersLayer {
         engine.on('CameraChanged', this.onCameraChanged);
         engine.on('PlotOwnershipChanged', this.onPlotOwnershipChanged);
         window.addEventListener('layer-hotkey', this.onLayerHotkeyListener);
+        window.addEventListener(LensActivationEventName, this.onLensActivationListener);
         this.cityOverlayGroup.setVisible(false);
     }
     getBorderOverlay(plotIndex) {
@@ -227,6 +240,14 @@ class bzCityBordersLayer {
             LensManager.toggleLayer('bz-city-borders-layer');
         } else if (hotkey.detail.name == 'toggle-fxs-culture-borders-layer') {
             LensManager.toggleLayer('fxs-culture-borders-layer');
+        }
+    }
+    onLensActivation(event) {
+        if (this.defaultLenses.has(event.detail.activeLens)) {
+            LensManager.enableLayer('bz-city-borders-layer');
+            LensManager.disableLayer('fxs-culture-borders-layer');
+            LensManager.disableLayer('fxs-city-borders-layer');
+            this.defaultLenses.delete(event.detail.activeLens);
         }
     }
 }
