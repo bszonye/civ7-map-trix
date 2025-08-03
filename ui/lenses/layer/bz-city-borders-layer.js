@@ -33,30 +33,11 @@ class bzCityBordersLayer {
         this.onLayerHotkeyListener = this.onLayerHotkey.bind(this);
         this.onPlotOwnershipChanged = (data) => {
             const plotIndex = GameplayMap.getIndexFromLocation(data.location);
+            console.warn(`TRIX CHANGE ${JSON.stringify(data)}`);
             // Remove plot from prior owner if valid
-            if (data.priorOwner != PlayerIds.NO_PLAYER) {
-                const owningPlot = this.ownedPlotMap.get(plotIndex);
-                console.warn(`TRIX DEL ${plotIndex} from ${owningPlot} for ${JSON.stringify(data)}`);
-                // TODO: remove stale borderOverlayMap entries
-                if (owningPlot) {
-                    this.ownedPlotMap.delete(plotIndex);
-                    const previousOverlay = this.borderOverlayMap.get(owningPlot);
-                    if (previousOverlay) previousOverlay.clearPlotGroups(plotIndex);
-                }
-            }
+            if (data.priorOwner != PlayerIds.NO_PLAYER) this.removeOwningPlot(plotIndex);
             // Add plot to new owner
-            if (data.owner != PlayerIds.NO_PLAYER && Players.isAlive(data.owner)) {
-                const cityPlot = this.findCityCenterIndexForPlotIndex(plotIndex);
-                if (cityPlot != -1) {
-                    this.ownedPlotMap.set(plotIndex, cityPlot);
-                    const newOverlay = this.getBorderOverlay(plotIndex);
-                    console.warn(`TRIX SET ${JSON.stringify(data)}`);
-                    newOverlay.setPlotGroups(plotIndex, 0);
-                    if (cityPlot == plotIndex) {
-                        // TODO: update border style
-                    }
-                }
-            }
+            if (Players.isAlive(data.owner)) this.setOwningPlot(plotIndex);
         };
         this.onCameraChanged = (camera) => {
             if (this.lastZoomLevel != camera.zoomLevel) {
@@ -149,38 +130,63 @@ class bzCityBordersLayer {
             }
         });
     }
-    initBordersForIndependent(player) {
-        let villagePlotIndex = -1;
-        let plotIndexes = [];
-        player.Constructibles?.getConstructibles().forEach(construct => {
-            const constructDef = GameInfo.Constructibles.lookup(construct.type);
-            if (constructDef) {
-                if (constructDef.ConstructibleType == "IMPROVEMENT_VILLAGE" || constructDef.ConstructibleType == "IMPROVEMENT_ENCAMPMENT") {
-                    villagePlotIndex = GameplayMap.getIndexFromLocation(construct.location);
-                    plotIndexes = plotIndexes.concat(villagePlotIndex);
-                    const adjacentPlotDirection = [
-                        DirectionTypes.DIRECTION_NORTHEAST,
-                        DirectionTypes.DIRECTION_EAST,
-                        DirectionTypes.DIRECTION_SOUTHEAST,
-                        DirectionTypes.DIRECTION_SOUTHWEST,
-                        DirectionTypes.DIRECTION_WEST,
-                        DirectionTypes.DIRECTION_NORTHWEST
-                    ];
-                    // Loop through each direction type, and if they are not hidden and owned, add.
-                    for (let directionIndex = 0; directionIndex < adjacentPlotDirection.length; directionIndex++) {
-                        let plot = GameplayMap.getAdjacentPlotLocation(construct.location, adjacentPlotDirection[directionIndex]);
-                        let owner = GameplayMap.getOwner(plot.x, plot.y);
-                        if (owner == player.id) {
-                            plotIndexes = plotIndexes.concat(GameplayMap.getIndexFromLocation(plot));
-                        }
-                    }
-                }
+    findVillage(player) {
+        for (const con of player.Constructibles?.getConstructibles() ?? []) {;
+            const info = GameInfo.Constructibles.lookup(con.type);
+            if (info.ConstructibleType == "IMPROVEMENT_VILLAGE" ||
+                info.ConstructibleType == "IMPROVEMENT_ENCAMPMENT") {
+                return con;
             }
-        });
-        if (plotIndexes.length > 0) {
-            const borderOverlay = this.getBorderOverlay(villagePlotIndex);
-            borderOverlay.setPlotGroups(plotIndexes, 0);
         }
+        return undefined;
+    }
+    initBordersForIndependent(player) {
+        const village = this.findVillage(player);
+        if (!village) return;
+        const villagePlotIndex = GameplayMap.getIndexFromLocation(village.location);
+        let plotIndexes = [villagePlotIndex];
+        const adjacentPlotDirection = [
+            DirectionTypes.DIRECTION_NORTHEAST,
+            DirectionTypes.DIRECTION_EAST,
+            DirectionTypes.DIRECTION_SOUTHEAST,
+            DirectionTypes.DIRECTION_SOUTHWEST,
+            DirectionTypes.DIRECTION_WEST,
+            DirectionTypes.DIRECTION_NORTHWEST
+        ];
+        // Loop through each direction type, and if they are not hidden and owned, add.
+        for (let directionIndex = 0; directionIndex < adjacentPlotDirection.length; directionIndex++) {
+            let plot = GameplayMap.getAdjacentPlotLocation(village.location, adjacentPlotDirection[directionIndex]);
+            let owner = GameplayMap.getOwner(plot.x, plot.y);
+            if (owner == player.id) {
+                plotIndexes.push(GameplayMap.getIndexFromLocation(plot));
+            }
+        }
+        for (const plot of plotIndexes) this.ownedPlotMap.set(plot, villagePlotIndex);
+        const borderOverlay = this.getBorderOverlay(villagePlotIndex);
+        borderOverlay.setPlotGroups(plotIndexes, 0);
+    }
+    removeOwningPlot(plotIndex) {
+        const owningPlot = this.ownedPlotMap.get(plotIndex);
+        console.warn(`TRIX DEL ${plotIndex} from ${owningPlot}`);
+        if (!owningPlot) return;
+        const overlay = this.borderOverlayMap.get(owningPlot);
+        if (overlay) overlay.clearPlotGroups(plotIndex);
+        this.ownedPlotMap.delete(plotIndex);
+        if (plotIndex == owningPlot) {
+            for (const [plot, owner] of this.ownedPlotMap) {
+                if (owner == owningPlot) this.ownedPlotMap.delete(plot);
+            }
+            if (overlay) overlay.clear();
+            this.borderOverlayMap.delete(owningPlot);
+        }
+    }
+    setOwningPlot(plotIndex) {
+        const owningPlot = this.findCityCenterIndexForPlotIndex(plotIndex);
+        if (owningPlot == -1) return;
+        this.ownedPlotMap.set(plotIndex, owningPlot);
+        const overlay = this.getBorderOverlay(plotIndex);
+        console.warn(`TRIX SET ${plotIndex} to ${owningPlot}`);
+        overlay.setPlotGroups(plotIndex, 0);
     }
     findCityCenterIndexForPlotIndex(plotIndex) {
         const plotCoord = GameplayMap.getLocationFromIndex(plotIndex);
@@ -194,19 +200,12 @@ class bzCityBordersLayer {
             return -1;
         }
         if (player.isIndependent) {
-            let villagePlotIndex = -1;
-            player.Constructibles?.getConstructibles().forEach(construct => {
-                const constructDef = GameInfo.Constructibles.lookup(construct.type);
-                if (constructDef) {
-                    if (constructDef.ConstructibleType == "IMPROVEMENT_VILLAGE") {
-                        villagePlotIndex = GameplayMap.getIndexFromLocation(construct.location);
-                    }
-                }
-            });
-            if (villagePlotIndex == -1) {
+            const village = this.findVillage(player);
+            if (!village) {
                 console.error(`city-borders-layer: findCityCenterIndexForPlotIndex failed to find villagePlotIndex for plotIndex ${plotIndex}`);
+                return -1;
             }
-            return villagePlotIndex;
+            return GameplayMap.getIndexFromLocation(village.location);
         }
         const owningCity = player.Cities?.getCities().find((city) => {
             return ComponentID.isMatch(city.id, owningCityId);
