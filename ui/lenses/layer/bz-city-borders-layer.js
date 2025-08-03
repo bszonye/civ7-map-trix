@@ -55,7 +55,6 @@ class bzCityBordersLayer {
         // initialize new village overlays
         for (const player of Players.getAlive()) {
             if (this.villageOverlays.has(player.id)) continue;
-            console.warn(`TRIX VILLAGE ADD ${player.id}`);
             const overlay = this.cityOverlayGroup.addBorderOverlay(BZ_VILLAGE_STYLE);
             this.villageOverlays.set(player.id, overlay);
         }
@@ -88,11 +87,9 @@ class bzCityBordersLayer {
             const style = styles[plotOwner.owner];
             let overlay = this.cityOverlays.get(plotIndex);
             if (!overlay) {
-                console.warn(`TRIX CITY ADD ${city.name}`);
                 overlay = this.cityOverlayGroup.addBorderOverlay(style);
                 this.cityOverlays.set(plotIndex, overlay);
             } else if (plotOwner.owner != oldOwner.owner) {
-                console.warn(`TRIX CITY RESTYLE ${city.name}`);
                 overlay.setDefaultStyle(style);
             }
             const cityPlots = city.getPurchasedPlots();
@@ -123,8 +120,12 @@ class bzCityBordersLayer {
                 LensManager.enableLayer('bz-city-borders-layer');
             }
         } else if (hotkey.detail.name == 'toggle-fxs-culture-borders-layer') {
-            // toggle borders
-            LensManager.toggleLayer('fxs-culture-borders-layer');
+            // toggle borders, including city limits if enabled
+            if (LensManager.isLayerEnabled('bz-city-borders-layer')) {
+                LensManager.disableLayer('bz-city-borders-layer');
+            } else {
+                LensManager.toggleLayer('fxs-culture-borders-layer');
+            }
         }
     }
     onLensActivation(event) {
@@ -138,7 +139,6 @@ class bzCityBordersLayer {
         switch (event.detail.layer) {
             case 'fxs-city-borders-layer':
                 // replace the vanilla city borders
-                console.warn(`TRIX OVERRIDE`);
                 LensManager.disableLayer('fxs-city-borders-layer');
                 LensManager.enableLayer('bz-city-borders-layer');
                 break;
