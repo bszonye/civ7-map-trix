@@ -1,10 +1,4 @@
-/**
- * @file city-borders-layer
- * @copyright 2024, Firaxis Games
- * @description Lens layer for city borders where individual city bounds are represented if two cities are adjacent
- */
-import { ComponentID } from '/core/ui/utilities/utilities-component-id.js';
-import LensManager, { LensActivationEventName } from '/core/ui/lenses/lens-manager.js';
+import LensManager, { LensActivationEventName, LensLayerEnabledEventName } from '/core/ui/lenses/lens-manager.js';
 import { OVERLAY_PRIORITY } from '/base-standard/ui/utilities/utilities-overlay.js';
 var BorderStyleTypes;
 (function (BorderStyleTypes) {
@@ -13,17 +7,15 @@ var BorderStyleTypes;
     BorderStyleTypes["CityStateOpen"] = "CultureBorder_CityState_Open";
 })(BorderStyleTypes || (BorderStyleTypes = {}));
 
-const BZ_DEFAULT_LENSES = ['dmt-map-tack-lens', 'fxs-trade-lens'];
+const BZ_DEFAULT_LENSES = ['fxs-trade-lens'];
 const BZ_GRID_SIZE = GameplayMap.getGridWidth() * GameplayMap.getGridHeight();
-
-// TODO: Pull from database or gamecore when implemented
-const independentPrimaryColor = 0xFF333333;
-const independentSecondaryColor = 0xFFCCFFFF;
-/** Default style - Only used to initialize the BorderOverlay */
-const defaultStyle = {
+const BZ_NO_CITY = { owner: -1, id: -1, type: 1 };
+const BZ_VILLAGE_PRIMARY = 0xff000000;
+const BZ_VILLAGE_SECONDARY = 0xffffffff;
+const BZ_VILLAGE_STYLE = {
     style: BorderStyleTypes.CityStateOpen,
-    primaryColor: independentPrimaryColor,
-    secondaryColor: independentSecondaryColor
+    primaryColor: BZ_VILLAGE_PRIMARY,
+    secondaryColor: BZ_VILLAGE_SECONDARY
 };
 const thicknessZoomMultiplier = 3;
 class bzCityBordersLayer {
@@ -31,203 +23,90 @@ class bzCityBordersLayer {
         this.defaultLenses = new Set(BZ_DEFAULT_LENSES);  // initialization tracker
         this.cityOverlayGroup = WorldUI.createOverlayGroup("bzCityBorderOverlayGroup", OVERLAY_PRIORITY.CULTURE_BORDER);
         // border overlay storage
-        this.cityCenters = new Map();  // plot -> center plot
-        this.cityOverlays = new Map();  // center plot -> overlay
+        this.cityOverlays = new Map();  // plot -> overlay
         this.villageOverlays = new Map();  // player ID -> overlay
-        this.plotOwners = new Array(BZ_GRID_SIZE).fill(-1);
-        console.warn(`TRIX GRID ${this.plotOwners}`);
-        // Map of border overlays keyed by the PlotIndex of the city
-        this.borderOverlayMap = new Map();
-        // Map of city center plot indexes keyed by plot indexes owned by that city
-        this.ownedPlotMap = new Map();
+        this.plotOwners = new Array(BZ_GRID_SIZE).fill(BZ_NO_CITY);
         this.lastZoomLevel = -1;
         this.onLayerHotkeyListener = this.onLayerHotkey.bind(this);
         this.onLensActivationListener = this.onLensActivation.bind(this);
+        this.onLensLayerEnabledListener = this.onLensLayerEnabled.bind(this);
         this.onPlotOwnershipChanged = (data) => {
-            const plotIndex = GameplayMap.getIndexFromLocation(data.location);
-            console.warn(`TRIX CHANGE ${JSON.stringify(data)}`);
-            // Remove plot from prior owner if valid
-            if (data.priorOwner != PlayerIds.NO_PLAYER) this.removeOwningPlot(plotIndex);
-            // Add plot to new owner
-            if (Players.isAlive(data.owner)) this.setOwningPlot(plotIndex);
+            const loc = data.location;
+            const plotIndex = GameplayMap.getIndexFromLocation(loc);
+            const was = this.plotOwners[plotIndex];
+            const now = GameplayMap.getOwningCityFromXY(loc.x, loc.y);
+            if (was.owner == now.owner && was.id == now.id) return;
+            this.updateBorders();
         };
         this.onCameraChanged = (camera) => {
             if (this.lastZoomLevel != camera.zoomLevel) {
                 this.lastZoomLevel = camera.zoomLevel;
-                this.borderOverlayMap.forEach((borderOverlay) => {
-                    borderOverlay.setThicknessScale(camera.zoomLevel * thicknessZoomMultiplier); // Set thickness to 0 when zoomed all the way in.
-                });
+                // Set thickness to 0 when zoomed all the way in.
+                const scale = camera.zoomLevel * thicknessZoomMultiplier;
+                this.cityOverlays.forEach((o) => o.setThicknessScale(scale));
+                this.villageOverlays.forEach((o) => o.setThicknessScale(scale));
             }
         };
     }
+    updateBorders() {
+        // reset existing overlays
+        for (const overlay of this.cityOverlays.values()) overlay.clear();
+        for (const overlay of this.villageOverlays.values()) overlay.clear();
+        // initialize new village overlays
+        for (const player of Players.getAlive()) {
+            if (this.villageOverlays.has(player.id)) continue;
+            console.warn(`TRIX VILLAGE ADD ${player.id}`);
+            const overlay = this.cityOverlayGroup.addBorderOverlay(BZ_VILLAGE_STYLE);
+            this.villageOverlays.set(player.id, overlay);
+        }
+        // configure player styles
+        const styles = [];
+        for (const player of Players.getEverAlive()) {
+            const style = {
+                style: player.isMajor ?
+                    BorderStyleTypes.Closed : BorderStyleTypes.CityStateClosed,
+                primaryColor: UI.Player.getPrimaryColorValueAsHex(player.id),
+                secondaryColor: UI.Player.getSecondaryColorValueAsHex(player.id),
+            };
+            styles[player.id] = style;
+        }
+        // update owners and overlays
+        for (const [plotIndex, oldOwner] of this.plotOwners.entries()) {
+            const loc = GameplayMap.getLocationFromIndex(plotIndex);
+            const plotOwner = GameplayMap.getOwningCityFromXY(loc.x, loc.y);
+            this.plotOwners[plotIndex] = plotOwner;
+            if (!Players.isAlive(plotOwner.owner)) continue;
+            if (plotOwner.id == -1) {
+                // village
+                const overlay = this.villageOverlays.get(plotOwner.owner);
+                overlay.setPlotGroups([plotIndex], 0);
+                continue;
+            }
+            // city
+            const city = Cities.get(plotOwner);
+            if (loc.x != city.location.x || loc.y != city.location.y) continue;
+            const style = styles[plotOwner.owner];
+            let overlay = this.cityOverlays.get(plotIndex);
+            if (!overlay) {
+                console.warn(`TRIX CITY ADD ${city.name}`);
+                overlay = this.cityOverlayGroup.addBorderOverlay(style);
+                this.cityOverlays.set(plotIndex, overlay);
+            } else if (plotOwner.owner != oldOwner.owner) {
+                console.warn(`TRIX CITY RESTYLE ${city.name}`);
+                overlay.setDefaultStyle(style);
+            }
+            const cityPlots = city.getPurchasedPlots();
+            overlay.setPlotGroups(cityPlots, 0);
+        }
+    }
     initLayer() {
-        const alivePlayers = Players.getAlive();
-        alivePlayers.forEach((player) => {
-            if (player.isIndependent) {
-                this.initBordersForIndependent(player);
-            }
-            else {
-                this.initBordersForPlayer(player);
-            }
-        });
+        this.updateBorders();
         engine.on('CameraChanged', this.onCameraChanged);
         engine.on('PlotOwnershipChanged', this.onPlotOwnershipChanged);
         window.addEventListener('layer-hotkey', this.onLayerHotkeyListener);
         window.addEventListener(LensActivationEventName, this.onLensActivationListener);
+        window.addEventListener(LensLayerEnabledEventName, this.onLensLayerEnabledListener);
         this.cityOverlayGroup.setVisible(false);
-    }
-    getBorderOverlay(plotIndex) {
-        // First assuming we're looking for the border overlay by city center plot index
-        const borderOverlay = this.borderOverlayMap.get(plotIndex);
-        if (borderOverlay) {
-            return borderOverlay;
-        }
-        // If that fails see if this plot index is tied to an existing border overlay
-        const owningPlot = this.ownedPlotMap.get(plotIndex);
-        if (owningPlot) {
-            const borderOverlay = this.borderOverlayMap.get(owningPlot);
-            if (borderOverlay) {
-                return borderOverlay;
-            }
-        }
-        return this.createBorderOverlay(plotIndex);
-    }
-    createBorderOverlay(plotIndex) {
-        const borderOverlay = this.cityOverlayGroup.addBorderOverlay(defaultStyle);
-        // Find the owning player for this plot index
-        const plotLocation = GameplayMap.getLocationFromIndex(plotIndex);
-        const ownerId = GameplayMap.getOwner(plotLocation.x, plotLocation.y);
-        const owner = Players.get(ownerId);
-        if (!owner) {
-            console.error(`city-borders-layer: createBorderOverlay failed to create overlay for plotIndex ${plotIndex}`);
-            return borderOverlay;
-        }
-        // Set border group style
-        const primary = UI.Player.getPrimaryColorValueAsHex(owner.id);
-        const secondary = UI.Player.getSecondaryColorValueAsHex(owner.id);
-        const borderStyle = {
-            style: BorderStyleTypes.Closed,
-            primaryColor: primary,
-            secondaryColor: secondary
-        };
-        // Check if we want to use city-state or independent styles
-        if (owner.isIndependent) {
-            borderStyle.style = BorderStyleTypes.CityStateOpen;
-            borderStyle.primaryColor = independentPrimaryColor;
-            borderStyle.secondaryColor = independentSecondaryColor;
-        }
-        else if (!owner.isMajor) {
-            borderStyle.style = BorderStyleTypes.CityStateClosed;
-        }
-        borderOverlay.setDefaultStyle(borderStyle);
-        this.borderOverlayMap.set(plotIndex, borderOverlay);
-        return borderOverlay;
-    }
-    initBordersForPlayer(player) {
-        const playerCities = player.Cities?.getCities();
-        if (!playerCities) {
-            console.error(`city-borders-layer: initLayer() failed to find cities for PlayerID ${player.id}`);
-            return;
-        }
-        // Find all the plots owned by the player
-        playerCities.forEach((city) => {
-            const cityPlots = city.getPurchasedPlots();
-            if (cityPlots.length > 0) {
-                const cityPlotIndex = GameplayMap.getIndexFromLocation(city.location);
-                this.ownedPlotMap.set(cityPlotIndex, cityPlotIndex);
-                const borderOverlay = this.getBorderOverlay(cityPlotIndex);
-                borderOverlay.setPlotGroups(cityPlots, 0);
-                cityPlots.forEach((plotIndex) => {
-                    this.ownedPlotMap.set(plotIndex, cityPlotIndex);
-                });
-            }
-        });
-    }
-    findVillage(player) {
-        for (const con of player.Constructibles?.getConstructibles() ?? []) {;
-            const info = GameInfo.Constructibles.lookup(con.type);
-            if (info.ConstructibleType == "IMPROVEMENT_VILLAGE" ||
-                info.ConstructibleType == "IMPROVEMENT_ENCAMPMENT") {
-                return con;
-            }
-        }
-        return undefined;
-    }
-    initBordersForIndependent(player) {
-        const village = this.findVillage(player);
-        if (!village) return;
-        const villagePlotIndex = GameplayMap.getIndexFromLocation(village.location);
-        let plotIndexes = [villagePlotIndex];
-        const adjacentPlotDirection = [
-            DirectionTypes.DIRECTION_NORTHEAST,
-            DirectionTypes.DIRECTION_EAST,
-            DirectionTypes.DIRECTION_SOUTHEAST,
-            DirectionTypes.DIRECTION_SOUTHWEST,
-            DirectionTypes.DIRECTION_WEST,
-            DirectionTypes.DIRECTION_NORTHWEST
-        ];
-        // Loop through each direction type, and if they are not hidden and owned, add.
-        for (let directionIndex = 0; directionIndex < adjacentPlotDirection.length; directionIndex++) {
-            let plot = GameplayMap.getAdjacentPlotLocation(village.location, adjacentPlotDirection[directionIndex]);
-            let owner = GameplayMap.getOwner(plot.x, plot.y);
-            if (owner == player.id) {
-                plotIndexes.push(GameplayMap.getIndexFromLocation(plot));
-            }
-        }
-        for (const plot of plotIndexes) this.ownedPlotMap.set(plot, villagePlotIndex);
-        const borderOverlay = this.getBorderOverlay(villagePlotIndex);
-        borderOverlay.setPlotGroups(plotIndexes, 0);
-    }
-    removeOwningPlot(plotIndex) {
-        const owningPlot = this.ownedPlotMap.get(plotIndex);
-        console.warn(`TRIX DEL ${plotIndex} from ${owningPlot}`);
-        if (!owningPlot) return;
-        const overlay = this.borderOverlayMap.get(owningPlot);
-        if (overlay) overlay.clearPlotGroups(plotIndex);
-        this.ownedPlotMap.delete(plotIndex);
-        if (plotIndex == owningPlot) {
-            for (const [plot, owner] of this.ownedPlotMap) {
-                if (owner == owningPlot) this.ownedPlotMap.delete(plot);
-            }
-            if (overlay) overlay.clear();
-            this.borderOverlayMap.delete(owningPlot);
-        }
-    }
-    setOwningPlot(plotIndex) {
-        const owningPlot = this.findCityCenterIndexForPlotIndex(plotIndex);
-        if (owningPlot == -1) return;
-        this.ownedPlotMap.set(plotIndex, owningPlot);
-        const overlay = this.getBorderOverlay(plotIndex);
-        console.warn(`TRIX SET ${plotIndex} to ${owningPlot}`);
-        overlay.setPlotGroups(plotIndex, 0);
-    }
-    findCityCenterIndexForPlotIndex(plotIndex) {
-        const plotCoord = GameplayMap.getLocationFromIndex(plotIndex);
-        const owningCityId = GameplayMap.getOwningCityFromXY(plotCoord.x, plotCoord.y);
-        if (!owningCityId) {
-            return -1; // off the map
-        }
-        const player = Players.get(owningCityId.owner);
-        if (!player) {
-            console.error(`city-borders-layer: findCityCenterIndexForPlotIndex failed to find owning player for plotIndex ${plotIndex}`);
-            return -1;
-        }
-        if (player.isIndependent) {
-            const village = this.findVillage(player);
-            if (!village) {
-                console.error(`city-borders-layer: findCityCenterIndexForPlotIndex failed to find villagePlotIndex for plotIndex ${plotIndex}`);
-                return -1;
-            }
-            return GameplayMap.getIndexFromLocation(village.location);
-        }
-        const owningCity = player.Cities?.getCities().find((city) => {
-            return ComponentID.isMatch(city.id, owningCityId);
-        });
-        if (!owningCity) {
-            console.error(`city-borders-layer: findCityCenterIndexForPlotIndex failed to find owningCity for plotIndex ${plotIndex}`);
-            return -1;
-        }
-        return GameplayMap.getIndexFromLocation(owningCity.location);
     }
     applyLayer() {
         this.cityOverlayGroup.setVisible(true);
@@ -237,8 +116,14 @@ class bzCityBordersLayer {
     }
     onLayerHotkey(hotkey) {
         if (hotkey.detail.name == 'toggle-bz-city-borders-layer') {
-            LensManager.toggleLayer('bz-city-borders-layer');
+            // toggle between city limits and culture borders
+            if (LensManager.isLayerEnabled('bz-city-borders-layer')) {
+                LensManager.enableLayer('fxs-culture-borders-layer');
+            } else {
+                LensManager.enableLayer('bz-city-borders-layer');
+            }
         } else if (hotkey.detail.name == 'toggle-fxs-culture-borders-layer') {
+            // toggle borders
             LensManager.toggleLayer('fxs-culture-borders-layer');
         }
     }
@@ -246,11 +131,28 @@ class bzCityBordersLayer {
         if (this.defaultLenses.has(event.detail.activeLens)) {
             LensManager.enableLayer('bz-city-borders-layer');
             LensManager.disableLayer('fxs-culture-borders-layer');
-            LensManager.disableLayer('fxs-city-borders-layer');
             this.defaultLenses.delete(event.detail.activeLens);
+        }
+    }
+    onLensLayerEnabled(event) {
+        switch (event.detail.layer) {
+            case 'fxs-city-borders-layer':
+                // replace the vanilla city borders
+                console.warn(`TRIX OVERRIDE`);
+                LensManager.disableLayer('fxs-city-borders-layer');
+                LensManager.enableLayer('bz-city-borders-layer');
+                break;
+            case 'fxs-culture-borders-layer':
+                if (LensManager.isLayerEnabled('bz-city-borders-layer')) {
+                    LensManager.disableLayer('bz-city-borders-layer');
+                }
+                break;
+            case 'bz-city-borders-layer':
+                if (LensManager.isLayerEnabled('fxs-culture-borders-layer')) {
+                    LensManager.disableLayer('fxs-culture-borders-layer');
+                }
+                break;
         }
     }
 }
 LensManager.registerLensLayer('bz-city-borders-layer', new bzCityBordersLayer());
-
-//# sourceMappingURL=file:///base-standard/ui/lenses/layer/city-borders-layer.js.map
