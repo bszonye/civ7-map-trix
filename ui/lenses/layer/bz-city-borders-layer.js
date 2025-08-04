@@ -36,6 +36,18 @@ class bzCityBordersLayer {
             const was = this.plotOwners[plotIndex];
             const now = GameplayMap.getOwningCityFromXY(loc.x, loc.y);
             if (was.owner == now.owner && was.id == now.id) return;
+            if (was.owner == -1 && Players.isAlive(now.owner) && now.id != -1) {
+                // add a single new plot to its city
+                const city = Cities.get(now);
+                const ckey = city ? GameplayMap.getIndexFromLocation(city.location) : -1;
+                const overlay = this.cityOverlays.get(ckey);
+                if (overlay) {
+                    console.warn(`TRIX BUMP ${plotIndex} = ${ckey}`);
+                    overlay.setPlotGroups(plotIndex, 0);
+                    this.plotOwners[plotIndex] = now;
+                    return;
+                }
+            }
             this.updateBorders();
         };
         this.onCameraChanged = (camera) => {
