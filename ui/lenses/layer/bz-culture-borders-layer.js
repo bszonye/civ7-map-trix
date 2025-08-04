@@ -46,22 +46,22 @@ class bzCultureBordersLayer {
             }
         };
     }
+    getPlayerStyle(player) {
+        if (player.isIndependent) return BZ_VILLAGE_STYLE;
+        const style = player.isMajor ? BorderStyleTypes.Closed :
+            BorderStyleTypes.CityStateClosed;
+        const primaryColor = UI.Player.getPrimaryColorValueAsHex(player.id);
+        const secondaryColor = UI.Player.getSecondaryColorValueAsHex(player.id);
+        return { style, primaryColor, secondaryColor };
+    }
     updateBorders() {
-        // configure player styles
-        const styles = [];
-        for (const player of Players.getAlive()) {
-            const style = player.isMajor ? BorderStyleTypes.Closed :
-                BorderStyleTypes.CityStateClosed;
-            const primaryColor = UI.Player.getPrimaryColorValueAsHex(player.id);
-            const secondaryColor = UI.Player.getSecondaryColorValueAsHex(player.id);
-            styles[player.id] = player.isIndependent ? BZ_VILLAGE_STYLE :
-                { style, primaryColor, secondaryColor };
-        }
+        const t1 = performance.now();
         // reset existing overlays
         for (const overlay of this.playerOverlays.values()) overlay.clear();
-        // initialize new overlays and styles
+        // configure player overlays and styles
+        const styles = [];
         for (const player of Players.getAlive()) {
-            const style = styles[player.id];
+            const style = styles[player.id] = this.getPlayerStyle(player);
             const overlay = this.playerOverlays.get(player.id);
             if (overlay) {
                 overlay.setDefaultStyle(style);
@@ -70,7 +70,7 @@ class bzCultureBordersLayer {
                 this.playerOverlays.set(player.id, overlay);
             }
         }
-        // update owners and village overlays
+        // update plot owners and independents
         for (const plotIndex of this.plotOwners.keys()) {
             const loc = GameplayMap.getLocationFromIndex(plotIndex);
             const ownerID = GameplayMap.getOwner(loc.x, loc.y);
@@ -79,7 +79,7 @@ class bzCultureBordersLayer {
             const owner = Players.get(ownerID);
             if (!owner || !owner.isAlive || !owner.isIndependent) continue;
             const overlay = this.playerOverlays.get(ownerID);
-            overlay.setPlotGroups([plotIndex], 0);
+            overlay.setPlotGroups(plotIndex, 0);
         }
         // update city overlays
         for (const player of Players.getAlive()) {
@@ -89,6 +89,8 @@ class bzCultureBordersLayer {
                 overlay.setPlotGroups(cityPlots, 0);
             }
         }
+        const t2 = performance.now();
+        console.warn(`TRIX B=${t2-t1}ms`);
     }
     initLayer() {
         this.updateBorders();
