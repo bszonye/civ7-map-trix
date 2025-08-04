@@ -33,8 +33,8 @@ class bzCultureBordersLayer {
             const loc = data.location;
             const plotIndex = GameplayMap.getIndexFromLocation(loc);
             const was = this.plotOwners[plotIndex];
-            const now = GameplayMap.getOwningCityFromXY(loc.x, loc.y);
-            if (was.owner == now.owner) return;
+            const now = GameplayMap.getOwner(loc.x, loc.y);
+            if (was == now) return;
             this.updateBorders();
         };
         this.onCameraChanged = (camera) => {
@@ -73,10 +73,10 @@ class bzCultureBordersLayer {
         // update owners and overlays
         for (const plotIndex of this.plotOwners.keys()) {
             const loc = GameplayMap.getLocationFromIndex(plotIndex);
-            const plotOwner = GameplayMap.getOwningCityFromXY(loc.x, loc.y);
+            const plotOwner = GameplayMap.getOwner(loc.x, loc.y);
             this.plotOwners[plotIndex] = plotOwner;
-            if (!Players.isAlive(plotOwner.owner)) continue;
-            const overlay = this.playerOverlays.get(plotOwner.owner);
+            if (!Players.isAlive(plotOwner)) continue;
+            const overlay = this.playerOverlays.get(plotOwner);
             overlay.setPlotGroups([plotIndex], 0);
         }
     }
