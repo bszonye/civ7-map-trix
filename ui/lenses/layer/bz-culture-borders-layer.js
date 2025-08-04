@@ -70,14 +70,25 @@ class bzCultureBordersLayer {
                 this.playerOverlays.set(player.id, overlay);
             }
         }
-        // update owners and overlays
+        // update owners and village overlays
         for (const plotIndex of this.plotOwners.keys()) {
             const loc = GameplayMap.getLocationFromIndex(plotIndex);
-            const plotOwner = GameplayMap.getOwner(loc.x, loc.y);
-            this.plotOwners[plotIndex] = plotOwner;
-            if (!Players.isAlive(plotOwner)) continue;
-            const overlay = this.playerOverlays.get(plotOwner);
+            const ownerID = GameplayMap.getOwner(loc.x, loc.y);
+            this.plotOwners[plotIndex] = ownerID;
+            // only collect living independents
+            const owner = Players.get(ownerID);
+            if (!owner || !owner.isAlive || !owner.isIndependent) continue;
+            console.warn(`TRIX OWNER ${Object.keys(owner)}`);
+            const overlay = this.playerOverlays.get(ownerID);
             overlay.setPlotGroups([plotIndex], 0);
+        }
+        // update city overlays
+        for (const player of Players.getAlive()) {
+            const overlay = this.playerOverlays.get(player.id);
+            for (const city of player.Cities?.getCities() ?? []) {
+                const cityPlots = city.getPurchasedPlots();
+                overlay.setPlotGroups(cityPlots, 0);
+            }
         }
     }
     initLayer() {
