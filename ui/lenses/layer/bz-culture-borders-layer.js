@@ -7,7 +7,7 @@ var BorderStyleTypes;
     BorderStyleTypes["CityStateOpen"] = "CultureBorder_CityState_Open";
 })(BorderStyleTypes || (BorderStyleTypes = {}));
 
-const BZ_DEFAULT_LENSES = [];
+const BZ_DEFAULT_LENSES = ['fxs-trade-lens'];
 const BZ_GRID_SIZE = GameplayMap.getGridWidth() * GameplayMap.getGridHeight();
 const BZ_NO_CITY = { owner: -1, id: -1, type: 1 };
 const BZ_VILLAGE_PRIMARY = 0xff000000;
@@ -18,13 +18,12 @@ const BZ_VILLAGE_STYLE = {
     secondaryColor: BZ_VILLAGE_SECONDARY
 };
 const thicknessZoomMultiplier = 3;
-class bzCityBordersLayer {
+class bzCultureBordersLayer {
     constructor() {
         this.defaultLenses = new Set(BZ_DEFAULT_LENSES);  // initialization tracker
-        this.cityOverlayGroup = WorldUI.createOverlayGroup("bzCityBorderOverlayGroup", OVERLAY_PRIORITY.CULTURE_BORDER);
+        this.cityOverlayGroup = WorldUI.createOverlayGroup("bzCultureBorderOverlayGroup", OVERLAY_PRIORITY.CULTURE_BORDER);
         // border overlay storage
-        this.cityOverlays = new Map();  // plot -> overlay
-        this.villageOverlays = new Map();  // player ID -> overlay
+        this.playerOverlays = new Map();  // player ID -> overlay
         this.plotOwners = new Array(BZ_GRID_SIZE).fill(BZ_NO_CITY);
         this.lastZoomLevel = -1;
         this.onLayerHotkeyListener = this.onLayerHotkey.bind(this);
@@ -35,7 +34,7 @@ class bzCityBordersLayer {
             const plotIndex = GameplayMap.getIndexFromLocation(loc);
             const was = this.plotOwners[plotIndex];
             const now = GameplayMap.getOwningCityFromXY(loc.x, loc.y);
-            if (was.owner == now.owner && was.id == now.id) return;
+            if (was.owner == now.owner) return;
             this.updateBorders();
         };
         this.onCameraChanged = (camera) => {
@@ -43,8 +42,7 @@ class bzCityBordersLayer {
                 this.lastZoomLevel = camera.zoomLevel;
                 // Set thickness to 0 when zoomed all the way in.
                 const scale = camera.zoomLevel * thicknessZoomMultiplier;
-                this.cityOverlays.forEach((o) => o.setThicknessScale(scale));
-                this.villageOverlays.forEach((o) => o.setThicknessScale(scale));
+                this.playerOverlays.forEach((o) => o.setThicknessScale(scale));
             }
         };
     }
@@ -61,42 +59,29 @@ class bzCityBordersLayer {
                 { style, primaryColor, secondaryColor };
         }
         // reset existing overlays
-        for (const overlay of this.cityOverlays.values()) overlay.clear();
-        for (const overlay of this.villageOverlays.values()) overlay.clear();
-        // initialize new village overlays
+        for (const overlay of this.playerOverlays.values()) overlay.clear();
+        // initialize new overlays and styles
         for (const player of Players.getAlive()) {
-            if (this.villageOverlays.has(player.id)) continue;
-            const overlay = this.cityOverlayGroup.addBorderOverlay(BZ_VILLAGE_STYLE);
-            this.villageOverlays.set(player.id, overlay);
+            const style = styles[player.id];
+            const overlay = this.playerOverlays.get(player.id);
+            if (overlay) {
+                overlay.setDefaultStyle(style);
+            } else {
+                const overlay = this.cityOverlayGroup.addBorderOverlay(style);
+                this.playerOverlays.set(player.id, overlay);
+            }
         }
         // update owners and overlays
-        for (const [plotIndex, oldOwner] of this.plotOwners.entries()) {
+        for (const plotIndex of this.plotOwners.keys()) {
             const loc = GameplayMap.getLocationFromIndex(plotIndex);
             const plotOwner = GameplayMap.getOwningCityFromXY(loc.x, loc.y);
             this.plotOwners[plotIndex] = plotOwner;
             if (!Players.isAlive(plotOwner.owner)) continue;
-            if (plotOwner.id == -1) {
-                // village
-                const overlay = this.villageOverlays.get(plotOwner.owner);
-                overlay.setPlotGroups([plotIndex], 0);
-                continue;
-            }
-            // city
-            const city = Cities.get(plotOwner);
-            if (loc.x != city.location.x || loc.y != city.location.y) continue;
-            const style = styles[plotOwner.owner];
-            let overlay = this.cityOverlays.get(plotIndex);
-            if (!overlay) {
-                overlay = this.cityOverlayGroup.addBorderOverlay(style);
-                this.cityOverlays.set(plotIndex, overlay);
-            } else if (plotOwner.owner != oldOwner.owner) {
-                overlay.setDefaultStyle(style);
-            }
-            const cityPlots = city.getPurchasedPlots();
-            overlay.setPlotGroups(cityPlots, 0);
+            const overlay = this.playerOverlays.get(plotOwner.owner);
+            overlay.setPlotGroups([plotIndex], 0);
         }
         const t2 = performance.now();
-        console.warn(`TRIX C=${t2-t1}ms`);
+        console.warn(`TRIX B=${t2-t1}ms`);
     }
     initLayer() {
         this.updateBorders();
@@ -111,36 +96,35 @@ class bzCityBordersLayer {
         this.updateBorders();
         this.cityOverlayGroup.setVisible(true);
         // make city and empire borders mutually exclusive
-        if (LensManager.isLayerEnabled('bz-culture-borders-layer')) {
-            LensManager.disableLayer('bz-culture-borders-layer');
+        if (LensManager.isLayerEnabled('bz-city-borders-layer')) {
+            LensManager.disableLayer('bz-city-borders-layer');
         }
     }
     removeLayer() {
         this.cityOverlayGroup.setVisible(false);
     }
     onLayerHotkey(hotkey) {
-        if (hotkey.detail.name == 'toggle-bz-city-borders-layer') {
-            // toggle between city limits and culture borders
+        if (hotkey.detail.name == 'toggle-bz-culture-borders-layer') {
+            // toggle borders, including city limits if enabled
             if (LensManager.isLayerEnabled('bz-city-borders-layer')) {
-                LensManager.enableLayer('bz-culture-borders-layer');
+                LensManager.disableLayer('bz-city-borders-layer');
             } else {
-                LensManager.enableLayer('bz-city-borders-layer');
+                LensManager.toggleLayer('bz-culture-borders-layer');
             }
         }
     }
     onLensActivation(event) {
         if (this.defaultLenses.has(event.detail.activeLens)) {
-            LensManager.enableLayer('bz-city-borders-layer');
-            LensManager.disableLayer('bz-culture-borders-layer');
+            LensManager.enableLayer('bz-culture-borders-layer');
             this.defaultLenses.delete(event.detail.activeLens);
         }
     }
     onLensLayerEnabled(event) {
-        if (event.detail.layer == 'fxs-city-borders-layer') {
-            // replace the vanilla city borders
-            LensManager.disableLayer('fxs-city-borders-layer');
-            LensManager.enableLayer('bz-city-borders-layer');
+        if (event.detail.layer == 'fxs-culture-borders-layer') {
+            // replace the vanilla empire borders
+            LensManager.disableLayer('fxs-culture-borders-layer');
+            LensManager.enableLayer('bz-culture-borders-layer');
         }
     }
 }
-LensManager.registerLensLayer('bz-city-borders-layer', new bzCityBordersLayer());
+LensManager.registerLensLayer('bz-culture-borders-layer', new bzCultureBordersLayer());

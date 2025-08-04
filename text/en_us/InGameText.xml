@@ -71,7 +71,7 @@
             <Text>Toggle Borders</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS_TT">
-            <Text>Toggle visibility of civilization borders</Text>
+            <Text>Toggle visibility of empire borders</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_LIMITS">
             <Text>Toggle City Limits</Text>
@@ -105,6 +105,9 @@
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_DISCOVERY">
             <Text>Discoveries</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_MINI_MAP_BZ_FORTIFICATION">
+            <Text>Fortifications</Text>
         </Replace>
         <Replace Tag="LOC_YIELD_BZ_TOTAL">
             <Text>Total Yield</Text>

@@ -52,6 +52,7 @@ export default [
                 document: "readonly",
                 engine: "readonly",
                 localStorage: "readonly",
+                performance: "readonly",
                 window: "readonly",
             }
         }
