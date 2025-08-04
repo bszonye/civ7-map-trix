@@ -47,7 +47,6 @@ class bzCultureBordersLayer {
         };
     }
     updateBorders() {
-        const t1 = performance.now();
         // configure player styles
         const styles = [];
         for (const player of Players.getAlive()) {
@@ -80,8 +79,6 @@ class bzCultureBordersLayer {
             const overlay = this.playerOverlays.get(plotOwner.owner);
             overlay.setPlotGroups([plotIndex], 0);
         }
-        const t2 = performance.now();
-        console.warn(`TRIX B=${t2-t1}ms`);
     }
     initLayer() {
         this.updateBorders();
@@ -93,7 +90,6 @@ class bzCultureBordersLayer {
         this.cityOverlayGroup.setVisible(false);
     }
     applyLayer() {
-        this.updateBorders();
         this.cityOverlayGroup.setVisible(true);
         // make city and empire borders mutually exclusive
         if (LensManager.isLayerEnabled('bz-city-borders-layer')) {
