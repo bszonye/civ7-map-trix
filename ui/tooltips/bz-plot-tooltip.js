@@ -1007,8 +1007,10 @@ class bzPlotTooltip {
         }
         // settlement type
         if (this.owner?.isIndependent) {
-            // village or encampment
-            this.settlementType = this.improvement?.info.Name ?? "FOO";
+            // village, encampment, or captured town
+            this.settlementType =
+                this.city ? "LOC_CAPITAL_SELECT_PROMOTION_NONE" :
+                this.improvement?.info.Name ?? "LOC_DISTRICT_BZ_INDEPENDENT";
         } else if (!this.city) {
             // not a settlement
         } else if (this.owner.isMinor) {
