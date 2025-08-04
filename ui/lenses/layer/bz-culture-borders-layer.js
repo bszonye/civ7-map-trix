@@ -9,6 +9,7 @@ var BorderStyleTypes;
 
 const BZ_DEFAULT_LENSES = [];
 const BZ_GRID_SIZE = GameplayMap.getGridWidth() * GameplayMap.getGridHeight();
+const BZ_GROUP_MAX = 65534;
 const BZ_VILLAGE_PRIMARY = 0xff000000;
 const BZ_VILLAGE_SECONDARY = 0xffffffff;
 const BZ_VILLAGE_STYLE = {
@@ -17,6 +18,12 @@ const BZ_VILLAGE_STYLE = {
     secondaryColor: BZ_VILLAGE_SECONDARY
 };
 const thicknessZoomMultiplier = 3;
+function borderGroup(id) {
+    if (typeof id === 'number') return id < 0 ? id : BZ_GROUP_MAX - id;
+    if (id.id == -1) return borderGroup(id.owner);
+    const city = Cities.get(id);
+    return city ? GameplayMap.getIndexFromLocation(city.location) : -1;
+}
 class bzCultureBordersLayer {
     constructor() {
         this.defaultLenses = new Set(BZ_DEFAULT_LENSES);  // initialization tracker
@@ -30,11 +37,15 @@ class bzCultureBordersLayer {
             const plotIndex = GameplayMap.getIndexFromLocation(data.location);
             if (data.priorOwner != PlayerIds.NO_PLAYER) {
                 this.borderOverlay.clearPlotGroups(plotIndex);
+                console.warn(`TRIX B- ${JSON.stringify(data)} ${plotIndex}`);
             }
             if (data.owner != PlayerIds.NO_PLAYER && Players.isAlive(data.owner)) {
-                this.borderOverlay.setPlotGroups(plotIndex, data.owner);
+                const group = borderGroup(data.owner);
+                const style = this.getPlayerStyle(data.owner);
+                this.borderOverlay.setPlotGroups(plotIndex, group);
+                this.borderOverlay.setGroupStyle(group, style);
+                console.warn(`TRIX B+ ${JSON.stringify(data)} ${plotIndex} ${group} ${style.style}`);
             }
-            this.updateStyles();
         };
         this.onCameraChanged = (camera) => {
             if (this.lastZoomLevel != camera.zoomLevel) {
@@ -46,6 +57,7 @@ class bzCultureBordersLayer {
         };
     }
     getPlayerStyle(player) {
+        if (typeof player === 'number') player = Players.get(player);
         if (player.isIndependent) return BZ_VILLAGE_STYLE;
         const style = player.isMajor ? BorderStyleTypes.Closed :
             BorderStyleTypes.CityStateClosed;
@@ -53,33 +65,34 @@ class bzCultureBordersLayer {
         const secondaryColor = UI.Player.getSecondaryColorValueAsHex(player.id);
         return { style, primaryColor, secondaryColor };
     }
-    updateStyles() {
+    updateBorders() {
+        // const t1 = performance.now();
+        this.borderOverlay.clear();
+        // update player colors
         for (const player of Players.getEverAlive()) {
             const style = this.getPlayerStyle(player);
-            this.borderOverlay.setGroupStyle(player.id, style);
+            const group = borderGroup(player.id);
+            this.borderOverlay.setGroupStyle(group, style);
         }
-    }
-    updateBorders() {
-        const t1 = performance.now();
-        this.borderOverlay.clear();
-        this.updateStyles();
         // update independent powers
         for (let plotIndex=0; plotIndex < BZ_GRID_SIZE; ++plotIndex) {
             const loc = GameplayMap.getLocationFromIndex(plotIndex);
             const ownerID = GameplayMap.getOwner(loc.x, loc.y);
             const owner = Players.get(ownerID);
             if (!owner || !owner.isAlive || !owner.isIndependent) continue;
-            this.borderOverlay.setPlotGroups(plotIndex, ownerID);
+            const group = borderGroup(ownerID);
+            this.borderOverlay.setPlotGroups(plotIndex, group);
         }
         // update city overlays
         for (const player of Players.getAlive()) {
+            const group = borderGroup(player.id);
             for (const city of player.Cities?.getCities() ?? []) {
                 const cityPlots = city.getPurchasedPlots();
-                this.borderOverlay.setPlotGroups(cityPlots, player.id);
+                this.borderOverlay.setPlotGroups(cityPlots, group);
             }
         }
-        const t2 = performance.now();
-        console.warn(`TRIX B=${t2-t1}ms`);
+        // const t2 = performance.now();
+        // console.warn(`TRIX B=${t2-t1}ms`);
     }
     initLayer() {
         this.updateBorders();
@@ -91,6 +104,7 @@ class bzCultureBordersLayer {
         this.cultureOverlayGroup.setVisible(false);
     }
     applyLayer() {
+        // TODO: full refresh here
         this.cultureOverlayGroup.setVisible(true);
         // make city and empire borders mutually exclusive
         if (LensManager.isLayerEnabled('bz-city-borders-layer')) {
@@ -102,7 +116,7 @@ class bzCultureBordersLayer {
     }
     onLayerHotkey(hotkey) {
         if (hotkey.detail.name == 'toggle-bz-culture-borders-layer') {
-            // toggle borders, including city limits if enabled
+            // toggle all borders (including city limits if enabled)
             if (LensManager.isLayerEnabled('bz-city-borders-layer')) {
                 LensManager.disableLayer('bz-city-borders-layer');
             } else {
