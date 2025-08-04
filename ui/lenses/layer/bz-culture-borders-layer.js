@@ -7,9 +7,8 @@ var BorderStyleTypes;
     BorderStyleTypes["CityStateOpen"] = "CultureBorder_CityState_Open";
 })(BorderStyleTypes || (BorderStyleTypes = {}));
 
-const BZ_DEFAULT_LENSES = ['fxs-trade-lens'];
+const BZ_DEFAULT_LENSES = [];
 const BZ_GRID_SIZE = GameplayMap.getGridWidth() * GameplayMap.getGridHeight();
-const BZ_NO_CITY = { owner: -1, id: -1, type: 1 };
 const BZ_VILLAGE_PRIMARY = 0xff000000;
 const BZ_VILLAGE_SECONDARY = 0xffffffff;
 const BZ_VILLAGE_STYLE = {
@@ -21,28 +20,30 @@ const thicknessZoomMultiplier = 3;
 class bzCultureBordersLayer {
     constructor() {
         this.defaultLenses = new Set(BZ_DEFAULT_LENSES);  // initialization tracker
-        this.cityOverlayGroup = WorldUI.createOverlayGroup("bzCultureBorderOverlayGroup", OVERLAY_PRIORITY.CULTURE_BORDER);
+        this.cultureOverlayGroup = WorldUI.createOverlayGroup("bzCultureBorderOverlayGroup", OVERLAY_PRIORITY.CULTURE_BORDER);
         // border overlay storage
-        this.playerOverlays = new Map();  // player ID -> overlay
-        this.plotOwners = new Array(BZ_GRID_SIZE).fill(BZ_NO_CITY);
+        this.borderOverlay = this.cultureOverlayGroup.addBorderOverlay(BZ_VILLAGE_STYLE);
+        this.borderStyle = [];
         this.lastZoomLevel = -1;
         this.onLayerHotkeyListener = this.onLayerHotkey.bind(this);
         this.onLensActivationListener = this.onLensActivation.bind(this);
         this.onLensLayerEnabledListener = this.onLensLayerEnabled.bind(this);
         this.onPlotOwnershipChanged = (data) => {
-            const loc = data.location;
-            const plotIndex = GameplayMap.getIndexFromLocation(loc);
-            const was = this.plotOwners[plotIndex];
-            const now = GameplayMap.getOwner(loc.x, loc.y);
-            if (was == now) return;
-            this.updateBorders();
+            const plotIndex = GameplayMap.getIndexFromLocation(data.location);
+            if (data.priorOwner != PlayerIds.NO_PLAYER) {
+                this.borderOverlay.clearPlotGroups(plotIndex);
+            }
+            if (data.owner != PlayerIds.NO_PLAYER && Players.isAlive(data.owner)) {
+                this.borderOverlay.setPlotGroups(plotIndex, data.owner);
+            }
+            this.updateStyles();
         };
         this.onCameraChanged = (camera) => {
             if (this.lastZoomLevel != camera.zoomLevel) {
                 this.lastZoomLevel = camera.zoomLevel;
                 // Set thickness to 0 when zoomed all the way in.
                 const scale = camera.zoomLevel * thicknessZoomMultiplier;
-                this.playerOverlays.forEach((o) => o.setThicknessScale(scale));
+                this.borderOverlay.setThicknessScale(scale);
             }
         };
     }
@@ -54,40 +55,30 @@ class bzCultureBordersLayer {
         const secondaryColor = UI.Player.getSecondaryColorValueAsHex(player.id);
         return { style, primaryColor, secondaryColor };
     }
+    updateStyles() {
+        for (const player of Players.getEverAlive()) {
+            const style = this.getPlayerStyle(player);
+            this.borderStyle[player.id] = style;
+            this.borderOverlay.setGroupStyle(player.id, style);
+        }
+    }
     updateBorders() {
         const t1 = performance.now();
-        // reset existing overlays
-        for (const overlay of this.playerOverlays.values()) overlay.clear();
-        // configure player overlays and styles
-        const styles = [];
-        for (const player of Players.getAlive()) {
-            const style = styles[player.id] = this.getPlayerStyle(player);
-            console.warn(`TRIX BSTYLE ${player.id} = ${style.style}`);
-            const overlay = this.playerOverlays.get(player.id);
-            if (overlay) {
-                overlay.setDefaultStyle(style);
-            } else {
-                const overlay = this.cityOverlayGroup.addBorderOverlay(style);
-                this.playerOverlays.set(player.id, overlay);
-            }
-        }
-        // update plot owners and independents
-        for (const plotIndex of this.plotOwners.keys()) {
+        this.borderOverlay.clear();
+        this.updateStyles();
+        // update independent powers
+        for (let plotIndex=0; plotIndex < BZ_GRID_SIZE; ++plotIndex) {
             const loc = GameplayMap.getLocationFromIndex(plotIndex);
             const ownerID = GameplayMap.getOwner(loc.x, loc.y);
-            this.plotOwners[plotIndex] = ownerID;
-            // only collect living independents
             const owner = Players.get(ownerID);
             if (!owner || !owner.isAlive || !owner.isIndependent) continue;
-            const overlay = this.playerOverlays.get(ownerID);
-            overlay.setPlotGroups(plotIndex, 0);
+            this.borderOverlay.setPlotGroups(plotIndex, ownerID);
         }
         // update city overlays
         for (const player of Players.getAlive()) {
-            const overlay = this.playerOverlays.get(player.id);
             for (const city of player.Cities?.getCities() ?? []) {
                 const cityPlots = city.getPurchasedPlots();
-                overlay.setPlotGroups(cityPlots, 0);
+                this.borderOverlay.setPlotGroups(cityPlots, player.id);
             }
         }
         const t2 = performance.now();
@@ -100,17 +91,17 @@ class bzCultureBordersLayer {
         window.addEventListener('layer-hotkey', this.onLayerHotkeyListener);
         window.addEventListener(LensActivationEventName, this.onLensActivationListener);
         window.addEventListener(LensLayerEnabledEventName, this.onLensLayerEnabledListener);
-        this.cityOverlayGroup.setVisible(false);
+        this.cultureOverlayGroup.setVisible(false);
     }
     applyLayer() {
-        this.cityOverlayGroup.setVisible(true);
+        this.cultureOverlayGroup.setVisible(true);
         // make city and empire borders mutually exclusive
         if (LensManager.isLayerEnabled('bz-city-borders-layer')) {
             LensManager.disableLayer('bz-city-borders-layer');
         }
     }
     removeLayer() {
-        this.cityOverlayGroup.setVisible(false);
+        this.cultureOverlayGroup.setVisible(false);
     }
     onLayerHotkey(hotkey) {
         if (hotkey.detail.name == 'toggle-bz-culture-borders-layer') {
