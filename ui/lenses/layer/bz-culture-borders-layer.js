@@ -35,16 +35,6 @@ class bzCultureBordersLayer {
             const was = this.plotOwners[plotIndex];
             const now = GameplayMap.getOwner(loc.x, loc.y);
             if (was == now) return;
-            if (was == -1 && Players.isAlive(now)) {
-                // add a single new plot to its owner
-                const overlay = this.playerOverlays.get(now);
-                if (overlay) {
-                    console.warn(`TRIX BUMP ${plotIndex} = ${now}`);
-                    overlay.setPlotGroups(plotIndex, 0);
-                    this.plotOwners[plotIndex] = now;
-                    return;
-                }
-            }
             this.updateBorders();
         };
         this.onCameraChanged = (camera) => {
@@ -72,6 +62,7 @@ class bzCultureBordersLayer {
         const styles = [];
         for (const player of Players.getAlive()) {
             const style = styles[player.id] = this.getPlayerStyle(player);
+            console.warn(`TRIX BSTYLE ${player.id} = ${style.style}`);
             const overlay = this.playerOverlays.get(player.id);
             if (overlay) {
                 overlay.setDefaultStyle(style);
