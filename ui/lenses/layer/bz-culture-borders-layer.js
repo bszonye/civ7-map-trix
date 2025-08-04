@@ -21,9 +21,7 @@ class bzCultureBordersLayer {
     constructor() {
         this.defaultLenses = new Set(BZ_DEFAULT_LENSES);  // initialization tracker
         this.cultureOverlayGroup = WorldUI.createOverlayGroup("bzCultureBorderOverlayGroup", OVERLAY_PRIORITY.CULTURE_BORDER);
-        // border overlay storage
         this.borderOverlay = this.cultureOverlayGroup.addBorderOverlay(BZ_VILLAGE_STYLE);
-        this.borderStyle = [];
         this.lastZoomLevel = -1;
         this.onLayerHotkeyListener = this.onLayerHotkey.bind(this);
         this.onLensActivationListener = this.onLensActivation.bind(this);
@@ -58,7 +56,6 @@ class bzCultureBordersLayer {
     updateStyles() {
         for (const player of Players.getEverAlive()) {
             const style = this.getPlayerStyle(player);
-            this.borderStyle[player.id] = style;
             this.borderOverlay.setGroupStyle(player.id, style);
         }
     }
