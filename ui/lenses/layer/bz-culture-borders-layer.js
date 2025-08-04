@@ -78,7 +78,6 @@ class bzCultureBordersLayer {
             // only collect living independents
             const owner = Players.get(ownerID);
             if (!owner || !owner.isAlive || !owner.isIndependent) continue;
-            console.warn(`TRIX OWNER ${Object.keys(owner)}`);
             const overlay = this.playerOverlays.get(ownerID);
             overlay.setPlotGroups([plotIndex], 0);
         }

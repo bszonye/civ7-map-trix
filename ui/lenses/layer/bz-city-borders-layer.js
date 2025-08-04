@@ -69,6 +69,7 @@ class bzCityBordersLayer {
             this.villageOverlays.set(player.id, overlay);
         }
         // update owners and overlays
+        // TODO: use improved logic from bz-culture-borders-layer
         for (const [plotIndex, oldOwner] of this.plotOwners.entries()) {
             const loc = GameplayMap.getLocationFromIndex(plotIndex);
             const plotOwner = GameplayMap.getOwningCityFromXY(loc.x, loc.y);
