@@ -37,7 +37,6 @@ class bzCityBordersLayer {
             const plotIndex = GameplayMap.getIndexFromLocation(data.location);
             if (data.priorOwner != PlayerIds.NO_PLAYER) {
                 this.borderOverlay.clearPlotGroups(plotIndex);
-                console.warn(`TRIX C+ ${JSON.stringify(data)} ${plotIndex}`);
             }
             if (data.owner != PlayerIds.NO_PLAYER && Players.isAlive(data.owner)) {
                 const loc = data.location;
@@ -46,7 +45,6 @@ class bzCityBordersLayer {
                 const style = this.getPlayerStyle(data.owner);
                 this.borderOverlay.setPlotGroups(plotIndex, group);
                 this.borderOverlay.setGroupStyle(group, style);
-                console.warn(`TRIX C+ ${JSON.stringify(data)} ${plotIndex} ${group} ${style.style}`);
             }
         };
         this.onCameraChanged = (camera) => {
@@ -108,7 +106,7 @@ class bzCityBordersLayer {
         this.cityOverlayGroup.setVisible(false);
     }
     applyLayer() {
-        // TODO: full refresh here
+        this.updateBorders();
         this.cityOverlayGroup.setVisible(true);
         // make city and empire borders mutually exclusive
         if (LensManager.isLayerEnabled('bz-culture-borders-layer')) {
