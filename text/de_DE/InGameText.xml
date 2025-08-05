@@ -68,16 +68,16 @@
             <Text>Einzigartig</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS" Language="de_DE">
-            <Text>Toggle Borders</Text>
+            <Text>Grenzen umschalten</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS_TT" Language="de_DE">
-            <Text>Toggles visibility of borders</Text>
+            <Text>Sichtbarkeit der Grenzen umschalten</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_LIMITS" Language="de_DE">
-            <Text>Toggle City Limits</Text>
+            <Text>Stadtgrenzen umschalten</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_LIMITS_TT" Language="de_DE">
-            <Text>Toggles between city and empire borders</Text>
+            <Text>Umschalten zwischen Stadt- und Reichsgrenzen</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_DISCOVERY_ICONS" Language="de_DE">
             <Text>Entdeckungssymbole umschalten</Text>
@@ -98,16 +98,16 @@
             <Text>Sichtbarkeit der Religionssymbole umschalten</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_BORDERS" Language="de_DE">
-            <Text>Borders</Text>
+            <Text>Grenzen</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_CITY_LIMITS" Language="de_DE">
-            <Text>City Limits</Text>
+            <Text>Stadtgrenzen</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_DISCOVERY" Language="de_DE">
             <Text>Entdeckungen</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_FORTIFICATION" Language="de_DE">
-            <Text>Fortifications</Text>
+            <Text>Befestigungen</Text>
         </Replace>
         <Replace Tag="LOC_YIELD_BZ_TOTAL" Language="de_DE">
             <Text>Gesamtertrag</Text>
