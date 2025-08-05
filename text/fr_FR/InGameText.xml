@@ -67,7 +67,7 @@
         <Replace Tag="LOC_STATE_BZ_UNIQUE" Language="fr_FR">
             <Text>Unique</Text>
         </Replace>
-        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS Language="fr_FR"">
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS" Language="fr_FR">
             <Text>Toggle Borders</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS_TT" Language="fr_FR">
