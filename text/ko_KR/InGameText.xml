@@ -68,46 +68,46 @@
             <Text>특유</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS" Language="ko_KR">
-            <Text>Toggle Borders</Text>
+            <Text>국경</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS_TT" Language="ko_KR">
-            <Text>Toggles visibility of borders</Text>
+            <Text>국경의 가시성을 전환합니다.</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_LIMITS" Language="ko_KR">
-            <Text>Toggle City Limits</Text>
+            <Text>도시 경계</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_LIMITS_TT" Language="ko_KR">
-            <Text>Toggles between city and empire borders</Text>
+            <Text>도시와 제국 경계 사이를 전환합니다.</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_DISCOVERY_ICONS" Language="ko_KR">
-            <Text>Toggle Discovery Icons</Text>
+            <Text>발견 아이콘</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_DISCOVERY_ICONS_TT" Language="ko_KR">
-            <Text>Toggles visibility of discovery icons</Text>
+            <Text>발견 아이콘의 가시성을 전환합니다.</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_FORTIFICATION_ICONS" Language="ko_KR">
-            <Text>Toggle Fortification Icons</Text>
+            <Text>요새 아이콘</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_FORTIFICATION_ICONS_TT" Language="ko_KR">
-            <Text>Toggles visibility of fortification icons</Text>
+            <Text>요새 아이콘의 가시성을 전환합니다.</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_RELIGION_ICONS" Language="ko_KR">
-            <Text>Toggle Religion Icons</Text>
+            <Text>종교 아이콘</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_RELIGION_ICONS_TT" Language="ko_KR">
-            <Text>Toggles visibility of religion icons</Text>
+            <Text>종교 아이콘의 가시성을 전환합니다.</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_BORDERS" Language="ko_KR">
-            <Text>Borders</Text>
+            <Text>국경</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_CITY_LIMITS" Language="ko_KR">
-            <Text>City Limits</Text>
+            <Text>도시 경계</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_DISCOVERY" Language="ko_KR">
-            <Text>Discoveries</Text>
+            <Text>발견물</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_FORTIFICATION" Language="ko_KR">
-            <Text>Fortifications</Text>
+            <Text>요새</Text>
         </Replace>
         <Replace Tag="LOC_YIELD_BZ_TOTAL" Language="ko_KR">
             <Text>총 생산량</Text>

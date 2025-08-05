@@ -101,7 +101,7 @@
             <Text>Confini</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_CITY_LIMITS" Language="it_IT">
-            <Text>Limiti d. città</Text>
+            <Text>Città</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_DISCOVERY" Language="it_IT">
             <Text>Scoperte</Text>
