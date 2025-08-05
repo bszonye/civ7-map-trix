@@ -68,46 +68,46 @@
             <Text>Unico</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS" Language="it_IT">
-            <Text>Toggle Borders</Text>
+            <Text>Confini</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS_TT" Language="it_IT">
-            <Text>Toggles visibility of borders</Text>
+            <Text>Attiva/disattiva la visibilità dei confini</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_LIMITS" Language="it_IT">
-            <Text>Toggle City Limits</Text>
+            <Text>Limiti della città</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_LIMITS_TT" Language="it_IT">
-            <Text>Toggles between city and empire borders</Text>
+            <Text>Alterna i confini della città e dell'impero</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_DISCOVERY_ICONS" Language="it_IT">
-            <Text>Toggle Discovery Icons</Text>
+            <Text>Icone di scoperta</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_DISCOVERY_ICONS_TT" Language="it_IT">
-            <Text>Toggles visibility of discovery icons</Text>
+            <Text>Attiva/disattiva la visibilità delle icone di scoperta</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_FORTIFICATION_ICONS" Language="it_IT">
-            <Text>Toggle Fortification Icons</Text>
+            <Text>Icone di fortificazione</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_FORTIFICATION_ICONS_TT" Language="it_IT">
-            <Text>Toggles visibility of fortification icons</Text>
+            <Text>Attiva/disattiva la visibilità delle icone di fortificazione</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_RELIGION_ICONS" Language="it_IT">
-            <Text>Toggle Religion Icons</Text>
+            <Text>Icone della religione</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_RELIGION_ICONS_TT" Language="it_IT">
-            <Text>Toggles visibility of religion icons</Text>
+            <Text>Attiva/disattiva la visibilità delle icone della religione</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_BORDERS" Language="it_IT">
-            <Text>Borders</Text>
+            <Text>Confini</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_CITY_LIMITS" Language="it_IT">
-            <Text>City Limits</Text>
+            <Text>Limiti d. città</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_DISCOVERY" Language="it_IT">
-            <Text>Discoveries</Text>
+            <Text>Scoperte</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_FORTIFICATION" Language="it_IT">
-            <Text>Fortifications</Text>
+            <Text>Fortificazioni</Text>
         </Replace>
         <Replace Tag="LOC_YIELD_BZ_TOTAL" Language="it_IT">
             <Text>Rese Totali</Text>
