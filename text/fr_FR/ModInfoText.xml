@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Database>
+    <LocalizedText Language="fr_FR">
+        <Row Tag="LOC_MOD_BZ_MAP_TRIX_NAME">
+            <Text>Map Trix</Text>
+        </Row>
+        <Row Tag="LOC_MOD_BZ_MAP_TRIX_DESCRIPTION" Language="fr_FR">
+            <Text>de meilleurs outils cartographiques</Text>
+        </Row>
+    </LocalizedText>
+</Database>
