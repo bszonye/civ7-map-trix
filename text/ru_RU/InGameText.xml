@@ -68,46 +68,46 @@
             <Text>Уникальное</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS" Language="ru_RU">
-            <Text>Toggle Borders</Text>
+            <Text>Границы</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS_TT" Language="ru_RU">
-            <Text>Toggles visibility of borders</Text>
+            <Text>Показывать или скрыть границы</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_LIMITS" Language="ru_RU">
-            <Text>Toggle City Limits</Text>
+            <Text>Границы города</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_LIMITS_TT" Language="ru_RU">
-            <Text>Toggles between city and empire borders</Text>
+            <Text>Переключение между границами города и империи</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_DISCOVERY_ICONS" Language="ru_RU">
-            <Text>Toggle Discovery Icons</Text>
+            <Text>Значки открытий</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_DISCOVERY_ICONS_TT" Language="ru_RU">
-            <Text>Toggles visibility of discovery icons</Text>
+            <Text>Показывать или скрыть значки открытий</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_FORTIFICATION_ICONS" Language="ru_RU">
-            <Text>Toggle Fortification Icons</Text>
+            <Text>Значки укреплений</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_FORTIFICATION_ICONS_TT" Language="ru_RU">
-            <Text>Toggles visibility of fortification icons</Text>
+            <Text>Показывать или скрыть значки укреплений</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_RELIGION_ICONS" Language="ru_RU">
-            <Text>Toggle Religion Icons</Text>
+            <Text>Значки религии</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_RELIGION_ICONS_TT" Language="ru_RU">
-            <Text>Toggles visibility of religion icons</Text>
+            <Text>Показывать или скрыть значки религии</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_BORDERS" Language="ru_RU">
-            <Text>Borders</Text>
+            <Text>Границы</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_CITY_LIMITS" Language="ru_RU">
-            <Text>City Limits</Text>
+            <Text>Города</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_DISCOVERY" Language="ru_RU">
-            <Text>Discoveries</Text>
+            <Text>Открытия</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_FORTIFICATION" Language="ru_RU">
-            <Text>Fortifications</Text>
+            <Text>Укрепления</Text>
         </Replace>
         <Replace Tag="LOC_YIELD_BZ_TOTAL" Language="ru_RU">
             <Text>Общий Доход</Text>
