@@ -67,6 +67,18 @@
         <Replace Tag="LOC_STATE_BZ_UNIQUE" Language="it_IT">
             <Text>Unico</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS" Language="it_IT">
+            <Text>Toggle Borders</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS_TT" Language="it_IT">
+            <Text>Toggles visibility of borders</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_LIMITS" Language="it_IT">
+            <Text>Toggle City Limits</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_LIMITS_TT" Language="it_IT">
+            <Text>Toggles between city and empire borders</Text>
+        </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_DISCOVERY_ICONS" Language="it_IT">
             <Text>Toggle Discovery Icons</Text>
         </Replace>
@@ -85,8 +97,17 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_RELIGION_ICONS_TT" Language="it_IT">
             <Text>Toggles visibility of religion icons</Text>
         </Replace>
+        <Replace Tag="LOC_UI_MINI_MAP_BZ_BORDERS" Language="it_IT">
+            <Text>Borders</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_MINI_MAP_BZ_CITY_LIMITS" Language="it_IT">
+            <Text>City Limits</Text>
+        </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_DISCOVERY" Language="it_IT">
             <Text>Discoveries</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_MINI_MAP_BZ_FORTIFICATION" Language="it_IT">
+            <Text>Fortifications</Text>
         </Replace>
         <Replace Tag="LOC_YIELD_BZ_TOTAL" Language="it_IT">
             <Text>Rese Totali</Text>
