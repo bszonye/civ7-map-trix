@@ -1376,7 +1376,7 @@ class bzPlotTooltip {
         if (!this.isCompact) this.renderPopulation();
     }
     renderUrban() {
-        let hexName = GameInfo.Districts.lookup(this.district.type).Name;
+        let hexName = "LOC_PLOT_TOOLTIP_URBAN_DISTRICT";
         const hexRules = [];
         // set name & description
         if (this.district.type == DistrictTypes.CITY_CENTER) {
@@ -1398,8 +1398,6 @@ class bzPlotTooltip {
         } else if (this.buildings.length == 0) {
             // urban tile with canceled production
             hexName = "LOC_DISTRICT_BZ_URBAN_VACANT";
-        } else {
-            hexName = "LOC_PLOT_TOOLTIP_URBAN_DISTRICT";
         }
         // title bar & district defense
         if (!this.isCompact) this.renderTitleHeading(hexName);
