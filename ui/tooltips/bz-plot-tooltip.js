@@ -1445,7 +1445,7 @@ class bzPlotTooltip {
             hexName = this.city.name;
         } else if (this.district?.type) {
             // rural
-            hexName = GameInfo.Districts.lookup(this.district?.type).Name;
+            hexName = "LOC_PLOT_TOOLTIP_RURAL_DISTRICT";
         } else if (this.city && this.freeConstructible) {
             // claimed but undeveloped
             hexName = "LOC_PLOT_TOOLTIP_UNIMPROVED";
