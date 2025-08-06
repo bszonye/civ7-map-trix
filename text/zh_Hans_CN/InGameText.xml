@@ -20,7 +20,7 @@
             <Text>需建造 {1_icon} {2_name}</Text>
         </Replace>
         <Replace Tag="LOC_DISTRICT_BZ_DISCOVERY" Language="zh_Hans_CN">
-            <Text>发现物</Text>
+            <Text>发现</Text>
         </Replace>
         <Replace Tag="LOC_DISTRICT_BZ_INDEPENDENT" Language="zh_Hans_CN">
             <Text>独立势力</Text>
@@ -62,46 +62,46 @@
             <Text>独特</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS" Language="zh_Hans_CN">
-            <Text>Toggle Borders</Text>
+            <Text>开关边界显示</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS_TT" Language="zh_Hans_CN">
-            <Text>Toggles visibility of borders</Text>
+            <Text>开关边界显示</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_BORDERS" Language="zh_Hans_CN">
-            <Text>Toggle City Limits</Text>
+            <Text>开关定居点显示</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_BORDERS_TT" Language="zh_Hans_CN">
-            <Text>Toggles between city and empire borders</Text>
+            <Text>开关定居点显示</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_DISCOVERY_ICONS" Language="zh_Hans_CN">
-            <Text>Toggle Discovery Icons</Text>
+            <Text>开关发现图标</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_DISCOVERY_ICONS_TT" Language="zh_Hans_CN">
-            <Text>Toggles visibility of discovery icons</Text>
+            <Text>开关发现图标的显示</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_FORTIFICATION_ICONS" Language="zh_Hans_CN">
-            <Text>Toggle Fortification Icons</Text>
+            <Text>开关防御工事图标</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_FORTIFICATION_ICONS_TT" Language="zh_Hans_CN">
-            <Text>Toggles visibility of fortification icons</Text>
+            <Text>开关防御工事图标的显示</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_RELIGION_ICONS" Language="zh_Hans_CN">
-            <Text>Toggle Religion Icons</Text>
+            <Text>开关宗教图标</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_RELIGION_ICONS_TT" Language="zh_Hans_CN">
-            <Text>Toggles visibility of religion icons</Text>
+            <Text>开关宗教图标的显示</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_BORDERS" Language="zh_Hans_CN">
-            <Text>Borders</Text>
+            <Text>边界</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_CITY_BORDERS" Language="zh_Hans_CN">
-            <Text>City Limits</Text>
+            <Text>定居点</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_DISCOVERY" Language="zh_Hans_CN">
-            <Text>Discoveries</Text>
+            <Text>发现</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_FORTIFICATION" Language="zh_Hans_CN">
-            <Text>Fortifications</Text>
+            <Text>防御工事</Text>
         </Replace>
         <Replace Tag="LOC_YIELD_BZ_TOTAL" Language="zh_Hans_CN">
             <Text>总产出</Text>

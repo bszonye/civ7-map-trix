@@ -68,7 +68,7 @@
             <Text>Показывать или скрыть границы</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_BORDERS" Language="ru_RU">
-            <Text>Границы города</Text>
+            <Text>Поселения</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_BORDERS_TT" Language="ru_RU">
             <Text>Переключение между границами города и империи</Text>
