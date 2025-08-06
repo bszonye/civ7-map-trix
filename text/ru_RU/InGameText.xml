@@ -28,12 +28,6 @@
         <Replace Tag="LOC_DISTRICT_BZ_TOWN_CENTER" Language="ru_RU">
             <Text>Центр Города </Text>
         </Replace>
-        <Replace Tag="LOC_DISTRICT_BZ_URBAN_DISTRICT" Language="ru_RU">
-            <Text>Городской Район</Text>
-        </Replace>
-        <Replace Tag="LOC_DISTRICT_BZ_URBAN_QUARTER" Language="ru_RU">
-            <Text>Квартал</Text>
-        </Replace>
         <Replace Tag="LOC_DISTRICT_BZ_URBAN_VACANT" Language="ru_RU">
             <Text>Свободный Район</Text>
         </Replace>

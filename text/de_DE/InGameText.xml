@@ -28,12 +28,6 @@
         <Replace Tag="LOC_DISTRICT_BZ_TOWN_CENTER" Language="de_DE">
             <Text>Stadtzentrum</Text>
         </Replace>
-        <Replace Tag="LOC_DISTRICT_BZ_URBAN_DISTRICT" Language="de_DE">
-            <Text>Bezirk</Text>
-        </Replace>
-        <Replace Tag="LOC_DISTRICT_BZ_URBAN_QUARTER" Language="de_DE">
-            <Text>Quartier</Text>
-        </Replace>
         <Replace Tag="LOC_DISTRICT_BZ_URBAN_VACANT" Language="de_DE">
             <Text>Freier Bezirk</Text>
         </Replace>

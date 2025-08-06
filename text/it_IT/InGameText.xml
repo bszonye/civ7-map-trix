@@ -28,12 +28,6 @@
         <Replace Tag="LOC_DISTRICT_BZ_TOWN_CENTER" Language="it_IT">
             <Text>Centro Cittadino</Text>
         </Replace>
-        <Replace Tag="LOC_DISTRICT_BZ_URBAN_DISTRICT" Language="it_IT">
-            <Text>Distretto</Text>
-        </Replace>
-        <Replace Tag="LOC_DISTRICT_BZ_URBAN_QUARTER" Language="it_IT">
-            <Text>Quartiere</Text>
-        </Replace>
         <Replace Tag="LOC_DISTRICT_BZ_URBAN_VACANT" Language="it_IT">
             <Text>Distretto Vacante</Text>
         </Replace>

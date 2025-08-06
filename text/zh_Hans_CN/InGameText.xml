@@ -28,12 +28,6 @@
         <Replace Tag="LOC_DISTRICT_BZ_TOWN_CENTER" Language="zh_Hans_CN">
             <Text>城镇中心</Text>
         </Replace>
-        <Replace Tag="LOC_DISTRICT_BZ_URBAN_DISTRICT" Language="zh_Hans_CN">
-            <Text>城市区</Text>
-        </Replace>
-        <Replace Tag="LOC_DISTRICT_BZ_URBAN_QUARTER" Language="zh_Hans_CN">
-            <Text>城市分区</Text>
-        </Replace>
         <Replace Tag="LOC_DISTRICT_BZ_URBAN_VACANT" Language="zh_Hans_CN">
             <Text>空置区</Text>
         </Replace>

@@ -1394,12 +1394,12 @@ class bzPlotTooltip {
             const rule = Locale.keyExists(tooltip) ? tooltip : this.quarter.Description;
             hexRules.push(rule);
         } else if (this.district.isQuarter) {
-            hexName = "LOC_DISTRICT_BZ_URBAN_QUARTER";
+            hexName = "LOC_PLOT_TOOLTIP_URBAN_QUARTER";
         } else if (this.buildings.length == 0) {
             // urban tile with canceled production
             hexName = "LOC_DISTRICT_BZ_URBAN_VACANT";
         } else {
-            hexName = "LOC_DISTRICT_BZ_URBAN_DISTRICT";
+            hexName = "LOC_PLOT_TOOLTIP_URBAN_DISTRICT";
         }
         // title bar & district defense
         if (!this.isCompact) this.renderTitleHeading(hexName);

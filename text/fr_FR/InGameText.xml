@@ -34,12 +34,6 @@
             <Gender>masculine</Gender>
             <Plurality>1|2</Plurality>
         </Replace>
-        <Replace Tag="LOC_DISTRICT_BZ_URBAN_DISTRICT" Language="fr_FR">
-            <Text>District</Text>
-        </Replace>
-        <Replace Tag="LOC_DISTRICT_BZ_URBAN_QUARTER" Language="fr_FR">
-            <Text>Quarter</Text>
-        </Replace>
         <Replace Tag="LOC_DISTRICT_BZ_URBAN_VACANT" Language="fr_FR">
             <Text>Vacant District</Text>
         </Replace>

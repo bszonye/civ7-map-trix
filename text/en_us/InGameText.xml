@@ -28,12 +28,6 @@
         <Replace Tag="LOC_DISTRICT_BZ_TOWN_CENTER">
             <Text>Town Center</Text>
         </Replace>
-        <Replace Tag="LOC_DISTRICT_BZ_URBAN_DISTRICT">
-            <Text>District</Text>
-        </Replace>
-        <Replace Tag="LOC_DISTRICT_BZ_URBAN_QUARTER">
-            <Text>Quarter</Text>
-        </Replace>
         <Replace Tag="LOC_DISTRICT_BZ_URBAN_VACANT">
             <Text>Vacant District</Text>
         </Replace>
