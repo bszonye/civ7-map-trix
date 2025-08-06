@@ -73,10 +73,10 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS_TT" Language="zh_Hant_HK">
             <Text>Toggles visibility of borders</Text>
         </Replace>
-        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_LIMITS" Language="zh_Hant_HK">
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_BORDERS" Language="zh_Hant_HK">
             <Text>Toggle City Limits</Text>
         </Replace>
-        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_LIMITS_TT" Language="zh_Hant_HK">
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_BORDERS_TT" Language="zh_Hant_HK">
             <Text>Toggles between city and empire borders</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_DISCOVERY_ICONS" Language="zh_Hant_HK">
@@ -100,7 +100,7 @@
         <Replace Tag="LOC_UI_MINI_MAP_BZ_BORDERS" Language="zh_Hant_HK">
             <Text>Borders</Text>
         </Replace>
-        <Replace Tag="LOC_UI_MINI_MAP_BZ_CITY_LIMITS" Language="zh_Hant_HK">
+        <Replace Tag="LOC_UI_MINI_MAP_BZ_CITY_BORDERS" Language="zh_Hant_HK">
             <Text>City Limits</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_DISCOVERY" Language="zh_Hant_HK">

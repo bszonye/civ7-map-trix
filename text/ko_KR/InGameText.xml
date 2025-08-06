@@ -73,10 +73,10 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS_TT" Language="ko_KR">
             <Text>국경의 가시성을 전환합니다.</Text>
         </Replace>
-        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_LIMITS" Language="ko_KR">
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_BORDERS" Language="ko_KR">
             <Text>도시 경계</Text>
         </Replace>
-        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_LIMITS_TT" Language="ko_KR">
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_BORDERS_TT" Language="ko_KR">
             <Text>도시와 제국 경계 사이를 전환합니다.</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_DISCOVERY_ICONS" Language="ko_KR">
@@ -100,7 +100,7 @@
         <Replace Tag="LOC_UI_MINI_MAP_BZ_BORDERS" Language="ko_KR">
             <Text>국경</Text>
         </Replace>
-        <Replace Tag="LOC_UI_MINI_MAP_BZ_CITY_LIMITS" Language="ko_KR">
+        <Replace Tag="LOC_UI_MINI_MAP_BZ_CITY_BORDERS" Language="ko_KR">
             <Text>도시 경계</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_DISCOVERY" Language="ko_KR">

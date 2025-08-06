@@ -1,6 +1,6 @@
 const BZ_LAYERS = {
     "bz-culture-borders-layer": "LOC_UI_MINI_MAP_BZ_BORDERS",
-    "bz-city-borders-layer": "LOC_UI_MINI_MAP_BZ_CITY_LIMITS",
+    "bz-city-borders-layer": "LOC_UI_MINI_MAP_BZ_CITY_BORDERS",
     "bz-discovery-layer": "LOC_UI_MINI_MAP_BZ_DISCOVERY",
     "bz-fortification-layer": "LOC_UI_MINI_MAP_BZ_FORTIFICATION",
     "bz-religion-layer": "LOC_UI_MINI_MAP_RELIGION",

@@ -2,7 +2,7 @@
 <Database>
     <InputActions>
         <Row ActionId="toggle-bz-culture-borders-layer" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS" Description="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS_TT" />
-        <Row ActionId="toggle-bz-city-borders-layer" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_LIMITS" Description="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_LIMITS_TT" />
+        <Row ActionId="toggle-bz-city-borders-layer" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_BORDERS" Description="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_BORDERS_TT" />
         <Row ActionId="toggle-bz-discovery-layer" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_TOGGLE_BZ_DISCOVERY_ICONS" Description="LOC_UI_KBM_MAPPING_TOGGLE_BZ_DISCOVERY_ICONS_TT" />
         <Row ActionId="toggle-bz-fortification-layer" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_TOGGLE_BZ_FORTIFICATION_ICONS" Description="LOC_UI_KBM_MAPPING_TOGGLE_BZ_FORTIFICATION_ICONS_TT" />
         <Row ActionId="toggle-bz-religion-layer" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_TOGGLE_BZ_RELIGION_ICONS" Description="LOC_UI_KBM_MAPPING_TOGGLE_BZ_RELIGION_ICONS_TT" />

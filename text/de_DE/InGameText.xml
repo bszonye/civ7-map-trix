@@ -73,10 +73,10 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS_TT" Language="de_DE">
             <Text>Sichtbarkeit der Grenzen umschalten</Text>
         </Replace>
-        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_LIMITS" Language="de_DE">
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_BORDERS" Language="de_DE">
             <Text>Stadtgrenzen umschalten</Text>
         </Replace>
-        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_LIMITS_TT" Language="de_DE">
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_BORDERS_TT" Language="de_DE">
             <Text>Umschalten zwischen Stadt- und Reichsgrenzen</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_DISCOVERY_ICONS" Language="de_DE">
@@ -100,7 +100,7 @@
         <Replace Tag="LOC_UI_MINI_MAP_BZ_BORDERS" Language="de_DE">
             <Text>Grenzen</Text>
         </Replace>
-        <Replace Tag="LOC_UI_MINI_MAP_BZ_CITY_LIMITS" Language="de_DE">
+        <Replace Tag="LOC_UI_MINI_MAP_BZ_CITY_BORDERS" Language="de_DE">
             <Text>Stadtgrenzen</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_DISCOVERY" Language="de_DE">

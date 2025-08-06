@@ -73,10 +73,10 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS_TT" Language="it_IT">
             <Text>Attiva/disattiva la visibilità dei confini</Text>
         </Replace>
-        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_LIMITS" Language="it_IT">
-            <Text>Limiti della città</Text>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_BORDERS" Language="it_IT">
+            <Text>Città</Text>
         </Replace>
-        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_LIMITS_TT" Language="it_IT">
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_BORDERS_TT" Language="it_IT">
             <Text>Alterna i confini della città e dell'impero</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_DISCOVERY_ICONS" Language="it_IT">
@@ -100,7 +100,7 @@
         <Replace Tag="LOC_UI_MINI_MAP_BZ_BORDERS" Language="it_IT">
             <Text>Confini</Text>
         </Replace>
-        <Replace Tag="LOC_UI_MINI_MAP_BZ_CITY_LIMITS" Language="it_IT">
+        <Replace Tag="LOC_UI_MINI_MAP_BZ_CITY_BORDERS" Language="it_IT">
             <Text>Città</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_DISCOVERY" Language="it_IT">
