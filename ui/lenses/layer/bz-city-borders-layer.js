@@ -66,7 +66,6 @@ class bzCityBordersLayer {
         return { style, primaryColor, secondaryColor };
     }
     updateBorders() {
-        // const t1 = performance.now();
         this.borderOverlay.clear();
         // update player colors
         for (const player of Players.getEverAlive()) {
@@ -93,8 +92,6 @@ class bzCityBordersLayer {
                 this.borderOverlay.setGroupStyle(group, style);
             }
         }
-        // const t2 = performance.now();
-        // console.warn(`TRIX C=${t2-t1}ms`);
     }
     initLayer() {
         this.updateBorders();

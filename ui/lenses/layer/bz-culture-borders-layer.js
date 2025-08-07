@@ -64,7 +64,6 @@ class bzCultureBordersLayer {
         return { style, primaryColor, secondaryColor };
     }
     updateBorders() {
-        // const t1 = performance.now();
         this.borderOverlay.clear();
         // update player colors
         for (const player of Players.getEverAlive()) {
@@ -89,8 +88,6 @@ class bzCultureBordersLayer {
                 this.borderOverlay.setPlotGroups(cityPlots, group);
             }
         }
-        // const t2 = performance.now();
-        // console.warn(`TRIX B=${t2-t1}ms`);
     }
     initLayer() {
         this.updateBorders();
