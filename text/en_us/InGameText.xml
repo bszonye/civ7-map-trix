@@ -91,6 +91,12 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_RELIGION_ICONS_TT">
             <Text>Toggles visibility of religion icons</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER">
+            <Text>Toggle Terrain Highlighting</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER_TT">
+            <Text>Toggles visibility of terrain highlighting</Text>
+        </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_BORDERS">
             <Text>Borders</Text>
         </Replace>
@@ -102,6 +108,9 @@
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_FORTIFICATION">
             <Text>Fortifications</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_MINI_MAP_BZ_TERRAIN">
+            <Text>Terrain</Text>
         </Replace>
         <Replace Tag="LOC_YIELD_BZ_TOTAL">
             <Text>Total Yield</Text>

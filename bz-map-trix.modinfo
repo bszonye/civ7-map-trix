@@ -61,6 +61,7 @@
                     <Item>ui/lenses/layer/bz-discovery-layer.js</Item>
                     <Item>ui/lenses/layer/bz-fortification-layer.js</Item>
                     <Item>ui/lenses/layer/bz-religion-layer.js</Item>
+                    <Item>ui/lenses/layer/bz-terrain-layer.js</Item>
                     <Item>ui/mini-map/bz-panel-mini-map.js</Item>
                     <Item>ui/options/editors/bz-editor-keyboard-mapping.js</Item>
                     <Item>ui/options/bz-map-trix-options.js</Item>
