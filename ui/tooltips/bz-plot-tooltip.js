@@ -8,7 +8,7 @@ import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
 
 // custom & adapted icons
 const BZ_ICON_SIZE = 12;
-const BZ_ICON_DISCOVERY = "url('blp:tech_cartography')";
+const BZ_ICON_DISCOVERY = "NAR_REW_DEFAULT";
 const BZ_ICON_EMPTY_SLOT = "BUILDING_OPEN";
 const BZ_ICON_FRAME = "url('hud_sub_circle_bk')";
 const BZ_ICON_RURAL = "CITY_RURAL";  // urban population/yield
@@ -1007,8 +1007,10 @@ class bzPlotTooltip {
         }
         // settlement type
         if (this.owner?.isIndependent) {
-            // village or encampment
-            this.settlementType = this.improvement?.info.Name ?? "FOO";
+            // village, encampment, or captured town
+            this.settlementType =
+                this.city ? "LOC_CAPITAL_SELECT_PROMOTION_NONE" :
+                this.improvement?.info.Name ?? "LOC_DISTRICT_BZ_INDEPENDENT";
         } else if (!this.city) {
             // not a settlement
         } else if (this.owner.isMinor) {
@@ -1374,7 +1376,7 @@ class bzPlotTooltip {
         if (!this.isCompact) this.renderPopulation();
     }
     renderUrban() {
-        let hexName = GameInfo.Districts.lookup(this.district.type).Name;
+        let hexName = "LOC_PLOT_TOOLTIP_URBAN_DISTRICT";
         const hexRules = [];
         // set name & description
         if (this.district.type == DistrictTypes.CITY_CENTER) {
@@ -1392,12 +1394,10 @@ class bzPlotTooltip {
             const rule = Locale.keyExists(tooltip) ? tooltip : this.quarter.Description;
             hexRules.push(rule);
         } else if (this.district.isQuarter) {
-            hexName = "LOC_DISTRICT_BZ_URBAN_QUARTER";
+            hexName = "LOC_PLOT_TOOLTIP_URBAN_QUARTER";
         } else if (this.buildings.length == 0) {
             // urban tile with canceled production
             hexName = "LOC_DISTRICT_BZ_URBAN_VACANT";
-        } else {
-            hexName = "LOC_DISTRICT_BZ_URBAN_DISTRICT";
         }
         // title bar & district defense
         if (!this.isCompact) this.renderTitleHeading(hexName);
@@ -1443,7 +1443,7 @@ class bzPlotTooltip {
             hexName = this.city.name;
         } else if (this.district?.type) {
             // rural
-            hexName = GameInfo.Districts.lookup(this.district?.type).Name;
+            hexName = "LOC_PLOT_TOOLTIP_RURAL_DISTRICT";
         } else if (this.city && this.freeConstructible) {
             // claimed but undeveloped
             hexName = "LOC_PLOT_TOOLTIP_UNIMPROVED";

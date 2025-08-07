@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Mod id="bz-map-trix" version="20200"
+<Mod id="bz-map-trix" version="30000"
     xmlns="ModInfo">
     <Properties>
         <Name>LOC_MOD_BZ_MAP_TRIX_NAME</Name>
-        <Version>2.2.0</Version>
+        <Version>3.0.0</Version>
         <Description>LOC_MOD_BZ_MAP_TRIX_DESCRIPTION</Description>
         <Authors>beezany</Authors>
         <URL>https://forums.civfanatics.com/resources/map-trix.31950/</URL>
@@ -25,12 +25,17 @@
             </Properties>
             <Actions>
                 <UIScripts>
+                    <Item>ui/options/editors/bz-editor-keyboard-mapping.js</Item>
                     <Item>ui/options/bz-map-trix-options.js</Item>
                     <Item>ui/options/mod-options-decorator.js</Item>
                 </UIScripts>
+                <UpdateDatabase>
+                    <Item>config/bz-input.xml</Item>
+                </UpdateDatabase>
                 <UpdateText>
                     <Item>text/en_us/InGameText.xml</Item>
                     <Item locale="de_DE">text/de_DE/InGameText.xml</Item>
+                    <Item locale="fr_FR">text/fr_FR/InGameText.xml</Item>
                     <Item locale="it_IT">text/it_IT/InGameText.xml</Item>
                     <Item locale="ko_KR">text/ko_kr/InGameText.xml</Item>
                     <Item locale="ru_RU">text/ru_RU/InGameText.xml</Item>
@@ -50,6 +55,14 @@
                 </ImportFiles>
                 <UIScripts>
                     <Item>ui/diplo-ribbon/bz-panel-yield-banner.js</Item>
+                    <Item>ui/input/bz-hotkey-manager.js</Item>
+                    <Item>ui/lenses/layer/bz-city-borders-layer.js</Item>
+                    <Item>ui/lenses/layer/bz-culture-borders-layer.js</Item>
+                    <Item>ui/lenses/layer/bz-discovery-layer.js</Item>
+                    <Item>ui/lenses/layer/bz-fortification-layer.js</Item>
+                    <Item>ui/lenses/layer/bz-religion-layer.js</Item>
+                    <Item>ui/mini-map/bz-panel-mini-map.js</Item>
+                    <Item>ui/options/editors/bz-editor-keyboard-mapping.js</Item>
                     <Item>ui/options/bz-map-trix-options.js</Item>
                     <Item>ui/options/mod-options-decorator.js</Item>
                     <Item>ui/tooltips/bz-plot-tooltip.js</Item>
@@ -60,6 +73,7 @@
                 <UpdateText>
                     <Item>text/en_us/InGameText.xml</Item>
                     <Item locale="de_DE">text/de_DE/InGameText.xml</Item>
+                    <Item locale="fr_FR">text/fr_FR/InGameText.xml</Item>
                     <Item locale="it_IT">text/it_IT/InGameText.xml</Item>
                     <Item locale="ko_KR">text/ko_kr/InGameText.xml</Item>
                     <Item locale="ru_RU">text/ru_RU/InGameText.xml</Item>
@@ -72,6 +86,7 @@
     <LocalizedText>
         <File>text/en_us/ModInfoText.xml</File>
         <File>text/de_DE/ModInfoText.xml</File>
+        <File>text/fr_FR/ModInfoText.xml</File>
         <File>text/it_IT/ModInfoText.xml</File>
         <File>text/ko_KR/ModInfoText.xml</File>
         <File>text/zh_Hans_CN/ModInfoText.xml</File>

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Database>
+    <LocalizedText>
+        <Replace Tag="LOC_BZ_PEOPLE_NAME" Language="fr_FR">
+            <Text>Les gens de {1_name}</Text>
+        </Replace>
+        <Replace Tag="LOC_BZ_RELATIONSHIP_TRIBUTARY" Language="fr_FR">
+            <Text>Tributaire</Text>
+        </Replace>
+        <Replace Tag="LOC_BZ_SETTLEMENT_CITY_STATE" Language="fr_FR">
+            <Text>Cité-État</Text>
+        </Replace>
+        <Replace Tag="LOC_BZ_WAS_PREVIOUSLY" Language="fr_FR">
+            <Text>(Était {1_name})</Text>
+        </Replace>
+        <Replace Tag="LOC_BZ_IMPROVEMENT_FOR_TILE" Language="fr_FR">
+            <Text>Permet {1_icon} {2_name}</Text>
+        </Replace>
+        <Replace Tag="LOC_BZ_IMPROVEMENT_FOR_RESOURCE" Language="fr_FR">
+            <Text>Nécessite {1_icon} {2_name}</Text>
+        </Replace>
+        <Replace Tag="LOC_DISTRICT_BZ_DISCOVERY" Language="fr_FR">
+            <Text>Découverte|Découvertes</Text>
+            <Gender>feminine</Gender>
+            <Plurality>1|2</Plurality>
+        </Replace>
+        <Replace Tag="LOC_DISTRICT_BZ_INDEPENDENT" Language="fr_FR">
+            <Text>Indépendant|Indépendante|Indépendants|Indépendantes</Text>
+            <Gender>masculine|feminine|masculine|feminine</Gender>
+            <Plurality>1|1|2|2</Plurality>
+        </Replace>
+        <Replace Tag="LOC_DISTRICT_BZ_TOWN_CENTER" Language="fr_FR">
+            <Text>Centre-ville|Centres-villes</Text>
+            <Gender>masculine</Gender>
+            <Plurality>1|2</Plurality>
+        </Replace>
+        <Replace Tag="LOC_DISTRICT_BZ_URBAN_VACANT" Language="fr_FR">
+            <Text>District vacant</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE" Language="fr_FR">
+            <Text>Map Trix • niveau de détail</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE_DESCRIPTION" Language="fr_FR">
+            <Text>Quel niveau de détails afficher dans les infobulles.[N] [N][B]Touche de raccourci[/B][N]Bref • Ctrl[N]Détaillé • Maj[N]Caché • Ctrl+Maj</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER" Language="fr_FR">
+            <Text>Map Trix • relooker la bannière de rendement</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER_DESCRIPTION" Language="fr_FR">
+            <Text>La bannière de rendement adopte le style des mods de Trixie.</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_VERBOSITY_HIDDEN" Language="fr_FR">
+            <Text>Caché</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_VERBOSITY_COMPACT" Language="fr_FR">
+            <Text>Bref</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_VERBOSITY_STANDARD" Language="fr_FR">
+            <Text>Standard</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_VERBOSITY_VERBOSE" Language="fr_FR">
+            <Text>Détaillé</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_GROUP_BZ_MODS" Language="fr_FR">
+            <Text>mods de Trixie</Text>
+        </Replace>
+        <Replace Tag="LOC_STATE_BZ_UNIQUE" Language="fr_FR">
+            <Text>Exclusif|Exclusive|Exclusifs|Exclusives</Text>
+            <Gender>masculine|feminine|masculine|feminine</Gender>
+            <Plurality>1|1|2|2</Plurality>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS" Language="fr_FR">
+            <Text>Frontières</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS_TT" Language="fr_FR">
+            <Text>Affiche ou masque les frontières.</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_BORDERS" Language="fr_FR">
+            <Text>Colonies</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_BORDERS_TT" Language="fr_FR">
+            <Text>Change les frontières entre les colonies et l'empire.</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_DISCOVERY_ICONS" Language="fr_FR">
+            <Text>Icônes de découverte</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_DISCOVERY_ICONS_TT" Language="fr_FR">
+            <Text>Affiche ou masque les icônes de découverte.</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_FORTIFICATION_ICONS" Language="fr_FR">
+            <Text>Icônes de fortification</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_FORTIFICATION_ICONS_TT" Language="fr_FR">
+            <Text>Affiche ou masque les icônes de fortification.</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_RELIGION_ICONS" Language="fr_FR">
+            <Text>Icônes de la religion</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_RELIGION_ICONS_TT" Language="fr_FR">
+            <Text>Affiche ou masque les icônes de la religion.</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_MINI_MAP_BZ_BORDERS" Language="fr_FR">
+            <Text>Frontières</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_MINI_MAP_BZ_CITY_BORDERS" Language="fr_FR">
+            <Text>Colonies</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_MINI_MAP_BZ_DISCOVERY" Language="fr_FR">
+            <Text>Découvertes</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_MINI_MAP_BZ_FORTIFICATION" Language="fr_FR">
+            <Text>Fortifications</Text>
+        </Replace>
+        <Replace Tag="LOC_YIELD_BZ_TOTAL" Language="fr_FR">
+            <Text>Rendement total</Text>
+        </Replace>
+    </LocalizedText>
+</Database>

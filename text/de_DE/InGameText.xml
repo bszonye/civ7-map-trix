@@ -28,12 +28,6 @@
         <Replace Tag="LOC_DISTRICT_BZ_TOWN_CENTER" Language="de_DE">
             <Text>Stadtzentrum</Text>
         </Replace>
-        <Replace Tag="LOC_DISTRICT_BZ_URBAN_DISTRICT" Language="de_DE">
-            <Text>Bezirk</Text>
-        </Replace>
-        <Replace Tag="LOC_DISTRICT_BZ_URBAN_QUARTER" Language="de_DE">
-            <Text>Quartier</Text>
-        </Replace>
         <Replace Tag="LOC_DISTRICT_BZ_URBAN_VACANT" Language="de_DE">
             <Text>Freier Bezirk</Text>
         </Replace>
@@ -66,6 +60,48 @@
         </Replace>
         <Replace Tag="LOC_STATE_BZ_UNIQUE" Language="de_DE">
             <Text>Einzigartig</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS" Language="de_DE">
+            <Text>Grenzen umschalten</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS_TT" Language="de_DE">
+            <Text>Sichtbarkeit der Grenzen umschalten</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_BORDERS" Language="de_DE">
+            <Text>Stadtgrenzen umschalten</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_BORDERS_TT" Language="de_DE">
+            <Text>Umschalten zwischen Stadt- und Reichsgrenzen</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_DISCOVERY_ICONS" Language="de_DE">
+            <Text>Entdeckungssymbole umschalten</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_DISCOVERY_ICONS_TT" Language="de_DE">
+            <Text>Sichtbarkeit der Entdeckungssymbole umschalten</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_FORTIFICATION_ICONS" Language="de_DE">
+            <Text>Befestigungssymbole umschalten</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_FORTIFICATION_ICONS_TT" Language="de_DE">
+            <Text>Sichtbarkeit der Befestigungssymbole umschalten</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_RELIGION_ICONS" Language="de_DE">
+            <Text>Religionssymbole umschalten</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_RELIGION_ICONS_TT" Language="de_DE">
+            <Text>Sichtbarkeit der Religionssymbole umschalten</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_MINI_MAP_BZ_BORDERS" Language="de_DE">
+            <Text>Grenzen</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_MINI_MAP_BZ_CITY_BORDERS" Language="de_DE">
+            <Text>Stadtgrenzen</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_MINI_MAP_BZ_DISCOVERY" Language="de_DE">
+            <Text>Entdeckungen</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_MINI_MAP_BZ_FORTIFICATION" Language="de_DE">
+            <Text>Befestigungen</Text>
         </Replace>
         <Replace Tag="LOC_YIELD_BZ_TOTAL" Language="de_DE">
             <Text>Gesamtertrag</Text>

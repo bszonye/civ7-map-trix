@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Database>
+    <InputActions>
+        <Replace ActionId="toggle-bz-culture-borders-layer" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS" Description="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS_TT" />
+        <Replace ActionId="toggle-bz-city-borders-layer" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_BORDERS" Description="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_BORDERS_TT" />
+        <Replace ActionId="toggle-bz-discovery-layer" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_TOGGLE_BZ_DISCOVERY_ICONS" Description="LOC_UI_KBM_MAPPING_TOGGLE_BZ_DISCOVERY_ICONS_TT" />
+        <Replace ActionId="toggle-bz-fortification-layer" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_TOGGLE_BZ_FORTIFICATION_ICONS" Description="LOC_UI_KBM_MAPPING_TOGGLE_BZ_FORTIFICATION_ICONS_TT" />
+        <Replace ActionId="toggle-bz-religion-layer" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_TOGGLE_BZ_RELIGION_ICONS" Description="LOC_UI_KBM_MAPPING_TOGGLE_BZ_RELIGION_ICONS_TT" />
+    </InputActions>
+    <InputContextConstraints>
+        <Replace ActionId="toggle-bz-culture-borders-layer" ContextId="World"/>
+        <Replace ActionId="toggle-bz-culture-borders-layer" ContextId="Unit"/>
+        <Replace ActionId="toggle-bz-city-borders-layer" ContextId="World"/>
+        <Replace ActionId="toggle-bz-city-borders-layer" ContextId="Unit"/>
+        <Replace ActionId="toggle-bz-discovery-layer" ContextId="World"/>
+        <Replace ActionId="toggle-bz-discovery-layer" ContextId="Unit"/>
+        <Replace ActionId="toggle-bz-fortification-layer" ContextId="World"/>
+        <Replace ActionId="toggle-bz-fortification-layer" ContextId="Unit"/>
+        <Replace ActionId="toggle-bz-religion-layer" ContextId="World"/>
+        <Replace ActionId="toggle-bz-religion-layer" ContextId="Unit"/>
+    </InputContextConstraints>
+    <InputActionDefaultGestures>
+        <Replace ActionId="toggle-bz-culture-borders-layer" Index="0" GestureType="KBMouse" GestureData="KEY_SHIFT+KEY_B"/>
+        <Replace ActionId="toggle-bz-city-borders-layer" Index="0" GestureType="KBMouse" GestureData="KEY_SHIFT+KEY_C"/>
+        <Replace ActionId="toggle-bz-discovery-layer" Index="0" GestureType="KBMouse" GestureData="KEY_SHIFT+KEY_D"/>
+        <Replace ActionId="toggle-bz-fortification-layer" Index="0" GestureType="KBMouse" GestureData="KEY_SHIFT+KEY_F"/>
+        <Replace ActionId="toggle-bz-religion-layer" Index="0" GestureType="KBMouse" GestureData="KEY_SHIFT+KEY_R"/>
+    </InputActionDefaultGestures>
+</Database>
