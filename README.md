@@ -1,4 +1,4 @@
-# Map Trix 3.0.0
+# Map Trix 3.1.0
 better map tools for Civilization VII
 
 ## better tooltips
@@ -24,7 +24,7 @@ five new decoration layers offer guidance and customization options.
 - fortifications:  show which tiles are fortified and who controls them
 - religion:  see exactly which tiles to visit with your missionaries
 
-each layer has a configurable shortcut key.
+activate layers in the minimap or with configurable shortcut keys.
 
 ## localization
 supported languages:
