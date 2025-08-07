@@ -1,7 +1,7 @@
 # Map Trix 3.0.0
 better map tools for Civilization VII
 
-## better map tooltips
+## better tooltips
 color highlights emphasize important map features:  terrain obstacles,
 enemy territory and units, building types, and more.  hold down Ctrl or
 Shift to change the level of detail, or set your preferences in the
