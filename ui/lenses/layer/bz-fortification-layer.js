@@ -1,5 +1,6 @@
 import LensManager, { BaseSpriteGridLensLayer, LensActivationEventName } from '/core/ui/lenses/lens-manager.js';
 ;
+const BZ_DEFAULT_LENSES = [];
 const SPRITE_PLOT_POSITION = { x: 0, y: 0, z: 10 };
 const SPRITE_SCALE = 1;
 const _SPRITE_SIZE = 64 * SPRITE_SCALE;
@@ -13,6 +14,7 @@ class bzFortificationLensLayer extends BaseSpriteGridLensLayer {
         super([
             { handle: SpriteGroup.bzFortification, name: "bzFortificationLayer_SpriteGroup", spriteMode: SpriteMode.Default },
         ]);
+        this.defaultLenses = new Set(BZ_DEFAULT_LENSES);  // initialization tracker
         this.onLayerHotkeyListener = this.onLayerHotkey.bind(this);
         this.onLensActivationListener = this.onLensActivation.bind(this);
     }
@@ -50,7 +52,7 @@ class bzFortificationLensLayer extends BaseSpriteGridLensLayer {
             const item = Constructibles.getByComponentID(con);
             if (!item) continue;
             const info = GameInfo.Constructibles.lookup(item.type);
-            if (!info.DistrictDefense) continue;
+            if (!info?.DistrictDefense) continue;
             const controller = Players.get(district.controllingPlayer);
             const civ = GameInfo.Civilizations.lookup(controller.civilizationType);
             const asset = this.getCivilizationIcon(civ.CivilizationType);
@@ -74,8 +76,9 @@ class bzFortificationLensLayer extends BaseSpriteGridLensLayer {
         }
     }
     onLensActivation(event) {
-        if (event.detail.activeLens == 'fxs-default-lens' && !event.detail.prevLens) {
-            // LensManager.enableLayer('bz-fortification-layer');
+        if (this.defaultLenses.has(event.detail.activeLens)) {
+            LensManager.enableLayer('bz-fortification-layer');
+            this.defaultLenses.delete(event.detail.activeLens);
         }
     }
 }

@@ -1,8 +1,9 @@
 import '/bz-map-trix/ui/lenses/layer/bz-fortification-layer.js';  // force layer order
 import LensManager, { BaseSpriteGridLensLayer, LensActivationEventName } from '/core/ui/lenses/lens-manager.js';
 ;
+const BZ_DEFAULT_LENSES = [];
 const SPRITE_PLOT_POSITION = { x: 0, y: -18, z: 5 };
-const SPRITE_SCALE = 0.5;
+const SPRITE_SCALE = 1/2;
 const _SPRITE_SIZE = 64 * SPRITE_SCALE;
 var SpriteGroup;
 (function (SpriteGroup) {
@@ -14,6 +15,7 @@ class bzReligionLensLayer extends BaseSpriteGridLensLayer {
         super([
             { handle: SpriteGroup.bzReligion, name: "bzReligionLayer_SpriteGroup", spriteMode: SpriteMode.Billboard },
         ]);
+        this.defaultLenses = new Set(BZ_DEFAULT_LENSES);  // initialization tracker
         this.onLayerHotkeyListener = this.onLayerHotkey.bind(this);
         this.onLensActivationListener = this.onLensActivation.bind(this);
     }
@@ -81,8 +83,9 @@ class bzReligionLensLayer extends BaseSpriteGridLensLayer {
         }
     }
     onLensActivation(event) {
-        if (event.detail.activeLens == 'fxs-default-lens' && !event.detail.prevLens) {
-            // LensManager.enableLayer('bz-religion-layer');
+        if (this.defaultLenses.has(event.detail.activeLens)) {
+            LensManager.enableLayer('bz-religion-layer');
+            this.defaultLenses.delete(event.detail.activeLens);
         }
     }
 }
