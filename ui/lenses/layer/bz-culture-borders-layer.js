@@ -15,7 +15,7 @@ const BZ_VILLAGE_SECONDARY = 0xffffffff;
 const BZ_VILLAGE_STYLE = {
     style: BorderStyleTypes.CityStateOpen,
     primaryColor: BZ_VILLAGE_PRIMARY,
-    secondaryColor: BZ_VILLAGE_SECONDARY
+    secondaryColor: BZ_VILLAGE_SECONDARY,
 };
 const thicknessZoomMultiplier = 3;
 function borderGroup(id) {
