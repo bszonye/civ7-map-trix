@@ -1,5 +1,5 @@
 import LensManager, { BaseSpriteGridLensLayer, LensActivationEventName } from '/core/ui/lenses/lens-manager.js';
-;
+
 const BZ_DEFAULT_LENSES = [];
 const SPRITE_PLOT_POSITION = { x: 0, y: 0, z: 10 };
 const SPRITE_SCALE = 1;

@@ -1,6 +1,6 @@
 import '/bz-map-trix/ui/lenses/layer/bz-fortification-layer.js';  // force layer order
 import LensManager, { BaseSpriteGridLensLayer, LensActivationEventName } from '/core/ui/lenses/lens-manager.js';
-;
+
 const BZ_DEFAULT_LENSES = [];
 const SPRITE_PLOT_POSITION = { x: 0, y: -18, z: 5 };
 const SPRITE_SCALE = 1/2;
