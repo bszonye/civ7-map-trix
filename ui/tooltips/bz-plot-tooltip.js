@@ -415,7 +415,7 @@ function gatherBuildingsTagged(tag) {
 }
 // get the set of obstacles that end movement for a movement class
 const BZ_OBSTACLES = {};  // cache
-function gatherMovementObstacles(mclass) {
+export function gatherMovementObstacles(mclass) {
     if (!mclass) {
         // get the movement class for the selected unit
         const unitID = UI.Player.getHeadSelectedUnit();
