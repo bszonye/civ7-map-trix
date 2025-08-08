@@ -105,25 +105,17 @@ class bzCityBordersLayer {
     applyLayer() {
         this.updateBorders();
         this.cityOverlayGroup.setVisible(true);
-        // make city and empire borders mutually exclusive
-        if (LensManager.isLayerEnabled('bz-culture-borders-layer')) {
-            LensManager.disableLayer('bz-culture-borders-layer');
-        }
     }
     removeLayer() {
         this.cityOverlayGroup.setVisible(false);
     }
     onLayerHotkey(hotkey) {
         if (hotkey.detail.name == 'toggle-bz-city-borders-layer') {
-            // toggle between city limits and culture borders
-            if (LensManager.isLayerEnabled('bz-city-borders-layer')) {
-                LensManager.enableLayer('bz-culture-borders-layer');
-            } else {
-                LensManager.enableLayer('bz-city-borders-layer');
-            }
+            LensManager.toggleLayer('bz-city-borders-layer');
         }
     }
     onLensActivation(event) {
+        // enable this layer the first time a default lens activates
         if (this.defaultLenses.has(event.detail.activeLens)) {
             LensManager.enableLayer('bz-city-borders-layer');
             this.defaultLenses.delete(event.detail.activeLens);

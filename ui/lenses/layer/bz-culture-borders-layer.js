@@ -1,4 +1,4 @@
-import LensManager, { LensActivationEventName, LensLayerEnabledEventName } from '/core/ui/lenses/lens-manager.js';
+import LensManager, { LensActivationEventName, LensLayerDisabledEventName, LensLayerEnabledEventName } from '/core/ui/lenses/lens-manager.js';
 import { OVERLAY_PRIORITY } from '/base-standard/ui/utilities/utilities-overlay.js';
 var BorderStyleTypes;
 (function (BorderStyleTypes) {
@@ -32,6 +32,7 @@ class bzCultureBordersLayer {
         this.lastZoomLevel = -1;
         this.onLayerHotkeyListener = this.onLayerHotkey.bind(this);
         this.onLensActivationListener = this.onLensActivation.bind(this);
+        this.onLensLayerDisabledListener = this.onLensLayerDisabled.bind(this);
         this.onLensLayerEnabledListener = this.onLensLayerEnabled.bind(this);
         this.onPlotOwnershipChanged = (data) => {
             const plotIndex = GameplayMap.getIndexFromLocation(data.location);
@@ -95,34 +96,41 @@ class bzCultureBordersLayer {
         engine.on('PlotOwnershipChanged', this.onPlotOwnershipChanged);
         window.addEventListener('layer-hotkey', this.onLayerHotkeyListener);
         window.addEventListener(LensActivationEventName, this.onLensActivationListener);
+        window.addEventListener(LensLayerDisabledEventName, this.onLensLayerDisabledListener);
         window.addEventListener(LensLayerEnabledEventName, this.onLensLayerEnabledListener);
         this.cultureOverlayGroup.setVisible(false);
     }
     applyLayer() {
+        if (LensManager.isLayerEnabled('bz-city-borders-layer')) return;
         this.updateBorders();
         this.cultureOverlayGroup.setVisible(true);
-        // make city and empire borders mutually exclusive
-        if (LensManager.isLayerEnabled('bz-city-borders-layer')) {
-            LensManager.disableLayer('bz-city-borders-layer');
-        }
     }
     removeLayer() {
         this.cultureOverlayGroup.setVisible(false);
     }
     onLayerHotkey(hotkey) {
         if (hotkey.detail.name == 'toggle-bz-culture-borders-layer') {
-            // toggle all borders (including city limits if enabled)
-            if (LensManager.isLayerEnabled('bz-city-borders-layer')) {
-                LensManager.disableLayer('bz-city-borders-layer');
-            } else {
-                LensManager.toggleLayer('bz-culture-borders-layer');
-            }
+            LensManager.toggleLayer('bz-culture-borders-layer');
         }
     }
     onLensActivation(event) {
+        // enable this layer the first time a default lens activates
         if (this.defaultLenses.has(event.detail.activeLens)) {
             LensManager.enableLayer('bz-culture-borders-layer');
             this.defaultLenses.delete(event.detail.activeLens);
+        }
+    }
+    onLensLayerDisabled(event) {
+        if (event.detail.layer == 'bz-culture-borders-layer') {
+            // when Borders are off, City Limits must be off too
+            if (LensManager.isLayerEnabled('bz-city-borders-layer')) {
+                LensManager.disableLayer('bz-city-borders-layer');
+            }
+        } else if (event.detail.layer == 'bz-city-borders-layer') {
+            // when City Limits turn off, reapply Borders
+            if (LensManager.isLayerEnabled('bz-culture-borders-layer')) {
+                this.applyLayer();
+            }
         }
     }
     onLensLayerEnabled(event) {
@@ -130,6 +138,13 @@ class bzCultureBordersLayer {
             // replace the vanilla empire borders
             LensManager.disableLayer('fxs-culture-borders-layer');
             LensManager.enableLayer('bz-culture-borders-layer');
+        } else if (event.detail.layer == 'bz-city-borders-layer') {
+            // when City Limits are on, Borders must be on (but hidden)
+            if (LensManager.isLayerEnabled('bz-culture-borders-layer')) {
+                this.removeLayer();
+            } else {
+                LensManager.enableLayer('bz-culture-borders-layer');
+            }
         }
     }
 }
