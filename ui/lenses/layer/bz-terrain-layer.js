@@ -1,22 +1,16 @@
 import { gatherMovementObstacles } from '/bz-map-trix/ui/tooltips/bz-plot-tooltip.js';
 import LensManager, { LensActivationEventName } from '/core/ui/lenses/lens-manager.js';
 import { OVERLAY_PRIORITY } from '/base-standard/ui/utilities/utilities-overlay.js';
-;
-const BZ_DEFAULT_LENSES = [];
+
+const BZ_DEFAULT_LENSES = ['fxs-default-lens'];
 // adapted from ui/tooltips/bz-plot-tooltip.js
 const BZ_OVERLAY = {
-    debug: 0x80ff00ff,
-    TERRAIN_OCEAN: 0,
-    TERRAIN_HILL: 0xff3b6074,             // #c7b28a66 TODO
-    FEATURE_CLASS_VEGETATED: 0xff0a714a,  // #aaff0033 TODO
-    FEATURE_CLASS_WET: 0xff717115,        // #55ffff33 TODO
-    RIVER_MINOR: 0x55ffaa55,              // #55aaff66 TODO
-    RIVER_NAVIGABLE: 0x55ffaa55,          // #55aaff66 TODO
-    ROUTE_BRIDGE: 0xffc4c9d4,             // #d4c9c4cc TODO
-    ROUTE_FERRY: 0xffc4c9d4,              // #d4c9c4cc TODO
-    ROUTE_RAILROAD: 0xffccc4c2,           // #c2c4cccc TODO
-    ROUTE_ROAD: 0xffacd2e5,               // #e5d2accc TODO
-};
+    TERRAIN_HILL: { fillColor: 0xdd446677, edgeColor: 0xff446677, },
+    FEATURE_CLASS_VEGETATED: { fillColor: 0xdd005533, edgeColor: 0xff005533, },
+    FEATURE_CLASS_WET: { fillColor: 0xdd666600, edgeColor: 0xff666600, },
+    RIVER_MINOR: { fillColor: 0x66ffaa55, edgeColor: 0xffffaa55, },
+    RIVER_NAVIGABLE: { fillColor: 0x66ffaa55, edgeColor: 0xffffaa55, },
+}
 class bzTerrainLensLayer {
     constructor() {
         this.defaultLenses = new Set(BZ_DEFAULT_LENSES);  // initialization tracker
@@ -26,26 +20,20 @@ class bzTerrainLensLayer {
         this.onLayerHotkeyListener = this.onLayerHotkey.bind(this);
         this.onLensActivationListener = this.onLensActivation.bind(this);
     }
-    clearOverlay() {
-        this.terrainOverlayGroup.clearAll();
-        this.terrainOverlay.clear();
-    }
     initLayer() {
-        engine.on('RouteAddedToMap', this.onMapChange, this);
-        engine.on('RouteChanged', this.onMapChange, this);
-        engine.on('RouteRemovedFromMap', this.onMapChange, this);
+        this.updateMap();
         window.addEventListener('layer-hotkey', this.onLayerHotkeyListener);
         window.addEventListener(LensActivationEventName, this.onLensActivationListener);
+        this.terrainOverlayGroup.setVisible(false);
     }
     applyLayer() {
         this.updateMap();
+        this.terrainOverlayGroup.setVisible(true);
     }
     removeLayer() {
-        this.clearOverlay();
+        this.terrainOverlayGroup.setVisible(false);
     }
-    getObstacleColor(loc) {
-        // rivers
-        // TODO
+    getTerrainStyle(loc) {
         // terrain obstacles
         const tid = GameplayMap.getTerrainType(loc.x, loc.y);
         const tinfo = GameInfo.Terrains.lookup(tid);
@@ -60,18 +48,15 @@ class bzTerrainLensLayer {
             const type = finfo.FeatureType;
             if (this.obstacles.has(type)) return BZ_OVERLAY[finfo.FeatureClassType];
         }
-        return 0;
-    }
-    getRouteColor(loc) {
-        const id = GameplayMap.getRouteType(loc.x, loc.y);
-        const info = GameInfo.Routes.lookup(id);
-        if (!info) return 0;
-        if (GameplayMap.isFerry(loc.x, loc.x)) return BZ_OVERLAY.ROUTE_FERRY;
-        if (info.PlacementRequiresRoutePresent) return BZ_OVERLAY.ROUTE_RAILROAD;
-        return BZ_OVERLAY.ROUTE_ROAD;
+        // rivers
+        const rid = GameplayMap.getRiverType(loc.x, loc.y);
+        if (rid == RiverTypes.RIVER_NAVIGABLE) return BZ_OVERLAY.RIVER_NAVIGABLE;
+        if (rid == RiverTypes.RIVER_MINOR) return BZ_OVERLAY.RIVER_MINOR;
+        return null;
     }
     updateMap() {
-        this.clearOverlay();
+        this.terrainOverlayGroup.clearAll();
+        this.terrainOverlay.clear();
         const width = GameplayMap.getGridWidth();
         const height = GameplayMap.getGridHeight();
         for (let x = 0; x < width; x++) {
@@ -82,15 +67,11 @@ class bzTerrainLensLayer {
     }
     updatePlot(loc) {
         const plotIndex = GameplayMap.getIndexFromLocation(loc);
-        const fillColor = this.getObstacleColor(loc);
-        const edgeColor = this.getRouteColor(loc);
-        this.terrainOverlay.addPlots(plotIndex, { fillColor, edgeColor });
+        const terrainStyle = this.getTerrainStyle(loc);
+        if (terrainStyle) this.terrainOverlay.addPlots(plotIndex, terrainStyle);
     }
     onMapChange() {
         this.updateMap();
-    }
-    onPlotChange(data) {
-        this.updatePlot(data.location);
     }
     onLayerHotkey(hotkey) {
         if (hotkey.detail.name == 'toggle-bz-terrain-layer') {
