@@ -5,9 +5,9 @@ import { OVERLAY_PRIORITY } from '/base-standard/ui/utilities/utilities-overlay.
 const BZ_DEFAULT_LENSES = ['fxs-default-lens'];
 // adapted from ui/tooltips/bz-plot-tooltip.js
 const BZ_OVERLAY = {
-    TERRAIN_HILL: { fillColor: 0xdd446677, edgeColor: 0xff223344, },
-    FEATURE_CLASS_VEGETATED: { fillColor: 0xdd005533, edgeColor: 0xff003322, },
-    FEATURE_CLASS_WET: { fillColor: 0xdd666600, edgeColor: 0xff444400, },
+    TERRAIN_HILL: { fillColor: 0xee446677, edgeColor: 0xff223344, },
+    FEATURE_CLASS_VEGETATED: { fillColor: 0xee005533, edgeColor: 0xff003322, },
+    FEATURE_CLASS_WET: { fillColor: 0xee666600, edgeColor: 0xff444400, },
     FEATURE_CLASS_FLOODPLAIN: { fillColor: 0xcccc8844, edgeColor: 0xffffcc99, },
     RIVER_MINOR: { fillColor: 0xcccc8844, edgeColor: 0xff775533, },
     RIVER_NAVIGABLE: { fillColor: 0xcccc8844, edgeColor: 0xff775533, },
