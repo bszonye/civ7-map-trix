@@ -2,7 +2,7 @@ import { gatherMovementObstacles } from '/bz-map-trix/ui/tooltips/bz-plot-toolti
 import LensManager, { LensActivationEventName } from '/core/ui/lenses/lens-manager.js';
 import { OVERLAY_PRIORITY } from '/base-standard/ui/utilities/utilities-overlay.js';
 
-const BZ_DEFAULT_LENSES = ['fxs-default-lens'];
+const BZ_DEFAULT_LENSES = [];
 // adapted from ui/tooltips/bz-plot-tooltip.js
 // hill        #c07e45  oklch(0.65 0.11 60)   #633e1d  oklch(0.40 0.07 60)
 // vegetated   #6ba211  oklch(0.65 0.17 130)  #3b4f25  oklch(0.40 0.07 130)
