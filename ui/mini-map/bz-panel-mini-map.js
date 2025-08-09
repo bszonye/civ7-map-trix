@@ -49,19 +49,31 @@ class bzPanelMiniMap {
     }
 }
 
-const unitSelectionHandler = InterfaceMode.getInterfaceModeHandler('INTERFACEMODE_UNIT_SELECTED');
-const USHproto = Object.getPrototypeOf(unitSelectionHandler);
-const USH_setUnitLens = USHproto.setUnitLens;
-USHproto.setUnitLens = function(...args) {
+// units handled by other lens mods
+const DL_SKIP = new Set(["UNIT_MOVEMENT_CLASS_RECON", "UNIT_MOVEMENT_CLASS_NAVAL"]);
+const FL_SKIP = new Set(["UNIT_ARMY_COMMANDER", "UNIT_AERODROME_COMMANDER"]);
+
+// extend UnitSelectedInterfaceMode
+const USIM = InterfaceMode.getInterfaceModeHandler('INTERFACEMODE_UNIT_SELECTED');
+const USIMproto = Object.getPrototypeOf(USIM);
+const USIM_setUnitLens = USIMproto.setUnitLens;
+USIMproto.setUnitLens = function(...args) {
     const [id] = args;
     const unit = Units.get(id);
     // let the original method report errors
-    if (!unit) return USH_setUnitLens.apply(this, args);
+    if (!unit) return USIM_setUnitLens.apply(this, args);
     const info = GameInfo.Units.lookup(unit.type);
-    console.warn(`TRIX ${Object.entries(info).filter(i => i[1]).map(i => i.join(':'))}`);
-    console.warn(`TRIX ${Object.entries(unit).filter(i => typeof i[1] === 'boolean').map(i => i.join(':'))}`);
+    // console.warn(`TRIX ${Object.entries(info).filter(i => i[1]).map(i => i.join(':'))}`);
+    // console.warn(`TRIX ${Object.entries(unit).filter(i => typeof i[1] === 'boolean').map(i => i.join(':'))}`);
+    const lenses = LensManager.lenses;
     if (info.FoundCity) {
-        // don't interfere with settlers
+        // don't interfere with Settler
+    } else if (lenses.has('mod-discovery-lens') && DL_SKIP.has(info.UnitMovementClass)) {
+        // don't interfere with Discovery lens
+        console.warn(`TRIX DISCOVERY`);
+    } else if (lenses.has('mod-fortified-district-lens') && FL_SKIP.has(info.UnitType)) {
+        // don't interfere with Fortified lens
+        console.warn(`TRIX FORTIFIED`);
     } else if (info.SpreadCharges) {
         LensManager.setActiveLens('bz-religion-lens');
         return;
@@ -69,7 +81,7 @@ USHproto.setUnitLens = function(...args) {
         LensManager.setActiveLens('bz-commander-lens');
         return;
     }
-    return USH_setUnitLens.apply(this, args);
+    return USIM_setUnitLens.apply(this, args);
 }
 
 Controls.decorate('lens-panel', (component) => new bzPanelMiniMap(component));
