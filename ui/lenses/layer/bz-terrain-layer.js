@@ -1,16 +1,15 @@
-import { gatherMovementObstacles } from '/bz-map-trix/ui/tooltips/bz-plot-tooltip.js';
 import LensManager, { LensActivationEventName } from '/core/ui/lenses/lens-manager.js';
 import { OVERLAY_PRIORITY } from '/base-standard/ui/utilities/utilities-overlay.js';
 
 const BZ_DEFAULT_LENSES = ['fxs-default-lens'];
 // adapted from ui/tooltips/bz-plot-tooltip.js
-// hill        #e1caaa  oklch(0.85 0.05 75)   #5f5343  oklch(0.45 0.03 75)
+// hill        #b88255  oklch(0.65 0.09 60)   #633e1d  oklch(0.40 0.07 60)
 // vegetated   #6ba211  oklch(0.65 0.17 130)  #3b4f25  oklch(0.40 0.07 130)
 // wet         #08a2af  oklch(0.65 0.11 205)  #00525a  oklch(0.40 0.07 205)
 // floodplain  #6ab3fd  oklch(0.75 0.13 250)  #6d4d3e  oklch(0.45 0.05 45)
 // river:      #6ab3fd  oklch(0.75 0.13 250)  #36587b  oklch(0.45 0.07 250)
 const BZ_OVERLAY = {
-    TERRAIN_HILL: { fillColor: 0xaaaacae1, edgeColor: 0xff43535f, },
+    TERRAIN_HILL: { fillColor: 0xaa5582b8, edgeColor: 0xff1d3e63, },
     FEATURE_CLASS_VEGETATED: { fillColor: 0xaa11a26b, edgeColor: 0xff254f3b, },
     FEATURE_CLASS_WET: { fillColor: 0xaaafa208, edgeColor: 0xff5a5200, },
     FEATURE_CLASS_FLOODPLAIN: { fillColor: 0x99fdb36a, edgeColor: 0xff3e4d6d, },
@@ -29,7 +28,6 @@ class bzTerrainLensLayer {
         this.terrainOverlay = this.terrainOverlayGroup.addPlotOverlay();
         this.terrainOutline = this.terrainOverlayGroup.addBorderOverlay(BZ_NO_OUTLINE);
         this.outlineGroup = new Map();
-        this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
         this.onLayerHotkeyListener = this.onLayerHotkey.bind(this);
         this.onLensActivationListener = this.onLensActivation.bind(this);
     }
@@ -57,27 +55,24 @@ class bzTerrainLensLayer {
         this.terrainOverlayGroup.setVisible(false);
     }
     getTerrainType(loc) {
-        // terrain obstacles
-        const tid = GameplayMap.getTerrainType(loc.x, loc.y);
-        const tinfo = GameInfo.Terrains.lookup(tid);
-        if (tinfo) {
-            const type = tinfo.TerrainType;
-            if (this.obstacles.has(type)) return type;
-        }
-        // feature obstacles
+        // feature types
         const fid = GameplayMap.getFeatureType(loc.x, loc.y);
-        const finfo = GameInfo.Features.lookup(fid);
-        if (finfo) {
-            const type = finfo.FeatureType;
-            const ctype = finfo.FeatureClassType;
-            if (this.obstacles.has(type)) return ctype;
-            if (ctype == "FEATURE_CLASS_FLOODPLAIN") return ctype;
+        if (fid != FeatureTypes.NO_FEATURE) {
+            const finfo = GameInfo.Features.lookup(fid);
+            const fctype = finfo.FeatureClassType;
+            if (Object.hasOwn(BZ_OVERLAY, fctype)) return fctype;
         }
-        // rivers
+        // river types
         const rid = GameplayMap.getRiverType(loc.x, loc.y);
-        if (rid == RiverTypes.RIVER_NAVIGABLE) return "RIVER_NAVIGABLE";
-        if (rid == RiverTypes.RIVER_MINOR) return "RIVER_MINOR";
-        return null;
+        switch (rid) {
+            case RiverTypes.RIVER_NAVIGABLE:
+                return "RIVER_NAVIGABLE";
+            case RiverTypes.RIVER_MINOR:
+                return "RIVER_MINOR";
+        }
+        // terrain types
+        const tid = GameplayMap.getTerrainType(loc.x, loc.y);
+        return GameInfo.Terrains.lookup(tid)?.TerrainType;
     }
     updateMap() {
         this.terrainOverlayGroup.clearAll();
@@ -93,8 +88,8 @@ class bzTerrainLensLayer {
     updatePlot(loc) {
         const plotIndex = GameplayMap.getIndexFromLocation(loc);
         const type = this.getTerrainType(loc);
-        if (type) {
-            const overlay = BZ_OVERLAY[type];
+        const overlay = BZ_OVERLAY[type];
+        if (overlay) {
             const group = this.outlineGroup.get(type);
             this.terrainOverlay.addPlots(plotIndex, overlay);
             this.terrainOutline.setPlotGroups(plotIndex, group);
