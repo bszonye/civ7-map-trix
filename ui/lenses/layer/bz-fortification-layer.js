@@ -1,6 +1,6 @@
 import LensManager, { BaseSpriteGridLensLayer, LensActivationEventName } from '/core/ui/lenses/lens-manager.js';
 
-const BZ_DEFAULT_LENSES = [];
+const BZ_DEFAULT_LENSES = ['mod-fortified-district-lens'];
 const SPRITE_PLOT_POSITION = { x: 0, y: 0, z: 10 };
 const SPRITE_SCALE = 1;
 const _SPRITE_SIZE = 64 * SPRITE_SCALE;

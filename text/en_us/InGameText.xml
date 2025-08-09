@@ -109,9 +109,6 @@
         <Replace Tag="LOC_UI_MINI_MAP_BZ_FORTIFICATION">
             <Text>Fortifications</Text>
         </Replace>
-        <Replace Tag="LOC_UI_MINI_MAP_BZ_STRATEGY">
-            <Text>Strategy</Text>
-        </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_TERRAIN">
             <Text>Terrain</Text>
         </Replace>

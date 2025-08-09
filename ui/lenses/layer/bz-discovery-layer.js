@@ -1,6 +1,13 @@
 import LensManager, { BaseSpriteGridLensLayer, LensActivationEventName } from '/core/ui/lenses/lens-manager.js';
 
-const BZ_DEFAULT_LENSES = ['fxs-default-lens'];
+const BZ_DEFAULT_LENSES = [
+    'fxs-default-lens',
+    'fxs-continent-lens',
+    'fxs-settler-lens',
+    'fxs-trade-lens',
+    'mod-discovery-lens',
+    'mod-fortified-district-lens',
+];
 const BZ_ICON_DISCOVERY = "NAR_REW_DEFAULT";
 const SPRITE_PLOT_POSITION = { x: 0, y: 25, z: 5 };
 const SPRITE_SCALE = 3/4;

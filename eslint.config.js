@@ -54,6 +54,7 @@ export default [
                 engine: "readonly",
                 localStorage: "readonly",
                 performance: "readonly",
+                setTimeout: "readonly",
                 window: "readonly",
             }
         }

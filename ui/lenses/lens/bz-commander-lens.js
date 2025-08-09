@@ -1,5 +1,5 @@
 import LensManager from '/core/ui/lenses/lens-manager.js';
-class bzStrategyLens {
+class bzCommanderLens {
     constructor() {
         this.activeLayers = new Set([
             'fxs-hexgrid-layer',
@@ -13,4 +13,4 @@ class bzStrategyLens {
         ]);
     }
 }
-LensManager.registerLens('bz-strategy-lens', new bzStrategyLens());
+LensManager.registerLens('bz-commander-lens', new bzCommanderLens());
