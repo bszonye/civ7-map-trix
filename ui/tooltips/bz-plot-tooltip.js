@@ -88,7 +88,7 @@ const BZ_COLOR = {
     caution: "#cea92f",  // caution = healthbar-medium
     note: "#ff800033",  // note = orange 20% opacity
     // geographic colors
-    hill: "#c7b28a66",  // Rough terrain = medium bronze 40% opacity
+    hill: "#ea995266",  // Rough terrain = orange 40% opacity
     vegetated: "#aaff0033",  // Vegetated features = green 20% opacity
     wet: "#55ffff33",  // Wet features = teal 20% opacity
     floodplain: "#ff800033",  // Floodplains = orange 20% opacity
@@ -416,7 +416,7 @@ function gatherBuildingsTagged(tag) {
 }
 // get the set of obstacles that end movement for a movement class
 const BZ_OBSTACLES = {};  // cache
-function gatherMovementObstacles(mclass) {
+export function gatherMovementObstacles(mclass) {
     if (!mclass) {
         // get the movement class for the selected unit
         const unitID = UI.Player.getHeadSelectedUnit();
