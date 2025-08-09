@@ -48,24 +48,9 @@ class bzPanelMiniMap {
     }
 }
 
-// skip lens activation for units handled by other lens mods
-const BZ_MOD_SKIPS = {
-    'mod-discovery-lens': ['UNIT_MOVEMENT_CLASS_RECON', 'UNIT_MOVEMENT_CLASS_NAVAL'],
-    'mod-fortified-district-lens': ['UNIT_ARMY_COMMANDER', 'UNIT_AERODROME_COMMANDER'],
-};
-const BZ_SKIPS = new Set();  // cache
-function getLensSkips() {
-    if (BZ_SKIPS.size) return BZ_SKIPS;
-    BZ_SKIPS.add('UNIT_SETTLER');  // ensure a non-empty set
-    for (const [mod, skips] of Object.entries(BZ_MOD_SKIPS)) {
-        if (LensManager.lenses.has(mod)) skips.forEach(skip => BZ_SKIPS.add(skip));
-    }
-    return BZ_SKIPS;
-}
-
-// extend UnitSelectedInterfaceMode
-function bzSetUnitLens(id) {
-    const unit = Units.get(id);
+// extend UnitSelectedInterfaceMode.setUnitLens(unitID)
+function bzSetUnitLens(unitID) {
+    const unit = Units.get(unitID);
     if (!unit) return true;  // hand off errors to original method
     const info = GameInfo.Units.lookup(unit.type);
     const skips = getLensSkips();
@@ -80,19 +65,33 @@ function bzSetUnitLens(id) {
         LensManager.setActiveLens('bz-commander-lens');
         return;
     }
-    return true;  // hand off to the original method
+    return true;  // return to original method
 }
-// replace USIM.setUnitLens (calling it as a fallback)
+// skip lens activation for units handled by other lens mods
+const BZ_MOD_SKIPS = {
+    'mod-discovery-lens': ['UNIT_MOVEMENT_CLASS_RECON', 'UNIT_MOVEMENT_CLASS_NAVAL'],
+    'mod-fortified-district-lens': ['UNIT_ARMY_COMMANDER', 'UNIT_AERODROME_COMMANDER'],
+};
+const BZ_SKIPS = new Set();  // cache
+function getLensSkips() {
+    if (BZ_SKIPS.size) return BZ_SKIPS;
+    BZ_SKIPS.add('UNIT_SETTLER');  // ensure a non-empty set
+    for (const [mod, skips] of Object.entries(BZ_MOD_SKIPS)) {
+        if (LensManager.lenses.has(mod)) skips.forEach(skip => BZ_SKIPS.add(skip));
+    }
+    return BZ_SKIPS;
+}
+// patch USIM.setUnitLens (calling it as a fallback)
 import '/base-standard/ui/interface-modes/interface-mode-unit-selected.js';
-function setUnitLensOverride(setUnitLens) {
+function patchUnitLens(patch) {
     const USIM = InterfaceMode.getInterfaceModeHandler('INTERFACEMODE_UNIT_SELECTED');
     const prototype = Object.getPrototypeOf(USIM);
-    const USIM_setUnitLens = prototype.setUnitLens;
+    const original = prototype.setUnitLens;
     prototype.setUnitLens = function(...args) {
-        const rv = setUnitLens.apply(this, args);
-        if (rv) return USIM_setUnitLens.apply(this, args);
+        const rv = patch.apply(this, args);
+        if (rv) return original.apply(this, args);
     }
 }
-setUnitLensOverride(bzSetUnitLens);
+patchUnitLens(bzSetUnitLens);
 
 Controls.decorate('lens-panel', (component) => new bzPanelMiniMap(component));
