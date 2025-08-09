@@ -2,7 +2,7 @@ import LensManager, { BaseSpriteGridLensLayer, LensActivationEventName } from '/
 
 const BZ_DEFAULT_LENSES = ['mod-fortified-district-lens'];
 const SPRITE_PLOT_POSITION = { x: 0, y: 0, z: 10 };
-const SPRITE_SCALE = 1;
+const SPRITE_SCALE = 2;
 const _SPRITE_SIZE = 64 * SPRITE_SCALE;
 var SpriteGroup;
 (function (SpriteGroup) {
@@ -17,6 +17,7 @@ class bzFortificationLensLayer extends BaseSpriteGridLensLayer {
         this.defaultLenses = new Set(BZ_DEFAULT_LENSES);  // initialization tracker
         this.onLayerHotkeyListener = this.onLayerHotkey.bind(this);
         this.onLensActivationListener = this.onLensActivation.bind(this);
+        this.upscaleMultiplier = 1;  // prevent UI scaling
     }
     initLayer() {
         this.updateMap();
