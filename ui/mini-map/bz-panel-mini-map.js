@@ -1,3 +1,7 @@
+const BZ_LENSES = {
+    "bz-religion-lens": "LOC_UI_MINI_MAP_RELIGION",
+    "bz-strategy-lens": "LOC_UI_MINI_MAP_BZ_STRATEGY",
+};
 const BZ_LAYERS = {
     "bz-culture-borders-layer": "LOC_UI_MINI_MAP_BZ_BORDERS",
     "bz-city-borders-layer": "LOC_UI_MINI_MAP_BZ_CITY_BORDERS",
@@ -33,6 +37,9 @@ class bzPanelMiniMap {
     afterDetach() { }
     onAttributeChanged(_name, _prev, _next) { }
     afterInitialize() {
+        for (const [lens, name] of Object.entries(BZ_LENSES)) {
+            this.component.createLensButton(name, lens, "lens-group");
+        }
         for (const [layer, name] of Object.entries(BZ_LAYERS)) {
             this.component.createLayerCheckbox(name, layer);
         }
