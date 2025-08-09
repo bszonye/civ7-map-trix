@@ -4,13 +4,18 @@ import { OVERLAY_PRIORITY } from '/base-standard/ui/utilities/utilities-overlay.
 
 const BZ_DEFAULT_LENSES = ['fxs-default-lens'];
 // adapted from ui/tooltips/bz-plot-tooltip.js
+// hill        #e1caaa  oklch(0.85 0.05 75)   #5f5343  oklch(0.45 0.03 75)
+// vegetated   #6ba211  oklch(0.65 0.17 130)  #3b4f25  oklch(0.40 0.07 130)
+// wet         #08a2af  oklch(0.65 0.11 205)  #00525a  oklch(0.40 0.07 205)
+// floodplain  #6ab3fd  oklch(0.75 0.13 250)  #6d4d3e  oklch(0.45 0.05 45)
+// river:      #6ab3fd  oklch(0.75 0.13 250)  #36587b  oklch(0.45 0.07 250)
 const BZ_OVERLAY = {
-    TERRAIN_HILL: { fillColor: 0xee446677, edgeColor: 0xff223344, },
-    FEATURE_CLASS_VEGETATED: { fillColor: 0xee005533, edgeColor: 0xff003322, },
-    FEATURE_CLASS_WET: { fillColor: 0xee666600, edgeColor: 0xff444400, },
-    FEATURE_CLASS_FLOODPLAIN: { fillColor: 0xcccc8844, edgeColor: 0xffffcc99, },
-    RIVER_MINOR: { fillColor: 0xcccc8844, edgeColor: 0xff775533, },
-    RIVER_NAVIGABLE: { fillColor: 0xcccc8844, edgeColor: 0xff775533, },
+    TERRAIN_HILL: { fillColor: 0xaaaacae1, edgeColor: 0xff43535f, },
+    FEATURE_CLASS_VEGETATED: { fillColor: 0xaa11a26b, edgeColor: 0xff254f3b, },
+    FEATURE_CLASS_WET: { fillColor: 0xaaafa208, edgeColor: 0xff5a5200, },
+    FEATURE_CLASS_FLOODPLAIN: { fillColor: 0x99fdb36a, edgeColor: 0xff3e4d6d, },
+    RIVER_MINOR: { fillColor: 0x99fdb36a, edgeColor: 0xff7b5836, },
+    RIVER_NAVIGABLE: { fillColor: 0x99fdb36a, edgeColor: 0xff7b5836, },
 }
 const BZ_NO_OUTLINE = {
     style: "CultureBorder_Closed",
