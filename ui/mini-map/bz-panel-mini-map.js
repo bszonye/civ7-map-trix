@@ -50,8 +50,20 @@ class bzPanelMiniMap {
 }
 
 // units handled by other lens mods
-const DL_SKIP = new Set(["UNIT_MOVEMENT_CLASS_RECON", "UNIT_MOVEMENT_CLASS_NAVAL"]);
-const FL_SKIP = new Set(["UNIT_ARMY_COMMANDER", "UNIT_AERODROME_COMMANDER"]);
+const BZ_SKIPS = new Set();  // cache
+const BZ_MOD_SKIPS = {
+    'mod-discovery-lens': ['UNIT_MOVEMENT_CLASS_RECON', 'UNIT_MOVEMENT_CLASS_NAVAL'],
+    'mod-fortified-district-lens': ['UNIT_ARMY_COMMANDER', 'UNIT_AERODROME_COMMANDER'],
+};
+function getLensSkips() {
+    if (BZ_SKIPS.size) return BZ_SKIPS;
+    BZ_SKIPS.add('UNIT_SETTLER');  // ensure a non-empty set
+    for (const [mod, skips] of Object.entries(BZ_MOD_SKIPS)) {
+        if (LensManager.lenses.has(mod)) skips.forEach(skip => BZ_SKIPS.add(skip));
+    }
+    console.warn(`TRIX SKIPS ${[...BZ_SKIPS]}`);
+    return BZ_SKIPS;
+}
 
 // extend UnitSelectedInterfaceMode
 const USIM = InterfaceMode.getInterfaceModeHandler('INTERFACEMODE_UNIT_SELECTED');
@@ -65,15 +77,11 @@ USIMproto.setUnitLens = function(...args) {
     const info = GameInfo.Units.lookup(unit.type);
     // console.warn(`TRIX ${Object.entries(info).filter(i => i[1]).map(i => i.join(':'))}`);
     // console.warn(`TRIX ${Object.entries(unit).filter(i => typeof i[1] === 'boolean').map(i => i.join(':'))}`);
-    const lenses = LensManager.lenses;
-    if (info.FoundCity) {
-        // don't interfere with Settler
-    } else if (lenses.has('mod-discovery-lens') && DL_SKIP.has(info.UnitMovementClass)) {
-        // don't interfere with Discovery lens
-        console.warn(`TRIX DISCOVERY`);
-    } else if (lenses.has('mod-fortified-district-lens') && FL_SKIP.has(info.UnitType)) {
-        // don't interfere with Fortified lens
-        console.warn(`TRIX FORTIFIED`);
+    const skips = getLensSkips();
+    if (info.FoundCity || info.MakeTradeRoute || info.ExtractsArtifacts) {
+        // don't interfere with fxs lenses
+    } else if (skips.has(info.UnitType) || skips.has(info.UnitMovementClass)) {
+        // don't interfere with other mods
     } else if (info.SpreadCharges) {
         LensManager.setActiveLens('bz-religion-lens');
         return;
