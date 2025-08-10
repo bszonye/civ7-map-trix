@@ -47,7 +47,7 @@
             <Text>Map Trix • TODO Commander lens activation</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMMANDER_LENS_DESCRIPTION" Language="zh_Hans_CN">
-            <Text>TODO Which units activate the Commander lens.</Text>
+            <Text>TODO Select which units activate the Commander lens.</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE" Language="zh_Hans_CN">
             <Text>Map Trix • 详细程度</Text>

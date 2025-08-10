@@ -35,19 +35,19 @@
             <Text>Nessuno</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMLENS_COMMANDERS" Language="it_IT">
-            <Text>TODO Commanders Only</Text>
+            <Text>Solo comandanti</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMLENS_MILITARY" Language="it_IT">
-            <Text>TODO All Military Units</Text>
+            <Text>Tutte le unità militari</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMLENS_RECON" Language="it_IT">
-            <Text>TODO Military and Recon Units</Text>
+            <Text>Unità militari e di ricognizione</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMMANDER_LENS" Language="it_IT">
-            <Text>Map Trix • TODO Commander lens activation</Text>
+            <Text>Map Trix • attivazione della lente Comandante</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMMANDER_LENS_DESCRIPTION" Language="it_IT">
-            <Text>TODO Which units activate the Commander lens.</Text>
+            <Text>Seleziona quali unità attivano la lente Comandante.</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE" Language="it_IT">
             <Text>Map Trix • grado di dettaglio</Text>
@@ -110,10 +110,10 @@
             <Text>Attiva/disattiva la visibilità delle icone della religione</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER" Language="it_IT">
-            <Text>TODO Toggle Terrain Features</Text>
+            <Text>Caratteristiche del terreno</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER_TT" Language="it_IT">
-            <Text>TODO Toggles visibility of terrain features</Text>
+            <Text>Attiva/disattiva la visibilità delle caratteristiche del terreno</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_BORDERS" Language="it_IT">
             <Text>Confini</Text>
