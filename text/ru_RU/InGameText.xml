@@ -110,10 +110,10 @@
             <Text>Показывать или скрыть значки религии</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER" Language="ru_RU">
-            <Text>TODO Toggle Terrain Highlighting</Text>
+            <Text>TODO Toggle Terrain Features</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER_TT" Language="ru_RU">
-            <Text>TODO Toggles visibility of terrain highlighting</Text>
+            <Text>TODO Toggles visibility of terrain features</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_BORDERS" Language="ru_RU">
             <Text>Границы</Text>

@@ -110,10 +110,10 @@
             <Text>Attiva/disattiva la visibilità delle icone della religione</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER" Language="it_IT">
-            <Text>TODO Toggle Terrain Highlighting</Text>
+            <Text>TODO Toggle Terrain Features</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER_TT" Language="it_IT">
-            <Text>TODO Toggles visibility of terrain highlighting</Text>
+            <Text>TODO Toggles visibility of terrain features</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_BORDERS" Language="it_IT">
             <Text>Confini</Text>

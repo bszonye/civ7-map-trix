@@ -53,7 +53,7 @@
             <Text>Map Trix • Activation du filtre Commandant</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMMANDER_LENS_DESCRIPTION" Language="fr_FR">
-            <Text>Quelles unités activent le filtre Commandant.</Text>
+            <Text>Définit les unités qui activent le filtre Commandant.</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE" Language="fr_FR">
             <Text>Map Trix • niveau de détail</Text>
@@ -118,10 +118,10 @@
             <Text>Affiche ou masque les icônes de la religion.</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER" Language="fr_FR">
-            <Text>TODO Toggle Terrain Highlighting</Text>
+            <Text>Caractéristiques du terrain</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER_TT" Language="fr_FR">
-            <Text>TODO Toggles visibility of terrain highlighting</Text>
+            <Text>Affiche ou masque les caractéristiques du terrain.</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_BORDERS" Language="fr_FR">
             <Text>Frontières</Text>

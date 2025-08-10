@@ -110,10 +110,10 @@
             <Text>Sichtbarkeit der Religionssymbole umschalten</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER" Language="de_DE">
-            <Text>Geländehervorhebung umschalten</Text>
+            <Text>Geländemerkmale umschalten</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER_TT" Language="de_DE">
-            <Text>Sichtbarkeit der Geländehervorhebung umschalten.</Text>
+            <Text>Sichtbarkeit der Geländemerkmale umschalten.</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_BORDERS" Language="de_DE">
             <Text>Grenzen</Text>

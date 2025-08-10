@@ -110,10 +110,10 @@
             <Text>开关宗教图标的显示</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER" Language="zh_Hans_CN">
-            <Text>TODO Toggle Terrain Highlighting</Text>
+            <Text>TODO Toggle Terrain Features</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER_TT" Language="zh_Hans_CN">
-            <Text>TODO Toggles visibility of terrain highlighting</Text>
+            <Text>TODO Toggles visibility of terrain features</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_BORDERS" Language="zh_Hans_CN">
             <Text>边界</Text>
