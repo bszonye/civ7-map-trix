@@ -16,15 +16,21 @@ the system bar adds new backgrounds to the empire yield banner, with
 more legible text and color coding to match the tooltips.
 
 ## more lens layers
-five new decoration layers offer guidance and customization options.
+six new decoration layers offer guidance and customization options.
 
 - borders:  optionally turn off borders for a more scenic map
 - city limits:  outline each settlement instead of whole empires
 - discoveries:  mark the location of goody huts and dig sites
 - fortifications:  show which tiles are fortified and who controls them
 - religion:  see exactly which tiles to visit with your missionaries
+- terrain:  highlight terrain features that block movement or vision
 
 activate layers in the minimap or with configurable shortcut keys.
+
+## more lenses
+new Commander and Religion lenses activate automatically when you select
+appropriate units.  the Commander lens can optionally include commander,
+military, and recon units.
 
 ## localization
 supported languages:
