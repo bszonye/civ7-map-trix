@@ -41,7 +41,7 @@
             <Text>All Military Units</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMLENS_RECON">
-            <Text>All Military and Recon Units</Text>
+            <Text>Military and Recon Units</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMMANDER_LENS">
             <Text>Map Trix • Commander lens activation</Text>
