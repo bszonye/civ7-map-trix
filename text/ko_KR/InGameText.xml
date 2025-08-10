@@ -35,19 +35,19 @@
             <Text>없음</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMLENS_COMMANDERS" Language="ko_KR">
-            <Text>TODO Commanders Only</Text>
+            <Text>사령관 전용</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMLENS_MILITARY" Language="ko_KR">
-            <Text>TODO All Military Units</Text>
+            <Text>모든 군사 유닛</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMLENS_RECON" Language="ko_KR">
-            <Text>TODO Military and Recon Units</Text>
+            <Text>군사 및 정찰 유닛</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMMANDER_LENS" Language="ko_KR">
-            <Text>Map Trix • TODO Commander lens activation</Text>
+            <Text>Map Trix • 사령관 렌즈 활성화</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMMANDER_LENS_DESCRIPTION" Language="ko_KR">
-            <Text>TODO Select which units activate the Commander lens.</Text>
+            <Text>사령관 렌즈를 활성화할 유닛을 선택하세요.</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE" Language="ko_KR">
             <Text>Map Trix • 세부 정보 수준</Text>
@@ -110,10 +110,10 @@
             <Text>종교 아이콘의 가시성을 전환합니다.</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER" Language="ko_KR">
-            <Text>TODO Toggle Terrain Features</Text>
+            <Text>지형 특성</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER_TT" Language="ko_KR">
-            <Text>TODO Toggles visibility of terrain features</Text>
+            <Text>지형 특성의 가시성을 전환합니다.</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_BORDERS" Language="ko_KR">
             <Text>국경</Text>
