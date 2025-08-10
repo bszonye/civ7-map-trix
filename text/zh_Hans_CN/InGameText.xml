@@ -31,6 +31,24 @@
         <Replace Tag="LOC_DISTRICT_BZ_URBAN_VACANT" Language="zh_Hans_CN">
             <Text>空置区</Text>
         </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_COMLENS_NONE" Language="zh_Hans_CN">
+            <Text>TODO None</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_COMLENS_COMMANDERS" Language="zh_Hans_CN">
+            <Text>TODO Commanders Only</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_COMLENS_MILITARY" Language="zh_Hans_CN">
+            <Text>TODO All Military Units</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_COMLENS_RECON" Language="zh_Hans_CN">
+            <Text>TODO Military and Recon Units</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_COMMANDER_LENS" Language="zh_Hans_CN">
+            <Text>Map Trix • TODO Commander lens activation</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_COMMANDER_LENS_DESCRIPTION" Language="zh_Hans_CN">
+            <Text>TODO Which units activate the Commander lens.</Text>
+        </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE" Language="zh_Hans_CN">
             <Text>Map Trix • 详细程度</Text>
         </Replace>
@@ -91,6 +109,12 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_RELIGION_ICONS_TT" Language="zh_Hans_CN">
             <Text>开关宗教图标的显示</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER" Language="zh_Hans_CN">
+            <Text>TODO Toggle Terrain Highlighting</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER_TT" Language="zh_Hans_CN">
+            <Text>TODO Toggles visibility of terrain highlighting</Text>
+        </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_BORDERS" Language="zh_Hans_CN">
             <Text>边界</Text>
         </Replace>
@@ -102,6 +126,9 @@
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_FORTIFICATION" Language="zh_Hans_CN">
             <Text>防御工事</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_MINI_MAP_BZ_TERRAIN" Language="zh_Hans_CN">
+            <Text>TODO Terrain</Text>
         </Replace>
         <Replace Tag="LOC_YIELD_BZ_TOTAL" Language="zh_Hans_CN">
             <Text>总产出</Text>

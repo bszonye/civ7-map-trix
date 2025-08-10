@@ -31,6 +31,24 @@
         <Replace Tag="LOC_DISTRICT_BZ_URBAN_VACANT" Language="ru_RU">
             <Text>Свободный Район</Text>
         </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_COMLENS_NONE" Language="ru_RU">
+            <Text>TODO None</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_COMLENS_COMMANDERS" Language="ru_RU">
+            <Text>TODO Commanders Only</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_COMLENS_MILITARY" Language="ru_RU">
+            <Text>TODO All Military Units</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_COMLENS_RECON" Language="ru_RU">
+            <Text>TODO Military and Recon Units</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_COMMANDER_LENS" Language="ru_RU">
+            <Text>Map Trix • TODO Commander lens activation</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_COMMANDER_LENS_DESCRIPTION" Language="ru_RU">
+            <Text>TODO Which units activate the Commander lens.</Text>
+        </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE" Language="ru_RU">
             <Text>Map Trix • Степень детализации подсказок</Text>
         </Replace>
@@ -91,6 +109,12 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_RELIGION_ICONS_TT" Language="ru_RU">
             <Text>Показывать или скрыть значки религии</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER" Language="ru_RU">
+            <Text>TODO Toggle Terrain Highlighting</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER_TT" Language="ru_RU">
+            <Text>TODO Toggles visibility of terrain highlighting</Text>
+        </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_BORDERS" Language="ru_RU">
             <Text>Границы</Text>
         </Replace>
@@ -102,6 +126,9 @@
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_FORTIFICATION" Language="ru_RU">
             <Text>Укрепления</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_MINI_MAP_BZ_TERRAIN" Language="ru_RU">
+            <Text>TODO Terrain</Text>
         </Replace>
         <Replace Tag="LOC_YIELD_BZ_TOTAL" Language="ru_RU">
             <Text>Общий Доход</Text>
