@@ -32,22 +32,22 @@
             <Text>Свободный Район</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMLENS_NONE" Language="ru_RU">
-            <Text>Никто</Text>
+            <Text>Нет</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMLENS_COMMANDERS" Language="ru_RU">
-            <Text>TODO Commanders Only</Text>
+            <Text>Только командиры</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMLENS_MILITARY" Language="ru_RU">
-            <Text>TODO All Military Units</Text>
+            <Text>Все воинские юниты</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMLENS_RECON" Language="ru_RU">
-            <Text>TODO Military and Recon Units</Text>
+            <Text>Военные и разведчики</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMMANDER_LENS" Language="ru_RU">
-            <Text>Map Trix • TODO Commander lens activation</Text>
+            <Text>Map Trix • Активация линзы Командира</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMMANDER_LENS_DESCRIPTION" Language="ru_RU">
-            <Text>TODO Select which units activate the Commander lens.</Text>
+            <Text>Выберите, какие юниты активируют линзу Командира.</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE" Language="ru_RU">
             <Text>Map Trix • Степень детализации подсказок</Text>
@@ -110,10 +110,10 @@
             <Text>Показывать или скрыть значки религии</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER" Language="ru_RU">
-            <Text>TODO Toggle Terrain Features</Text>
+            <Text>Особенности ландшафта</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER_TT" Language="ru_RU">
-            <Text>TODO Toggles visibility of terrain features</Text>
+            <Text>Показывать или скрыть особенности ландшафта</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_BORDERS" Language="ru_RU">
             <Text>Границы</Text>
