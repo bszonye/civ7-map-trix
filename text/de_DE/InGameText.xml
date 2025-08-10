@@ -32,7 +32,7 @@
             <Text>Freier Bezirk</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMLENS_NONE" Language="de_DE">
-            <Text>TODO None</Text>
+            <Text>Keiner</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMLENS_COMMANDERS" Language="de_DE">
             <Text>TODO Commanders Only</Text>
@@ -41,7 +41,7 @@
             <Text>TODO All Military Units</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMLENS_RECON" Language="de_DE">
-            <Text>TODO Military and Recon Units</Text>
+            <Text>Militär- und Aufklärungseinheiten</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMMANDER_LENS" Language="de_DE">
             <Text>Map Trix • TODO Commander lens activation</Text>
@@ -128,7 +128,7 @@
             <Text>Befestigungen</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_TERRAIN" Language="de_DE">
-            <Text>TODO Terrain</Text>
+            <Text>Gelände</Text>
         </Replace>
         <Replace Tag="LOC_YIELD_BZ_TOTAL" Language="de_DE">
             <Text>Gesamtertrag</Text>

@@ -38,22 +38,22 @@
             <Text>District vacant</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMLENS_NONE" Language="fr_FR">
-            <Text>TODO None</Text>
+            <Text>Aucun</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMLENS_COMMANDERS" Language="fr_FR">
-            <Text>TODO Commanders Only</Text>
+            <Text>Commandants uniquement</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMLENS_MILITARY" Language="fr_FR">
-            <Text>TODO All Military Units</Text>
+            <Text>Toutes les unités militaires</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMLENS_RECON" Language="fr_FR">
-            <Text>TODO Military and Recon Units</Text>
+            <Text>Militaire et reconnaissance</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMMANDER_LENS" Language="fr_FR">
-            <Text>Map Trix • TODO Commander lens activation</Text>
+            <Text>Map Trix • Activation du filtre Commandant</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMMANDER_LENS_DESCRIPTION" Language="fr_FR">
-            <Text>TODO Which units activate the Commander lens.</Text>
+            <Text>Quelles unités activent le filtre Commandant.</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE" Language="fr_FR">
             <Text>Map Trix • niveau de détail</Text>
@@ -136,7 +136,7 @@
             <Text>Fortifications</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_TERRAIN" Language="fr_FR">
-            <Text>TODO Terrain</Text>
+            <Text>Terrains</Text>
         </Replace>
         <Replace Tag="LOC_YIELD_BZ_TOTAL" Language="fr_FR">
             <Text>Rendement total</Text>

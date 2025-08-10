@@ -32,7 +32,7 @@
             <Text>Distretto Vacante</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMLENS_NONE" Language="it_IT">
-            <Text>TODO None</Text>
+            <Text>Nessuno</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMLENS_COMMANDERS" Language="it_IT">
             <Text>TODO Commanders Only</Text>
@@ -128,7 +128,7 @@
             <Text>Fortificazioni</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_TERRAIN" Language="it_IT">
-            <Text>TODO Terrain</Text>
+            <Text>Terreno</Text>
         </Replace>
         <Replace Tag="LOC_YIELD_BZ_TOTAL" Language="it_IT">
             <Text>Rese Totali</Text>

@@ -32,7 +32,7 @@
             <Text>빈 시가지</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMLENS_NONE" Language="ko_KR">
-            <Text>TODO None</Text>
+            <Text>없음</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMLENS_COMMANDERS" Language="ko_KR">
             <Text>TODO Commanders Only</Text>
@@ -128,7 +128,7 @@
             <Text>요새</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_TERRAIN" Language="ko_KR">
-            <Text>TODO Terrain</Text>
+            <Text>지형</Text>
         </Replace>
         <Replace Tag="LOC_YIELD_BZ_TOTAL" Language="ko_KR">
             <Text>총 생산량</Text>

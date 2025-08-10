@@ -32,7 +32,7 @@
             <Text>Свободный Район</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMLENS_NONE" Language="ru_RU">
-            <Text>TODO None</Text>
+            <Text>Никто</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMLENS_COMMANDERS" Language="ru_RU">
             <Text>TODO Commanders Only</Text>
@@ -128,7 +128,7 @@
             <Text>Укрепления</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_TERRAIN" Language="ru_RU">
-            <Text>TODO Terrain</Text>
+            <Text>Ландшафт</Text>
         </Replace>
         <Replace Tag="LOC_YIELD_BZ_TOTAL" Language="ru_RU">
             <Text>Общий Доход</Text>

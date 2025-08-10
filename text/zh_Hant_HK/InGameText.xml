@@ -32,7 +32,7 @@
             <Text>空置區</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMLENS_NONE" Language="zh_Hant_HK">
-            <Text>TODO None</Text>
+            <Text>無</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMLENS_COMMANDERS" Language="zh_Hant_HK">
             <Text>TODO Commanders Only</Text>
@@ -128,7 +128,7 @@
             <Text>防禦工事</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_TERRAIN" Language="zh_Hant_HK">
-            <Text>TODO Terrain</Text>
+            <Text>地形</Text>
         </Replace>
         <Replace Tag="LOC_YIELD_BZ_TOTAL" Language="zh_Hant_HK">
             <Text>總產出</Text>
