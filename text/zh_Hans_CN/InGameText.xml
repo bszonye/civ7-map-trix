@@ -35,19 +35,19 @@
             <Text>无</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMLENS_COMMANDERS" Language="zh_Hans_CN">
-            <Text>TODO Commanders Only</Text>
+            <Text>仅限指挥官</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMLENS_MILITARY" Language="zh_Hans_CN">
-            <Text>TODO All Military Units</Text>
+            <Text>所有军事单位</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMLENS_RECON" Language="zh_Hans_CN">
-            <Text>TODO Military and Recon Units</Text>
+            <Text>军事和侦察单位</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMMANDER_LENS" Language="zh_Hans_CN">
-            <Text>Map Trix • TODO Commander lens activation</Text>
+            <Text>Map Trix • 启用指挥官过滤镜</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMMANDER_LENS_DESCRIPTION" Language="zh_Hans_CN">
-            <Text>TODO Select which units activate the Commander lens.</Text>
+            <Text>选择哪些单位激活指挥官过滤镜。</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE" Language="zh_Hans_CN">
             <Text>Map Trix • 详细程度</Text>
@@ -110,10 +110,10 @@
             <Text>开关宗教图标的显示</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER" Language="zh_Hans_CN">
-            <Text>TODO Toggle Terrain Features</Text>
+            <Text>开关地形特征</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER_TT" Language="zh_Hans_CN">
-            <Text>TODO Toggles visibility of terrain features</Text>
+            <Text>开关地形特征的显示</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_BORDERS" Language="zh_Hans_CN">
             <Text>边界</Text>
