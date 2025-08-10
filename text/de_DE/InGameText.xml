@@ -35,25 +35,25 @@
             <Text>Keiner</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMLENS_COMMANDERS" Language="de_DE">
-            <Text>TODO Commanders Only</Text>
+            <Text>Nur Kommandanten</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMLENS_MILITARY" Language="de_DE">
-            <Text>TODO All Military Units</Text>
+            <Text>Alle Militäreinheiten</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMLENS_RECON" Language="de_DE">
             <Text>Militär- und Aufklärungseinheiten</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMMANDER_LENS" Language="de_DE">
-            <Text>Map Trix • TODO Commander lens activation</Text>
+            <Text>Map Trix • Aktivierung der Kommandantenlinse</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMMANDER_LENS_DESCRIPTION" Language="de_DE">
-            <Text>TODO Which units activate the Commander lens.</Text>
+            <Text>Wählt aus, welche Einheiten aktivieren die Kommandantenlinse.</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE" Language="de_DE">
             <Text>Map Trix • Detaillierungsgrad</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE_DESCRIPTION" Language="de_DE">
-            <Text>Detaillierungsgrad für die Kartentools.[N] [N][B]Tastenkombination[/B][N]Kurz • Strg[N]Detailliert • Umschalt[N]Verborgen • Strg+Umschalt</Text>
+            <Text>Die Detailstufe von Kartentools.[N] [N][B]Tastenkombination[/B][N]Kurz • Strg[N]Detailliert • Umschalt[N]Verborgen • Strg+Umschalt</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER" Language="de_DE">
             <Text>Map Trix • gestaltet das Ertragsbanner neu</Text>
@@ -110,10 +110,10 @@
             <Text>Sichtbarkeit der Religionssymbole umschalten</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER" Language="de_DE">
-            <Text>TODO Toggle Terrain Highlighting</Text>
+            <Text>Geländehervorhebung umschalten</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER_TT" Language="de_DE">
-            <Text>TODO Toggles visibility of terrain highlighting</Text>
+            <Text>Sichtbarkeit der Geländehervorhebung umschalten.</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_BORDERS" Language="de_DE">
             <Text>Grenzen</Text>
