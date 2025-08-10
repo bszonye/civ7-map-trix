@@ -1,3 +1,4 @@
+import bzMapTrixOptions, { bzCommanderLens } from '/bz-map-trix/ui/options/bz-map-trix-options.js';
 import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
 import LensManager from '/core/ui/lenses/lens-manager.js';
 const BZ_LENSES = {
@@ -54,18 +55,25 @@ function bzSetUnitLens(unitID) {
     if (!unit) return true;  // hand off errors to original method
     const info = GameInfo.Units.lookup(unit.type);
     const skips = getLensSkips();
+    let lens;
     if (info.FoundCity || info.MakeTradeRoute || info.ExtractsArtifacts) {
         // don't interfere with fxs lenses
     } else if (skips.has(info.UnitType) || skips.has(info.UnitMovementClass)) {
         // don't interfere with other mods
     } else if (info.SpreadCharges) {
-        LensManager.setActiveLens('bz-religion-lens');
-        return;
-    } else if (unit.isCommanderUnit || info.CoreClass == "CORE_CLASS_MILITARY") {
-        LensManager.setActiveLens('bz-commander-lens');
-        return;
+        lens = 'bz-religion-lens';
+    } else switch (bzMapTrixOptions.commanders) {
+        case bzCommanderLens.RECON:
+            if (info.CoreClass == "CORE_CLASS_RECON") lens = 'bz-commander-lens';
+            // falls through
+        case bzCommanderLens.MILITARY:
+            if (info.CoreClass == "CORE_CLASS_MILITARY") lens = 'bz-commander-lens';
+            // falls through
+        case bzCommanderLens.COMMANDERS:
+            if (unit.isCommanderUnit) lens = 'bz-commander-lens';
     }
-    return true;  // return to original method
+    if (!lens) return true;  // hand off to original method
+    LensManager.setActiveLens(lens);
 }
 // skip lens activation for units handled by other lens mods
 const BZ_MOD_SKIPS = {

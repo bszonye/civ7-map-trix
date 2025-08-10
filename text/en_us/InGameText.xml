@@ -31,6 +31,24 @@
         <Replace Tag="LOC_DISTRICT_BZ_URBAN_VACANT">
             <Text>Vacant District</Text>
         </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_COMLENS_NONE">
+            <Text>None</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_COMLENS_COMMANDERS">
+            <Text>Commanders Only</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_COMLENS_MILITARY">
+            <Text>All Military Units</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_COMLENS_RECON">
+            <Text>All Military and Recon Units</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_COMMANDER_LENS">
+            <Text>Map Trix • Commander lens activation</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_COMMANDER_LENS_DESCRIPTION">
+            <Text>Which units activate the Commander lens.</Text>
+        </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE">
             <Text>Map Trix • level of detail</Text>
         </Replace>

@@ -4,6 +4,19 @@ import { Options, OptionType } from '/core/ui/options/model-options.js';
 import ModSettings from '/bz-map-trix/ui/options/mod-options-decorator.js';
 
 const MOD_ID = "bz-map-trix";
+export var bzCommanderLens;
+(function (bzCommanderLens) {
+        bzCommanderLens[bzCommanderLens["NONE"] = 0] = "NONE";
+        bzCommanderLens[bzCommanderLens["COMMANDERS"] = 1] = "COMMANDERS";
+        bzCommanderLens[bzCommanderLens["MILITARY"] = 2] = "MILITARY";
+        bzCommanderLens[bzCommanderLens["RECON"] = 3] = "RECON";
+})(bzCommanderLens || (bzCommanderLens = {}));
+const commandOptions = [
+    { label: 'LOC_OPTIONS_BZ_COMLENS_NONE', value: bzCommanderLens.NONE },
+    { label: 'LOC_OPTIONS_BZ_COMLENS_COMMANDERS', value: bzCommanderLens.COMMANDERS },
+    { label: 'LOC_OPTIONS_BZ_COMLENS_MILITARY', value: bzCommanderLens.MILITARY },
+    { label: 'LOC_OPTIONS_BZ_COMLENS_RECON', value: bzCommanderLens.RECON },
+];
 export var bzVerbosity;
 (function (bzVerbosity) {
         bzVerbosity[bzVerbosity["HIDDEN"] = 0] = "HIDDEN";
@@ -19,6 +32,7 @@ const verbosityOptions = [
 ];
 
 const BZ_DEFAULT_OPTIONS = {
+    commanders: bzCommanderLens.COMMANDERS,
     verbose: bzVerbosity.STANDARD,
     yieldBanner: true,
 };
@@ -32,6 +46,13 @@ const bzMapTrixOptions = new class {
         ModSettings.save(MOD_ID, this.data);
         // sync optional styling
         document.body.classList.toggle("bz-yield-banner", this.yieldBanner);
+    }
+    get commanders() {
+        return this.data.commanders ?? BZ_DEFAULT_OPTIONS.commanders;
+    }
+    set commanders(level) {
+        this.data.commanders = level;
+        this.save();
     }
     get verbose() {
         // convert legacy boolean options
@@ -51,6 +72,26 @@ const bzMapTrixOptions = new class {
         this.save();
     }
 };
+const onInitCommanderLens = (info) => {
+    info.selectedItemIndex = bzMapTrixOptions.commanders;
+};
+const onUpdateCommanderLens = (_info, level) => {
+    bzMapTrixOptions.commanders = level;
+};
+Options.addInitCallback(() => {
+    Options.addOption({
+        category: CategoryType.Mods,
+        // @ts-ignore
+        group: "bz_mods",
+        type: OptionType.Dropdown,
+        id: "bz-commander-lens",
+        initListener: onInitCommanderLens,
+        updateListener: onUpdateCommanderLens,
+        label: "LOC_OPTIONS_BZ_COMMANDER_LENS",
+        description: "LOC_OPTIONS_BZ_COMMANDER_LENS_DESCRIPTION",
+        dropdownItems: commandOptions,
+    });
+});
 const onInitVerbose = (info) => {
     info.selectedItemIndex = bzMapTrixOptions.verbose;
 };
