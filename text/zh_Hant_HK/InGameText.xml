@@ -35,7 +35,7 @@
             <Text>無</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMLENS_COMMANDERS" Language="zh_Hant_HK">
-            <Text>僅限指揮官</Text>
+            <Text>指揮官</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMLENS_MILITARY" Language="zh_Hant_HK">
             <Text>所有軍事單位</Text>

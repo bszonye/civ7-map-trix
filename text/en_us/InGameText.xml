@@ -35,7 +35,7 @@
             <Text>None</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMLENS_COMMANDERS">
-            <Text>Commanders Only</Text>
+            <Text>Commanders</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMLENS_MILITARY">
             <Text>All Military Units</Text>

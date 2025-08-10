@@ -35,7 +35,7 @@
             <Text>Нет</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMLENS_COMMANDERS" Language="ru_RU">
-            <Text>Только командиры</Text>
+            <Text>Командиры</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMLENS_MILITARY" Language="ru_RU">
             <Text>Все воинские юниты</Text>

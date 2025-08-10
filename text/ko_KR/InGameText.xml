@@ -35,7 +35,7 @@
             <Text>없음</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMLENS_COMMANDERS" Language="ko_KR">
-            <Text>사령관 전용</Text>
+            <Text>사령관</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMLENS_MILITARY" Language="ko_KR">
             <Text>모든 군사 유닛</Text>

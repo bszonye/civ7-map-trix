@@ -41,7 +41,7 @@
             <Text>Aucun</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMLENS_COMMANDERS" Language="fr_FR">
-            <Text>Commandants uniquement</Text>
+            <Text>Commandants</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMLENS_MILITARY" Language="fr_FR">
             <Text>Toutes les unités militaires</Text>
