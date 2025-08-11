@@ -37,6 +37,24 @@
         <Replace Tag="LOC_DISTRICT_BZ_URBAN_VACANT" Language="fr_FR">
             <Text>District vacant</Text>
         </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_COMLENS_NONE" Language="fr_FR">
+            <Text>Aucun</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_COMLENS_COMMANDERS" Language="fr_FR">
+            <Text>Commandants</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_COMLENS_MILITARY" Language="fr_FR">
+            <Text>Toutes les unités militaires</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_COMLENS_RECON" Language="fr_FR">
+            <Text>Militaire et reconnaissance</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_COMMANDER_LENS" Language="fr_FR">
+            <Text>Map Trix • Activation du filtre Commandant</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_COMMANDER_LENS_DESCRIPTION" Language="fr_FR">
+            <Text>Définit les unités qui activent le filtre Commandant.</Text>
+        </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE" Language="fr_FR">
             <Text>Map Trix • niveau de détail</Text>
         </Replace>
@@ -99,6 +117,12 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_RELIGION_ICONS_TT" Language="fr_FR">
             <Text>Affiche ou masque les icônes de la religion.</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER" Language="fr_FR">
+            <Text>Caractéristiques du terrain</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER_TT" Language="fr_FR">
+            <Text>Affiche ou masque les caractéristiques du terrain.</Text>
+        </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_BORDERS" Language="fr_FR">
             <Text>Frontières</Text>
         </Replace>
@@ -110,6 +134,9 @@
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_FORTIFICATION" Language="fr_FR">
             <Text>Fortifications</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_MINI_MAP_BZ_TERRAIN" Language="fr_FR">
+            <Text>Terrains</Text>
         </Replace>
         <Replace Tag="LOC_YIELD_BZ_TOTAL" Language="fr_FR">
             <Text>Rendement total</Text>

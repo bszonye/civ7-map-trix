@@ -1,6 +1,5 @@
-import LensManager, { BaseSpriteGridLensLayer, LensActivationEventName } from '/core/ui/lenses/lens-manager.js';
-;
-const BZ_DEFAULT_LENSES = ['fxs-default-lens'];
+import LensManager, { BaseSpriteGridLensLayer } from '/core/ui/lenses/lens-manager.js';
+
 const BZ_ICON_DISCOVERY = "NAR_REW_DEFAULT";
 const SPRITE_PLOT_POSITION = { x: 0, y: 25, z: 5 };
 const SPRITE_SCALE = 3/4;
@@ -15,9 +14,7 @@ class bzDiscoveryLensLayer extends BaseSpriteGridLensLayer {
         super([
             { handle: SpriteGroup.bzDiscovery, name: "bzDiscoveryLayer_SpriteGroup", spriteMode: SpriteMode.FixedBillboard },
         ]);
-        this.defaultLenses = new Set(BZ_DEFAULT_LENSES);  // initialization tracker
         this.onLayerHotkeyListener = this.onLayerHotkey.bind(this);
-        this.onLensActivationListener = this.onLensActivation.bind(this);
     }
     initLayer() {
         this.updateMap();
@@ -26,7 +23,6 @@ class bzDiscoveryLensLayer extends BaseSpriteGridLensLayer {
         engine.on('ConstructibleAddedToMap', this.onPlotChange, this);
         engine.on('ConstructibleRemovedFromMap', this.onPlotChange, this);
         window.addEventListener('layer-hotkey', this.onLayerHotkeyListener);
-        window.addEventListener(LensActivationEventName, this.onLensActivationListener);
     }
     updateMap() {
         const width = GameplayMap.getGridWidth();
@@ -59,12 +55,6 @@ class bzDiscoveryLensLayer extends BaseSpriteGridLensLayer {
     onLayerHotkey(hotkey) {
         if (hotkey.detail.name == 'toggle-bz-discovery-layer') {
             LensManager.toggleLayer('bz-discovery-layer');
-        }
-    }
-    onLensActivation(event) {
-        if (this.defaultLenses.has(event.detail.activeLens)) {
-            LensManager.enableLayer('bz-discovery-layer');
-            this.defaultLenses.delete(event.detail.activeLens);
         }
     }
 }

@@ -4,6 +4,7 @@ const BZ_KEYS_TO_ADD = [
     "toggle-bz-discovery-layer",
     "toggle-bz-fortification-layer",
     "toggle-bz-religion-layer",
+    "toggle-bz-terrain-layer",
 ];
 class bzEditorKeyboardMapping {
     static c_prototype;
