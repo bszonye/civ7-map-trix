@@ -127,7 +127,7 @@ engine.whenReady.then(() => {
         const extra = new Set(BZ_EXTRA_LAYERS[lensType] ?? []);
         if (layers.has('fxs-resource-layer')) extra.add('bz-discovery-layer');
         for (const layerType of extra) layers.add(layerType);
-        // if lens is already active, enable the active layers
+        // if lens is already active, enable any registered layers
         // (event handlers will take care of borders)
         if (lensType == LensManager.activeLens) {
             for (const layerType of extra) {
