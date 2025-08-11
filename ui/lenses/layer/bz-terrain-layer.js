@@ -77,6 +77,7 @@ class bzTerrainLensLayer {
     updateMap() {
         this.terrainOverlayGroup.clearAll();
         this.terrainOverlay.clear();
+        this.terrainOutline.clear();
         const width = GameplayMap.getGridWidth();
         const height = GameplayMap.getGridHeight();
         for (let x = 0; x < width; x++) {
