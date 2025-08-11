@@ -95,9 +95,6 @@ class bzTerrainLensLayer {
             this.terrainOutline.setPlotGroups(plotIndex, group);
         }
     }
-    onMapChange() {
-        this.updateMap();
-    }
     onLayerHotkey(hotkey) {
         if (hotkey.detail.name == 'toggle-bz-terrain-layer') {
             LensManager.toggleLayer('bz-terrain-layer');
