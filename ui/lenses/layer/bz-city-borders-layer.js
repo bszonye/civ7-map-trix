@@ -113,6 +113,7 @@ class bzCityBordersLayer {
     onLensLayerEnabled(event) {
         if (event.detail.layer == 'fxs-city-borders-layer') {
             // replace the vanilla city borders
+            console.warn('bz-city-borders-layer: fxs borders replaced');
             LensManager.disableLayer('fxs-city-borders-layer');
             LensManager.enableLayer('bz-city-borders-layer');
         }

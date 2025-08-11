@@ -125,6 +125,7 @@ class bzCultureBordersLayer {
     onLensLayerEnabled(event) {
         if (event.detail.layer == 'fxs-culture-borders-layer') {
             // replace the vanilla empire borders
+            console.warn('bz-culture-borders-layer: fxs borders replaced');
             LensManager.disableLayer('fxs-culture-borders-layer');
             LensManager.enableLayer('bz-culture-borders-layer');
         } else if (event.detail.layer == 'bz-city-borders-layer') {

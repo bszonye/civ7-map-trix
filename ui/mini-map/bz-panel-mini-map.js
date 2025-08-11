@@ -109,15 +109,25 @@ engine.whenReady.then(() => {
 // patch new layers into registered lenses
 engine.whenReady.then(() => {
     for (const [lensType, lens] of LensManager.lenses.entries()) {
-        const isActiveLens = lensType == LensManager.activeLens;
+        const layers = lens.activeLayers;
+        // swap in modded borders
+        if (layers.has('fxs-culture-borders-layer')) {
+            layers.delete('fxs-culture-borders-layer');
+            layers.add('bz-culture-borders-layer');
+        }
+        if (layers.has('fxs-city-borders-layer')) {
+            layers.delete('fxs-city-borders-layer');
+            layers.add('bz-city-borders-layer');
+        }
+        // add extra default layers
         const extra = new Set(BZ_EXTRA_LAYERS[lensType] ?? []);
-        // add Discoveries to all layers with Resources
-        if (lens.activeLayers.has('fxs-resource-layer')) extra.add('bz-discovery-layer');
-        for (const layerType of extra) {
-            lens.activeLayers.add(layerType);
-            // if the layer is already registered, enable it
-            if (isActiveLens && LensManager.layers.get(layerType)) {
-                LensManager.enableLayer(layerType);
+        if (layers.has('fxs-resource-layer')) extra.add('bz-discovery-layer');
+        for (const layerType of extra) layers.add(layerType);
+        // if lens is already active, enable the active layers
+        // (event handlers will take care of borders)
+        if (lensType == LensManager.activeLens) {
+            for (const layerType of extra) {
+                if (LensManager.layers.get(layerType)) LensManager.enableLayer(layerType);
             }
         }
     }
