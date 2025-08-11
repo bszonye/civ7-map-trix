@@ -11,6 +11,7 @@ const BZ_LAYERS = {
     "bz-discovery-layer": "LOC_UI_MINI_MAP_BZ_DISCOVERY",
     "bz-fortification-layer": "LOC_UI_MINI_MAP_BZ_FORTIFICATION",
     "bz-religion-layer": "LOC_UI_MINI_MAP_RELIGION",
+    "bz-route-layer": "LOC_UI_MINI_MAP_BZ_ROUTE",
     "bz-terrain-layer": "LOC_UI_MINI_MAP_BZ_TERRAIN",
 };
 const BZ_EXTRA_LAYERS = {

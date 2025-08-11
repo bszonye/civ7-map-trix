@@ -7,6 +7,7 @@ class bzCommanderLens {
             'bz-culture-borders-layer',
             'bz-discovery-layer',
             'bz-fortification-layer',
+            'bz-route-layer',
             'bz-terrain-layer',
         ]);
         this.allowedLayers = new Set([

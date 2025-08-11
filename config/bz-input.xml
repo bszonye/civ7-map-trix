@@ -6,6 +6,7 @@
         <Replace ActionId="toggle-bz-discovery-layer" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_TOGGLE_BZ_DISCOVERY_ICONS" Description="LOC_UI_KBM_MAPPING_TOGGLE_BZ_DISCOVERY_ICONS_TT" />
         <Replace ActionId="toggle-bz-fortification-layer" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_TOGGLE_BZ_FORTIFICATION_ICONS" Description="LOC_UI_KBM_MAPPING_TOGGLE_BZ_FORTIFICATION_ICONS_TT" />
         <Replace ActionId="toggle-bz-religion-layer" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_TOGGLE_BZ_RELIGION_ICONS" Description="LOC_UI_KBM_MAPPING_TOGGLE_BZ_RELIGION_ICONS_TT" />
+        <Replace ActionId="toggle-bz-route-layer" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_TOGGLE_BZ_ROUTE_LAYER" Description="LOC_UI_KBM_MAPPING_TOGGLE_BZ_ROUTE_LAYER_TT" />
         <Replace ActionId="toggle-bz-terrain-layer" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER" Description="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER_TT" />
     </InputActions>
     <InputContextConstraints>
@@ -19,6 +20,8 @@
         <Replace ActionId="toggle-bz-fortification-layer" ContextId="Unit"/>
         <Replace ActionId="toggle-bz-religion-layer" ContextId="World"/>
         <Replace ActionId="toggle-bz-religion-layer" ContextId="Unit"/>
+        <Replace ActionId="toggle-bz-route-layer" ContextId="World"/>
+        <Replace ActionId="toggle-bz-route-layer" ContextId="Unit"/>
         <Replace ActionId="toggle-bz-terrain-layer" ContextId="World"/>
         <Replace ActionId="toggle-bz-terrain-layer" ContextId="Unit"/>
     </InputContextConstraints>
@@ -28,6 +31,7 @@
         <Replace ActionId="toggle-bz-discovery-layer" Index="0" GestureType="KBMouse" GestureData="KEY_SHIFT+KEY_D"/>
         <Replace ActionId="toggle-bz-fortification-layer" Index="0" GestureType="KBMouse" GestureData="KEY_SHIFT+KEY_F"/>
         <Replace ActionId="toggle-bz-religion-layer" Index="0" GestureType="KBMouse" GestureData="KEY_SHIFT+KEY_R"/>
+        <Replace ActionId="toggle-bz-route-layer" Index="0" GestureType="KBMouse" GestureData="KEY_SHIFT+KEY_X"/>
         <Replace ActionId="toggle-bz-terrain-layer" Index="0" GestureType="KBMouse" GestureData="KEY_SHIFT+KEY_T"/>
     </InputActionDefaultGestures>
 </Database>
