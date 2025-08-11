@@ -17,7 +17,11 @@ const BZ_EXTRA_LAYERS = {
     // 'fxs-default-lens': [ 'bz-city-borders-layer', ],
     'fxs-settler-lens': [ 'bz-city-borders-layer', ],
     'fxs-trade-lens': [ 'bz-city-borders-layer', ],
-    'mod-fortified-district-lens': [ 'bz-discovery-layer', 'bz-fortification-layer', ],
+    'mod-fortified-district-lens': [
+        'fxs-resource-layer',
+        'bz-discovery-layer',
+        'bz-fortification-layer',
+    ],
 };
 // mini-map extensions
 class bzPanelMiniMap {
