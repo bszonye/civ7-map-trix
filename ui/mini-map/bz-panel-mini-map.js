@@ -13,6 +13,13 @@ const BZ_LAYERS = {
     "bz-religion-layer": "LOC_UI_MINI_MAP_RELIGION",
     "bz-terrain-layer": "LOC_UI_MINI_MAP_BZ_TERRAIN",
 };
+const BZ_EXTRA_LAYERS = {
+    // 'fxs-default-lens': [ 'bz-city-borders-layer', ],
+    'fxs-settler-lens': [ 'bz-city-borders-layer', ],
+    'fxs-trade-lens': [ 'bz-city-borders-layer', ],
+    'mod-fortified-district-lens': [ 'bz-discovery-layer', 'bz-fortification-layer', ],
+};
+// mini-map extensions
 class bzPanelMiniMap {
     static c_prototype;
     constructor(component) {
@@ -90,16 +97,30 @@ function getLensSkips() {
     return BZ_SKIPS;
 }
 // patch USIM.setUnitLens (calling it as a fallback)
-import '/base-standard/ui/interface-modes/interface-mode-unit-selected.js';
-function patchUnitLens(patch) {
+engine.whenReady.then(() => {
     const USIM = InterfaceMode.getInterfaceModeHandler('INTERFACEMODE_UNIT_SELECTED');
     const prototype = Object.getPrototypeOf(USIM);
     const original = prototype.setUnitLens;
     prototype.setUnitLens = function(...args) {
-        const rv = patch.apply(this, args);
+        const rv = bzSetUnitLens.apply(this, args);
         if (rv) return original.apply(this, args);
     }
-}
-patchUnitLens(bzSetUnitLens);
+});
+// patch new layers into registered lenses
+engine.whenReady.then(() => {
+    for (const [lensType, lens] of LensManager.lenses.entries()) {
+        const isActiveLens = lensType == LensManager.activeLens;
+        const extra = new Set(BZ_EXTRA_LAYERS[lensType] ?? []);
+        // add Discoveries to all layers with Resources
+        if (lens.activeLayers.has('fxs-resource-layer')) extra.add('bz-discovery-layer');
+        for (const layerType of extra) {
+            lens.activeLayers.add(layerType);
+            // if the layer is already registered, enable it
+            if (isActiveLens && LensManager.layers.get(layerType)) {
+                LensManager.enableLayer(layerType);
+            }
+        }
+    }
+});
 
 Controls.decorate('lens-panel', (component) => new bzPanelMiniMap(component));

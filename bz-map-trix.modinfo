@@ -10,9 +10,10 @@
         <Package>Mod</Package>
         <AffectsSavedGames>0</AffectsSavedGames>
     </Properties>
-    <Dependencies>
-        <Mod id="base-standard" title="LOC_MODULE_BASE_STANDARD_NAME" />
-    </Dependencies>
+    <References>
+        <Mod id="discovery-lens" title="LOC_MOD_DISCOVERY_LENS_NAME" />
+        <Mod id="fortified-district-lens" title="LOC_FORTIFIED_DISTRICT_LENS_TITLE" />
+    </References>
     <ActionCriteria>
         <Criteria id="always">
             <AlwaysMet/>

@@ -1,6 +1,5 @@
-import LensManager, { BaseSpriteGridLensLayer, LensActivationEventName } from '/core/ui/lenses/lens-manager.js';
+import LensManager, { BaseSpriteGridLensLayer } from '/core/ui/lenses/lens-manager.js';
 
-const BZ_DEFAULT_LENSES = ['mod-fortified-district-lens'];
 const SPRITE_PLOT_POSITION = { x: 0, y: 0, z: 10 };
 const SPRITE_SCALE = 2;
 const _SPRITE_SIZE = 64 * SPRITE_SCALE;
@@ -14,9 +13,7 @@ class bzFortificationLensLayer extends BaseSpriteGridLensLayer {
         super([
             { handle: SpriteGroup.bzFortification, name: "bzFortificationLayer_SpriteGroup", spriteMode: SpriteMode.Default },
         ]);
-        this.defaultLenses = new Set(BZ_DEFAULT_LENSES);  // initialization tracker
         this.onLayerHotkeyListener = this.onLayerHotkey.bind(this);
-        this.onLensActivationListener = this.onLensActivation.bind(this);
         this.upscaleMultiplier = 1;  // prevent UI scaling
     }
     initLayer() {
@@ -27,7 +24,6 @@ class bzFortificationLensLayer extends BaseSpriteGridLensLayer {
         engine.on('ConstructibleRemovedFromMap', this.onPlotChange, this);
         engine.on('DistrictControlChanged', this.onPlotChange, this);
         window.addEventListener('layer-hotkey', this.onLayerHotkeyListener);
-        window.addEventListener(LensActivationEventName, this.onLensActivationListener);
     }
     updateMap() {
         const width = GameplayMap.getGridWidth();
@@ -74,12 +70,6 @@ class bzFortificationLensLayer extends BaseSpriteGridLensLayer {
     onLayerHotkey(hotkey) {
         if (hotkey.detail.name == 'toggle-bz-fortification-layer') {
             LensManager.toggleLayer('bz-fortification-layer');
-        }
-    }
-    onLensActivation(event) {
-        if (this.defaultLenses.has(event.detail.activeLens)) {
-            LensManager.enableLayer('bz-fortification-layer');
-            this.defaultLenses.delete(event.detail.activeLens);
         }
     }
 }

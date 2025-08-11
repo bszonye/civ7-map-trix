@@ -1,4 +1,4 @@
-import LensManager, { LensActivationEventName, LensLayerDisabledEventName, LensLayerEnabledEventName } from '/core/ui/lenses/lens-manager.js';
+import LensManager, { LensLayerDisabledEventName, LensLayerEnabledEventName } from '/core/ui/lenses/lens-manager.js';
 import { OVERLAY_PRIORITY } from '/base-standard/ui/utilities/utilities-overlay.js';
 var BorderStyleTypes;
 (function (BorderStyleTypes) {
@@ -7,7 +7,6 @@ var BorderStyleTypes;
     BorderStyleTypes["CityStateOpen"] = "CultureBorder_CityState_Open";
 })(BorderStyleTypes || (BorderStyleTypes = {}));
 
-const BZ_DEFAULT_LENSES = [];
 const BZ_GRID_SIZE = GameplayMap.getGridWidth() * GameplayMap.getGridHeight();
 const BZ_GROUP_MAX = 65534;
 const BZ_VILLAGE_PRIMARY = 0xff000000;
@@ -26,12 +25,10 @@ function borderGroup(id) {
 }
 class bzCultureBordersLayer {
     constructor() {
-        this.defaultLenses = new Set(BZ_DEFAULT_LENSES);  // initialization tracker
         this.cultureOverlayGroup = WorldUI.createOverlayGroup("bzCultureBorderOverlayGroup", OVERLAY_PRIORITY.CULTURE_BORDER);
         this.borderOverlay = this.cultureOverlayGroup.addBorderOverlay(BZ_VILLAGE_STYLE);
         this.lastZoomLevel = -1;
         this.onLayerHotkeyListener = this.onLayerHotkey.bind(this);
-        this.onLensActivationListener = this.onLensActivation.bind(this);
         this.onLensLayerDisabledListener = this.onLensLayerDisabled.bind(this);
         this.onLensLayerEnabledListener = this.onLensLayerEnabled.bind(this);
         this.onPlotOwnershipChanged = (data) => {
@@ -95,7 +92,6 @@ class bzCultureBordersLayer {
         engine.on('CameraChanged', this.onCameraChanged);
         engine.on('PlotOwnershipChanged', this.onPlotOwnershipChanged);
         window.addEventListener('layer-hotkey', this.onLayerHotkeyListener);
-        window.addEventListener(LensActivationEventName, this.onLensActivationListener);
         window.addEventListener(LensLayerDisabledEventName, this.onLensLayerDisabledListener);
         window.addEventListener(LensLayerEnabledEventName, this.onLensLayerEnabledListener);
         this.cultureOverlayGroup.setVisible(false);
@@ -111,13 +107,6 @@ class bzCultureBordersLayer {
     onLayerHotkey(hotkey) {
         if (hotkey.detail.name == 'toggle-bz-culture-borders-layer') {
             LensManager.toggleLayer('bz-culture-borders-layer');
-        }
-    }
-    onLensActivation(event) {
-        // enable this layer the first time a default lens activates
-        if (this.defaultLenses.has(event.detail.activeLens)) {
-            LensManager.enableLayer('bz-culture-borders-layer');
-            this.defaultLenses.delete(event.detail.activeLens);
         }
     }
     onLensLayerDisabled(event) {

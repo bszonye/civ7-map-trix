@@ -1,8 +1,7 @@
 import { gatherMovementObstacles } from '/bz-map-trix/ui/tooltips/bz-plot-tooltip.js';
-import LensManager, { LensActivationEventName } from '/core/ui/lenses/lens-manager.js';
+import LensManager from '/core/ui/lenses/lens-manager.js';
 import { OVERLAY_PRIORITY } from '/base-standard/ui/utilities/utilities-overlay.js';
 
-const BZ_DEFAULT_LENSES = [];
 // adapted from ui/tooltips/bz-plot-tooltip.js
 // hill        #c07e45  oklch(0.65 0.11 60)   #633e1d  oklch(0.40 0.07 60)
 // vegetated   #6ba211  oklch(0.65 0.17 130)  #3b4f25  oklch(0.40 0.07 130)
@@ -24,14 +23,12 @@ const BZ_NO_OUTLINE = {
 };
 class bzTerrainLensLayer {
     constructor() {
-        this.defaultLenses = new Set(BZ_DEFAULT_LENSES);  // initialization tracker
         this.terrainOverlayGroup = WorldUI.createOverlayGroup("bzTerrainOverlayGroup", OVERLAY_PRIORITY.PLOT_HIGHLIGHT);
         this.terrainOverlay = this.terrainOverlayGroup.addPlotOverlay();
         this.terrainOutline = this.terrainOverlayGroup.addBorderOverlay(BZ_NO_OUTLINE);
         this.outlineGroup = new Map();
         this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
         this.onLayerHotkeyListener = this.onLayerHotkey.bind(this);
-        this.onLensActivationListener = this.onLensActivation.bind(this);
     }
     initLayer() {
         for (const [type, overlay] of Object.entries(BZ_OVERLAY)) {
@@ -46,7 +43,6 @@ class bzTerrainLensLayer {
         }
         this.updateMap();
         window.addEventListener('layer-hotkey', this.onLayerHotkeyListener);
-        window.addEventListener(LensActivationEventName, this.onLensActivationListener);
         this.terrainOverlayGroup.setVisible(false);
     }
     applyLayer() {
@@ -105,12 +101,6 @@ class bzTerrainLensLayer {
     onLayerHotkey(hotkey) {
         if (hotkey.detail.name == 'toggle-bz-terrain-layer') {
             LensManager.toggleLayer('bz-terrain-layer');
-        }
-    }
-    onLensActivation(event) {
-        if (this.defaultLenses.has(event.detail.activeLens)) {
-            LensManager.enableLayer('bz-terrain-layer');
-            this.defaultLenses.delete(event.detail.activeLens);
         }
     }
 }

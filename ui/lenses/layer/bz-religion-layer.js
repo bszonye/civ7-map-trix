@@ -1,7 +1,6 @@
 import '/bz-map-trix/ui/lenses/layer/bz-fortification-layer.js';  // force layer order
-import LensManager, { BaseSpriteGridLensLayer, LensActivationEventName } from '/core/ui/lenses/lens-manager.js';
+import LensManager, { BaseSpriteGridLensLayer } from '/core/ui/lenses/lens-manager.js';
 
-const BZ_DEFAULT_LENSES = [];
 const SPRITE_PLOT_POSITION = { x: 0, y: -18, z: 5 };
 const SPRITE_SCALE = 1;
 const _SPRITE_SIZE = 64 * SPRITE_SCALE;
@@ -15,9 +14,7 @@ class bzReligionLensLayer extends BaseSpriteGridLensLayer {
         super([
             { handle: SpriteGroup.bzReligion, name: "bzReligionLayer_SpriteGroup", spriteMode: SpriteMode.Billboard },
         ]);
-        this.defaultLenses = new Set(BZ_DEFAULT_LENSES);  // initialization tracker
         this.onLayerHotkeyListener = this.onLayerHotkey.bind(this);
-        this.onLensActivationListener = this.onLensActivation.bind(this);
         this.upscaleMultiplier = 1;  // prevent UI scaling
     }
     initLayer() {
@@ -28,7 +25,6 @@ class bzReligionLensLayer extends BaseSpriteGridLensLayer {
         engine.on('RuralReligionChanged', this.onMapChange, this);
         engine.on('UrbanReligionChanged', this.onMapChange, this);
         window.addEventListener('layer-hotkey', this.onLayerHotkeyListener);
-        window.addEventListener(LensActivationEventName, this.onLensActivationListener);
     }
     updateMap() {
         const width = GameplayMap.getGridWidth();
@@ -81,12 +77,6 @@ class bzReligionLensLayer extends BaseSpriteGridLensLayer {
     onLayerHotkey(hotkey) {
         if (hotkey.detail.name == 'toggle-bz-religion-layer') {
             LensManager.toggleLayer('bz-religion-layer');
-        }
-    }
-    onLensActivation(event) {
-        if (this.defaultLenses.has(event.detail.activeLens)) {
-            LensManager.enableLayer('bz-religion-layer');
-            this.defaultLenses.delete(event.detail.activeLens);
         }
     }
 }

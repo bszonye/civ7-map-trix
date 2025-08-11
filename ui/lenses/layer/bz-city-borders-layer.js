@@ -1,4 +1,4 @@
-import LensManager, { LensActivationEventName, LensLayerEnabledEventName } from '/core/ui/lenses/lens-manager.js';
+import LensManager, { LensLayerEnabledEventName } from '/core/ui/lenses/lens-manager.js';
 import { OVERLAY_PRIORITY } from '/base-standard/ui/utilities/utilities-overlay.js';
 var BorderStyleTypes;
 (function (BorderStyleTypes) {
@@ -7,7 +7,6 @@ var BorderStyleTypes;
     BorderStyleTypes["CityStateOpen"] = "CultureBorder_CityState_Open";
 })(BorderStyleTypes || (BorderStyleTypes = {}));
 
-const BZ_DEFAULT_LENSES = ['fxs-settler-lens', 'fxs-trade-lens'];
 const BZ_GRID_SIZE = GameplayMap.getGridWidth() * GameplayMap.getGridHeight();
 const BZ_GROUP_MAX = 65534;
 const BZ_VILLAGE_PRIMARY = 0xff000000;
@@ -26,12 +25,10 @@ function borderGroup(id) {
 }
 class bzCityBordersLayer {
     constructor() {
-        this.defaultLenses = new Set(BZ_DEFAULT_LENSES);  // initialization tracker
         this.cityOverlayGroup = WorldUI.createOverlayGroup("bzCityBorderOverlayGroup", OVERLAY_PRIORITY.CULTURE_BORDER);
         this.borderOverlay = this.cityOverlayGroup.addBorderOverlay(BZ_VILLAGE_STYLE);
         this.lastZoomLevel = -1;
         this.onLayerHotkeyListener = this.onLayerHotkey.bind(this);
-        this.onLensActivationListener = this.onLensActivation.bind(this);
         this.onLensLayerEnabledListener = this.onLensLayerEnabled.bind(this);
         this.onPlotOwnershipChanged = (data) => {
             const plotIndex = GameplayMap.getIndexFromLocation(data.location);
@@ -98,7 +95,6 @@ class bzCityBordersLayer {
         engine.on('CameraChanged', this.onCameraChanged);
         engine.on('PlotOwnershipChanged', this.onPlotOwnershipChanged);
         window.addEventListener('layer-hotkey', this.onLayerHotkeyListener);
-        window.addEventListener(LensActivationEventName, this.onLensActivationListener);
         window.addEventListener(LensLayerEnabledEventName, this.onLensLayerEnabledListener);
         this.cityOverlayGroup.setVisible(false);
     }
@@ -112,13 +108,6 @@ class bzCityBordersLayer {
     onLayerHotkey(hotkey) {
         if (hotkey.detail.name == 'toggle-bz-city-borders-layer') {
             LensManager.toggleLayer('bz-city-borders-layer');
-        }
-    }
-    onLensActivation(event) {
-        // enable this layer the first time a default lens activates
-        if (this.defaultLenses.has(event.detail.activeLens)) {
-            LensManager.enableLayer('bz-city-borders-layer');
-            this.defaultLenses.delete(event.detail.activeLens);
         }
     }
     onLensLayerEnabled(event) {
