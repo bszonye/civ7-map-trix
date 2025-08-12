@@ -1,16 +1,17 @@
 import LensManager from '/core/ui/lenses/lens-manager.js';
 
-const BZ_ROAD_RGB = [239/255, 200/255, 118/255];
-const BZ_RAILROAD_RGB = [164/255, 172/255, 206/255];
+// #e0b67b  oklch(0.8 0.09 75)  rgb(224, 182, 123)
+const BZ_ROAD_RGB = [224/255, 182/255, 123/255];
+// #9daae7  oklch(0.75 0.09 275)  rgb(157, 170, 231)
+const BZ_RAILROAD_RGB = [157/255, 170/255, 231/255];
+
 class bzRouteLensLayer {
     constructor() {
         this.routeModelGroup = WorldUI.createModelGroup("bzRouteModelGroup");
         this.onLayerHotkeyListener = this.onLayerHotkey.bind(this);
     }
     initLayer() {
-        this.updateMap();
         window.addEventListener('layer-hotkey', this.onLayerHotkeyListener);
-        // this.routeModelGroup.setVisible(false);
         console.warn(`TRIX ${Object.getOwnPropertyNames(Object.getPrototypeOf(this.routeModelGroup))}`);
     }
     applyLayer() {
@@ -18,15 +19,19 @@ class bzRouteLensLayer {
         // this.routeModelGroup.setVisible(true);
     }
     removeLayer() {
+        this.routeModelGroup.clear();
         // this.routeModelGroup.setVisible(false);
     }
-    getRoutes(_loc) {
-        // TODO
+    getRoutes(loc) {
+        const id = GameplayMap.getRouteType(loc.x, loc.y);
+        const info = GameInfo.Routes.lookup(id);
+        if (!info) return [];
+        const color = info.PlacementRequiresRoutePresent ? BZ_RAILROAD_RGB :
+            BZ_ROAD_RGB;
         return [
-            { start: 0, end: 3, Color3: BZ_ROAD_RGB },
-            { start: 0, end: 6, Color3: BZ_ROAD_RGB },
-            { start: 0, end: 2, Color3: BZ_RAILROAD_RGB },
-            { start: 0, end: 5, Color3: BZ_RAILROAD_RGB },
+            { start: 1, end: 4, Color3: color },
+            { start: 2, end: 5, Color3: color },
+            { start: 3, end: 6, Color3: color },
         ];
     }
     updateMap() {
