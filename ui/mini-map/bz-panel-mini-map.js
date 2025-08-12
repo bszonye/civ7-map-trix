@@ -6,12 +6,12 @@ const BZ_LENSES = {
     "bz-religion-lens": "LOC_UI_MINI_MAP_RELIGION",
 };
 const BZ_LAYERS = {
-    "bz-culture-borders-layer": "LOC_UI_MINI_MAP_BZ_BORDERS",
-    "bz-city-borders-layer": "LOC_UI_MINI_MAP_BZ_CITY_BORDERS",
     "bz-discovery-layer": "LOC_UI_MINI_MAP_BZ_DISCOVERY",
+    "bz-culture-borders-layer": "LOC_UI_MINI_MAP_BZ_BORDERS",
     "bz-fortification-layer": "LOC_UI_MINI_MAP_BZ_FORTIFICATION",
-    "bz-religion-layer": "LOC_UI_MINI_MAP_RELIGION",
+    "bz-city-borders-layer": "LOC_UI_MINI_MAP_BZ_CITY_BORDERS",
     "bz-route-layer": "LOC_UI_MINI_MAP_BZ_ROUTE",
+    "bz-religion-layer": "LOC_UI_MINI_MAP_RELIGION",
     "bz-terrain-layer": "LOC_UI_MINI_MAP_BZ_TERRAIN",
 };
 const BZ_EXTRA_LAYERS = {
