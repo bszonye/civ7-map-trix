@@ -110,10 +110,10 @@
             <Text>开关宗教图标的显示</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_ROUTE_LAYER" Language="zh_Hans_CN">
-            <Text>Toggle Roads Overlay</Text>
+            <Text>开关路线图</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_ROUTE_LAYER_TT" Language="zh_Hans_CN">
-            <Text>Toggles visibility of road and railroad routes</Text>
+            <Text>开关路线图的显示</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER" Language="zh_Hans_CN">
             <Text>开关地形特征</Text>

@@ -118,10 +118,10 @@
             <Text>Affiche ou masque les icônes de la religion.</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_ROUTE_LAYER" Language="fr_FR">
-            <Text>Toggle Roads Overlay</Text>
+            <Text>Carte routière</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_ROUTE_LAYER_TT" Language="fr_FR">
-            <Text>Toggles visibility of road and railroad routes</Text>
+            <Text>Affiche ou masque la carte routière</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER" Language="fr_FR">
             <Text>Caractéristiques du terrain</Text>

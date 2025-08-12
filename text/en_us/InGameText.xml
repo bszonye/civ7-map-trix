@@ -110,13 +110,13 @@
             <Text>Toggles visibility of religion icons</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_ROUTE_LAYER">
-            <Text>Toggle Roads Overlay</Text>
+            <Text>Toggle Road Map</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_ROUTE_LAYER_TT">
-            <Text>Toggles visibility of road and railroad routes</Text>
+            <Text>Toggles visibility of road map</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER">
-            <Text>Toggle Terrain Overlay</Text>
+            <Text>Toggle Terrain Features</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER_TT">
             <Text>Toggles visibility of terrain features</Text>

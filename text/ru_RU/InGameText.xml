@@ -110,10 +110,10 @@
             <Text>Показывать или скрыть значки религии</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_ROUTE_LAYER" Language="ru_RU">
-            <Text>Toggle Roads Overlay</Text>
+            <Text>Дорожная карта</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_ROUTE_LAYER_TT" Language="ru_RU">
-            <Text>Toggles visibility of road and railroad routes</Text>
+            <Text>Показывать или скрыть дорожная карта</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER" Language="ru_RU">
             <Text>Особенности ландшафта</Text>

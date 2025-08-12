@@ -110,10 +110,10 @@
             <Text>종교 아이콘의 가시성을 전환합니다.</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_ROUTE_LAYER" Language="ko_KR">
-            <Text>Toggle Roads Overlay</Text>
+            <Text>로드맵</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_ROUTE_LAYER_TT" Language="ko_KR">
-            <Text>Toggles visibility of road and railroad routes</Text>
+            <Text>로드맵의 가시성을 전환합니다.</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER" Language="ko_KR">
             <Text>지형 특성</Text>

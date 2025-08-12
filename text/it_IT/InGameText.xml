@@ -110,10 +110,10 @@
             <Text>Attiva/disattiva la visibilità delle icone della religione</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_ROUTE_LAYER" Language="it_IT">
-            <Text>Toggle Roads Overlay</Text>
+            <Text>Mappa stradale</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_ROUTE_LAYER_TT" Language="it_IT">
-            <Text>Toggles visibility of road and railroad routes</Text>
+            <Text>Attiva/disattiva la visibilità della mappa stradale</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER" Language="it_IT">
             <Text>Caratteristiche del terreno</Text>
