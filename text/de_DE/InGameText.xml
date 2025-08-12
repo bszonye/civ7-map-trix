@@ -134,7 +134,7 @@
             <Text>Befestigungen</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_ROUTE" Language="de_DE">
-            <Text>Roads</Text>
+            <Text>Straßen</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_TERRAIN" Language="de_DE">
             <Text>Gelände</Text>

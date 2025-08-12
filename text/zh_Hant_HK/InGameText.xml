@@ -109,10 +109,10 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_RELIGION_ICONS_TT" Language="zh_Hant_HK">
             <Text>開啟/關閉宗教圖示的可見度。</Text>
         </Replace>
-        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_ROUTE_LAYER" Language="de_DE">
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_ROUTE_LAYER" Language="zh_Hant_HK">
             <Text>Toggle Roads Overlay</Text>
         </Replace>
-        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_ROUTE_LAYER_TT" Language="de_DE">
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_ROUTE_LAYER_TT" Language="zh_Hant_HK">
             <Text>Toggles visibility of road and railroad routes</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER" Language="zh_Hant_HK">
@@ -133,8 +133,8 @@
         <Replace Tag="LOC_UI_MINI_MAP_BZ_FORTIFICATION" Language="zh_Hant_HK">
             <Text>防禦工事</Text>
         </Replace>
-        <Replace Tag="LOC_UI_MINI_MAP_BZ_ROUTE" Language="de_DE">
-            <Text>Roads</Text>
+        <Replace Tag="LOC_UI_MINI_MAP_BZ_ROUTE" Language="zh_Hant_HK">
+            <Text>道路</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_TERRAIN" Language="zh_Hant_HK">
             <Text>地形</Text>
