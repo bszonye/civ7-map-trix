@@ -126,8 +126,9 @@ class bzCultureBordersLayer {
         if (event.detail.layer == 'fxs-culture-borders-layer') {
             // replace the vanilla empire borders
             console.warn('bz-culture-borders-layer: fxs borders replaced');
-            LensManager.disableLayer('fxs-culture-borders-layer');
             LensManager.enableLayer('bz-culture-borders-layer');
+            // delay switch to avoid crashing Border Toggles
+            setTimeout(() => LensManager.disableLayer('fxs-culture-borders-layer'));
         } else if (event.detail.layer == 'bz-city-borders-layer') {
             // when City Limits are on, Borders must be on (but hidden)
             if (LensManager.isLayerEnabled('bz-culture-borders-layer')) {

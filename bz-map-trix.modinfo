@@ -12,6 +12,7 @@
     </Properties>
     <References>
         <Mod id="discovery-lens" title="LOC_MOD_DISCOVERY_LENS_NAME" />
+        <Mod id="finwickle-border-boggles" title="LOC_MOD_BORDER_TOGGLES_NAME" />
         <Mod id="fortified-district-lens" title="LOC_FORTIFIED_DISTRICT_LENS_TITLE" />
     </References>
     <ActionCriteria>
