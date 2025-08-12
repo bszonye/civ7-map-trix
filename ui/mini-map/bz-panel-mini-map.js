@@ -30,35 +30,24 @@ class bzPanelMiniMap {
     constructor(component) {
         component.bzComponent = this;
         this.component = component;
-        this.patchPrototypes(this.component);
-    }
-    patchPrototypes(component) {
-        const c_prototype = Object.getPrototypeOf(component);
-        if (bzPanelMiniMap.c_prototype == c_prototype) return;
-        // patch component methods
-        const proto = bzPanelMiniMap.c_prototype = c_prototype;
-        // afterInitialize
-        const afterInitialize = this.afterInitialize;
-        const onInitialize = proto.onInitialize;
-        proto.onInitialize = function(...args) {
-            const c_rv = onInitialize.apply(this, args);
-            const after_rv = afterInitialize.apply(this.bzComponent, args);
-            return after_rv ?? c_rv;
-        }
     }
     beforeAttach() { }
-    afterAttach() { }
-    beforeDetach() { }
-    afterDetach() { }
-    onAttributeChanged(_name, _prev, _next) { }
-    afterInitialize() {
+    afterAttach() {
         for (const [lens, name] of Object.entries(BZ_LENSES)) {
             this.component.createLensButton(name, lens, "lens-group");
         }
         for (const [layer, name] of Object.entries(BZ_LAYERS)) {
             this.component.createLayerCheckbox(name, layer);
         }
+        // hide checkboxes for fxs borders (added by Border Toggles)
+        for (const layer of ['fxs-city-borders-layer', 'fxs-culture-borders-layer']) {
+            const checkbox = this.component.layerElementMap[layer];
+            if (checkbox) checkbox.parentElement.style.display = 'none';
+        }
     }
+    beforeDetach() { }
+    afterDetach() { }
+    onAttributeChanged(_name, _prev, _next) { }
 }
 
 // extend UnitSelectedInterfaceMode.setUnitLens(unitID)
