@@ -52,19 +52,17 @@ class bzRouteLensLayer {
             if (!i || !type) continue;  // skip hub and missing links
             (type.PlacementRequiresRoutePresent ? hub : road).push(i);
         }
-        for (let i = 0; i < 6; i+=2) {
-            if (i < road.length) {
-                const start = road[i];
-                const end = road[i+1] ?? 0;
-                const Color3 = BZ_ROAD_RGB;
-                links.push({ start, end, Color3 });
-            }
-            if (i < rail.length) {
-                const start = rail[i];
-                const end = rail[i+1] ?? 0;
-                const Color3 = BZ_RAILROAD_RGB;
-                links.push({ start, end, Color3 });
-            }
+        for (let i = 0; i < road.length; i+=2) {
+            const start = road[i];
+            const end = road[i+1] ?? 0;
+            const Color3 = BZ_ROAD_RGB;
+            links.push({ start, end, Color3 });
+        }
+        for (let i = 0; i < rail.length; i+=2) {
+            const start = rail[i];
+            const end = rail[i+1] ?? 0;
+            const Color3 = BZ_RAILROAD_RGB;
+            links.push({ start, end, Color3 });
         }
         return links;
     }
