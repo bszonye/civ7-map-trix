@@ -21,16 +21,18 @@ class bzRouteLensLayer {
         this.map = [];
         this.visible = false;
         this.updateGate = new UpdateGate(this.updateMap.bind(this));
+        this.onRouteChange = () => this.updateGate.call('onRouteChange');
         this.onLayerHotkeyListener = this.onLayerHotkey.bind(this);
     }
     initLayer() {
         this.updateMap();
-        engine.on('RouteAddedToMap', this.onRouteChange, this);
-        engine.on('RouteChanged', this.onRouteChange, this);
-        engine.on('RouteRemovedFromMap', this.onRouteChange, this);
+        engine.on('RouteAddedToMap', this.onRouteChange);
+        engine.on('RouteChanged', this.onRouteChange);
+        engine.on('RouteRemovedFromMap', this.onRouteChange);
         window.addEventListener('layer-hotkey', this.onLayerHotkeyListener);
     }
     applyLayer() {
+        // show VFX if it isn't already visible (prevents flickering)
         this.updateVFX(!this.visible);
     }
     removeLayer() {
@@ -87,9 +89,6 @@ class bzRouteLensLayer {
             this.routeModelGroup.addVFXAtPlot("VFX_3dUI_TradeRoute_01", plotIndex, { x: 0, y: 0, z: 0 }, { constants: route });
         }
         this.visible = true;
-    }
-    onRouteChange(_data) {
-        this.updateGate.call('onRouteChange');
     }
     onLayerHotkey(hotkey) {
         if (hotkey.detail.name == 'toggle-bz-route-layer') {
