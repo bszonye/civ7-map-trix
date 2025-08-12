@@ -1,56 +1,103 @@
 import LensManager from '/core/ui/lenses/lens-manager.js';
+import UpdateGate from '/core/ui/utilities/utilities-update-gate.js';
 
-// #e0b67b  oklch(0.8 0.09 75)  rgb(224, 182, 123)
-const BZ_ROAD_RGB = [224/255, 182/255, 123/255];
-// #9daae7  oklch(0.75 0.09 275)  rgb(157, 170, 231)
-const BZ_RAILROAD_RGB = [157/255, 170/255, 231/255];
+const BZ_DIRECTIONS = [
+    DirectionTypes.NO_DIRECTION,
+    DirectionTypes.DIRECTION_EAST,
+    DirectionTypes.DIRECTION_SOUTHEAST,
+    DirectionTypes.DIRECTION_SOUTHWEST,
+    DirectionTypes.DIRECTION_WEST,
+    DirectionTypes.DIRECTION_NORTHWEST,
+    DirectionTypes.DIRECTION_NORTHEAST,
+];
+// #ebb25f  oklch(0.8 0.12 75)  rgb(235, 178, 95)
+const BZ_ROAD_RGB = [235/255, 178/255, 95/255];
+// #98a7fa  oklch(0.75 0.12 275)  rgb(152, 167, 250)
+const BZ_RAILROAD_RGB = [152/255, 167/255, 250/255];
 
 class bzRouteLensLayer {
     constructor() {
         this.routeModelGroup = WorldUI.createModelGroup("bzRouteModelGroup");
+        this.map = [];
+        this.visible = false;
+        this.updateGate = new UpdateGate(this.updateMap.bind(this));
         this.onLayerHotkeyListener = this.onLayerHotkey.bind(this);
     }
     initLayer() {
+        this.updateMap();
+        engine.on('RouteAddedToMap', this.onRouteChange, this);
+        engine.on('RouteChanged', this.onRouteChange, this);
+        engine.on('RouteRemovedFromMap', this.onRouteChange, this);
         window.addEventListener('layer-hotkey', this.onLayerHotkeyListener);
         console.warn(`TRIX ${Object.getOwnPropertyNames(Object.getPrototypeOf(this.routeModelGroup))}`);
     }
     applyLayer() {
-        this.updateMap();
-        // this.routeModelGroup.setVisible(true);
+        this.updateVFX(!this.visible);
     }
     removeLayer() {
+        this.visible = false;
         this.routeModelGroup.clear();
-        // this.routeModelGroup.setVisible(false);
     }
     getRoutes(loc) {
-        const id = GameplayMap.getRouteType(loc.x, loc.y);
-        const info = GameInfo.Routes.lookup(id);
-        if (!info) return [];
-        const color = info.PlacementRequiresRoutePresent ? BZ_RAILROAD_RGB :
-            BZ_ROAD_RGB;
-        return [
-            { start: 1, end: 4, Color3: color },
-            { start: 2, end: 5, Color3: color },
-            { start: 3, end: 6, Color3: color },
-        ];
-    }
-    updateMap() {
-        this.routeModelGroup.clear();
-        const width = GameplayMap.getGridWidth();
-        const height = GameplayMap.getGridHeight();
-        for (let x = 0; x < width; x++) {
-            for (let y = 0; y < height; y++) {
-                this.updatePlot({ x, y });
+        const links = [];
+        if (GameplayMap.getRouteType(loc.x, loc.y) == -1) return links;
+        const adj = BZ_DIRECTIONS.map(i => GameplayMap.getAdjacentPlotLocation(loc, i));
+        const ids = adj.map(loc => GameplayMap.getRouteType(loc.x, loc.y));
+        const types = ids.map(id => GameInfo.Routes.lookup(id));
+        const road = [];
+        const rail = [];
+        const hub = types[0].PlacementRequiresRoutePresent ? rail : road;
+        for (const [i, type] of types.entries()) {
+            if (!i || !type) continue;  // skip hub and missing links
+            (type.PlacementRequiresRoutePresent ? hub : road).push(i);
+        }
+        for (let i = 0; i < 6; i+=2) {
+            if (i < road.length) {
+                const start = road[i];
+                const end = road[i+1] ?? 0;
+                const Color3 = BZ_ROAD_RGB;
+                links.push({ start, end, Color3 });
+            }
+            if (i < rail.length) {
+                const start = rail[i];
+                const end = rail[i+1] ?? 0;
+                const Color3 = BZ_RAILROAD_RGB;
+                links.push({ start, end, Color3 });
             }
         }
+        return links;
     }
-    updatePlot(loc) {
-        const plotIndex = GameplayMap.getIndexFromLocation(loc);
-        const routes = this.getRoutes(loc);
-        for (const route of routes) {
-            const index = this.routeModelGroup.addVFXAtPlot("VFX_3dUI_TradeRoute_01", plotIndex, { x: 0, y: 0, z: 0 }, { constants: route });
-            console.warn(`TRIX VFX ${index} ${JSON.stringify(this.routeModelGroup.getVFXByIndex(index))}`);
+    updateMap() {
+        const p1 = performance.now();
+        const width = GameplayMap.getGridWidth();
+        const height = GameplayMap.getGridHeight();
+        this.map = [];
+        for (let x = 0; x < width; x++) {
+            for (let y = 0; y < height; y++) {
+                const loc = { x, y };
+                const plotIndex = GameplayMap.getIndexFromLocation(loc);
+                const routes = this.getRoutes(loc);
+                for (const route of routes) this.map.push([plotIndex, route]);
+            }
         }
+        const p2 = performance.now();
+        console.warn(`TRIX UPDATE-MAP ${p2-p1}ms`);
+        if (this.visible) this.updateVFX();
+    }
+    updateVFX(visible=this.visible) {
+        if (!visible) return;
+        const p1 = performance.now();
+        this.routeModelGroup.clear();
+        for (const [plotIndex, route] of this.map) {
+            this.routeModelGroup.addVFXAtPlot("VFX_3dUI_TradeRoute_01", plotIndex, { x: 0, y: 0, z: 0 }, { constants: route });
+        }
+        this.visible = true;
+        const p2 = performance.now();
+        console.warn(`TRIX VFX ${p2-p1}ms`);
+    }
+    onRouteChange(data) {
+        console.warn(`TRIX ROUTE ${JSON.stringify(data)}`);
+        this.updateGate.call('onRouteChange');
     }
     onLayerHotkey(hotkey) {
         if (hotkey.detail.name == 'toggle-bz-route-layer') {
