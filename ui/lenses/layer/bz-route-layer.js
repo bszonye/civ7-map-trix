@@ -29,7 +29,6 @@ class bzRouteLensLayer {
         engine.on('RouteChanged', this.onRouteChange, this);
         engine.on('RouteRemovedFromMap', this.onRouteChange, this);
         window.addEventListener('layer-hotkey', this.onLayerHotkeyListener);
-        console.warn(`TRIX ${Object.getOwnPropertyNames(Object.getPrototypeOf(this.routeModelGroup))}`);
     }
     applyLayer() {
         this.updateVFX(!this.visible);
@@ -68,7 +67,6 @@ class bzRouteLensLayer {
         return links;
     }
     updateMap() {
-        const p1 = performance.now();
         const width = GameplayMap.getGridWidth();
         const height = GameplayMap.getGridHeight();
         this.map = [];
@@ -80,23 +78,17 @@ class bzRouteLensLayer {
                 for (const route of routes) this.map.push([plotIndex, route]);
             }
         }
-        const p2 = performance.now();
-        console.warn(`TRIX UPDATE-MAP ${p2-p1}ms`);
         if (this.visible) this.updateVFX();
     }
     updateVFX(visible=this.visible) {
         if (!visible) return;
-        const p1 = performance.now();
         this.routeModelGroup.clear();
         for (const [plotIndex, route] of this.map) {
             this.routeModelGroup.addVFXAtPlot("VFX_3dUI_TradeRoute_01", plotIndex, { x: 0, y: 0, z: 0 }, { constants: route });
         }
         this.visible = true;
-        const p2 = performance.now();
-        console.warn(`TRIX VFX ${p2-p1}ms`);
     }
-    onRouteChange(data) {
-        console.warn(`TRIX ROUTE ${JSON.stringify(data)}`);
+    onRouteChange(_data) {
         this.updateGate.call('onRouteChange');
     }
     onLayerHotkey(hotkey) {
