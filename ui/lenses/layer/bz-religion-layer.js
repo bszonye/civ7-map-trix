@@ -2,6 +2,7 @@ import '/bz-map-trix/ui/lenses/layer/bz-fortification-layer.js';  // force layer
 import LensManager, { BaseSpriteGridLensLayer } from '/core/ui/lenses/lens-manager.js';
 
 const SPRITE_PLOT_POSITION = { x: 0, y: -18, z: 5 };
+const SPRITE_FALLBACK = "buildicon_open";
 const SPRITE_SCALE = 1;
 const _SPRITE_SIZE = 64 * SPRITE_SCALE;
 var SpriteGroup;
@@ -59,14 +60,19 @@ class bzReligionLensLayer extends BaseSpriteGridLensLayer {
         if (religionID == -1) return;
         const info = GameInfo.Religions.lookup(religionID);
         const asset = this.getReligionIcon(info.ReligionType);
-        this.addSprite(SpriteGroup.bzReligion, loc, asset, SPRITE_PLOT_POSITION, { scale: SPRITE_SCALE });
+        this.addSprite(SpriteGroup.bzReligion, loc, asset ?? SPRITE_FALLBACK, SPRITE_PLOT_POSITION, { scale: SPRITE_SCALE });
+        if (!asset) {
+            // show the IconString over the fallback icon
+            const text = info.IconString.toUpperCase();
+            const font = { fonts: ["TitleFont"], fontSize: 21/(text.length+1), faceCamera: true };
+            this.addText(SpriteGroup.bzReligion, loc, text, SPRITE_PLOT_POSITION, font);
+        }
     }
     getReligionIcon(icon) {
         const blp = UI.getIconBLP(icon);
         const url = UI.getIconURL(icon);
         // sprites only support built-in BLPs, for now
         if (url == `blp:${blp}` || url == `fs://game/${blp}`) return blp;
-        return "legacy_mod_culture_ga";
     }
     onMapChange() {
         this.updateMap();
