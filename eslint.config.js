@@ -21,6 +21,7 @@ export default [
                 Constructibles: "readonly",
                 Controls: "readonly",
                 Database: "readonly",
+                DiplomacyActions: "readonly",
                 DirectionTypes: "readonly",
                 DistrictTypes: "readonly",
                 Districts: "readonly",
