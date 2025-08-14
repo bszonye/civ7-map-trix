@@ -76,7 +76,8 @@ class bzReligionLensLayer extends BaseSpriteGridLensLayer {
         const blp = UI.getIconBLP(icon);
         const url = UI.getIconURL(icon);
         // sprites only support built-in BLPs, for now
-        if (url == `blp:${blp}` || url == `fs://game/${blp}`) return blp;
+        if (url != `blp:${blp}` && url != `fs://game/${blp}`) return null;
+        return blp;
     }
     onMapChange() {
         this.updateMap();
