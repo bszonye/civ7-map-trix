@@ -78,7 +78,7 @@ class bzRouteLensLayer {
                 for (const route of routes) this.map.push([plotIndex, route]);
             }
         }
-        if (this.visible) this.updateVFX();
+        this.updateVFX();
     }
     updateVFX(visible=this.visible) {
         if (!visible) return;
