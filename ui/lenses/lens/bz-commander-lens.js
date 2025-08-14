@@ -4,6 +4,7 @@ class bzCommanderLens {
         this.activeLayers = new Set([
             'fxs-hexgrid-layer',
             'fxs-resource-layer',
+            'fxs-operation-target-layer',
             'bz-culture-borders-layer',
             'bz-discovery-layer',
             'bz-fortification-layer',

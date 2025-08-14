@@ -95,7 +95,7 @@ class bzCultureBordersLayer {
     }
     updateBorders() {
         this.borderOverlay.clear();
-        // update player colors
+        // update border colors and styles
         this.updateBorderStyles();
         // update independent powers
         for (let plotIndex=0; plotIndex < BZ_GRID_SIZE; ++plotIndex) {

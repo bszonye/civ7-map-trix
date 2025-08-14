@@ -20,12 +20,13 @@ const BZ_EXTRA_LAYERS = {
     'fxs-trade-lens': [ 'bz-city-borders-layer', ],
     'mod-fortified-district-lens': [
         'fxs-resource-layer',
+        'fxs-operation-target-layer',
         'bz-discovery-layer',
         'bz-fortification-layer',
     ],
 };
 // mini-map extensions
-class bzPanelMiniMap {
+class bzLensPanel {
     static c_prototype;
     constructor(component) {
         component.bzComponent = this;
@@ -127,4 +128,4 @@ engine.whenReady.then(() => {
     }
 });
 
-Controls.decorate('lens-panel', (component) => new bzPanelMiniMap(component));
+Controls.decorate('lens-panel', (component) => new bzLensPanel(component));
