@@ -34,9 +34,9 @@ class bzCultureBordersLayer {
         this.onLensLayerDisabledListener = this.onLensLayerDisabled.bind(this);
         this.onLensLayerEnabledListener = this.onLensLayerEnabled.bind(this);
         const borderEvents = [
-            Game.getHash("DIPLOMACY_ACTION_DECLARE_WAR"),
-            Game.getHash("DIPLOMACY_ACTION_FORM_ALLIANCE"),
-            Game.getHash("DIPLOMACY_ACTION_OPEN_BORDERS"),
+            Database.makeHash("DIPLOMACY_ACTION_DECLARE_WAR"),
+            Database.makeHash("DIPLOMACY_ACTION_FORM_ALLIANCE"),
+            Database.makeHash("DIPLOMACY_ACTION_OPEN_BORDERS"),
         ];
         this.onDiplomacyEvent = (event) => {
             if (borderEvents.includes(event.actionType)) this.updateBorderStyles();
@@ -77,7 +77,7 @@ class bzCultureBordersLayer {
         // update set of players with open borders
         this.openBorders.clear();
         const localID = GameContext.localObserverID;
-        const diploOpen = Game.getHash("DIPLOMACY_ACTION_OPEN_BORDERS");
+        const diploOpen = Database.makeHash("DIPLOMACY_ACTION_OPEN_BORDERS");
         // record open borders agreements
         Game.Diplomacy.getPlayerEvents(localID)
             .filter(e => e.actionType == diploOpen && e.initialPlayer == localID)
