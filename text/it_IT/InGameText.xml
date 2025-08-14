@@ -109,6 +109,12 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_RELIGION_ICONS_TT" Language="it_IT">
             <Text>Attiva/disattiva la visibilità delle icone della religione</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_ROUTE_LAYER" Language="it_IT">
+            <Text>Mappa stradale</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_ROUTE_LAYER_TT" Language="it_IT">
+            <Text>Attiva/disattiva la visibilità della mappa stradale</Text>
+        </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER" Language="it_IT">
             <Text>Caratteristiche del terreno</Text>
         </Replace>
@@ -126,6 +132,9 @@
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_FORTIFICATION" Language="it_IT">
             <Text>Fortificazioni</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_MINI_MAP_BZ_ROUTE" Language="it_IT">
+            <Text>Strade</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_TERRAIN" Language="it_IT">
             <Text>Terreno</Text>

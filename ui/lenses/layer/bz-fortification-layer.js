@@ -1,8 +1,7 @@
 import LensManager, { BaseSpriteGridLensLayer } from '/core/ui/lenses/lens-manager.js';
 
-const SPRITE_PLOT_POSITION = { x: 0, y: 0, z: 10 };
+const SPRITE_PLOT_POSITION = { x: 0, y: 0, z: 5 };
 const SPRITE_SCALE = 2;
-const _SPRITE_SIZE = 64 * SPRITE_SCALE;
 var SpriteGroup;
 (function (SpriteGroup) {
     SpriteGroup[SpriteGroup["bzFortification"] = 0] = "bzFortification";

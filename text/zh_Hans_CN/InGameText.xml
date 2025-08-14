@@ -109,6 +109,12 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_RELIGION_ICONS_TT" Language="zh_Hans_CN">
             <Text>开关宗教图标的显示</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_ROUTE_LAYER" Language="zh_Hans_CN">
+            <Text>开关路线图</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_ROUTE_LAYER_TT" Language="zh_Hans_CN">
+            <Text>开关路线图的显示</Text>
+        </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER" Language="zh_Hans_CN">
             <Text>开关地形特征</Text>
         </Replace>
@@ -126,6 +132,9 @@
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_FORTIFICATION" Language="zh_Hans_CN">
             <Text>防御工事</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_MINI_MAP_BZ_ROUTE" Language="zh_Hans_CN">
+            <Text>道路</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_TERRAIN" Language="zh_Hans_CN">
             <Text>地形</Text>

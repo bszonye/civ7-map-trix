@@ -3,6 +3,7 @@ import { OVERLAY_PRIORITY } from '/base-standard/ui/utilities/utilities-overlay.
 var BorderStyleTypes;
 (function (BorderStyleTypes) {
     BorderStyleTypes["Closed"] = "CultureBorder_Closed";
+    BorderStyleTypes["Open"] = "CultureBorder_Open";
     BorderStyleTypes["CityStateClosed"] = "CultureBorder_CityState_Closed";
     BorderStyleTypes["CityStateOpen"] = "CultureBorder_CityState_Open";
 })(BorderStyleTypes || (BorderStyleTypes = {}));
@@ -27,10 +28,19 @@ class bzCultureBordersLayer {
     constructor() {
         this.cultureOverlayGroup = WorldUI.createOverlayGroup("bzCultureBorderOverlayGroup", OVERLAY_PRIORITY.CULTURE_BORDER);
         this.borderOverlay = this.cultureOverlayGroup.addBorderOverlay(BZ_VILLAGE_STYLE);
+        this.openBorders = new Set();
         this.lastZoomLevel = -1;
         this.onLayerHotkeyListener = this.onLayerHotkey.bind(this);
         this.onLensLayerDisabledListener = this.onLensLayerDisabled.bind(this);
         this.onLensLayerEnabledListener = this.onLensLayerEnabled.bind(this);
+        const borderEvents = [
+            Database.makeHash("DIPLOMACY_ACTION_DECLARE_WAR"),
+            Database.makeHash("DIPLOMACY_ACTION_FORM_ALLIANCE"),
+            Database.makeHash("DIPLOMACY_ACTION_OPEN_BORDERS"),
+        ];
+        this.onDiplomacyEvent = (event) => {
+            if (borderEvents.includes(event.actionType)) this.updateBorderStyles();
+        };
         this.onPlotOwnershipChanged = (data) => {
             const plotIndex = GameplayMap.getIndexFromLocation(data.location);
             if (data.priorOwner != PlayerIds.NO_PLAYER) {
@@ -55,20 +65,38 @@ class bzCultureBordersLayer {
     getPlayerStyle(player) {
         if (typeof player === 'number') player = Players.get(player);
         if (player.isIndependent) return BZ_VILLAGE_STYLE;
-        const style = player.isMajor ? BorderStyleTypes.Closed :
+        const style =
+            this.openBorders.has(player.id) ? BorderStyleTypes.Open :
+            player.isMajor ? BorderStyleTypes.Closed :
             BorderStyleTypes.CityStateClosed;
         const primaryColor = UI.Player.getPrimaryColorValueAsHex(player.id);
         const secondaryColor = UI.Player.getSecondaryColorValueAsHex(player.id);
         return { style, primaryColor, secondaryColor };
     }
-    updateBorders() {
-        this.borderOverlay.clear();
-        // update player colors
+    updateBorderStyles() {
+        // update set of players with open borders
+        this.openBorders.clear();
+        const localID = GameContext.localObserverID;
+        const diploOpen = Database.makeHash("DIPLOMACY_ACTION_OPEN_BORDERS");
+        // record open borders agreements
+        Game.Diplomacy.getPlayerEvents(localID)
+            .filter(e => e.actionType == diploOpen && e.initialPlayer == localID)
+            .forEach(e => this.openBorders.add(e.targetPlayer));
+        // record alliances
+        Players.getAlive()
+            .filter(p => p.isMajor && p.Diplomacy.hasAllied(localID))
+            .forEach(p => this.openBorders.add(p.id));
+        // update styles
         for (const player of Players.getEverAlive()) {
             const style = this.getPlayerStyle(player);
             const group = borderGroup(player.id);
             this.borderOverlay.setGroupStyle(group, style);
         }
+    }
+    updateBorders() {
+        this.borderOverlay.clear();
+        // update border colors and styles
+        this.updateBorderStyles();
         // update independent powers
         for (let plotIndex=0; plotIndex < BZ_GRID_SIZE; ++plotIndex) {
             const loc = GameplayMap.getLocationFromIndex(plotIndex);
@@ -90,6 +118,8 @@ class bzCultureBordersLayer {
     initLayer() {
         this.updateBorders();
         engine.on('CameraChanged', this.onCameraChanged);
+        engine.on('DiplomacyEventStarted', this.onDiplomacyEvent);
+        engine.on('DiplomacyEventEnded', this.onDiplomacyEvent);
         engine.on('PlotOwnershipChanged', this.onPlotOwnershipChanged);
         window.addEventListener('layer-hotkey', this.onLayerHotkeyListener);
         window.addEventListener(LensLayerDisabledEventName, this.onLensLayerDisabledListener);
@@ -126,8 +156,9 @@ class bzCultureBordersLayer {
         if (event.detail.layer == 'fxs-culture-borders-layer') {
             // replace the vanilla empire borders
             console.warn('bz-culture-borders-layer: fxs borders replaced');
-            LensManager.disableLayer('fxs-culture-borders-layer');
             LensManager.enableLayer('bz-culture-borders-layer');
+            // delay switch to avoid crashing Border Toggles
+            setTimeout(() => LensManager.disableLayer('fxs-culture-borders-layer'));
         } else if (event.detail.layer == 'bz-city-borders-layer') {
             // when City Limits are on, Borders must be on (but hidden)
             if (LensManager.isLayerEnabled('bz-culture-borders-layer')) {

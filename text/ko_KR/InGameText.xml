@@ -109,6 +109,12 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_RELIGION_ICONS_TT" Language="ko_KR">
             <Text>종교 아이콘의 가시성을 전환합니다.</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_ROUTE_LAYER" Language="ko_KR">
+            <Text>로드맵</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_ROUTE_LAYER_TT" Language="ko_KR">
+            <Text>로드맵의 가시성을 전환합니다.</Text>
+        </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER" Language="ko_KR">
             <Text>지형 특성</Text>
         </Replace>
@@ -126,6 +132,9 @@
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_FORTIFICATION" Language="ko_KR">
             <Text>요새</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_MINI_MAP_BZ_ROUTE" Language="ko_KR">
+            <Text>도로</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_TERRAIN" Language="ko_KR">
             <Text>지형</Text>

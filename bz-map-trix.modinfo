@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Mod id="bz-map-trix" version="30100"
+<Mod id="bz-map-trix" version="30200"
     xmlns="ModInfo">
     <Properties>
         <Name>LOC_MOD_BZ_MAP_TRIX_NAME</Name>
-        <Version>3.1.0</Version>
+        <Version>3.2.0</Version>
         <Description>LOC_MOD_BZ_MAP_TRIX_DESCRIPTION</Description>
         <Authors>beezany</Authors>
         <URL>https://forums.civfanatics.com/resources/map-trix.31950/</URL>
@@ -12,6 +12,7 @@
     </Properties>
     <References>
         <Mod id="discovery-lens" title="LOC_MOD_DISCOVERY_LENS_NAME" />
+        <Mod id="finwickle-border-boggles" title="LOC_MOD_BORDER_TOGGLES_NAME" />
         <Mod id="fortified-district-lens" title="LOC_FORTIFIED_DISTRICT_LENS_TITLE" />
     </References>
     <ActionCriteria>
@@ -62,6 +63,7 @@
                     <Item>ui/lenses/layer/bz-discovery-layer.js</Item>
                     <Item>ui/lenses/layer/bz-fortification-layer.js</Item>
                     <Item>ui/lenses/layer/bz-religion-layer.js</Item>
+                    <Item>ui/lenses/layer/bz-route-layer.js</Item>
                     <Item>ui/lenses/layer/bz-terrain-layer.js</Item>
                     <Item>ui/lenses/lens/bz-commander-lens.js</Item>
                     <Item>ui/lenses/lens/bz-religion-lens.js</Item>

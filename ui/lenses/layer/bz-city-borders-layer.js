@@ -114,8 +114,9 @@ class bzCityBordersLayer {
         if (event.detail.layer == 'fxs-city-borders-layer') {
             // replace the vanilla city borders
             console.warn('bz-city-borders-layer: fxs borders replaced');
-            LensManager.disableLayer('fxs-city-borders-layer');
             LensManager.enableLayer('bz-city-borders-layer');
+            // delay switch to avoid crashing Border Toggles
+            setTimeout(() => LensManager.disableLayer('fxs-city-borders-layer'));
         }
     }
 }

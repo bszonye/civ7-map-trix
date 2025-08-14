@@ -6,10 +6,11 @@ const BZ_LENSES = {
     "bz-religion-lens": "LOC_UI_MINI_MAP_RELIGION",
 };
 const BZ_LAYERS = {
-    "bz-culture-borders-layer": "LOC_UI_MINI_MAP_BZ_BORDERS",
-    "bz-city-borders-layer": "LOC_UI_MINI_MAP_BZ_CITY_BORDERS",
     "bz-discovery-layer": "LOC_UI_MINI_MAP_BZ_DISCOVERY",
+    "bz-culture-borders-layer": "LOC_UI_MINI_MAP_BZ_BORDERS",
     "bz-fortification-layer": "LOC_UI_MINI_MAP_BZ_FORTIFICATION",
+    "bz-city-borders-layer": "LOC_UI_MINI_MAP_BZ_CITY_BORDERS",
+    "bz-route-layer": "LOC_UI_MINI_MAP_BZ_ROUTE",
     "bz-religion-layer": "LOC_UI_MINI_MAP_RELIGION",
     "bz-terrain-layer": "LOC_UI_MINI_MAP_BZ_TERRAIN",
 };
@@ -19,45 +20,35 @@ const BZ_EXTRA_LAYERS = {
     'fxs-trade-lens': [ 'bz-city-borders-layer', ],
     'mod-fortified-district-lens': [
         'fxs-resource-layer',
+        'fxs-operation-target-layer',
         'bz-discovery-layer',
         'bz-fortification-layer',
     ],
 };
 // mini-map extensions
-class bzPanelMiniMap {
+class bzLensPanel {
     static c_prototype;
     constructor(component) {
         component.bzComponent = this;
         this.component = component;
-        this.patchPrototypes(this.component);
-    }
-    patchPrototypes(component) {
-        const c_prototype = Object.getPrototypeOf(component);
-        if (bzPanelMiniMap.c_prototype == c_prototype) return;
-        // patch component methods
-        const proto = bzPanelMiniMap.c_prototype = c_prototype;
-        // afterInitialize
-        const afterInitialize = this.afterInitialize;
-        const onInitialize = proto.onInitialize;
-        proto.onInitialize = function(...args) {
-            const c_rv = onInitialize.apply(this, args);
-            const after_rv = afterInitialize.apply(this.bzComponent, args);
-            return after_rv ?? c_rv;
-        }
     }
     beforeAttach() { }
-    afterAttach() { }
-    beforeDetach() { }
-    afterDetach() { }
-    onAttributeChanged(_name, _prev, _next) { }
-    afterInitialize() {
+    afterAttach() {
         for (const [lens, name] of Object.entries(BZ_LENSES)) {
             this.component.createLensButton(name, lens, "lens-group");
         }
         for (const [layer, name] of Object.entries(BZ_LAYERS)) {
             this.component.createLayerCheckbox(name, layer);
         }
+        // hide checkboxes for fxs borders (added by Border Toggles)
+        for (const layer of ['fxs-city-borders-layer', 'fxs-culture-borders-layer']) {
+            const checkbox = this.component.layerElementMap[layer];
+            if (checkbox) checkbox.parentElement.style.display = 'none';
+        }
     }
+    beforeDetach() { }
+    afterDetach() { }
+    onAttributeChanged(_name, _prev, _next) { }
 }
 
 // extend UnitSelectedInterfaceMode.setUnitLens(unitID)
@@ -137,4 +128,4 @@ engine.whenReady.then(() => {
     }
 });
 
-Controls.decorate('lens-panel', (component) => new bzPanelMiniMap(component));
+Controls.decorate('lens-panel', (component) => new bzLensPanel(component));

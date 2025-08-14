@@ -12,6 +12,7 @@ HotkeyManager.handleInput = function(...args) {
             case "toggle-bz-discovery-layer":
             case "toggle-bz-fortification-layer":
             case "toggle-bz-religion-layer":
+            case "toggle-bz-route-layer":
             case "toggle-bz-terrain-layer":
                 this.sendLayerHotkeyEvent(name);
                 return false;

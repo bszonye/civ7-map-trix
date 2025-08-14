@@ -3,7 +3,7 @@ import LensManager, { BaseSpriteGridLensLayer } from '/core/ui/lenses/lens-manag
 
 const SPRITE_PLOT_POSITION = { x: 0, y: -18, z: 5 };
 const SPRITE_SCALE = 1;
-const _SPRITE_SIZE = 64 * SPRITE_SCALE;
+const SPRITE_ALT = "buildicon_open";
 var SpriteGroup;
 (function (SpriteGroup) {
     SpriteGroup[SpriteGroup["bzReligion"] = 0] = "bzReligion";
@@ -59,14 +59,25 @@ class bzReligionLensLayer extends BaseSpriteGridLensLayer {
         if (religionID == -1) return;
         const info = GameInfo.Religions.lookup(religionID);
         const asset = this.getReligionIcon(info.ReligionType);
-        this.addSprite(SpriteGroup.bzReligion, loc, asset, SPRITE_PLOT_POSITION, { scale: SPRITE_SCALE });
+        const pos = SPRITE_PLOT_POSITION;
+        const scale = SPRITE_SCALE;
+        if (asset) {
+            this.addSprite(SpriteGroup.bzReligion, loc, asset, pos, { scale });
+        } else {
+            // show the IconString over the alternate icon
+            this.addSprite(SpriteGroup.bzReligion, loc, SPRITE_ALT, pos, { scale });
+            const text = info.IconString.toUpperCase();
+            const fontSize = 24 / (text.length + 1);
+            const font = { fonts: ["TitleFont"], fontSize, faceCamera: true, };
+            this.addText(SpriteGroup.bzReligion, loc, text, pos, font);
+        }
     }
     getReligionIcon(icon) {
         const blp = UI.getIconBLP(icon);
         const url = UI.getIconURL(icon);
         // sprites only support built-in BLPs, for now
-        if (url == `blp:${blp}` || url == `fs://game/${blp}`) return blp;
-        return "legacy_mod_culture_ga";
+        if (url != `blp:${blp}` && url != `fs://game/${blp}`) return null;
+        return blp;
     }
     onMapChange() {
         this.updateMap();
