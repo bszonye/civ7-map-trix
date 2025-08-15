@@ -19,6 +19,7 @@ class bzRouteLensLayer {
     constructor() {
         this.routeModelGroup = WorldUI.createModelGroup("bzRouteModelGroup");
         this.map = [];
+        this.hidden = [];
         this.visible = false;
         this.updateGate = new UpdateGate(this.updateMap.bind(this));
         this.onRouteChange = () => this.updateGate.call('onRouteChange');
@@ -26,6 +27,7 @@ class bzRouteLensLayer {
     }
     initLayer() {
         this.updateMap();
+        engine.on('PlotVisibilityChanged', this.onVisibilityChange, this);
         engine.on('RouteAddedToMap', this.onRouteChange);
         engine.on('RouteChanged', this.onRouteChange);
         engine.on('RouteRemovedFromMap', this.onRouteChange);
@@ -75,7 +77,7 @@ class bzRouteLensLayer {
                 const loc = { x, y };
                 const plotIndex = GameplayMap.getIndexFromLocation(loc);
                 const routes = this.getRoutes(loc);
-                for (const route of routes) this.map.push([plotIndex, route]);
+                this.map[plotIndex] = routes;
             }
         }
         this.updateVFX();
@@ -83,10 +85,31 @@ class bzRouteLensLayer {
     updateVFX(visible=this.visible) {
         if (!visible) return;
         this.routeModelGroup.clear();
-        for (const [plotIndex, route] of this.map) {
-            this.routeModelGroup.addVFXAtPlot("VFX_3dUI_TradeRoute_01", plotIndex, { x: 0, y: 0, z: 0 }, { constants: route });
+        this.hidden = [];
+        const observer = GameContext.localObserverID;
+        for (const [plotIndex, routes] of this.map.entries()) {
+            const loc = GameplayMap.getLocationFromIndex(plotIndex);
+            const revealed = GameplayMap.getRevealedState(observer, loc.x, loc.y);
+            if (revealed == RevealedStates.HIDDEN) {
+                this.hidden[plotIndex] = true;
+                continue;
+            }
+            for (const route of routes) {
+                const vfx = 'VFX_3dUI_TradeRoute_01';
+                const pos = { x: 0, y: 0, z: 0 };
+                const params = { constants: route };
+                this.routeModelGroup.addVFXAtPlot(vfx, plotIndex, pos, params);
+            }
         }
         this.visible = true;
+    }
+    onVisibilityChange(data) {
+        const loc = data.location;
+        const plotIndex = GameplayMap.getIndexFromLocation(loc);
+        if (this.map[plotIndex]?.length && this.hidden[plotIndex]) {
+            // only update if necessary, to minimize flicker
+            this.updateGate.call('onVisibilityChange');
+        }
     }
     onLayerHotkey(hotkey) {
         if (hotkey.detail.name == 'toggle-bz-route-layer') {
