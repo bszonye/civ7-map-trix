@@ -545,10 +545,10 @@ function getTownFocus(city) {
     return { isGrowing, name, note, icon, info, };
 }
 function getVillageIcon(owner, age) {
-    // get the minor civ type
+    // get the village's city-state type
     const ctype = GameInfo.Independents
         .find(i => i.CityStateName == owner.civilizationAdjective)?.CityStateType;
-    // select an icon
+    // select an icon based on type, with Expedition Base as default
     const icons = BZ_ICON_VILLAGE_TYPES[ctype] ?? ["IMPROVEMENT_EXPEDITION_BASE"];
     const index = age?.ChronologyIndex ?? 0;
     const icon = icons.at(index) ?? icons.at(-1);
