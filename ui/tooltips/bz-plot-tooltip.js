@@ -546,12 +546,10 @@ function getTownFocus(city) {
 }
 function getVillageIcon(owner, age) {
     // get the minor civ type
-    let dctype = "MILITARISTIC";  // default
-    const cname = owner.civilizationAdjective;
     const ctype = GameInfo.Independents
-        .find(i => i.CityStateName == cname)?.CityStateType ??  dctype;
+        .find(i => i.CityStateName == owner.civilizationAdjective)?.CityStateType;
     // select an icon
-    const icons = BZ_ICON_VILLAGE_TYPES[ctype] ?? BZ_ICON_VILLAGE_TYPES[dctype];
+    const icons = BZ_ICON_VILLAGE_TYPES[ctype] ?? ["IMPROVEMENT_EXPEDITION_BASE"];
     const index = age?.ChronologyIndex ?? 0;
     const icon = icons.at(index) ?? icons.at(-1);
     return icon;
