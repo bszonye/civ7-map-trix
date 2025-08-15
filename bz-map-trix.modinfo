@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Mod id="bz-map-trix" version="30200"
+<Mod id="bz-map-trix" version="30201"
     xmlns="ModInfo">
     <Properties>
         <Name>LOC_MOD_BZ_MAP_TRIX_NAME</Name>
-        <Version>3.2.0</Version>
+        <Version>3.2.1</Version>
         <Description>LOC_MOD_BZ_MAP_TRIX_DESCRIPTION</Description>
         <Authors>beezany</Authors>
         <URL>https://forums.civfanatics.com/resources/map-trix.31950/</URL>
