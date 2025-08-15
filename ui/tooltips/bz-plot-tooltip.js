@@ -35,6 +35,16 @@ const BZ_ICON_VILLAGE_TYPES = {  // by city-state type and age
         "IMPROVEMENT_MONASTERY",
         "IMPROVEMENT_INSTITUTE",
     ],
+    // extra village types from City-States Expanded mod
+    AGRICULTURAL: [
+        "IMPROVEMENT_FARM",
+    ],
+    INDUSTRIAL: [
+        "IMPROVEMENT_MINE",
+    ],
+    HAPPINESS: [
+        "IMPROVEMENT_EXPEDITION_BASE",
+    ],
 };
 const BZ_ICON_TYPES = {
     IMPROVEMENT_MEGALITH: ["CULTURAL"],
@@ -535,13 +545,11 @@ function getTownFocus(city) {
     return { isGrowing, name, note, icon, info, };
 }
 function getVillageIcon(owner, age) {
-    // get the minor civ type
-    let ctype = "MILITARISTIC";  // default
-    GameInfo.Independents.forEach(i => {
-        if (owner.civilizationAdjective == i.CityStateName) ctype = i.CityStateType;
-    });
-    // select an icon
-    const icons = BZ_ICON_VILLAGE_TYPES[ctype ?? "MILITARISTIC"];
+    // get the village's city-state type
+    const ctype = GameInfo.Independents
+        .find(i => i.CityStateName == owner.civilizationAdjective)?.CityStateType;
+    // select an icon based on type, with Expedition Base as default
+    const icons = BZ_ICON_VILLAGE_TYPES[ctype] ?? ["IMPROVEMENT_EXPEDITION_BASE"];
     const index = age?.ChronologyIndex ?? 0;
     const icon = icons.at(index) ?? icons.at(-1);
     return icon;
