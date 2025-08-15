@@ -90,10 +90,8 @@ class bzRouteLensLayer {
         for (const [plotIndex, routes] of this.map.entries()) {
             const loc = GameplayMap.getLocationFromIndex(plotIndex);
             const revealed = GameplayMap.getRevealedState(observer, loc.x, loc.y);
-            if (revealed == RevealedStates.HIDDEN) {
-                this.hidden[plotIndex] = true;
-                continue;
-            }
+            this.hidden[plotIndex] = (revealed == RevealedStates.HIDDEN);
+            if (this.hidden[plotIndex]) continue;
             for (const route of routes) {
                 const vfx = 'VFX_3dUI_TradeRoute_01';
                 const pos = { x: 0, y: 0, z: 0 };
