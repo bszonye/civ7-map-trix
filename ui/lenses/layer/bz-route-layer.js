@@ -88,13 +88,11 @@ class bzRouteLensLayer {
     }
     updatePlotVFX(plotIndex) {
         if (this.visible[plotIndex]) return;  // already visible
-        const routes = this.map[plotIndex];
-        if (!routes.length) return;  // nothing to display
         const loc = GameplayMap.getLocationFromIndex(plotIndex);
         if (GameplayMap.getRevealedState(GameContext.localObserverID, loc.x, loc.y) ==
             RevealedStates.HIDDEN) return;  // not yet revealed
         this.visible[plotIndex] = true;
-        for (const route of routes) {
+        for (const route of this.map[plotIndex]) {
             const params = { constants: route };
             this.routeModelGroup.addVFXAtPlot(VFX_NAME, plotIndex, VFX_OFFSET, params);
         }
