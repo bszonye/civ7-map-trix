@@ -19,9 +19,12 @@ const BZ_RAILROAD_RGB = [152/255, 167/255, 250/255];
 
 class bzRouteLensLayer {
     constructor() {
+        // model group for displaying route VFX
         this.routeModelGroup = WorldUI.createModelGroup("bzRouteModelGroup");
-        this.map = [];
-        this.visible = null;
+        // map of route links and revealed plots, indexed by plotIndex
+        this.routes = [];
+        this.visible = null;  // layer enabled: array, disabled: null
+        // event handlers
         this.updateGate = new UpdateGate(this.updateMap.bind(this));
         this.onRouteChange = () => this.updateGate.call('onRouteChange');
         this.onLayerHotkeyListener = this.onLayerHotkey.bind(this);
@@ -34,33 +37,42 @@ class bzRouteLensLayer {
         window.addEventListener('layer-hotkey', this.onLayerHotkeyListener);
     }
     applyLayer() {
+        // initialize visibility map but don't reset it (avoids flicker)
         if (!this.visible) this.visible = [];
         this.updateVFX();
         engine.on('PlotVisibilityChanged', this.onVisibilityChange, this);
     }
     removeLayer() {
+        // disable VFX handlers and clear the map
         engine.off('PlotVisibilityChanged', this.onVisibilityChange, this);
-        this.clearVFX(null);
+        this.routeModelGroup.clear();
+        this.visible = null;
     }
     getPlotRoutes(loc) {
         const links = [];
         if (GameplayMap.getRouteType(loc.x, loc.y) == -1) return links;
-        const adj = BZ_DIRECTIONS.map(i => GameplayMap.getAdjacentPlotLocation(loc, i));
-        const ids = adj.map(loc => GameplayMap.getRouteType(loc.x, loc.y));
-        const types = ids.map(id => GameInfo.Routes.lookup(id));
-        const road = [];
+        // get route info for [center, east, southest, ..., northeast]
+        const dinfo = BZ_DIRECTIONS
+            .map(i => GameplayMap.getAdjacentPlotLocation(loc, i))
+            .map(loc => GameplayMap.getRouteType(loc.x, loc.y))
+            .map(id => GameInfo.Routes.lookup(id));
+        // collect all rail-to-rail and road links
         const rail = [];
-        const hub = types[0].PlacementRequiresRoutePresent ? rail : road;
-        for (const [i, type] of types.entries()) {
-            if (!i || !type) continue;  // skip hub and missing links
-            (type.PlacementRequiresRoutePresent ? hub : road).push(i);
+        const road = [];
+        const hasRail = dinfo[0].PlacementRequiresRoutePresent;
+        for (const [i, info] of dinfo.entries()) {
+            if (!i || !info) continue;  // skip center and missing links
+            const rtype = hasRail && info.PlacementRequiresRoutePresent ? rail : road;
+            rtype.push(i);
         }
+        // combine road links into start/end pairs
         for (let i = 0; i < road.length; i+=2) {
             const start = road[i];
             const end = road[i+1] ?? 0;
             const Color3 = BZ_ROAD_RGB;
             links.push({ start, end, Color3 });
         }
+        // combine rail links into start/end pairs
         for (let i = 0; i < rail.length; i+=2) {
             const start = rail[i];
             const end = rail[i+1] ?? 0;
@@ -70,19 +82,24 @@ class bzRouteLensLayer {
         return links;
     }
     updateMap() {
+        // refresh the route map
+        const p1 = performance.now();
         const width = GameplayMap.getGridWidth();
         const height = GameplayMap.getGridHeight();
-        this.map = [];
+        this.routes = [];
         for (let x = 0; x < width; x++) {
             for (let y = 0; y < height; y++) {
                 const loc = { x, y };
                 const plotIndex = GameplayMap.getIndexFromLocation(loc);
-                const routes = this.getPlotRoutes(loc);
-                this.map[plotIndex] = routes;
+                this.routes[plotIndex] = this.getPlotRoutes(loc);
             }
         }
+        const p2 = performance.now();
+        console.warn(`TRIX MAP ${(p2-p1).toFixed(2)}ms`);
+        // refresh VFX, if enabled
         if (this.visible) {
-            this.clearVFX();
+            this.visible = [];
+            this.routeModelGroup.clear();
             this.updateVFX();
         }
     }
@@ -92,17 +109,13 @@ class bzRouteLensLayer {
         if (GameplayMap.getRevealedState(GameContext.localObserverID, loc.x, loc.y) ==
             RevealedStates.HIDDEN) return;  // not yet revealed
         this.visible[plotIndex] = true;
-        for (const route of this.map[plotIndex]) {
+        for (const route of this.routes[plotIndex]) {
             const params = { constants: route };
             this.routeModelGroup.addVFXAtPlot(VFX_NAME, plotIndex, VFX_OFFSET, params);
         }
     }
     updateVFX() {
-        for (const plotIndex of this.map.keys()) this.updatePlotVFX(plotIndex);
-    }
-    clearVFX(visible = []) {
-        this.visible = visible;
-        this.routeModelGroup.clear();
+        for (const plotIndex of this.routes.keys()) this.updatePlotVFX(plotIndex);
     }
     onVisibilityChange(data) {
         const plotIndex = GameplayMap.getIndexFromLocation(data.location);
