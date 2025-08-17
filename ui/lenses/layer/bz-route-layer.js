@@ -24,6 +24,9 @@ class bzRouteLensLayer {
         // map data (indexed by plotIndex)
         this.routes = null;  // route segments
         this.visible = null;  // revealed plots (when layer is enabled)
+        // route types
+        const railTypes = GameInfo.Routes.filter(r => r.RequiredConstructible);
+        this.railTypes = new Set(railTypes.map(r => r.$hash));
         // event handlers
         this.updateGate = new UpdateGate(this.updateMap.bind(this));
         this.onRouteChange = () => this.updateGate.call('onRouteChange');
@@ -52,18 +55,18 @@ class bzRouteLensLayer {
         const links = [];
         if (GameplayMap.getRouteType(loc.x, loc.y) == -1) return links;
         // get route info for [center, east, southest, ..., northeast]
-        const dinfo = BZ_DIRECTIONS
+        const drtype = BZ_DIRECTIONS
             .map(i => GameplayMap.getAdjacentPlotLocation(loc, i))
-            .map(loc => GameplayMap.getRouteType(loc.x, loc.y))
-            .map(id => GameInfo.Routes.lookup(id));
+            .map(loc => GameplayMap.getRouteType(loc.x, loc.y));
         // collect all rail-to-rail and road links
         const rail = [];
         const road = [];
-        const hasRail = dinfo[0].PlacementRequiresRoutePresent;
-        for (const [i, info] of dinfo.entries()) {
-            if (!i || !info) continue;  // skip center and missing links
-            const rtype = hasRail && info.PlacementRequiresRoutePresent ? rail : road;
-            rtype.push(i);
+        const hasRail = this.railTypes.has(drtype[0]);
+        for (const [i, rtype] of drtype.entries()) {
+            if (!i) continue;  // skip center
+            if (rtype == -1) continue;  // skip missing links
+            const link = hasRail && this.railTypes.has(rtype) ? rail : road;
+            link.push(i);
         }
         // combine road links into start/end pairs
         for (let i = 0; i < road.length; i+=2) {
