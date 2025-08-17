@@ -21,9 +21,9 @@ class bzRouteLensLayer {
     constructor() {
         // model group for displaying route VFX
         this.routeModelGroup = WorldUI.createModelGroup("bzRouteModelGroup");
-        // map of route links and revealed plots, indexed by plotIndex
-        this.routes = [];
-        this.visible = null;  // layer enabled: array, disabled: null
+        // map data (indexed by plotIndex)
+        this.routes = null;  // route segments
+        this.visible = null;  // revealed plots (when layer is enabled)
         // event handlers
         this.updateGate = new UpdateGate(this.updateMap.bind(this));
         this.onRouteChange = () => this.updateGate.call('onRouteChange');
