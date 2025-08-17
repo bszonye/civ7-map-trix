@@ -911,8 +911,7 @@ class bzPlotTooltip {
         const text = dotJoin([name, crossing]);
         const highlight =
             bridge ? "ROUTE_BRIDGE" :
-            info?.PlacementRequiresRoutePresent ? "ROUTE_RAILROAD" :
-            "ROUTE_ROAD";
+            info?.RequiredConstructible ? "ROUTE_RAILROAD" : "ROUTE_ROAD";
         const route = { text, name, crossing, highlight, type, info, };
         return route;
     }
