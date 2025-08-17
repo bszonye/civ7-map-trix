@@ -83,7 +83,6 @@ class bzRouteLensLayer {
     }
     updateMap() {
         // refresh the route map
-        const p1 = performance.now();
         const width = GameplayMap.getGridWidth();
         const height = GameplayMap.getGridHeight();
         this.routes = [];
@@ -94,8 +93,6 @@ class bzRouteLensLayer {
                 this.routes[plotIndex] = this.getPlotRoutes(loc);
             }
         }
-        const p2 = performance.now();
-        console.warn(`TRIX MAP ${(p2-p1).toFixed(2)}ms`);
         // refresh VFX, if enabled
         if (this.visible) {
             this.visible = [];
