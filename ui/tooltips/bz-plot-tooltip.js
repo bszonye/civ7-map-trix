@@ -2,8 +2,8 @@ import bzMapTrixOptions, { bzVerbosity } from '/bz-map-trix/ui/options/bz-map-tr
 import "/base-standard/ui/tooltips/plot-tooltip.js";
 
 import TooltipManager, { PlotTooltipPriority } from '/core/ui/tooltips/tooltip-manager.js';
-import { ComponentID } from '/core/ui/utilities/utilities-component-id.chunk.js';
-import LensManager from '/core/ui/lenses/lens-manager.js';
+import { C as ComponentID } from '/core/ui/utilities/utilities-component-id.chunk.js';
+import { L as LensManager } from '../../../core/ui/lenses/lens-manager.chunk.js';
 import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
 
 // custom & adapted icons

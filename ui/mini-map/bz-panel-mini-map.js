@@ -1,6 +1,6 @@
 import bzMapTrixOptions, { bzCommanderLens } from '/bz-map-trix/ui/options/bz-map-trix-options.js';
 import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
-import LensManager from '/core/ui/lenses/lens-manager.js';
+import { L as LensManager } from '../../../core/ui/lenses/lens-manager.chunk.js';
 const BZ_LENSES = {
     "bz-commander-lens": "LOC_UI_MINI_MAP_COMMANDER",
     "bz-religion-lens": "LOC_UI_MINI_MAP_RELIGION",
