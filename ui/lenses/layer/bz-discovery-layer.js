@@ -1,7 +1,8 @@
-import LensManager, { BaseSpriteGridLensLayer } from '/core/ui/lenses/lens-manager.js';
+import { L as LensManager } from '/core/ui/lenses/lens-manager.chunk.js';
 
+const UPSCALE_START = 1080;
 const BZ_ICON_DISCOVERY = "NAR_REW_DEFAULT";
-const SPRITE_PLOT_POSITION = { x: 0, y: 25, z: 5 };
+const SPRITE_OFFSET = { x: 0, y: 25, z: 5 };
 const SPRITE_SCALE = 3/4;
 const SPRITE_SIZE = 64 * SPRITE_SCALE; // pixels wide
 var SpriteGroup;
@@ -9,20 +10,29 @@ var SpriteGroup;
     SpriteGroup[SpriteGroup["bzDiscovery"] = 0] = "bzDiscovery";
     SpriteGroup[SpriteGroup["All"] = Number.MAX_VALUE] = "All";
 })(SpriteGroup || (SpriteGroup = {}));
-class bzDiscoveryLensLayer extends BaseSpriteGridLensLayer {
-    constructor() {
-        super([
-            { handle: SpriteGroup.bzDiscovery, name: "bzDiscoveryLayer_SpriteGroup", spriteMode: SpriteMode.FixedBillboard },
-        ]);
-        this.onLayerHotkeyListener = this.onLayerHotkey.bind(this);
-    }
+class bzDiscoveryLensLayer {
+    bzSpriteGrid = WorldUI.createSpriteGrid(
+        "bzDiscoveryLayer_SpriteGroup",
+        SpriteMode.FixedBillboard
+    );
+    upscaleMultiplier = 1;
+    onLayerHotkeyListener = this.onLayerHotkey.bind(this);
     initLayer() {
+        if (window.innerHeight > UPSCALE_START) {
+          this.upscaleMultiplier = window.innerHeight / UPSCALE_START;
+        }
         this.updateMap();
-        this.setVisible(SpriteGroup.All, false);
+        this.bzSpriteGrid.setVisible(false);
         engine.on('PlotVisibilityChanged', this.onPlotChange, this);
         engine.on('ConstructibleAddedToMap', this.onPlotChange, this);
         engine.on('ConstructibleRemovedFromMap', this.onPlotChange, this);
         window.addEventListener('layer-hotkey', this.onLayerHotkeyListener);
+    }
+    applyLayer() {
+        this.bzSpriteGrid.setVisible(true);
+    }
+    removeLayer() {
+        this.bzSpriteGrid.setVisible(false);
     }
     updateMap() {
         const width = GameplayMap.getGridWidth();
@@ -34,7 +44,7 @@ class bzDiscoveryLensLayer extends BaseSpriteGridLensLayer {
         }
     }
     updatePlot(loc) {
-        this.clearPlot(SpriteGroup.All, loc);
+        this.bzSpriteGrid.clearPlot(loc);
         const observer = GameContext.localObserverID;
         const revealed = GameplayMap.getRevealedState(observer, loc.x, loc.y);
         if (revealed == RevealedStates.HIDDEN) return;
@@ -43,9 +53,10 @@ class bzDiscoveryLensLayer extends BaseSpriteGridLensLayer {
             const item = Constructibles.getByComponentID(con);
             if (!item) continue;
             const info = GameInfo.Constructibles.lookup(item.type);
-            if (!info?.Discovery) continue;
+            if (!info || !info.Discovery && !info.Archaeology) continue;
             const asset = UI.getIconBLP(BZ_ICON_DISCOVERY);
-            this.addSprite(SpriteGroup.bzDiscovery, loc, asset, SPRITE_PLOT_POSITION, { scale: SPRITE_SIZE });
+            const params = { scale: SPRITE_SIZE * this.upscaleMultiplier };
+            this.bzSpriteGrid.addSprite(loc, asset, SPRITE_OFFSET, params);
             return;
         }
     }

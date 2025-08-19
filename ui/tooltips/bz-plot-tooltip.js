@@ -1135,8 +1135,8 @@ class bzPlotTooltip {
         if (this.improvement) {
             // set up icons and special district names for improvements
             const info = this.improvement.info;
-            if (this.improvement?.info.Discovery) {
-                // discoveries don't have an icon, but here's a nice map
+            if (info.Discovery || info.Archaeology) {
+                // use the narrative reward icon for discoveries
                 this.improvement.icon = BZ_ICON_DISCOVERY;
                 this.improvement.districtName = "LOC_DISTRICT_BZ_DISCOVERY";
             } else if (info.Age == null && info.Population == 0) {
@@ -1875,7 +1875,7 @@ class bzPlotTooltip {
 function dump_constructibles() {
     const dump = [];
     for (const item of GameInfo.Constructibles) {
-        if (item.Discovery ||  // discoveries
+        if (item.Discovery || item.Archaeology ||  // discoveries
             item.Age == null && item.Population == 0 ||  // villages
             item.ConstructibleType.endsWith("_RESOURCE"))  // duplicate
             continue;
