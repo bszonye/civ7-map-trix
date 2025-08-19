@@ -1,6 +1,6 @@
 import { gatherMovementObstacles } from '/bz-map-trix/ui/tooltips/bz-plot-tooltip.js';
-import LensManager from '/core/ui/lenses/lens-manager.js';
-import { OVERLAY_PRIORITY } from '/base-standard/ui/utilities/utilities-overlay.js';
+import { L as LensManager } from '/core/ui/lenses/lens-manager.chunk.js';
+import { O as OVERLAY_PRIORITY } from '/base-standard/ui/utilities/utilities-overlay.chunk.js';
 
 // adapted from ui/tooltips/bz-plot-tooltip.js
 const BZ_OVERLAY = {
