@@ -1,5 +1,5 @@
 import '/bz-map-trix/ui/lenses/layer/bz-fortification-layer.js';  // force layer order
-import LensManager, { BaseSpriteGridLensLayer } from '/core/ui/lenses/lens-manager.js';
+import { L as LensManager } from '/core/ui/lenses/lens-manager.chunk.js';
 
 const SPRITE_PLOT_POSITION = { x: 0, y: -18, z: 5 };
 const SPRITE_SCALE = 1;
@@ -9,7 +9,7 @@ var SpriteGroup;
     SpriteGroup[SpriteGroup["bzReligion"] = 0] = "bzReligion";
     SpriteGroup[SpriteGroup["All"] = Number.MAX_VALUE] = "All";
 })(SpriteGroup || (SpriteGroup = {}));
-class bzReligionLensLayer extends BaseSpriteGridLensLayer {
+class bzReligionLensLayer {
     constructor() {
         super([
             { handle: SpriteGroup.bzReligion, name: "bzReligionLayer_SpriteGroup", spriteMode: SpriteMode.Billboard },
@@ -25,6 +25,12 @@ class bzReligionLensLayer extends BaseSpriteGridLensLayer {
         engine.on('RuralReligionChanged', this.onMapChange, this);
         engine.on('UrbanReligionChanged', this.onMapChange, this);
         window.addEventListener('layer-hotkey', this.onLayerHotkeyListener);
+    }
+    applyLayer() {
+        this.bzSpriteGrid.setVisible(true);
+    }
+    removeLayer() {
+        this.bzSpriteGrid.setVisible(false);
     }
     updateMap() {
         const width = GameplayMap.getGridWidth();
