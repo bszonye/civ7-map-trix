@@ -1,28 +1,32 @@
-import LensManager, { BaseSpriteGridLensLayer } from '/core/ui/lenses/lens-manager.js';
+import { L as LensManager } from '/core/ui/lenses/lens-manager.chunk.js';
 
-const SPRITE_PLOT_POSITION = { x: 0, y: 0, z: 5 };
+const SPRITE_OFFSET = { x: 0, y: 0, z: 5 };
 const SPRITE_SCALE = 2;
 var SpriteGroup;
 (function (SpriteGroup) {
     SpriteGroup[SpriteGroup["bzFortification"] = 0] = "bzFortification";
     SpriteGroup[SpriteGroup["All"] = Number.MAX_VALUE] = "All";
 })(SpriteGroup || (SpriteGroup = {}));
-class bzFortificationLensLayer extends BaseSpriteGridLensLayer {
-    constructor() {
-        super([
-            { handle: SpriteGroup.bzFortification, name: "bzFortificationLayer_SpriteGroup", spriteMode: SpriteMode.Default },
-        ]);
-        this.onLayerHotkeyListener = this.onLayerHotkey.bind(this);
-        this.upscaleMultiplier = 1;  // prevent UI scaling
-    }
+class bzFortificationLensLayer {
+    bzSpriteGrid = WorldUI.createSpriteGrid(
+        "bzFortificationLayer_SpriteGroup",
+        SpriteMode.Default
+    );
+    onLayerHotkeyListener = this.onLayerHotkey.bind(this);
     initLayer() {
         this.updateMap();
-        this.setVisible(SpriteGroup.All, false);
+        this.bzSpriteGrid.setVisible(false);
         engine.on('PlotVisibilityChanged', this.onPlotChange, this);
         engine.on('ConstructibleAddedToMap', this.onPlotChange, this);
         engine.on('ConstructibleRemovedFromMap', this.onPlotChange, this);
         engine.on('DistrictControlChanged', this.onPlotChange, this);
         window.addEventListener('layer-hotkey', this.onLayerHotkeyListener);
+    }
+    applyLayer() {
+        this.bzSpriteGrid.setVisible(true);
+    }
+    removeLayer() {
+        this.bzSpriteGrid.setVisible(false);
     }
     updateMap() {
         const width = GameplayMap.getGridWidth();
@@ -34,7 +38,7 @@ class bzFortificationLensLayer extends BaseSpriteGridLensLayer {
         }
     }
     updatePlot(loc) {
-        this.clearPlot(SpriteGroup.All, loc);
+        this.bzSpriteGrid.clearPlot(loc);
         const observer = GameContext.localObserverID;
         const revealed = GameplayMap.getRevealedState(observer, loc.x, loc.y);
         if (revealed == RevealedStates.HIDDEN) return;
@@ -52,7 +56,8 @@ class bzFortificationLensLayer extends BaseSpriteGridLensLayer {
             const controller = Players.get(district.controllingPlayer);
             const civ = GameInfo.Civilizations.lookup(controller.civilizationType);
             const asset = this.getCivilizationIcon(civ.CivilizationType);
-            this.addSprite(SpriteGroup.bzFortification, loc, asset, SPRITE_PLOT_POSITION, { scale: SPRITE_SCALE });
+            const params = { scale: SPRITE_SCALE };
+            this.bzSpriteGrid.addSprite(loc, asset, SPRITE_OFFSET, params);
             return;
         }
     }

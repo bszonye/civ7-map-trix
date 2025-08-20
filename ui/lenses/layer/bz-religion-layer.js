@@ -1,7 +1,7 @@
 import '/bz-map-trix/ui/lenses/layer/bz-fortification-layer.js';  // force layer order
-import LensManager, { BaseSpriteGridLensLayer } from '/core/ui/lenses/lens-manager.js';
+import { L as LensManager } from '/core/ui/lenses/lens-manager.chunk.js';
 
-const SPRITE_PLOT_POSITION = { x: 0, y: -18, z: 5 };
+const SPRITE_OFFSET = { x: 0, y: -18, z: 5 };
 const SPRITE_SCALE = 1;
 const SPRITE_ALT = "buildicon_open";
 var SpriteGroup;
@@ -9,22 +9,26 @@ var SpriteGroup;
     SpriteGroup[SpriteGroup["bzReligion"] = 0] = "bzReligion";
     SpriteGroup[SpriteGroup["All"] = Number.MAX_VALUE] = "All";
 })(SpriteGroup || (SpriteGroup = {}));
-class bzReligionLensLayer extends BaseSpriteGridLensLayer {
-    constructor() {
-        super([
-            { handle: SpriteGroup.bzReligion, name: "bzReligionLayer_SpriteGroup", spriteMode: SpriteMode.Billboard },
-        ]);
-        this.onLayerHotkeyListener = this.onLayerHotkey.bind(this);
-        this.upscaleMultiplier = 1;  // prevent UI scaling
-    }
+class bzReligionLensLayer {
+    bzSpriteGrid = WorldUI.createSpriteGrid(
+        "bzReligionLayer_SpriteGroup",
+        SpriteMode.Billboard
+    );
+    onLayerHotkeyListener = this.onLayerHotkey.bind(this);
     initLayer() {
         this.updateMap();
-        this.setVisible(SpriteGroup.All, false);
+        this.bzSpriteGrid.setVisible(false);
         engine.on('PlotVisibilityChanged', this.onPlotChange, this);
         engine.on('CityReligionChanged', this.onMapChange, this);
         engine.on('RuralReligionChanged', this.onMapChange, this);
         engine.on('UrbanReligionChanged', this.onMapChange, this);
         window.addEventListener('layer-hotkey', this.onLayerHotkeyListener);
+    }
+    applyLayer() {
+        this.bzSpriteGrid.setVisible(true);
+    }
+    removeLayer() {
+        this.bzSpriteGrid.setVisible(false);
     }
     updateMap() {
         const width = GameplayMap.getGridWidth();
@@ -36,7 +40,7 @@ class bzReligionLensLayer extends BaseSpriteGridLensLayer {
         }
     }
     updatePlot(loc) {
-        this.clearPlot(SpriteGroup.All, loc);
+        this.bzSpriteGrid.clearPlot(loc);
         const observer = GameContext.localObserverID;
         const revealed = GameplayMap.getRevealedState(observer, loc.x, loc.y);
         if (revealed == RevealedStates.HIDDEN) return;
@@ -59,17 +63,14 @@ class bzReligionLensLayer extends BaseSpriteGridLensLayer {
         if (religionID == -1) return;
         const info = GameInfo.Religions.lookup(religionID);
         const asset = this.getReligionIcon(info.ReligionType);
-        const pos = SPRITE_PLOT_POSITION;
-        const scale = SPRITE_SCALE;
-        if (asset) {
-            this.addSprite(SpriteGroup.bzReligion, loc, asset, pos, { scale });
-        } else {
+        const params = { scale: SPRITE_SCALE };
+        this.bzSpriteGrid.addSprite(loc, asset || SPRITE_ALT, SPRITE_OFFSET, params);
+        if (!asset) {
             // show the IconString over the alternate icon
-            this.addSprite(SpriteGroup.bzReligion, loc, SPRITE_ALT, pos, { scale });
             const text = info.IconString.toUpperCase();
             const fontSize = 24 / (text.length + 1);
             const font = { fonts: ["TitleFont"], fontSize, faceCamera: true, };
-            this.addText(SpriteGroup.bzReligion, loc, text, pos, font);
+            this.bzSpriteGrid.addText(loc, text, SPRITE_OFFSET, font);
         }
     }
     getReligionIcon(icon) {

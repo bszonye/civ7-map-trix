@@ -2,8 +2,8 @@ import bzMapTrixOptions, { bzVerbosity } from '/bz-map-trix/ui/options/bz-map-tr
 import "/base-standard/ui/tooltips/plot-tooltip.js";
 
 import TooltipManager, { PlotTooltipPriority } from '/core/ui/tooltips/tooltip-manager.js';
-import { ComponentID } from '/core/ui/utilities/utilities-component-id.js';
-import LensManager from '/core/ui/lenses/lens-manager.js';
+import { C as ComponentID } from '/core/ui/utilities/utilities-component-id.chunk.js';
+import { L as LensManager } from '/core/ui/lenses/lens-manager.chunk.js';
 import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
 
 // custom & adapted icons
@@ -1135,8 +1135,8 @@ class bzPlotTooltip {
         if (this.improvement) {
             // set up icons and special district names for improvements
             const info = this.improvement.info;
-            if (this.improvement?.info.Discovery) {
-                // discoveries don't have an icon, but here's a nice map
+            if (info.Discovery || info.Archaeology) {
+                // use the narrative reward icon for discoveries
                 this.improvement.icon = BZ_ICON_DISCOVERY;
                 this.improvement.districtName = "LOC_DISTRICT_BZ_DISCOVERY";
             } else if (info.Age == null && info.Population == 0) {
@@ -1875,7 +1875,7 @@ class bzPlotTooltip {
 function dump_constructibles() {
     const dump = [];
     for (const item of GameInfo.Constructibles) {
-        if (item.Discovery ||  // discoveries
+        if (item.Discovery || item.Archaeology ||  // discoveries
             item.Age == null && item.Population == 0 ||  // villages
             item.ConstructibleType.endsWith("_RESOURCE"))  // duplicate
             continue;

@@ -1,5 +1,5 @@
-import LensManager from '/core/ui/lenses/lens-manager.js';
-import UpdateGate from '/core/ui/utilities/utilities-update-gate.js';
+import { L as LensManager } from '/core/ui/lenses/lens-manager.chunk.js';
+import { U as UpdateGate } from '/core/ui/utilities/utilities-update-gate.chunk.js';
 
 const BZ_DIRECTIONS = [
     DirectionTypes.NO_DIRECTION,
