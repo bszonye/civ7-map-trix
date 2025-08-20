@@ -64,11 +64,9 @@ class bzReligionLensLayer {
         const info = GameInfo.Religions.lookup(religionID);
         const asset = this.getReligionIcon(info.ReligionType);
         const params = { scale: SPRITE_SCALE };
-        if (asset) {
-            this.bzSpriteGrid.addSprite(loc, asset, SPRITE_OFFSET, params);
-        } else {
+        this.bzSpriteGrid.addSprite(loc, asset || SPRITE_ALT, SPRITE_OFFSET, params);
+        if (!asset) {
             // show the IconString over the alternate icon
-            this.bzSpriteGrid.addSprite(loc, SPRITE_ALT, SPRITE_OFFSET, params);
             const text = info.IconString.toUpperCase();
             const fontSize = 24 / (text.length + 1);
             const font = { fonts: ["TitleFont"], fontSize, faceCamera: true, };
