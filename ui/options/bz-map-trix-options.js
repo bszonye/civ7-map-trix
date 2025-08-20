@@ -1,4 +1,4 @@
-import { O as Options, a as OptionType, C as CategoryType } from '/core/ui/options/editors/index.chunk.js';
+import { C as CategoryType, O as Options, a as OptionType } from '/core/ui/options/editors/index.chunk.js';
 import ModSettings from '/bz-map-trix/ui/options/mod-options-decorator.js';
 
 const MOD_ID = "bz-map-trix";
