@@ -1,3 +1,4 @@
+import '/core/ui/options/screen-options.js';  // make sure this loads first
 import { C as CategoryType, O as Options, a as OptionType } from '/core/ui/options/editors/index.chunk.js';
 import ModSettings from '/bz-map-trix/ui/options/mod-options-decorator.js';
 
