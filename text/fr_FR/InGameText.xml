@@ -50,7 +50,7 @@
             <Text>Militaire et reconnaissance</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMMANDER_LENS" Language="fr_FR">
-            <Text>Map Trix • Activation du filtre Commandant</Text>
+            <Text>Map Trix • activation du filtre Commandant</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_COMMANDER_LENS_DESCRIPTION" Language="fr_FR">
             <Text>Définit les unités qui activent le filtre Commandant.</Text>
