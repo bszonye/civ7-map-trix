@@ -65,6 +65,7 @@ class bzRouteLensLayer {
         for (const [i, rtype] of drtype.entries()) {
             if (!i) continue;  // skip center
             if (rtype == -1) continue;  // skip missing links
+            if (GameplayMap.isCliffCrossing(loc.x, loc.y, BZ_DIRECTIONS[i])) continue;
             const link = hasRail && this.railTypes.has(rtype) ? rail : road;
             link.push(i);
         }
