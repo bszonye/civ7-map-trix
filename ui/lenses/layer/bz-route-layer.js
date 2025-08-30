@@ -67,22 +67,23 @@ class bzRouteLensLayer {
         // this.routeSpriteGrid.clearPlot(loc);
         const plotIndex = GameplayMap.getIndexFromLocation(loc);
         const links = this.routes[plotIndex] = [];
-        const elev = GameplayMap.getElevation(loc.x, loc.y);
         const rtype = GameplayMap.getRouteType(loc.x, loc.y);
         // road & rail links are distinct only if this tile has rail
         const road = [];
         const rail = this.railTypes.has(rtype) ? [] : road;
         for (let dir = 0; dir < DirectionTypes.NUM_DIRECTION_TYPES; ++dir) {
-            const adj = GameplayMap.getAdjacentPlotLocation(loc, dir);
             if (GameplayMap.isCliffCrossing(loc.x, loc.y, dir)) {
                 // add a sprite at the top of the cliff
-                if (elev < GameplayMap.getElevation(adj.x, adj.y)) continue;
-                const offset = BZ_DIRECTION_OFFSET[dir];
-                const params = { scale: 1 };
-                this.routeSpriteGrid.addSprite(loc, this.cliffAsset, offset, params);
+                const adj = GameplayMap.getAdjacentPlotLocation(loc, dir);
+                if (GameplayMap.getElevation(adj.x, adj.y)
+                    <= GameplayMap.getElevation(loc.x, loc.y)) {
+                    const offset = BZ_DIRECTION_OFFSET[dir];
+                    this.routeSpriteGrid.addSprite(loc, this.cliffAsset, offset);
+                }
                 continue;  // no roads across cliffs
             }
             if (rtype == -1) continue;  // no roads through this tile
+            const adj = GameplayMap.getAdjacentPlotLocation(loc, dir);
             const artype = GameplayMap.getRouteType(adj.x, adj.y);
             if (artype == -1) continue;  // no roads in this direction
             const link = this.railTypes.has(artype) ? rail : road;
