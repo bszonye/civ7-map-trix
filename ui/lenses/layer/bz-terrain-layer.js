@@ -105,6 +105,7 @@ class bzTerrainLensLayer {
         this.terrainOverlayGroup.clearAll();
         this.terrainOverlay.clear();
         this.terrainOutline.clear();
+        this.terrainSpriteGrid.clear();
         const width = GameplayMap.getGridWidth();
         const height = GameplayMap.getGridHeight();
         for (let x = 0; x < width; x++) {
@@ -114,7 +115,6 @@ class bzTerrainLensLayer {
         }
     }
     updatePlot(loc) {
-        this.terrainSpriteGrid.clearPlot(loc);
         const plotIndex = GameplayMap.getIndexFromLocation(loc);
         // show obstacles (hills, rivers, swamps, vegetation)
         const type = this.getTerrainType(loc);
