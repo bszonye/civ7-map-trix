@@ -2,23 +2,6 @@ import { gatherMovementObstacles } from '/bz-map-trix/ui/tooltips/bz-plot-toolti
 import { L as LensManager } from '/core/ui/lenses/lens-manager.chunk.js';
 import { O as OVERLAY_PRIORITY } from '/base-standard/ui/utilities/utilities-overlay.chunk.js';
 
-const BZ_DIRECTIONS = [
-    DirectionTypes.DIRECTION_NORTHEAST,  // = 0
-    DirectionTypes.DIRECTION_EAST,       // = 1
-    DirectionTypes.DIRECTION_SOUTHEAST,  // = 2
-    DirectionTypes.DIRECTION_SOUTHWEST,  // = 3
-    DirectionTypes.DIRECTION_WEST,       // = 4
-    DirectionTypes.DIRECTION_NORTHWEST,  // = 5
-];
-const BZ_DIRECTION_OFFSET = [
-    { x: 16, y: 28 },    // northeast
-    { x: 32, y: 0 },     // east
-    { x: 16, y: -28 },   // southeast
-    { x: -16, y: -28 },  // southwest
-    { x: -32, y: 0 },    // west
-    { x: -16, y: 28 },   // northwest
-];
-console.warn(`TRIX ${BZ_DIRECTIONS}`);
 // adapted from ui/tooltips/bz-plot-tooltip.js
 const BZ_OVERLAY = {
     // #c07e45  oklch(0.65 0.11 60)   #633e1d  oklch(0.40 0.07 60)
@@ -39,10 +22,6 @@ const BZ_NO_OUTLINE = {
     secondaryColor: 0,
 };
 class bzTerrainLensLayer {
-    terrainSpriteGrid = WorldUI.createSpriteGrid(
-        "bzTerrainLayer_SpriteGroup",
-        SpriteMode.Billboard
-    );
     terrainOverlayGroup = WorldUI.createOverlayGroup(
         "bzTerrainOverlayGroup",
         OVERLAY_PRIORITY.CONTINENT_LENS  // very low priority
@@ -52,9 +31,7 @@ class bzTerrainLensLayer {
     outlineGroup = new Map();
     obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
     onLayerHotkeyListener = this.onLayerHotkey.bind(this);
-    cliffAsset = "dip_cancel";
     initLayer() {
-        console.warn(`TRIX CLIFF ${this.cliffAsset}`);
         for (const [type, overlay] of Object.entries(BZ_OVERLAY)) {
             const style = {
                 style: "CultureBorder_Closed",
@@ -68,16 +45,13 @@ class bzTerrainLensLayer {
         this.updateMap();
         window.addEventListener('layer-hotkey', this.onLayerHotkeyListener);
         this.terrainOverlayGroup.setVisible(false);
-        this.terrainSpriteGrid.setVisible(false);
     }
     applyLayer() {
         this.updateMap();
         this.terrainOverlayGroup.setVisible(true);
-        this.terrainSpriteGrid.setVisible(true);
     }
     removeLayer() {
         this.terrainOverlayGroup.setVisible(false);
-        this.terrainSpriteGrid.setVisible(false);
     }
     getTerrainType(loc) {
         // feature types
@@ -105,7 +79,6 @@ class bzTerrainLensLayer {
         this.terrainOverlayGroup.clearAll();
         this.terrainOverlay.clear();
         this.terrainOutline.clear();
-        this.terrainSpriteGrid.clear();
         const width = GameplayMap.getGridWidth();
         const height = GameplayMap.getGridHeight();
         for (let x = 0; x < width; x++) {
@@ -116,24 +89,12 @@ class bzTerrainLensLayer {
     }
     updatePlot(loc) {
         const plotIndex = GameplayMap.getIndexFromLocation(loc);
-        // show obstacles (hills, rivers, swamps, vegetation)
         const type = this.getTerrainType(loc);
         const overlay = BZ_OVERLAY[type];
         if (overlay) {
             const group = this.outlineGroup.get(type);
             this.terrainOverlay.addPlots(plotIndex, overlay);
             this.terrainOutline.setPlotGroups(plotIndex, group);
-        }
-        // show cliffs
-        const zloc = GameplayMap.getElevation(loc.x, loc.y);
-        for (const dir of BZ_DIRECTIONS) {
-            if (!GameplayMap.isCliffCrossing(loc.x, loc.y, dir)) continue;
-            const adj = GameplayMap.getAdjacentPlotLocation(loc, dir);
-            const zadj = GameplayMap.getElevation(adj.x, adj.y);
-            if (zloc < zadj) continue;  // show sprite at the top
-            const offset = BZ_DIRECTION_OFFSET[dir];
-            const params = { scale: 1 };
-            this.terrainSpriteGrid.addSprite(loc, this.cliffAsset, offset, params);
         }
     }
     onLayerHotkey(hotkey) {
