@@ -72,6 +72,7 @@ class bzRouteLensLayer {
         const road = [];
         const rail = this.railTypes.has(rtype) ? [] : road;
         for (let dir = 0; dir < DirectionTypes.NUM_DIRECTION_TYPES; ++dir) {
+            // note: getAdjacentPlotLocation is slow, only use as needed
             if (GameplayMap.isCliffCrossing(loc.x, loc.y, dir)) {
                 // add a sprite at the top of the cliff
                 const adj = GameplayMap.getAdjacentPlotLocation(loc, dir);
