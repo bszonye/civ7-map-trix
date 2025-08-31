@@ -2,7 +2,6 @@ import '/bz-map-trix/ui/lenses/layer/bz-fortification-layer.js';  // force layer
 import { L as LensManager } from '/core/ui/lenses/lens-manager.chunk.js';
 
 const SPRITE_OFFSET = { x: 0, y: -18, z: 5 };
-const SPRITE_SCALE = 1;
 const SPRITE_ALT = "buildicon_open";
 var SpriteGroup;
 (function (SpriteGroup) {
@@ -63,8 +62,7 @@ class bzReligionLensLayer {
         if (religionID == -1) return;
         const info = GameInfo.Religions.lookup(religionID);
         const asset = this.getReligionIcon(info.ReligionType);
-        const params = { scale: SPRITE_SCALE };
-        this.bzSpriteGrid.addSprite(loc, asset || SPRITE_ALT, SPRITE_OFFSET, params);
+        this.bzSpriteGrid.addSprite(loc, asset || SPRITE_ALT, SPRITE_OFFSET);
         if (!asset) {
             // show the IconString over the alternate icon
             const text = info.IconString.toUpperCase();
