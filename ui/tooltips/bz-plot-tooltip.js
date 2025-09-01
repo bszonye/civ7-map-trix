@@ -1076,8 +1076,8 @@ class bzPlotTooltip {
                 isImprovement ? GameInfo.Improvements.lookup(info.ConstructibleType) :
                 isWonder ? GameInfo.Wonders.lookup(info.ConstructibleType) :
                 null;
-            if (xinfo.TraitType && !this.quarter && this.district.isUniqueQuarter) {
-                this.quarter = GameInfo.UniqueQuarters
+            if (xinfo.TraitType && this.district.isUniqueQuarter) {
+                this.quarter ??= GameInfo.UniqueQuarters
                     .find(e => e.TraitType == xinfo.TraitType);
             }
 
