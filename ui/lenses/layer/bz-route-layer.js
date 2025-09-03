@@ -103,7 +103,6 @@ class bzRouteLensLayer {
         }
     }
     updateMap() {
-        const p1 = performance.now();
         this.routeSpriteGrid.clear();
         this.routes = [];
         // refresh the route map
@@ -115,16 +114,12 @@ class bzRouteLensLayer {
                 this.updatePlot(loc);
             }
         }
-        const p2 = performance.now();
-        console.warn(`TRIX MAP ${(p2-p1).toFixed(1)}ms`);
         // refresh VFX, if enabled
         if (this.visible) {
             this.visible = [];
             this.routeModelGroup.clear();
             this.updateVFX();
         }
-        const p3 = performance.now();
-        console.warn(`TRIX VFX ${(p3-p2).toFixed(1)}ms`);
     }
     updatePlotVFX(plotIndex) {
         if (this.visible[plotIndex]) return;  // already visible
