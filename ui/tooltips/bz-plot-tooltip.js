@@ -11,6 +11,7 @@ const BZ_ICON_SIZE = 12;
 const BZ_ICON_DISCOVERY = "NAR_REW_DEFAULT";
 const BZ_ICON_EMPTY_SLOT = "BUILDING_OPEN";
 const BZ_ICON_FRAME = "url('hud_sub_circle_bk')";
+const BZ_ICON_UNIMPROVED = "CITY_UNIMPROVED";  // unimproved yield
 const BZ_ICON_RURAL = "CITY_RURAL";  // urban population/yield
 const BZ_ICON_URBAN = "CITY_URBAN";  // rural population/yield
 const BZ_ICON_SPECIAL = "CITY_SPECIAL_BASE";  // specialists
@@ -640,7 +641,12 @@ class bzPlotTooltip {
                 // Controls.preloadImage(url, 'plot-tooltip');
                 preloadIcon(`${y.YieldType}`, "YIELD");
             }
-            const icons = [ BZ_ICON_RURAL, BZ_ICON_URBAN, BZ_ICON_SPECIAL, ];
+            const icons = [
+                BZ_ICON_UNIMPROVED,
+                BZ_ICON_RURAL,
+                BZ_ICON_URBAN,
+                BZ_ICON_SPECIAL,
+            ];
             for (const y of icons) preloadIcon(y);
         });
     }
@@ -1070,8 +1076,8 @@ class bzPlotTooltip {
                 isImprovement ? GameInfo.Improvements.lookup(info.ConstructibleType) :
                 isWonder ? GameInfo.Wonders.lookup(info.ConstructibleType) :
                 null;
-            if (xinfo.TraitType && !this.quarter && this.district.isUniqueQuarter) {
-                this.quarter = GameInfo.UniqueQuarters
+            if (xinfo.TraitType && this.district.isUniqueQuarter) {
+                this.quarter ??= GameInfo.UniqueQuarters
                     .find(e => e.TraitType == xinfo.TraitType);
             }
 
@@ -1191,7 +1197,8 @@ class bzPlotTooltip {
         if (this.yields.length < 2) return;
         // total
         const name = "LOC_YIELD_BZ_TOTAL";
-        const type = this.district?.isUrbanCore ? BZ_ICON_URBAN : BZ_ICON_RURAL;
+        const type = this.district?.isUrbanCore ? BZ_ICON_URBAN :
+            this.district ? BZ_ICON_RURAL : BZ_ICON_UNIMPROVED;
         // avoid fractions in total to avoid extra-wide columns
         // round down to avoid inflating totals (for science legacy)
         const value = Math.floor(this.totalYields).toString();

@@ -22,14 +22,15 @@ const BZ_NO_OUTLINE = {
     secondaryColor: 0,
 };
 class bzTerrainLensLayer {
-    constructor() {
-        this.terrainOverlayGroup = WorldUI.createOverlayGroup("bzTerrainOverlayGroup", OVERLAY_PRIORITY.PLOT_HIGHLIGHT);
-        this.terrainOverlay = this.terrainOverlayGroup.addPlotOverlay();
-        this.terrainOutline = this.terrainOverlayGroup.addBorderOverlay(BZ_NO_OUTLINE);
-        this.outlineGroup = new Map();
-        this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
-        this.onLayerHotkeyListener = this.onLayerHotkey.bind(this);
-    }
+    terrainOverlayGroup = WorldUI.createOverlayGroup(
+        "bzTerrainOverlayGroup",
+        OVERLAY_PRIORITY.CONTINENT_LENS  // very low priority
+    );
+    terrainOverlay = this.terrainOverlayGroup.addPlotOverlay();
+    terrainOutline = this.terrainOverlayGroup.addBorderOverlay(BZ_NO_OUTLINE);
+    outlineGroup = new Map();
+    obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
+    onLayerHotkeyListener = this.onLayerHotkey.bind(this);
     initLayer() {
         for (const [type, overlay] of Object.entries(BZ_OVERLAY)) {
             const style = {
