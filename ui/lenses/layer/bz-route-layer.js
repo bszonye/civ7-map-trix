@@ -3,7 +3,7 @@ import { U as UpdateGate } from '/core/ui/utilities/utilities-update-gate.chunk.
 
 const SPRITE_CLIFF = "dip_cancel";
 // coordinates for tile edges
-const DIRECTION_OFFSET = [
+const SPRITE_OFFSET = [
     { x: 16, y: 28 },    // northeast
     { x: 32, y: 0 },     // east
     { x: 16, y: -28 },   // southeast
@@ -12,11 +12,9 @@ const DIRECTION_OFFSET = [
     { x: -16, y: 28 },   // northwest
 ];
 // VFX constants
-const DIRECTION_VFX = [
-    6, 1, 2, 3, 4, 5
-];
 const VFX_ROUTE = 'VFX_3dUI_TradeRoute_01';
 const VFX_OFFSET = { x: 0, y: 0, z: 0 };
+const VFX_DIRECTION = [ 6, 1, 2, 3, 4, 5 ];  // northeast is 6, not 0
 // #ebb25f  oklch(0.8 0.12 75)  rgb(235, 178, 95)
 const RGB_ROAD = [235/255, 178/255, 95/255];
 // #98a7fa  oklch(0.75 0.12 275)  rgb(152, 167, 250)
@@ -75,7 +73,7 @@ class bzRouteLensLayer {
                 const adj = GameplayMap.getAdjacentPlotLocation(loc, dir);
                 if (GameplayMap.getElevation(adj.x, adj.y)
                     <= GameplayMap.getElevation(loc.x, loc.y)) {
-                    const offset = DIRECTION_OFFSET[dir];
+                    const offset = SPRITE_OFFSET[dir];
                     this.routeSpriteGrid.addSprite(loc, SPRITE_CLIFF, offset);
                 }
                 continue;  // no roads across cliffs
@@ -85,7 +83,7 @@ class bzRouteLensLayer {
             const artype = GameplayMap.getRouteType(adj.x, adj.y);
             if (artype == -1) continue;  // no roads in this direction
             const link = this.railTypes.has(artype) ? rail : road;
-            link.push(DIRECTION_VFX[dir]);
+            link.push(VFX_DIRECTION[dir]);
         }
         // combine road links into start/end pairs
         for (let i = 0; i < road.length; i+=2) {
