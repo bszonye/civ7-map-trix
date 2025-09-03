@@ -1,12 +1,9 @@
 import { L as LensManager } from '/core/ui/lenses/lens-manager.chunk.js';
 import { U as UpdateGate } from '/core/ui/utilities/utilities-update-gate.chunk.js';
 
-// VFX constants
-const BZ_DIRECTION_VFX = [
-    6, 1, 2, 3, 4, 5
-];
+const SPRITE_CLIFF = "dip_cancel";
 // coordinates for tile edges
-const BZ_DIRECTION_OFFSET = [
+const DIRECTION_OFFSET = [
     { x: 16, y: 28 },    // northeast
     { x: 32, y: 0 },     // east
     { x: 16, y: -28 },   // southeast
@@ -14,15 +11,18 @@ const BZ_DIRECTION_OFFSET = [
     { x: -32, y: 0 },    // west
     { x: -16, y: 28 },   // northwest
 ];
-const VFX_NAME = 'VFX_3dUI_TradeRoute_01';
+// VFX constants
+const DIRECTION_VFX = [
+    6, 1, 2, 3, 4, 5
+];
+const VFX_ROUTE = 'VFX_3dUI_TradeRoute_01';
 const VFX_OFFSET = { x: 0, y: 0, z: 0 };
 // #ebb25f  oklch(0.8 0.12 75)  rgb(235, 178, 95)
-const BZ_ROAD_RGB = [235/255, 178/255, 95/255];
+const RGB_ROAD = [235/255, 178/255, 95/255];
 // #98a7fa  oklch(0.75 0.12 275)  rgb(152, 167, 250)
-const BZ_RAILROAD_RGB = [152/255, 167/255, 250/255];
+const RGB_RAILROAD = [152/255, 167/255, 250/255];
 
 class bzRouteLensLayer {
-    cliffAsset = "dip_cancel";
     routeSpriteGrid = WorldUI.createSpriteGrid(
         "bzRouteLayer_SpriteGroup",
         SpriteMode.Billboard
@@ -78,8 +78,8 @@ class bzRouteLensLayer {
                 const adj = GameplayMap.getAdjacentPlotLocation(loc, dir);
                 if (GameplayMap.getElevation(adj.x, adj.y)
                     <= GameplayMap.getElevation(loc.x, loc.y)) {
-                    const offset = BZ_DIRECTION_OFFSET[dir];
-                    this.routeSpriteGrid.addSprite(loc, this.cliffAsset, offset);
+                    const offset = DIRECTION_OFFSET[dir];
+                    this.routeSpriteGrid.addSprite(loc, SPRITE_CLIFF, offset);
                 }
                 continue;  // no roads across cliffs
             }
@@ -88,13 +88,13 @@ class bzRouteLensLayer {
             const artype = GameplayMap.getRouteType(adj.x, adj.y);
             if (artype == -1) continue;  // no roads in this direction
             const link = this.railTypes.has(artype) ? rail : road;
-            link.push(BZ_DIRECTION_VFX[dir]);
+            link.push(DIRECTION_VFX[dir]);
         }
         // combine road links into start/end pairs
         for (let i = 0; i < road.length; i+=2) {
             const start = road[i];
             const end = road[i+1] ?? 0;
-            const Color3 = BZ_ROAD_RGB;
+            const Color3 = RGB_ROAD;
             links.push({ start, end, Color3 });
         }
         // combine rail links into start/end pairs
@@ -102,7 +102,7 @@ class bzRouteLensLayer {
             for (let i = 0; i < rail.length; i+=2) {
                 const start = rail[i];
                 const end = rail[i+1] ?? 0;
-                const Color3 = BZ_RAILROAD_RGB;
+                const Color3 = RGB_RAILROAD;
                 links.push({ start, end, Color3 });
             }
         }
@@ -139,7 +139,7 @@ class bzRouteLensLayer {
         this.visible[plotIndex] = true;
         for (const constants of this.routes[plotIndex]) {
             const params = { constants };
-            this.routeModelGroup.addVFXAtPlot(VFX_NAME, plotIndex, VFX_OFFSET, params);
+            this.routeModelGroup.addVFXAtPlot(VFX_ROUTE, plotIndex, VFX_OFFSET, params);
         }
     }
     updateVFX() {
