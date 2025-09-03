@@ -27,20 +27,17 @@ class bzRouteLensLayer {
         "bzRouteLayer_SpriteGroup",
         SpriteMode.Billboard
     );
-    constructor() {
-        // model group for displaying route VFX
-        this.routeModelGroup = WorldUI.createModelGroup("bzRouteModelGroup");
-        // map data (indexed by plotIndex)
-        this.routes = null;  // route segments
-        this.visible = null;  // revealed plots (when layer is enabled)
-        // route types
-        const railTypes = GameInfo.Routes.filter(r => r.RequiredConstructible);
-        this.railTypes = new Set(railTypes.map(r => r.$hash));
-        // event handlers
-        this.updateGate = new UpdateGate(this.updateMap.bind(this));
-        this.onRouteChange = () => this.updateGate.call('onRouteChange');
-        this.onLayerHotkeyListener = this.onLayerHotkey.bind(this);
-    }
+    routeModelGroup = WorldUI.createModelGroup("bzRouteModelGroup");
+    railTypes = new Set(
+        GameInfo.Routes.filter(r => r.RequiredConstructible).map(r => r.$hash)
+    );
+    // map data (indexed by plotIndex)
+    routes = null;  // route segments
+    visible = null;  // revealed plots (when layer is enabled)
+    // event handlers
+    updateGate = new UpdateGate(this.updateMap.bind(this));
+    onRouteChange = () => this.updateGate.call('onRouteChange');
+    onLayerHotkeyListener = this.onLayerHotkey.bind(this);
     initLayer() {
         this.updateMap();
         engine.on('RouteAddedToMap', this.onRouteChange);
