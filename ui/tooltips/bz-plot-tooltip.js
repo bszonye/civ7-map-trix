@@ -1870,7 +1870,7 @@ class bzPlotTooltip {
             const dump = document.createElement("div");
             dump.classList.value =
                 "self-center flex flex-wrap justify-center items-center";
-            dump.style.position = "absolute";
+            // dump.style.position = "absolute";
             dump.style.width = "106rem";
             for (const item of list) {
                 const info = { ...item };
