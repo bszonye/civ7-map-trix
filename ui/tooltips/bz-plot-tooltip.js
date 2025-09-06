@@ -1391,7 +1391,7 @@ class bzPlotTooltip {
         if (!this.isCompact) this.renderPopulation();
     }
     renderUrban() {
-        let hexName = "LOC_PLOT_TOOLTIP_URBAN_DISTRICT";
+        let hexName = GameInfo.Districts.lookup(this.district.type).Name;
         const hexRules = [];
         // set name & description
         if (this.district.type == DistrictTypes.CITY_CENTER) {
@@ -1413,6 +1413,8 @@ class bzPlotTooltip {
         } else if (this.buildings.length == 0) {
             // urban tile with canceled production
             hexName = "LOC_DISTRICT_BZ_URBAN_VACANT";
+        } else {
+            hexName = "LOC_PLOT_TOOLTIP_URBAN_DISTRICT";
         }
         // title bar & district defense
         if (!this.isCompact) this.renderTitleHeading(hexName);
@@ -1868,6 +1870,7 @@ class bzPlotTooltip {
             const dump = document.createElement("div");
             dump.classList.value =
                 "self-center flex flex-wrap justify-center items-center";
+            // dump.style.position = "absolute";
             dump.style.width = "106rem";
             for (const item of list) {
                 const info = { ...item };
@@ -1916,8 +1919,10 @@ function dump_yields() {
     const underlay = "BUILDING_OPEN";
     const glow = true;
     const yields = [
-        "YIELD_FOOD", "YIELD_PRODUCTION", "YIELD_GOLD", "YIELD_SCIENCE",
-        "YIELD_CULTURE", "YIELD_HAPPINESS", "YIELD_DIPLOMACY",
+        "url(Yield_Food)", "url(Yield_Production)",
+        "url(Yield_Gold)", "url(Yield_Science)",
+        "url(Yield_Culture)", "url(Yield_Happiness)",
+        "url(yield_influence)",
         "BUILDING_OPEN",
         "url(city_buildingslist)", "url(city_citizenslist)",
         "url(city_foodlist)", "url(city_improvementslist)",
@@ -1927,7 +1932,10 @@ function dump_yields() {
         ({ icon, size, underlay, glow, colors: [BZ_TYPE_COLOR[icon]] }));
 }
 const BZ_DUMP_ICONS = false;
-const BZ_DUMP_SIZE = 12;
+// const BZ_DUMP_SIZE = 8;  // 64px at 4K
+const BZ_DUMP_SIZE = 12;  // 96px at 4K
+// const BZ_DUMP_SIZE = 16;  // 128px at 4K
+// const BZ_DUMP_SIZE = 32;  // 256px at 4K
 
 bzPlotTooltip._instance = new bzPlotTooltip();
 TooltipManager.registerPlotType('plot', PlotTooltipPriority.LOW, bzPlotTooltip.instance);
