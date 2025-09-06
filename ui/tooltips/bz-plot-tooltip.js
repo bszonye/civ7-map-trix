@@ -1931,7 +1931,7 @@ function dump_yields() {
     return yields.map(icon =>
         ({ icon, size, underlay, glow, colors: [BZ_TYPE_COLOR[icon]] }));
 }
-const BZ_DUMP_ICONS = true;
+const BZ_DUMP_ICONS = false;
 // const BZ_DUMP_SIZE = 8;  // 64px at 4K
 const BZ_DUMP_SIZE = 12;  // 96px at 4K
 // const BZ_DUMP_SIZE = 16;  // 128px at 4K
