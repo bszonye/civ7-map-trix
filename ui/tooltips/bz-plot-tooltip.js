@@ -1929,7 +1929,8 @@ function dump_yields() {
         ({ icon, size, underlay, glow, colors: [BZ_TYPE_COLOR[icon]] }));
 }
 const BZ_DUMP_ICONS = false;
-const BZ_DUMP_SIZE = 12;
+const BZ_DUMP_SIZE = 12;  // 96px at 4K
+// const BZ_DUMP_SIZE = 32;  // 256px at 4K
 
 bzPlotTooltip._instance = new bzPlotTooltip();
 TooltipManager.registerPlotType('plot', PlotTooltipPriority.LOW, bzPlotTooltip.instance);
