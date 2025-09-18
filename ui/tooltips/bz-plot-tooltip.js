@@ -1722,24 +1722,30 @@ class bzPlotTooltip {
     renderUnits() {
         // show unit section
         if (this.isCompact || !this.units.length) return;
-        this.renderDivider();
-        const rows = [];
-        for (const unit of this.units) {
-            const info = [unit.name, unit.civ, unit.relationship.type];
-            rows.push(dotJoin(info));
+        const owners = [...new Set(this.units.map(unit => unit.owner))];
+        for (const owner of owners) {
+            this.renderDivider();
+            const rows = [];
+            const relationship = this.getCivRelationship(owner);
+            if (owner.id !== this.observerID) {
+                rows.push(dotJoin([this.getCivName(owner), relationship.type]));
+            }
+            for (const unit of this.units.filter(unit => unit.owner === owner)) {
+                rows.push(unit.name);
+            }
+            const style = relationship.isEnemy ? BZ_ALERT.enemy : null;
+            const banner = docBanner(rows, style);
+            banner.style.paddingTop = banner.style.paddingBottom =
+                metrics.padding.banner.px;
+            banner.style.lineHeight = metrics.body.ratio;
+            banner.style.marginBottom = `-${metrics.padding.y.css}`;
+            if (owner === owners.at(-1) && !this.isDebug) {
+                // bottom bumper rounding
+                const radius = metrics.radius.css;
+                banner.style.borderRadius = `0 0 ${radius} ${radius}`;
+            }
+            this.container.appendChild(banner);
         }
-        const style = this.units[0].relationship.isEnemy ? BZ_ALERT.enemy : null;
-        const banner = docBanner(rows, style);
-        banner.style.paddingTop = banner.style.paddingBottom =
-            metrics.padding.banner.px;
-        banner.style.lineHeight = metrics.body.ratio;
-        banner.style.marginBottom = `-${metrics.padding.y.css}`;
-        if (!this.isDebug) {
-            // bottom bumper rounding
-            const radius = metrics.radius.css;
-            banner.style.borderRadius = `0 0 ${radius} ${radius}`;
-        }
-        this.container.appendChild(banner);
     }
     setWarningCursor() {
         // highlight enemy territory & units with a red cursor
