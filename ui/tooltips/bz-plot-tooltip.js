@@ -1,5 +1,4 @@
 import bzMapTrixOptions, { bzVerbosity } from '/bz-map-trix/ui/options/bz-map-trix-options.js';
-import "/base-standard/ui/tooltips/plot-tooltip.js";
 
 import TooltipManager, { PlotTooltipPriority } from '/core/ui/tooltips/tooltip-manager.js';
 import { C as ComponentID } from '/core/ui/utilities/utilities-component-id.chunk.js';
@@ -1944,5 +1943,9 @@ const BZ_DUMP_SIZE = 12;  // 96px at 4K
 // const BZ_DUMP_SIZE = 32;  // 256px at 4K
 
 bzPlotTooltip._instance = new bzPlotTooltip();
-TooltipManager.registerPlotType('plot', PlotTooltipPriority.LOW, bzPlotTooltip.instance);
+engine.whenReady.then(() => {
+    // wait for engine-ready to override the vanilla plot tooltip
+    // (avoid "import" to work around broken tooltip mods)
+    TooltipManager.registerPlotType('plot', PlotTooltipPriority.LOW, bzPlotTooltip.instance);
+});
 export { bzPlotTooltip as default };
