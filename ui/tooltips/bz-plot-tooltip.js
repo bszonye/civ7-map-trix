@@ -1942,10 +1942,24 @@ const BZ_DUMP_SIZE = 12;  // 96px at 4K
 // const BZ_DUMP_SIZE = 16;  // 128px at 4K
 // const BZ_DUMP_SIZE = 32;  // 256px at 4K
 
+// enable modified plot tooltip
 bzPlotTooltip._instance = new bzPlotTooltip();
-engine.whenReady.then(() => {
-    // wait for engine-ready to override the vanilla plot tooltip
-    // (avoid "import" to work around broken tooltip mods)
-    TooltipManager.registerPlotType('plot', PlotTooltipPriority.LOW, bzPlotTooltip.instance);
-});
+function installPlotTooltip(instance) {
+    TooltipManager.registerPlotType('plot', PlotTooltipPriority.LOW, instance);
+    console.warn(`bz-plot-tooltip: enabled`);
+}
+// dynamically import the vanilla plot tooltip for timing
+// (but also protect against broken tooltip mods)
+import('/base-standard/ui/tooltips/plot-tooltip.js')
+    .then((mod) => {
+        if (mod?.UpdateTCSPlotTooltipName) {
+            console.warn(`bz-plot-tooltip: tcs-ui-improved-plot-tooltip enabled`);
+            return;
+        }
+        installPlotTooltip(bzPlotTooltip.instance);
+    })
+    .catch((_error) => {
+        console.warn(`bz-plot-tooltip: ignoring broken tooltip mod`);
+        installPlotTooltip(bzPlotTooltip.instance);
+    });
 export { bzPlotTooltip as default };
