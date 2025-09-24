@@ -11,6 +11,7 @@
         <AffectsSavedGames>0</AffectsSavedGames>
     </Properties>
     <References>
+        <Mod id="detailed-map-tacks" title="LOC_MOD_DETAILED_MAP_TACKS_NAME" />
         <Mod id="discovery-lens" title="LOC_MOD_DISCOVERY_LENS_NAME" />
         <Mod id="finwickle-border-boggles" title="LOC_MOD_BORDER_TOGGLES_NAME" />
         <Mod id="fortified-district-lens" title="LOC_FORTIFIED_DISTRICT_LENS_TITLE" />
@@ -55,8 +56,11 @@
                 <ImportFiles>
                     <Item>data/icons/bz-city-dot.png</Item>
                     <Item>data/icons/bz-town-dot.png</Item>
+                    <Item>ui/bz-units-panel/panel-units.css</Item>
                 </ImportFiles>
                 <UIScripts>
+                    <Item>ui/bz-units-panel/model-units.js</Item>
+                    <Item>ui/bz-units-panel/panel-units.js</Item>
                     <Item>ui/diplo-ribbon/bz-panel-yield-banner.js</Item>
                     <Item>ui/input/bz-hotkey-manager.js</Item>
                     <Item>ui/lenses/layer/bz-city-borders-layer.js</Item>

@@ -1,0 +1,32 @@
+.bz-units .mini-map__lens-button__bg,
+.bz-units .mini-map__map-tacks-button__bg {
+  top: 0;
+  left: 0;
+  right: 0.0555555556rem;
+  bottom: 0;
+  background-image: url("fs://game/hud_sub_circle_bk.png");
+}
+
+.mini-map__units-panel {
+  height: calc(100vh - 14rem);
+  pointer-events: auto;
+  width: 19.7777777778rem;
+  border-top-left-radius: 0.3333333333rem;
+  border-top-right-radius: 0.3333333333rem;
+  background: linear-gradient(to bottom, rgba(35, 37, 43, 0.9), rgba(18, 21, 31, 0.8));
+}
+
+.mini-map__units-panel-container {
+  transition-property: transform;
+  transition-timing-function: cubic-bezier(0.645, 0.045, 0.355, 1);
+  transform-origin: bottom;
+  transition-duration: 0.25s;
+}
+
+.bz-units-scrollable {
+  position: absolute;
+  width: 19.3333333333rem;
+  top: 4rem;
+  left: 0;
+  bottom: 2rem;
+}
