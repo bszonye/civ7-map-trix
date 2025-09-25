@@ -22,11 +22,10 @@ const DISTRICT_ICONS = new Map([
     [DistrictTypes.WONDER, ""],
     [DistrictTypes.WILDERNESS, ""],
 ]);
-console.warn(`TRIX DISTRICTS ${JSON.stringify(DistrictTypes)}`);
 const DOMAIN_VALUE = new Map(
     ["DOMAIN_LAND", "DOMAIN_SEA", "DOMAIN_AIR"].map((d, i) => [d, i])
 );
-class bzUnitsListModel {
+class bzUnitListModel {
     onUpdate;
     updateGate = new UpdateGate(() => { this.update(); });
     _selectedUnit = null;
@@ -56,6 +55,9 @@ class bzUnitsListModel {
         return this._selectedUnit;
     }
     get units() {
+        return this._units;
+    }
+    get unitList() {
         return this._unitList;
     }
     update() {
@@ -149,15 +151,12 @@ class bzUnitsListModel {
         const moves = unit.Movement;
         const movesLeft = moves?.movementMovesRemaining ?? 0;
         const maxMoves = moves?.maxMoves ?? 0;
-        if (maxMoves != moves.formationMaxMoves) {
-            console.warn(`TRIX MOVE ${unit.name} ${maxMoves} ${moves.formationMaxMoves}`);
-        }
         const slashMoves = `${movesLeft}/${maxMoves}`;
         const canMove = moves?.canMove;
         // location
         const location = unit.location;
         const districtID = MapCities.getDistrict(location.x, location.y);
-        const district = Districts.get(districtID);
+        const district = districtID && Districts.get(districtID);
         const isHome = district?.owner == GameContext.localObserverID;
         const districtIcon = DISTRICT_ICONS.get(isHome ? district.type : -1);
         const isGarrison = isHome && district.type == DistrictTypes.CITY_CENTER;
@@ -235,7 +234,6 @@ class bzUnitsListModel {
         this.updateDisplay();
     }
     onUnitUpdate(event) {
-        console.warn(`TRIX EVENT ${JSON.stringify(event)}`);
         const id = event?.unit;
         if (ComponentID.isInvalid(id)) return;
         if (id.owner != GameContext.localObserverID) return;
@@ -243,13 +241,13 @@ class bzUnitsListModel {
     }
 }
 
-const bzUnitsList = new bzUnitsListModel();
+const bzUnitList = new bzUnitListModel();
 engine.whenReady.then(() => {
   const updateModel = () => {
-    engine.updateWholeModel(bzUnitsList);
+    engine.updateWholeModel(bzUnitList);
   };
-  engine.createJSModel("g_bzUnitsListModel", bzUnitsList);
-  bzUnitsList.updateCallback = updateModel;
+  engine.createJSModel("g_bzUnitListModel", bzUnitList);
+  bzUnitList.updateCallback = updateModel;
 });
 
-export { bzUnitsList };
+export { bzUnitList };

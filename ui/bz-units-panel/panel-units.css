@@ -31,8 +31,11 @@
   bottom: 1.1111111111rem;
   background: #12151f66;
 }
-.bz-units-entry.bz-cannot-move {
-  filter: brightness(0.5);
+.bz-units-entry.bz-cannot-move .bz-unit-title,
+.bz-units-entry.bz-cannot-move .bz-unit-health,
+.bz-units-entry.bz-cannot-move .bz-unit-movement,
+.bz-units-entry.bz-cannot-move .bz-unit-status {
+  filter: brightness(0.6);
 }
 .bz-units-entry .bz-unit-title {
   width: 11rem;
