@@ -2,8 +2,7 @@ import { F as Focus } from '/core/ui/input/focus-support.chunk.js';
 import { A as AnchorType } from '/core/ui/panel-support.chunk.js';
 import { D as Databind } from '/core/ui/utilities/utilities-core-databinding.chunk.js';
 import { MinimapSubpanel } from '/base-standard/ui/mini-map/panel-mini-map.js';
-// TODO
-// import { bzUnitsList } from '/bz-map-trix/ui/bz-units-panel/model-units.js';
+import { bzUnitsList } from '/bz-map-trix/ui/bz-units-panel/model-units.js';
 
 const styles = "fs://game/bz-map-trix/ui/bz-units-panel/panel-units.css";
 
@@ -96,23 +95,30 @@ class bzUnitsPanel extends MinimapSubpanel {
             const entry = document.createElement("fxs-activatable");
             entry.classList.value = "bz-units-entry flex items-center";
             entry.addEventListener("action-activate", this.activateUnitListener);
-            Databind.attribute(entry, "data-unit-data", "entry.data");
+            Databind.attribute(entry, "data-unit-local-id", "entry.localId");
             // selected
             Databind.classToggle(entry, "bz-units-entry-selected",
                 "{{entry.localId}}=={{g_bzUnitsListModel.selectedUnit.localId}}");
-            // indent: TODO
+            // indentation
+            Databind.classToggle(entry, "bz-unit-in-army", "{{entry.isInArmy}}");
             // icon
             const icon = document.createElement("img");
-            icon.classList.value = "size-6 mx-1";
+            icon.classList.value = "size-6 ml-1";
             Databind.attribute(icon, "src", "entry.icon");
             entry.appendChild(icon);
             // name
             const name = document.createElement("div");
+            name.classList.value = "bz-unit-name ml-1";
             name.setAttribute("data-bind-attr-data-l10n-id", "{{entry.name}}");
             entry.appendChild(name);
             // damage: TODO
             // movement: TODO
-            // upgrade: TODO
+            // promotion
+            const promotion = document.createElement("div");
+            promotion.classList.value = "bz-unit-promotion size-6 bg-contain ml-1";
+            Databind.classToggle(entry, "bz-can-promote", "{{entry.canPromote}}");
+            Databind.classToggle(entry, "bz-can-upgrade", "{{entry.canUpgrade}}");
+            entry.appendChild(promotion);
             list.appendChild(entry);
         }
         // finish
@@ -133,12 +139,10 @@ class bzUnitsPanel extends MinimapSubpanel {
     }
     activateUnit(event) {
         if (event.target instanceof HTMLElement) {
-            const unitDataAttribute = event.target.getAttribute("data-unit-data");
-            if (unitDataAttribute) {
-                const unitData = JSON.parse(unitDataAttribute);
-                UI.Player.lookAtID(unitData.lookId);
-                UI.Player.selectUnit(unitData.selectId);
-            }
+            const data = event.target.getAttribute("data-unit-local-id");
+            if (!data) return;
+            const localId = JSON.parse(data);
+            if (localId) bzUnitsList.selectUnit(localId);
         }
     }
 }

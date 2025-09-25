@@ -60,6 +60,7 @@ export default [
                 engine: "readonly",
                 localStorage: "readonly",
                 performance: "readonly",
+                requestAnimationFrame: "readonly",
                 setTimeout: "readonly",
                 window: "readonly",
             }

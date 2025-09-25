@@ -31,9 +31,24 @@
   left: 0;
   bottom: 2rem;
 }
-
-.bz-units-entry {
+.bz-units-entry .bz-unit-name {
+  width: 13rem;
+  coh-font-fit-mode: shrink;
+}
+.bz-units-entry.bz-unit-in-army .bz-unit-name {
+  width: 11.6666666667rem;
+}
+.bz-units-entry.bz-unit-in-army {
+  padding-left: 1.3333333333rem;
 }
 .bz-units-entry-selected, .bz-units-entry:focus, .bz-units-entry:hover, .bz-units-entry.pressed {
   background: linear-gradient(90deg, #4c473d 0%, #333640 100%);
+}
+.bz-units-entry.bz-can-promote .bz-unit-promotion {
+  background-image: url("blp:Action_Promote");
+  background-color: #00ccff99;
+  border-radius: 1rem;
+}
+.bz-units-entry.bz-can-upgrade .bz-unit-promotion {
+  background-image: url("blp:Action_Upgrade");
 }
