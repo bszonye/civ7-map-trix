@@ -144,13 +144,21 @@ class bzUnitsPanel extends MinimapSubpanel {
             movement.appendChild(moveText);
             Databind.classToggle(entry, "bz-cannot-move", "!{{entry.canMove}}");
             entry.appendChild(movement);
-            // activity
+            // status (activity + garrison)
+            const state = document.createElement("div");
+            state.classList.value = "bz-unit-status size-6 mx-1 rounded-xl";
+            Databind.classToggle(entry, "bz-unit-garrison", "{{entry.isGarrison}}");
             const activity = document.createElement("div");
             activity.classList.value =
-                "bz-unit-activity size-6 bg-contain mx-1 rounded-xl";
-            Databind.classToggle(activity, "bg-secondary-3", "{{entry.isGarrison}}");
+                "bz-unit-activity size-6 bg-contain";
             Databind.bgImg(activity, "entry.activityIcon");
-            entry.appendChild(activity);
+            state.appendChild(activity);
+            const district = document.createElement("div");
+            district.classList.value = "bz-unit-district size-5 bg-contain";
+            Databind.classToggle(district, "hidden", "!!{{entry.activityIcon}}");
+            Databind.bgImg(district, "entry.districtIcon");
+            state.appendChild(district);
+            entry.appendChild(state);
             // finish
             list.appendChild(entry);
         }
