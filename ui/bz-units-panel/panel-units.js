@@ -1,5 +1,4 @@
 import { F as Focus } from '/core/ui/input/focus-support.chunk.js';
-import FocusManager from '/core/ui/input/focus-manager.js';
 import { b as InputEngineEventName } from '../../../core/ui/input/input-support.chunk.js';
 import { A as AnchorType } from '/core/ui/panel-support.chunk.js';
 import { D as Databind } from '/core/ui/utilities/utilities-core-databinding.chunk.js';
@@ -15,6 +14,8 @@ class bzPanelMiniMap {
     unitsSubpanel = null;
     engineInputListener = this.onEngineInput.bind(this);
     hotkeyListener = this.onHotkey.bind(this);
+    toggleCooldown = 0;
+    toggleQueued = false;
     constructor(component) {
         bzPanelMiniMap.instance = this;
         this.component = component;
@@ -57,7 +58,20 @@ class bzPanelMiniMap {
     }
     afterDetach() { }
     togglePanel() {
-        this.component.toggleSubpanel(this.unitsSubpanel);
+        this.toggleQueued = true;
+        if (this.toggleCooldown) return;
+        // limit panel toggles to 4 per second
+        // (avoids crashes in the minimap)
+        const toggle = () => {
+            if (this.toggleQueued) {
+                this.component.toggleSubpanel(this.unitsSubpanel);
+                this.toggleCooldown = setTimeout(() => toggle(), 250);
+            } else {
+                this.toggleCooldown = 0;
+            }
+            this.toggleQueued = false;
+        }
+        toggle();
     }
     onEngineInput(inputEvent) {
         if (inputEvent.detail.status != InputActionStatuses.FINISH) {
@@ -121,8 +135,11 @@ class bzUnitsPanel extends MinimapSubpanel {
         unitsPanelContent.appendChild(header);
         // TODO: filter buttons (land, sea, air, support, civilian)
         // units list
-        this.scrollable.classList.value = "bz-units-scrollable p-1";
-        this.panel.appendChild(this.scrollable);
+        const frame = document.createElement("div");
+        frame.classList.value = "bz-units-frame p-1";
+        this.panel.appendChild(frame);
+        this.scrollable.classList.value = "bz-units-scrollable";
+        frame.appendChild(this.scrollable);
         const list = document.createElement("fxs-vslot");
         this.scrollable.appendChild(list);
         list.classList.value = "font-body-xs";
@@ -209,6 +226,13 @@ class bzUnitsPanel extends MinimapSubpanel {
     onAttach() {
         super.onAttach();
         engine.on("UnitSelectionChanged", this.onUnitSelection, this);
+        // scroll to the selected unit
+        const selected = UI.Player.getHeadSelectedUnit();
+        if (selected) {
+            // allow for the panel-opening animation
+            const interval = setInterval(() => this.scrollToUnit(selected), 100);
+            setTimeout(() => clearInterval(interval), 500);
+        }
     }
     onDetach() {
         super.onDetach();
@@ -221,12 +245,20 @@ class bzUnitsPanel extends MinimapSubpanel {
     close() {
         super.close();
     }
+    scrollToUnit(id) {
+        if (ComponentID.isInvalid(id)) return;
+        const localId = JSON.stringify(id.id);
+        const entry = this.Root.querySelector(`[data-unit-local-id="${localId}"]`);
+        console.warn(`TRIX SCROLL ${localId} ${entry?.tagName}`);
+        if (!entry) return;
+        this.scrollable.component.scrollIntoView(entry);
+    }
     activateUnit(event) {
         if (event.target instanceof HTMLElement) {
             const data = event.target.getAttribute("data-unit-local-id");
             if (!data) return;
             if (Input.getActiveDeviceType() == InputDeviceType.Controller) {
-                // controller: close the panel to enable unit panel
+                // controller: close panel before selecting unit
                 bzPanelMiniMap.instance.togglePanel();
             }
             const localId = JSON.parse(data);
@@ -237,10 +269,7 @@ class bzUnitsPanel extends MinimapSubpanel {
         const id = event?.unit;
         if (ComponentID.isInvalid(id)) return;
         if (!event.selected) return;
-        const localId = JSON.stringify(id.id);
-        const entry = this.Root.querySelector(`[data-unit-local-id="${localId}"]`);
-        if (!entry) return;
-        FocusManager.setFocus(entry);
+        this.scrollToUnit(id);
     }
 }
 Controls.define("bz-units-panel", {

@@ -23,13 +23,16 @@
   transition-duration: 0.25s;
 }
 
-.bz-units-scrollable {
+.bz-units-frame {
   position: absolute;
   width: 19.7777777777rem;
   top: 2.3333333333rem;
   left: 0;
   bottom: 1.1111111111rem;
   background: #12151f66;
+}
+.bz-units-frame .fxs-scrollbar__track--vertical {
+ right: -0.6666666667rem;
 }
 .bz-units-entry.bz-cannot-move .bz-unit-title,
 .bz-units-entry.bz-cannot-move .bz-unit-health,
@@ -57,7 +60,7 @@
 .bz-units-entry.bz-can-promote .bz-unit-promotion {
   /* background-image: url("blp:ntf_unit_promotion"); */
   background-image: url("blp:Action_Promote");
-  background-color: #00ccff99;
+  background-color: #00ccffaa;
   border-radius: 1rem;
   display: flex;
 }
