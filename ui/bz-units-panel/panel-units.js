@@ -118,7 +118,7 @@ class bzUnitsPanel extends MinimapSubpanel {
             title.appendChild(name);
             // health
             const health = document.createElement("div");
-            health.classList.value = "flex justify-center items-center w-14";
+            health.classList.value = "flex justify-end items-center w-12 mr-2";
             Databind.classToggle(health, "invisible", "!{{entry.hasDamage}}");
             const healthIcon = document.createElement("img");
             healthIcon.classList.value = "size-5 -ml-1\\.5";

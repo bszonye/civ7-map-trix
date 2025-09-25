@@ -95,10 +95,15 @@ class bzUnitsListModel {
             const bDomain = DOMAIN_VALUE.get(b.domain);
             if (aDomain != bDomain) return aDomain - bDomain;
             // sort armies by commander experience
-            if (a.unit.isCommanderUnit && b.unit.isCommanderUnit) {
+            if (a.isCommander && b.isCommander) {
                 if (a.totalXP != b.totalXP) return b.totalXP - a.totalXP;
             }
-            // TODO: sort by damage
+            // sort armies first
+            if (a.isCommander && !b.isCommander) return -1;
+            if (b.isCommander && !a.isCommander) return +1;
+            // sort by moves left
+            if (a.movesLeft && !b.movesLeft) return -1;
+            if (b.movesLeft && !a.movesLeft) return +1;
             // TODO: sort by moves left
             // compare combat units by strength
             if (a.combat != b.combat) return b.combat - a.combat;
