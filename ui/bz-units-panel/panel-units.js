@@ -9,6 +9,8 @@ const styles = "fs://game/bz-map-trix/ui/bz-units-panel/panel-units.css";
 
 class bzPanelMiniMap {
     static c_prototype;
+    unitsSubpanel = null;
+    onHotkeyListener = this.onHotkey.bind(this);
     constructor(component) {
         this.component = component;
         component.bzComponent = this;
@@ -35,16 +37,26 @@ class bzPanelMiniMap {
             "LOC_UI_PRODUCTION_UNITS",
             "blp:Action_Promote",
         );
+        this.unitsSubpanel = this.component.subpanels.at(-1);
     }
     beforeAttach() { }
-    afterAttach() { }
-    beforeDetach() { }
+    afterAttach() {
+        window.addEventListener("hotkey-open-bz-units-panel", this.onHotkeyListener);
+    }
+    beforeDetach() {
+        window.removeEventListener("hotkey-open-bz-units-panel", this.onHotkeyListener);
+    }
     afterDetach() { }
+    onHotkey(_event) {
+        this.component.toggleSubpanel(this.unitsSubpanel);
+    }
 }
 Controls.decorate("panel-mini-map", (val) => new bzPanelMiniMap(val));
 
 class bzUnitsPanel extends MinimapSubpanel {
     panel = document.createElement("fxs-vslot");
+    inputContext = InputContext.World;
+    activateUnitListener = this.activateUnit.bind(this);
     constructor(root) {
         super(root);
         this.animateInType = this.animateOutType = AnchorType.Fade;
@@ -81,14 +93,13 @@ class bzUnitsPanel extends MinimapSubpanel {
         list.classList.value = "font-body-xs";
         Databind.for(list, "g_bzUnitsListModel.units", "entry");
         {
-            // TODO: activatable
-            const entry = document.createElement("div");
-            entry.classList.value = "flex items-center ml-1 mr-3 rounded-full";
+            const entry = document.createElement("fxs-activatable");
+            entry.classList.value = "bz-units-entry flex items-center";
+            entry.addEventListener("action-activate", this.activateUnitListener);
+            Databind.attribute(entry, "data-unit-data", "entry.data");
             // selected
-            Databind.classToggle(entry, "bg-secondary-3",
-                "{{entry.id}}=={{g_bzUnitsListModel.selectedUnitID}}");
-            Databind.classToggle(entry, "text-secondary",
-                "{{entry.id}}=={{g_bzUnitsListModel.selectedUnitID}}");
+            Databind.classToggle(entry, "bz-units-entry-selected",
+                "{{entry.localId}}=={{g_bzUnitsListModel.selectedUnit.localId}}");
             // indent: TODO
             // icon
             const icon = document.createElement("img");
@@ -119,6 +130,16 @@ class bzUnitsPanel extends MinimapSubpanel {
     }
     close() {
         super.close();
+    }
+    activateUnit(event) {
+        if (event.target instanceof HTMLElement) {
+            const unitDataAttribute = event.target.getAttribute("data-unit-data");
+            if (unitDataAttribute) {
+                const unitData = JSON.parse(unitDataAttribute);
+                UI.Player.lookAtID(unitData.lookId);
+                UI.Player.selectUnit(unitData.selectId);
+            }
+        }
     }
 }
 Controls.define("bz-units-panel", {

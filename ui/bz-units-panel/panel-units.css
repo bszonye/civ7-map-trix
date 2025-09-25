@@ -23,10 +23,17 @@
   transition-duration: 0.25s;
 }
 
+/* TODO: adjust scrollbar position */
 .bz-units-scrollable {
   position: absolute;
-  width: 19.3333333333rem;
+  width: 19.7777777777rem;
   top: 4rem;
   left: 0;
   bottom: 2rem;
+}
+
+.bz-units-entry {
+}
+.bz-units-entry-selected, .bz-units-entry:focus, .bz-units-entry:hover, .bz-units-entry.pressed {
+  background: linear-gradient(90deg, #4c473d 0%, #333640 100%);
 }

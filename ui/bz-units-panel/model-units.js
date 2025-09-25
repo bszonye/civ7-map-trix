@@ -2,11 +2,15 @@ import { C as ComponentID } from '/core/ui/utilities/utilities-component-id.chun
 import { Icon } from '/core/ui/utilities/utilities-image.chunk.js';
 import { U as UpdateGate } from '/core/ui/utilities/utilities-update-gate.chunk.js';
 
+const DOMAIN_VALUE = new Map(
+    ["DOMAIN_LAND", "DOMAIN_SEA", "DOMAIN_AIR"].map((d, i) => [d, i])
+);
 class bzUnitsListModel {
     onUpdate;
     updateGate = new UpdateGate(() => { this.update(); });
-    _selectedUnit = ComponentID.getInvalidID();
-    _units = [];
+    _selectedUnit = null;
+    _units = new Map();
+    _unitList = [];
     constructor() {
         this.updateGate.call("constructor");
         engine.on("UnitAddedToArmy", this.onUnitUpdate, this);
@@ -25,47 +29,95 @@ class bzUnitsListModel {
     set updateCallback(callback) {
         this.onUpdate = callback;
     }
-    get selectedUnitID() {
-        return this._selectedUnit.id;
+    get selectedUnit() {
+        return this._selectedUnit;
     }
     get units() {
-        return this._units;
+        return this._unitList;
     }
     update() {
-        console.warn(`TRIX UPDATE`);
-        const units = this._units = [];
+        this._units = new Map();
         const player = Players.get(GameContext.localObserverID);
         if (player?.Units == void 0) return;
-        // console.warn(`TRIX ${JSON.stringify(player.Units)}`);
         for (const id of player.Units.getUnitIds()) {
-            const unit = Units.get(id);
-            // console.warn(`TRIX UNIT ${Object.keys(unit)}`);
-            if (!unit) continue;
-            const utype = GameInfo.Units.lookup(unit.type);
-            // console.warn(`TRIX UNIT ${JSON.stringify(utype)}`);
-            const icon = Icon.getUnitIconFromDefinition(utype);
-            const name = unit.name;
-            const entry = { id: id.id, icon, name, };
-            console.warn(`TRIX ENTRY ${JSON.stringify(entry)}`);
-            units.push(entry);
+            this.updateUnit(id);
         }
+        this.updateDisplay();
+    }
+    updateDisplay() {
+        this._unitList = [...this._units.values()];
+        const unitSort = (a, b) => {
+            // group army units with their commanders
+            const aCommander = this._units.get(a.armyId);
+            const bCommander = this._units.get(b.armyId);
+            // sort by domain
+            const aDomain = DOMAIN_VALUE.get(aCommander?.domain ?? a.domain);
+            const bDomain = DOMAIN_VALUE.get(bCommander?.domain ?? b.domain);
+            if (aDomain != bDomain) return aDomain - bDomain;
+            // group armies together
+            if (a.armyId != b.armyId) {
+                a = aCommander ?? a;
+                b = bCommander ?? b;
+            }
+            // list commanders & armies first
+            if (a.unit.isCommanderUnit != b.unit.isCommanderUnit) {
+                return a.unit.isCommanderUnit ? -1 : +1;
+            }
+            // compare units
+            if (a.strength != b.strength) return b.strength - a.strength;
+            // compare names + original order
+            return Locale.compare(a.name.toUpperCase(), b.name.toUpperCase()) ||
+                a.index - b.index;
+        };
+        this._unitList.sort(unitSort);
         if (this.onUpdate) this.onUpdate(this);
     }
-    isLocalUnit(id) {
-        return !ComponentID.isInvalid(id) && id.owner == GameContext.localObserverID;
+    updateUnit(id) {
+        const unit = Units.get(id);
+        if (!unit) return;
+        // unit details
+        const localId = unit.localId;
+        const armyId = unit.armyId.id;
+        // unit type info
+        const info = GameInfo.Units.lookup(unit.type);
+        const type = info.UnitType;
+        const icon = Icon.getUnitIconFromDefinition(info);
+        const name = unit.name;
+        const domain = info.Domain;
+        // unit stats
+        const stats = GameInfo.Unit_Stats.lookup(type);
+        const strength = stats ? Math.max(stats.Combat, stats.RangedCombat) : -1;
+        // activation details
+        const selectId = { ...id };  // unit to select
+        const lookId = { ...id };  // unit or army to view
+        if (armyId != -1) lookId.id = armyId;
+        const data = JSON.stringify({ lookId, selectId });
+        // original sort order
+        const index = this._units.get(localId)?.index ?? this._units.size;
+        // collate entry
+        const entry = {
+            unit, id, localId, armyId,
+            info, type, icon, name, domain,
+            stats, strength,
+            data, index,
+        };
+        this._units.set(localId, entry);
     }
     onUnitSelection(event) {
         const id = event?.unit;
-        const valid = event?.selected && this.isLocalUnit(id);
-        this._selectedUnit = valid ? id : ComponentID.getInvalidID();
-        if (this.onUpdate) this.onUpdate(this);
-        console.warn(`TRIX UNIT ${JSON.stringify(this.selectedUnitID)}`);
+        if (ComponentID.isInvalid(id)) return;
+        this.updateUnit(id);
+        const selected = event.selected ? id : ComponentID.getInvalidID();
+        this._selectedUnit = this._units.get(selected.id);
+        Object.entries(this._selectedUnit?.unit ?? {}).forEach(([key, value]) =>
+            console.warn(`TRIX SELECT ${key} ${JSON.stringify(value)}`));
+        this.updateDisplay();
     }
     onUnitUpdate(event) {
-        if (this.isLocalUnit(event?.unit)) {
-            console.warn(`TRIX EVENT ${JSON.stringify(event)}`);
-            this.updateGate.call("onUnitUpdate");
-        }
+        const id = event?.unit;
+        if (ComponentID.isInvalid(id)) return;
+        if (id.owner != GameContext.localObserverID) return;
+        this.updateGate.call("onUnitUpdate");
     }
 }
 
