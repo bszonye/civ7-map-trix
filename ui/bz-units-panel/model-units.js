@@ -2,6 +2,27 @@ import { C as ComponentID } from '/core/ui/utilities/utilities-component-id.chun
 import { Icon } from '/core/ui/utilities/utilities-image.chunk.js';
 import { U as UpdateGate } from '/core/ui/utilities/utilities-update-gate.chunk.js';
 
+const ACTIVITY_ICONS = new Map([
+    [UnitActivityTypes.NONE, "blp:Action_Cancel"],
+    [UnitActivityTypes.AWAKE, ""],
+    [UnitActivityTypes.HOLD, "blp:Action_Skip"],
+    [UnitActivityTypes.SLEEP, "blp:Action_Sleep"],
+    [UnitActivityTypes.HEAL, "blp:Action_Heal"],
+    [UnitActivityTypes.SENTRY, "blp:Action_Wake"],
+    [UnitActivityTypes.INTERCEPT, "blp:Action_Cancel"],  // TODO
+    [UnitActivityTypes.OPERATION, ""],
+    [UnitActivityTypes.JUMP, "blp:Action_Cancel"],  // TODO
+]);
+const DISTRICT_ICONS = new Map([
+    // TODO
+    [DistrictTypes.INVALID, ""],
+    [DistrictTypes.CITY_CENTER, "blp:city_urban"],
+    [DistrictTypes.RURAL, "blp:city_rural"],
+    [DistrictTypes.URBAN, "blp:city_urban"],
+    [DistrictTypes.WONDER, ""],
+    [DistrictTypes.WILDERNESS, ""],
+]);
+console.warn(`TRIX DISTRICTS ${JSON.stringify(DistrictTypes)}`);
 const DOMAIN_VALUE = new Map(
     ["DOMAIN_LAND", "DOMAIN_SEA", "DOMAIN_AIR"].map((d, i) => [d, i])
 );
@@ -10,9 +31,11 @@ class bzUnitsListModel {
     updateGate = new UpdateGate(() => { this.update(); });
     _selectedUnit = null;
     _units = new Map();
+    _unitGroups = new Map();
     _unitList = [];
     constructor() {
         this.updateGate.call("constructor");
+        engine.on("UnitActivityChanged", this.onUnitUpdate, this);
         engine.on("UnitAddedToArmy", this.onUnitUpdate, this);
         engine.on("UnitAddedToMap", this.onUnitUpdate, this);
         engine.on("UnitBermudaTeleported", this.onUnitUpdate, this);
@@ -37,6 +60,7 @@ class bzUnitsListModel {
     }
     update() {
         this._units = new Map();
+        this._unitGroups = new Map();
         const player = Players.get(GameContext.localObserverID);
         if (player?.Units == void 0) return;
         for (const id of player.Units.getUnitIds()) {
@@ -52,21 +76,20 @@ class bzUnitsListModel {
             return Locale.compare(aName, bName);
         };
         const unitSort = (a, b) => {
-            // group armies together in their original order
+            // group armies together in player.Units order
             if (a.armyId == b.armyId && a.armyId != -1) {
+                // commander first
+                if (a.isCommander) return -1;
+                if (b.isCommander) return +1;
                 return a.index - b.index;
             }
             // otherwise, group army units with their commanders
-            a = this._units.get(a.armyId) ?? a;
-            b = this._units.get(b.armyId) ?? b;
-            // sort civilian units last
-            if (a.strength < 0 && 0 <= b.strength) return +1;
-            if (b.strength < 0 && 0 <= a.strength) return -1;
-            // sort support units after military units
-            const aSupport = a.strength <= 0 && !a.unit.isCommanderUnit;
-            const bSupport = b.strength <= 0 && !b.unit.isCommanderUnit;
-            if (aSupport && !bSupport) return +1;
-            if (bSupport && !aSupport) return -1;
+            a = this._unitGroups.get(a.armyId) ?? a;
+            b = this._unitGroups.get(b.armyId) ?? b;
+            // sort support and civilian units after military units
+            if (a.combat <= 0 || b.combat <= 0) {
+                if (a.combat != b.combat) return b.combat - a.combat;
+            }
             // sort by domain
             const aDomain = DOMAIN_VALUE.get(a.domain);
             const bDomain = DOMAIN_VALUE.get(b.domain);
@@ -74,12 +97,11 @@ class bzUnitsListModel {
             // sort armies by commander experience
             if (a.unit.isCommanderUnit && b.unit.isCommanderUnit) {
                 if (a.totalXP != b.totalXP) return b.totalXP - a.totalXP;
-            } else {
-                if (a.unit.isCommanderUnit) return -1;
-                if (b.unit.isCommanderUnit) return +1;
             }
-            // compare units
-            if (a.strength != b.strength) return b.strength - a.strength;
+            // TODO: sort by damage
+            // TODO: sort by moves left
+            // compare combat units by strength
+            if (a.combat != b.combat) return b.combat - a.combat;
             // fallback: localized names, then original order
             return nameSort(a.name, b.name) || a.index - b.index;
         };
@@ -92,7 +114,13 @@ class bzUnitsListModel {
         // unit details
         const localId = unit.localId;
         const armyId = unit.armyId.id;
-        const isInArmy = armyId != localId && armyId != -1;
+        const isCommander = unit.isCommanderUnit;
+        const isGrouped = armyId != -1 && !isCommander;
+        const operationType = unit.operationQueueSize ?
+            unit.getOperationType(0) : void 0;
+        const operation = operationType && GameInfo.UnitOperations.lookup(operationType);
+        const activityType = unit.activityType;
+        const activityIcon = operation?.Icon ?? ACTIVITY_ICONS.get(activityType);
         // unit type info
         const info = GameInfo.Units.lookup(unit.type);
         const type = info.UnitType;
@@ -101,8 +129,34 @@ class bzUnitsListModel {
         const domain = info.Domain;
         // unit stats
         const stats = GameInfo.Unit_Stats.lookup(type);
-        const strength = stats ? Math.max(stats.Combat, stats.RangedCombat) : -1;
-        // upgrades and promotions
+        const combat =
+            info.FormationClass == "FORMATION_CLASS_COMMAND" ? 9999 :
+            info.CoreClass == "CORE_CLASS_CIVILIAN" ? -1 :
+            stats ? Math.max(stats.Combat, stats.RangedCombat) : -1;
+        // health
+        const health = unit.Health;
+        const damage = health?.damage ?? 0;
+        const maxHealth = health?.maxDamage ?? 0;
+        const healthLeft = maxHealth - damage;
+        const slashHealth = `${healthLeft}/${maxHealth}`;
+        const hasDamage = !!damage;
+        // movement
+        const moves = unit.Movement;
+        const movesLeft = moves?.movementMovesRemaining ?? 0;
+        const maxMoves = moves?.maxMoves ?? 0;
+        if (maxMoves != moves.formationMaxMoves) {
+            console.warn(`TRIX MOVE ${unit.name} ${maxMoves} ${moves.formationMaxMoves}`);
+        }
+        const slashMoves = `${movesLeft}/${maxMoves}`;
+        const canMove = moves?.canMove;
+        // location
+        const location = unit.location;
+        const districtID = MapCities.getDistrict(location.x, location.y);
+        const district = Districts.get(districtID);
+        const isHome = district?.owner == GameContext.localObserverID;
+        const districtIcon = DISTRICT_ICONS.get(isHome ? district.type : -1);
+        const isGarrison = isHome && district.type == DistrictTypes.CITY_CENTER;
+        // promotion
         const xp = unit.Experience;
         const totalXP = xp ? xp.spentExperience + xp.experiencePoints : void 0;
         const canPromote = Boolean(
@@ -121,12 +175,17 @@ class bzUnitsListModel {
         const index = this._units.get(localId)?.index ?? this._units.size;
         // collate entry
         const entry = {
-            unit, id, localId, armyId, isInArmy,
+            unit, id, localId, armyId, isCommander, isGrouped,
+            activityType, activityIcon, operationType, operation,
             info, type, icon, name, domain,
-            stats, strength,
+            stats, combat,
+            health, healthLeft, maxHealth, slashHealth, hasDamage,
+            moves, movesLeft, maxMoves, slashMoves, canMove,
+            location, district, districtIcon, isGarrison,
             totalXP, canPromote, canUpgrade,
             data, index,
         };
+        if (isCommander) this._unitGroups.set(armyId, entry);
         this._units.set(localId, entry);
     }
     selectUnit(localId) {
@@ -136,12 +195,15 @@ class bzUnitsListModel {
         }
         const unit = this._units.get(localId);
         if (!unit) return;
-        const army = this._units.get(unit.armyId);
-        if (army) {
-            UI.Player.lookAtID(army.id);
-            UI.Player.selectUnit(army.id);
+        const group = this._unitGroups.get(unit.armyId);
+        if (group) {
+            // select the group first
+            UI.Player.lookAtID(group.id);
+            UI.Player.selectUnit(group.id);
+            // and give it time to settle
             requestAnimationFrame(() => UI.Player.selectUnit(unit.id));
         } else {
+            // select the unit
             UI.Player.lookAtID(unit.id);
             UI.Player.selectUnit(unit.id);
         }
@@ -153,15 +215,22 @@ class bzUnitsListModel {
         const selected = event.selected ? id : ComponentID.getInvalidID();
         this._selectedUnit = this._units.get(selected.id);
         if (this._selectedUnit) {
-            Object.entries(this._selectedUnit.unit ?? {}).forEach(([key, value]) =>
-                console.warn(`TRIX SELECT ${key} ${JSON.stringify(value)}`));
-            console.warn(`TRIX SELECT Experience = ${JSON.stringify(this._selectedUnit.unit.Experience)}`);
+            const unit = this._selectedUnit.unit;
+            Object.entries(unit).forEach(([key, value]) =>
+                console.warn(`TRIX SELECT ${key} = ${JSON.stringify(value)}`));
+            // Object.entries(unit.Combat).forEach(([key, value]) =>
+            //     console.warn(`TRIX SELECT Combat.${key} = ${JSON.stringify(value)}`));
+            // console.warn(`TRIX SELECT Experience = ${JSON.stringify(unit.Experience)}`);
+            console.warn(`TRIX SELECT district = ${JSON.stringify(this._selectedUnit.district)}`);
+            console.warn(`TRIX SELECT Movement = ${JSON.stringify(unit.Movement)}`);
+            console.warn(`TRIX SELECT Operation = ${this._selectedUnit.operationType} ${JSON.stringify(this._selectedUnit.operation)}`);
         } else {
             console.warn(`TRIX DESELECT`);
         }
         this.updateDisplay();
     }
     onUnitUpdate(event) {
+        console.warn(`TRIX EVENT ${JSON.stringify(event)}`);
         const id = event?.unit;
         if (ComponentID.isInvalid(id)) return;
         if (id.owner != GameContext.localObserverID) return;

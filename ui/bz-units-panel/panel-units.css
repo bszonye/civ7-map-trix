@@ -23,32 +23,46 @@
   transition-duration: 0.25s;
 }
 
-/* TODO: adjust scrollbar position */
 .bz-units-scrollable {
   position: absolute;
   width: 19.7777777777rem;
-  top: 4rem;
+  top: 2.3333333333rem;
   left: 0;
-  bottom: 2rem;
+  bottom: 1.1111111111rem;
+  background: #12151f66;
 }
-.bz-units-entry .bz-unit-name {
-  width: 13rem;
+.bz-units-entry.bz-cannot-move {
+  filter: brightness(0.5);
+}
+.bz-units-entry .bz-unit-title {
+  width: 11rem;
   coh-font-fit-mode: shrink;
 }
-.bz-units-entry.bz-unit-in-army .bz-unit-name {
-  width: 11.6666666667rem;
-}
-.bz-units-entry.bz-unit-in-army {
+.bz-units-entry.bz-unit-grouped .bz-unit-title {
   padding-left: 1.3333333333rem;
 }
 .bz-units-entry-selected, .bz-units-entry:focus, .bz-units-entry:hover, .bz-units-entry.pressed {
   background: linear-gradient(90deg, #4c473d 0%, #333640 100%);
 }
+.bz-units-entry.bz-unit-garrison .bz-unit-district {
+  background-color: #8c7e62;
+  border-radius: 1rem;
+}
+.bz-units-entry.bz-can-promote .bz-unit-icon,
+.bz-units-entry.bz-can-upgrade .bz-unit-icon {
+  display: none;
+}
+.bz-units-entry .bz-unit-promotion {
+  display: none;
+}
 .bz-units-entry.bz-can-promote .bz-unit-promotion {
+  /* background-image: url("blp:ntf_unit_promotion"); */
   background-image: url("blp:Action_Promote");
   background-color: #00ccff99;
   border-radius: 1rem;
+  display: flex;
 }
 .bz-units-entry.bz-can-upgrade .bz-unit-promotion {
   background-image: url("blp:Action_Upgrade");
+  display: flex;
 }

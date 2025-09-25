@@ -67,12 +67,7 @@ class bzUnitsPanel extends MinimapSubpanel {
         this.panel.setAttribute("data-navrule-down", "stop");
         this.panel.setAttribute("data-navrule-right", "stop");
         this.panel.setAttribute("data-navrule-left", "stop");
-        this.panel.classList.add("mini-map__units-panel", "left-3", "px-2", "py-8");
-        const closeLensPanelNavHelp = document.createElement("fxs-nav-help");
-        closeLensPanelNavHelp.setAttribute("action-key", "inline-cancel");
-        closeLensPanelNavHelp.classList.add("absolute", "-right-4", "-top-3", "z-1");
-        Databind.classToggle(closeLensPanelNavHelp, "hidden", "!{{g_NavTray.isTrayRequired}}");
-        this.panel.appendChild(closeLensPanelNavHelp);
+        this.panel.classList.add("mini-map__units-panel", "left-3", "px-2", "py-3");
         const unitsPanelContent = document.createElement("div");
         unitsPanelContent.classList.add("mb-5");
         this.panel.appendChild(unitsPanelContent);
@@ -85,7 +80,7 @@ class bzUnitsPanel extends MinimapSubpanel {
         // TODO: filter buttons (land, sea, air, support, civilian)
         // units list
         const scrollable = document.createElement("fxs-scrollable");
-        scrollable.classList.value = "bz-units-scrollable";
+        scrollable.classList.value = "bz-units-scrollable p-1";
         this.panel.appendChild(scrollable);
         const list = document.createElement("fxs-vslot");
         scrollable.appendChild(list);
@@ -100,25 +95,63 @@ class bzUnitsPanel extends MinimapSubpanel {
             Databind.classToggle(entry, "bz-units-entry-selected",
                 "{{entry.localId}}=={{g_bzUnitsListModel.selectedUnit.localId}}");
             // indentation
-            Databind.classToggle(entry, "bz-unit-in-army", "{{entry.isInArmy}}");
+            Databind.classToggle(entry, "bz-unit-grouped", "{{entry.isGrouped}}");
+            // title
+            const title = document.createElement("div");
+            title.classList.value = "bz-unit-title flex justify-start items-center";
+            entry.appendChild(title);
+            // promotion
+            const promotion = document.createElement("div");
+            promotion.classList.value = "bz-unit-promotion size-6 bg-contain";
+            Databind.classToggle(entry, "bz-can-promote", "{{entry.canPromote}}");
+            Databind.classToggle(entry, "bz-can-upgrade", "{{entry.canUpgrade}}");
+            title.appendChild(promotion);
             // icon
-            const icon = document.createElement("img");
-            icon.classList.value = "size-6 ml-1";
-            Databind.attribute(icon, "src", "entry.icon");
-            entry.appendChild(icon);
+            const icon = document.createElement("div");
+            icon.classList.value = "bz-unit-icon size-6 bg-contain";
+            Databind.bgImg(icon, "entry.icon");
+            title.appendChild(icon);
             // name
             const name = document.createElement("div");
             name.classList.value = "bz-unit-name ml-1";
             name.setAttribute("data-bind-attr-data-l10n-id", "{{entry.name}}");
-            entry.appendChild(name);
-            // damage: TODO
-            // movement: TODO
-            // promotion
-            const promotion = document.createElement("div");
-            promotion.classList.value = "bz-unit-promotion size-6 bg-contain ml-1";
-            Databind.classToggle(entry, "bz-can-promote", "{{entry.canPromote}}");
-            Databind.classToggle(entry, "bz-can-upgrade", "{{entry.canUpgrade}}");
-            entry.appendChild(promotion);
+            title.appendChild(name);
+            // health
+            const health = document.createElement("div");
+            health.classList.value = "flex justify-center items-center w-14";
+            Databind.classToggle(health, "invisible", "!{{entry.hasDamage}}");
+            const healthIcon = document.createElement("img");
+            healthIcon.classList.value = "size-5 -ml-1\\.5";
+            healthIcon.setAttribute("src", "blp:prod_generic");
+            health.appendChild(healthIcon);
+            const healthText = document.createElement("div");
+            healthText.classList.value = "ml-1";
+            healthText.setAttribute("data-bind-attr-data-l10n-id", "{{entry.healthLeft}}");
+            health.appendChild(healthText);
+            entry.appendChild(health);
+            // movement
+            const movement = document.createElement("div");
+            movement.classList.value =
+                "bz-unit-movement flex justify-end items-center w-14 mr-1";
+            const moveIcon = document.createElement("img");
+            moveIcon.classList.value = "size-5 mr-1";
+            Databind.classToggle(moveIcon, "hidden", "9<{{entry.maxMoves}}");
+            moveIcon.setAttribute("src", "blp:Action_Move");
+            movement.appendChild(moveIcon);
+            const moveText = document.createElement("div");
+            // moveText.classList.value = "ml-1";
+            moveText.setAttribute("data-bind-attr-data-l10n-id", "{{entry.slashMoves}}");
+            movement.appendChild(moveText);
+            Databind.classToggle(entry, "bz-cannot-move", "!{{entry.canMove}}");
+            entry.appendChild(movement);
+            // activity
+            const activity = document.createElement("div");
+            activity.classList.value =
+                "bz-unit-activity size-6 bg-contain mx-1 rounded-xl";
+            Databind.classToggle(activity, "bg-secondary-3", "{{entry.isGarrison}}");
+            Databind.bgImg(activity, "entry.activityIcon");
+            entry.appendChild(activity);
+            // finish
             list.appendChild(entry);
         }
         // finish
