@@ -79,6 +79,12 @@
         <Replace Tag="LOC_STATE_BZ_UNIQUE">
             <Text>Unique</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS">
+            <Text>Open Units</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS_TT">
+            <Text>Open the Units panel</Text>
+        </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS">
             <Text>Toggle Borders</Text>
         </Replace>

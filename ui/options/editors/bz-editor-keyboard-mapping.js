@@ -1,4 +1,5 @@
 const BZ_KEYS_TO_ADD = [
+    "open-bz-units-panel",
     "toggle-bz-culture-borders-layer",
     "toggle-bz-city-borders-layer",
     "toggle-bz-discovery-layer",
