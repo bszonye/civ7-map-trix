@@ -18,7 +18,6 @@ const ACTIVITY_ICONS = new Map([
     [UnitActivityTypes.JUMP, "blp:Action_Cancel"],  // TODO
 ]);
 const DISTRICT_ICONS = new Map([
-    // TODO
     [DistrictTypes.INVALID, ""],
     [DistrictTypes.CITY_CENTER, "blp:city_urban"],
     [DistrictTypes.RURAL, "blp:city_rural"],
@@ -97,8 +96,8 @@ class bzUnitListModel {
             const bDomain = DOMAIN_VALUE.get(b.domain);
             if (aDomain != bDomain) return aDomain - bDomain;
             // sort unique units first
-            if (a.trait && !b.trait) return -1;
-            if (b.trait && !a.trait) return +1;
+            if (a.isUnique && !b.isUnique) return -1;
+            if (b.isUnique && !a.isUnique) return +1;
             // sort by age
             if (a.age.ChronologyIndex != b.age.ChronologyIndex) {
                 return a.age.ChronologyIndex - b.age.ChronologyIndex;
@@ -111,7 +110,7 @@ class bzUnitListModel {
             // sort victory units first
             if (a.isVictoryUnit && !b.isVictoryUnit) return -1;
             if (b.isVictoryUnit && !a.isVictoryUnit) return +1;
-            // group armies together in player.Units order
+            // group armies together in original order
             if (a.armyId == b.armyId && a.armyId != -1) {
                 // commander first
                 if (a.isCommander) return -1;
@@ -129,27 +128,40 @@ class bzUnitListModel {
             const aDomain = DOMAIN_VALUE.get(a.domain);
             const bDomain = DOMAIN_VALUE.get(b.domain);
             if (aDomain != bDomain) return aDomain - bDomain;
+            // sort armies first
+            if (a.isCommander && !b.isCommander) return -1;
+            if (b.isCommander && !a.isCommander) return +1;
+            // sort armies by commander age and experience
+            if (a.isCommander && b.isCommander) {
+                if (a.age.ChronologyIndex != b.age.ChronologyIndex) {
+                    return a.age.ChronologyIndex - b.age.ChronologyIndex;
+                }
+                if (a.totalXP != b.totalXP) return b.totalXP - a.totalXP;
+                return nameSort(a.name, b.name) || a.index - b.index;
+            }
+            // compare combat units by strength
+            if (a.combat != b.combat) return b.combat - a.combat;
+            // sort unique units first
+            if (a.isUnique && !b.isUnique) return -1;
+            if (b.isUnique && !a.isUnique) return +1;
             // sort by age
             if (a.age.ChronologyIndex != b.age.ChronologyIndex) {
                 return a.age.ChronologyIndex - b.age.ChronologyIndex;
             }
-            // sort armies by commander experience
-            if (a.isCommander && b.isCommander) {
-                if (a.totalXP != b.totalXP) return b.totalXP - a.totalXP;
-            }
-            // sort armies first
-            if (a.isCommander && !b.isCommander) return -1;
-            if (b.isCommander && !a.isCommander) return +1;
+            // group by localized name
+            const lex = nameSort(a.name, b.name);
+            if (lex) return lex;
             // sort by moves left
             if (a.movesLeft && !b.movesLeft) return -1;
             if (b.movesLeft && !a.movesLeft) return +1;
             // sort by activity
             if (a.isBusy && !b.isBusy) return +1;
             if (b.isBusy && !a.isBusy) return -1;
-            // compare combat units by strength
-            if (a.combat != b.combat) return b.combat - a.combat;
-            // fallback: localized names, then original order
-            return nameSort(a.name, b.name) || a.index - b.index;
+            // group by garrison
+            if (a.isGarrison && !b.isGarrison) return +1;
+            if (b.isGarrison && !a.isGarrison) return -1;
+            // fallback: original order
+            return a.index - b.index;
         };
         this._unitList.sort(unitSort);
         this._types = new Map();
@@ -180,9 +192,11 @@ class bzUnitListModel {
         const info = GameInfo.Units.lookup(unit.type);
         const type = info.UnitType;
         const icon = Icon.getUnitIconFromDefinition(info);
-        const name = unit.name;
+        const name = unit.isCommanderUnit && unit.Experience.getLevel ?
+            `${unit.name} ${unit.Experience.getLevel}` : unit.name;
         const domain = info.Domain;
         const trait = info.TraitType;
+        const isUnique = Boolean(trait);
         const isTradeUnit = TRADER_TYPES.has(unit.type);
         const isVictoryUnit = info.VictoryUnit;
         // unit stats
@@ -240,7 +254,7 @@ class bzUnitListModel {
         const entry = {
             unit, id, localId, armyId, isCommander, isGrouped, age,
             operationType, operation, activityType, activityIcon, isBusy,
-            info, type, icon, name, trait, domain, isTradeUnit, isVictoryUnit,
+            info, type, icon, name, domain, trait, isUnique, isTradeUnit, isVictoryUnit,
             stats, combat,
             health, healthLeft, maxHealth, slashHealth, hasDamage,
             moves, movesLeft, maxMoves, slashMoves, canMove,
@@ -277,22 +291,6 @@ class bzUnitListModel {
         this.updateUnit(id);
         const selected = event.selected ? id : ComponentID.getInvalidID();
         this._selectedUnit = this._units.get(selected.id);
-        if (this._selectedUnit) {
-            const unit = this._selectedUnit.unit;
-            const info = this._selectedUnit.info;
-            Object.entries(unit).forEach(([key, value]) =>
-                console.warn(`TRIX SELECT ${key} = ${JSON.stringify(value)}`));
-            Object.entries(info).forEach(([key, value]) =>
-                console.warn(`TRIX SELECT ${key} = ${JSON.stringify(value)}`));
-            // Object.entries(unit.Combat).forEach(([key, value]) =>
-            //     console.warn(`TRIX SELECT Combat.${key} = ${JSON.stringify(value)}`));
-            // console.warn(`TRIX SELECT Experience = ${JSON.stringify(unit.Experience)}`);
-            // console.warn(`TRIX SELECT district = ${JSON.stringify(this._selectedUnit.district)}`);
-            // console.warn(`TRIX SELECT Movement = ${JSON.stringify(unit.Movement)}`);
-            // console.warn(`TRIX SELECT Operation = ${this._selectedUnit.operationType} ${JSON.stringify(this._selectedUnit.operation)}`);
-        } else {
-            console.warn(`TRIX DESELECT`);
-        }
         this.updateDisplay();
     }
     onUnitUpdate(event) {

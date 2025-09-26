@@ -150,6 +150,7 @@ class bzUnitsPanel extends MinimapSubpanel {
             face.classList.value = "bz-type-button bz-icon size-8 absolute";
             face.addEventListener("action-activate", this.activateTypeListener);
             Databind.attribute(face, "data-unit-local-id", "button.localId");
+            Databind.attribute(face, "data-tooltip-content", "button.info.Name");
             button.appendChild(face);
             const icon = document.createElement("div");
             icon.classList.value = "bz-type-icon bz-icon size-8 absolute";
@@ -208,7 +209,8 @@ class bzUnitsPanel extends MinimapSubpanel {
             const health = document.createElement("div");
             health.classList.value =
                 "bz-unit-health flex justify-end items-center w-12 mx-1";
-            Databind.classToggle(health, "invisible", "!{{entry.hasDamage}}");
+            Databind.classToggle(entry, "bz-unit-damaged", "{{entry.hasDamage}}");
+            Databind.classToggle(health, "hidden", "!{{entry.hasDamage}}");
             const healthIcon = document.createElement("img");
             healthIcon.classList.value = "bz-icon size-5 -ml-0\\.5 mr-0\\.5";
             healthIcon.setAttribute("src", "blp:prod_generic");
@@ -279,7 +281,6 @@ class bzUnitsPanel extends MinimapSubpanel {
     scrollUnitToTop(id) {
         const target = this.getUnitEntry(id);
         if (!target) return;
-        console.warn(`TRIX TARGET ${target.querySelector(".bz-unit-name").getAttribute("data-l10n-id")}`);
         const c = this.unitsContainer.component;
         const areaRect = this.unitsContainer.getBoundingClientRect();
         const targetRect = target.getBoundingClientRect();
@@ -306,7 +307,6 @@ class bzUnitsPanel extends MinimapSubpanel {
     activateType(event) {
         if (event.target instanceof HTMLElement) {
             const data = event.target.getAttribute("data-unit-local-id");
-            console.warn(`TRIX ACTIVATE ${data}`);
             if (!data) return;
             const localId = JSON.parse(data);
             const unit = bzUnitList.units.get(localId);
@@ -326,7 +326,6 @@ class bzUnitsPanel extends MinimapSubpanel {
         }
     }
     onModelUpdate() {
-        console.warn(`TRIX MODEL-UPDATE`);
         const selected = UI.Player.getHeadSelectedUnit();
         if (selected) this.scrollToUnit(selected, 50);
     }
