@@ -106,6 +106,7 @@ class bzUnitsPanel extends MinimapSubpanel {
     panel = document.createElement("fxs-vslot");
     inputContext = InputContext.Dual;
     activateUnitListener = this.activateUnit.bind(this);
+    modelUpdateListener = this.onModelUpdate.bind(this);
     scrollable = document.createElement("fxs-scrollable");
     constructor(root) {
         super(root);
@@ -161,13 +162,13 @@ class bzUnitsPanel extends MinimapSubpanel {
             entry.appendChild(title);
             // promotion
             const promotion = document.createElement("div");
-            promotion.classList.value = "bz-unit-promotion size-6 bg-contain";
+            promotion.classList.value = "bz-unit-promotion bz-icon size-6";
             Databind.classToggle(entry, "bz-can-promote", "{{entry.canPromote}}");
             Databind.classToggle(entry, "bz-can-upgrade", "{{entry.canUpgrade}}");
             title.appendChild(promotion);
             // icon
             const icon = document.createElement("div");
-            icon.classList.value = "bz-unit-icon size-6 bg-contain";
+            icon.classList.value = "bz-unit-icon bz-icon size-6";
             Databind.bgImg(icon, "entry.icon");
             title.appendChild(icon);
             // name
@@ -178,10 +179,10 @@ class bzUnitsPanel extends MinimapSubpanel {
             // health
             const health = document.createElement("div");
             health.classList.value =
-                "bz-unit-health flex justify-center items-center w-12 mx-1";
+                "bz-unit-health flex justify-end items-center w-12 mx-1";
             Databind.classToggle(health, "invisible", "!{{entry.hasDamage}}");
             const healthIcon = document.createElement("img");
-            healthIcon.classList.value = "size-5 -ml-0\\.5 mr-0\\.5";
+            healthIcon.classList.value = "bz-icon size-5 -ml-0\\.5 mr-0\\.5";
             healthIcon.setAttribute("src", "blp:prod_generic");
             health.appendChild(healthIcon);
             const healthText = document.createElement("div");
@@ -193,7 +194,7 @@ class bzUnitsPanel extends MinimapSubpanel {
             movement.classList.value =
                 "bz-unit-movement flex justify-center items-center w-14 mx-1";
             const moveIcon = document.createElement("img");
-            moveIcon.classList.value = "size-5 -ml-1 mr-1";
+            moveIcon.classList.value = "bz-icon size-5 -ml-1 mr-1";
             Databind.classToggle(moveIcon, "hidden", "9<{{entry.maxMoves}}");
             moveIcon.setAttribute("src", "blp:Action_Move");
             movement.appendChild(moveIcon);
@@ -204,16 +205,19 @@ class bzUnitsPanel extends MinimapSubpanel {
             entry.appendChild(movement);
             // status (activity + garrison)
             const state = document.createElement("div");
-            state.classList.value = "bz-unit-status size-6 rounded-xl";
-            Databind.classToggle(entry, "bz-unit-garrison", "{{entry.isGarrison}}");
+            state.classList.value = "bz-unit-status relative size-6";
+            const garrison = document.createElement("div");
+            garrison.classList.value = "bz-unit-garrison bz-icon absolute";
+            Databind.classToggle(garrison, "hidden", "!{{entry.isGarrison}}");
+            state.appendChild(garrison);
             const activity = document.createElement("div");
-            activity.classList.value =
-                "bz-unit-activity size-6 bg-contain";
+            activity.classList.value = "bz-unit-activity bz-icon absolute size-6";
             Databind.bgImg(activity, "entry.activityIcon");
             state.appendChild(activity);
             const district = document.createElement("div");
-            district.classList.value = "bz-unit-district size-5 bg-contain";
-            Databind.classToggle(district, "hidden", "!!{{entry.activityIcon}}");
+            district.classList.value = "bz-unit-district bz-icon absolute size-6";
+            district.style.backgroundSize = "85%";
+            Databind.classToggle(district, "hidden", "{{entry.isBusy}}");
             Databind.bgImg(district, "entry.districtIcon");
             state.appendChild(district);
             entry.appendChild(state);
@@ -225,18 +229,14 @@ class bzUnitsPanel extends MinimapSubpanel {
     }
     onAttach() {
         super.onAttach();
-        engine.on("UnitSelectionChanged", this.onUnitSelection, this);
+        window.addEventListener("bz-model-units-update", this.modelUpdateListener);
         // scroll to the selected unit
         const selected = UI.Player.getHeadSelectedUnit();
-        if (selected) {
-            // allow for the panel-opening animation
-            const interval = setInterval(() => this.scrollToUnit(selected), 100);
-            setTimeout(() => clearInterval(interval), 500);
-        }
+        if (selected) this.scrollToUnit(selected, 100);
     }
     onDetach() {
         super.onDetach();
-        engine.off("UnitSelectionChanged", this.onUnitSelection, this);
+        window.removeEventListener("bz-model-units-update", this.modelUpdateListener);
     }
     onReceiveFocus() {
         super.onReceiveFocus();
@@ -245,7 +245,12 @@ class bzUnitsPanel extends MinimapSubpanel {
     close() {
         super.close();
     }
-    scrollToUnit(id) {
+    scrollToUnit(id, interval=0, repeat=5) {
+        if (interval) {
+            const handle = setInterval(() => this.scrollToUnit(id), interval);
+            setTimeout(() => clearInterval(handle), interval * (repeat + 1));
+            return;
+        }
         if (ComponentID.isInvalid(id)) return;
         const localId = JSON.stringify(id.id);
         const entry = this.Root.querySelector(`[data-unit-local-id="${localId}"]`);
@@ -265,11 +270,10 @@ class bzUnitsPanel extends MinimapSubpanel {
             if (localId) bzUnitList.selectUnit(localId);
         }
     }
-    onUnitSelection(event) {
-        const id = event?.unit;
-        if (ComponentID.isInvalid(id)) return;
-        if (!event.selected) return;
-        this.scrollToUnit(id);
+    onModelUpdate() {
+        console.warn(`TRIX MODEL-UPDATE`);
+        const selected = UI.Player.getHeadSelectedUnit();
+        if (selected) this.scrollToUnit(selected, 50);
     }
 }
 Controls.define("bz-units-panel", {

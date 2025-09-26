@@ -34,11 +34,31 @@
 .bz-units-frame .fxs-scrollbar__track--vertical {
  right: -0.6666666667rem;
 }
-.bz-units-entry.bz-cannot-move .bz-unit-title,
-.bz-units-entry.bz-cannot-move .bz-unit-health,
-.bz-units-entry.bz-cannot-move .bz-unit-movement,
-.bz-units-entry.bz-cannot-move .bz-unit-status {
-  filter: brightness(0.6);
+.bz-units-entry {
+  text-shadow: 0 0.0555555556rem 0.1111111111rem black;
+}
+.bz-units-entry-selected {
+  background: linear-gradient(90deg, #4c473d 0%, #333640 100%);
+}
+.bz-units-entry:focus, .bz-units-entry:hover, .bz-units-entry.pressed {
+  background: linear-gradient(90deg, #8c7e62 0%, #4c473d 100%);
+}
+.bz-units-entry .bz-icon {
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  filter: drop-shadow(0 0.0555555556rem 0.1111111111rem #000c);
+}
+.bz-units-entry.bz-cannot-move {
+  color: #85878c;
+}
+.bz-units-entry.bz-cannot-move .bz-icon {
+  filter: brightness(0.65) drop-shadow(0 0.0555555556rem 0.1111111111rem #000c);
+}
+.bz-units-entry:focus.bz-cannot-move,
+.bz-units-entry:hover.bz-cannot-move,
+.bz-units-entry.pressed.bz-cannot-move {
+  color: #9da0a6;
 }
 .bz-units-entry .bz-unit-title {
   width: 11rem;
@@ -46,13 +66,6 @@
 }
 .bz-units-entry.bz-unit-grouped .bz-unit-title {
   padding-left: 1.3333333333rem;
-}
-.bz-units-entry-selected, .bz-units-entry:focus, .bz-units-entry:hover, .bz-units-entry.pressed {
-  background: linear-gradient(90deg, #4c473d 0%, #333640 100%);
-}
-.bz-units-entry.bz-can-promote .bz-unit-icon,
-.bz-units-entry.bz-can-upgrade .bz-unit-icon {
-  display: none;
 }
 .bz-units-entry .bz-unit-promotion {
   display: none;
@@ -68,20 +81,15 @@
   background-image: url("blp:Action_Upgrade");
   display: flex;
 }
-.bz-units-entry .bz-unit-status {
-  position: relative;
+.bz-units-entry.bz-can-promote .bz-unit-icon,
+.bz-units-entry.bz-can-upgrade .bz-unit-icon {
+  display: none;
 }
-.bz-units-entry .bz-unit-activity,
-.bz-units-entry .bz-unit-district {
-  position: absolute;
-}
-.bz-units-entry.bz-unit-garrison .bz-unit-status {
-  background-color: #4c473d;
-}
-.bz-units-entry.bz-unit-active .bz-unit-activity {
-  display: flex;
-}
-.bz-units-entry .bz-unit-district {
-  top: 0.1111111111rem;
-  left: 0.1111111111rem;
+.bz-units-entry .bz-unit-garrison {
+  height: 1.2222222222rem;
+  width: 1.2222222222rem;
+  top: 0.0555555556rem;
+  left: 0.0555555556rem;
+  background-color: #e5d2ac66;
+  border-radius: 1rem;
 }

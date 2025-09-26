@@ -21,6 +21,7 @@ export default [
                 ComponentValueChangeEventName: "readonly",
                 Constructibles: "readonly",
                 Controls: "readonly",
+                CustomEvent: "readonly",
                 Database: "readonly",
                 DiplomacyActions: "readonly",
                 DirectionTypes: "readonly",

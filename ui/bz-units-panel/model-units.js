@@ -106,7 +106,9 @@ class bzUnitListModel {
             // sort by moves left
             if (a.movesLeft && !b.movesLeft) return -1;
             if (b.movesLeft && !a.movesLeft) return +1;
-            // TODO: sort by moves left
+            // sort by activity
+            if (a.isBusy && !b.isBusy) return +1;
+            if (b.isBusy && !a.isBusy) return -1;
             // compare combat units by strength
             if (a.combat != b.combat) return b.combat - a.combat;
             // fallback: localized names, then original order
@@ -114,6 +116,7 @@ class bzUnitListModel {
         };
         this._unitList.sort(unitSort);
         if (this.onUpdate) this.onUpdate(this);
+        window.dispatchEvent(new CustomEvent("bz-model-units-update"));
     }
     updateUnit(id) {
         const unit = Units.get(id);
@@ -128,6 +131,7 @@ class bzUnitListModel {
         const operation = operationType && GameInfo.UnitOperations.lookup(operationType);
         const activityType = unit.activityType;
         const activityIcon = operation?.Icon ?? ACTIVITY_ICONS.get(activityType);
+        const isBusy = !!activityIcon;
         // unit type info
         const info = GameInfo.Units.lookup(unit.type);
         const type = info.UnitType;
@@ -180,7 +184,7 @@ class bzUnitListModel {
         // collate entry
         const entry = {
             unit, id, localId, armyId, isCommander, isGrouped,
-            activityType, activityIcon, operationType, operation,
+            operationType, operation, activityType, activityIcon, isBusy,
             info, type, icon, name, domain,
             stats, combat,
             health, healthLeft, maxHealth, slashHealth, hasDamage,
