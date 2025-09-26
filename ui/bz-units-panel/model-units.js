@@ -108,6 +108,9 @@ class bzUnitListModel {
         }
         this._typeList.sort(typeSort);
         const unitSort = (a, b) => {
+            // sort victory units first
+            if (a.isVictoryUnit && !b.isVictoryUnit) return -1;
+            if (b.isVictoryUnit && !a.isVictoryUnit) return +1;
             // group armies together in player.Units order
             if (a.armyId == b.armyId && a.armyId != -1) {
                 // commander first
@@ -126,6 +129,10 @@ class bzUnitListModel {
             const aDomain = DOMAIN_VALUE.get(a.domain);
             const bDomain = DOMAIN_VALUE.get(b.domain);
             if (aDomain != bDomain) return aDomain - bDomain;
+            // sort by age
+            if (a.age.ChronologyIndex != b.age.ChronologyIndex) {
+                return a.age.ChronologyIndex - b.age.ChronologyIndex;
+            }
             // sort armies by commander experience
             if (a.isCommander && b.isCommander) {
                 if (a.totalXP != b.totalXP) return b.totalXP - a.totalXP;

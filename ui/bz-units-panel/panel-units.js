@@ -276,7 +276,7 @@ class bzUnitsPanel extends MinimapSubpanel {
         const localId = JSON.stringify(id.id);
         return this.unitsContainer.querySelector(`[data-unit-local-id="${localId}"]`);
     }
-    scrollToTop(id) {
+    scrollUnitToTop(id) {
         const target = this.getUnitEntry(id);
         if (!target) return;
         console.warn(`TRIX TARGET ${target.querySelector(".bz-unit-name").getAttribute("data-l10n-id")}`);
@@ -310,7 +310,7 @@ class bzUnitsPanel extends MinimapSubpanel {
             if (!data) return;
             const localId = JSON.parse(data);
             const unit = bzUnitList.units.get(localId);
-            this.scrollToTop(unit.id);
+            this.scrollUnitToTop(unit.id);
         }
     }
     activateUnit(event) {
