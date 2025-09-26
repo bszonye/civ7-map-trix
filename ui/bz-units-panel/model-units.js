@@ -33,6 +33,8 @@ class bzUnitListModel {
     onUpdate;
     updateGate = new UpdateGate(() => { this.update(); });
     _selectedUnit = null;
+    _types = new Map();
+    _typeList = [];
     _units = new Map();
     _unitGroups = new Map();
     _unitList = [];
@@ -58,6 +60,12 @@ class bzUnitListModel {
     get selectedUnit() {
         return this._selectedUnit;
     }
+    get types() {
+        return this._types;
+    }
+    get typeList() {
+        return this._typeList;
+    }
     get units() {
         return this._units;
     }
@@ -81,6 +89,24 @@ class bzUnitListModel {
             const bName = Locale.compose(b).toUpperCase();
             return Locale.compare(aName, bName);
         };
+        const typeSort = (a, b) => {
+            // sort by combat classes first
+            if (a.combat != b.combat) return b.combat - a.combat;
+            // sort by domain
+            const aDomain = DOMAIN_VALUE.get(a.domain);
+            const bDomain = DOMAIN_VALUE.get(b.domain);
+            if (aDomain != bDomain) return aDomain - bDomain;
+            // sort unique units first
+            if (a.trait && !b.trait) return -1;
+            if (b.trait && !a.trait) return +1;
+            // sort by age
+            if (a.age.ChronologyIndex != b.age.ChronologyIndex) {
+                return a.age.ChronologyIndex - b.age.ChronologyIndex;
+            }
+            // sort by name
+            return nameSort(a.name, b.name);
+        }
+        this._typeList.sort(typeSort);
         const unitSort = (a, b) => {
             // group armies together in player.Units order
             if (a.armyId == b.armyId && a.armyId != -1) {
@@ -119,6 +145,18 @@ class bzUnitListModel {
             return nameSort(a.name, b.name) || a.index - b.index;
         };
         this._unitList.sort(unitSort);
+        this._types = new Map();
+        this._typeList = [];
+        for (const unit of this._unitList) {
+            if (unit.info.CoreClass == "CORE_CLASS_MILITARY") continue;
+            if (unit.isTradeUnit || unit.isVictoryUnit) continue;
+            const tlist = this._types.get(unit.icon) ?? [];
+            if (tlist.length == 0) {
+                this._types.set(unit.icon, tlist);
+                this._typeList.push(unit);
+            }
+            tlist.push(unit.localId);
+        }
         if (this.onUpdate) this.onUpdate(this);
         window.dispatchEvent(new CustomEvent("bz-model-units-update"));
     }
@@ -130,25 +168,23 @@ class bzUnitListModel {
         const armyId = unit.armyId.id;
         const isCommander = unit.isCommanderUnit;
         const isGrouped = armyId != -1 && !isCommander;
-        const operationType = unit.operationQueueSize ?
-            unit.getOperationType(0) : void 0;
-        const operation = operationType && GameInfo.UnitOperations.lookup(operationType);
-        const activityType = unit.activityType;
-        const activityIcon = operation?.Icon ?? ACTIVITY_ICONS.get(activityType);
-        const isBusy = !!activityIcon;
+        const age = GameInfo.Ages.lookup(unit.age);
         // unit type info
         const info = GameInfo.Units.lookup(unit.type);
         const type = info.UnitType;
         const icon = Icon.getUnitIconFromDefinition(info);
         const name = unit.name;
         const domain = info.Domain;
+        const trait = info.TraitType;
+        const isTradeUnit = TRADER_TYPES.has(unit.type);
+        const isVictoryUnit = info.VictoryUnit;
         // unit stats
         const stats = GameInfo.Unit_Stats.lookup(type);
         const combat =
             info.FormationClass == "FORMATION_CLASS_COMMAND" ? 9999 :
-            TRADER_TYPES.has(unit.type) ? -9999 :
+            isTradeUnit ? -9999 :
             info.CoreClass == "CORE_CLASS_CIVILIAN" ? -1 :
-            stats ? Math.max(stats.Combat, stats.RangedCombat) : -1;
+            stats ? Math.max(stats.Combat, stats.RangedCombat) : 0;
         // health
         const health = unit.Health;
         const damage = health?.damage ?? 0;
@@ -162,6 +198,13 @@ class bzUnitListModel {
         const maxMoves = moves?.maxMoves ?? 0;
         const slashMoves = `${movesLeft}/${maxMoves}`;
         const canMove = moves?.canMove;
+        // activity
+        const operationType = unit.operationQueueSize ?
+            unit.getOperationType(0) : void 0;
+        const operation = operationType && GameInfo.UnitOperations.lookup(operationType);
+        const activityType = unit.activityType;
+        const activityIcon = operation?.Icon ?? ACTIVITY_ICONS.get(activityType);
+        const isBusy = !!activityIcon;
         // location
         const location = unit.location;
         const districtID = MapCities.getDistrict(location.x, location.y);
@@ -188,9 +231,9 @@ class bzUnitListModel {
         const index = this._units.get(localId)?.index ?? this._units.size;
         // collate entry
         const entry = {
-            unit, id, localId, armyId, isCommander, isGrouped,
+            unit, id, localId, armyId, isCommander, isGrouped, age,
             operationType, operation, activityType, activityIcon, isBusy,
-            info, type, icon, name, domain,
+            info, type, icon, name, trait, domain, isTradeUnit, isVictoryUnit,
             stats, combat,
             health, healthLeft, maxHealth, slashHealth, hasDamage,
             moves, movesLeft, maxMoves, slashMoves, canMove,
@@ -229,14 +272,17 @@ class bzUnitListModel {
         this._selectedUnit = this._units.get(selected.id);
         if (this._selectedUnit) {
             const unit = this._selectedUnit.unit;
+            const info = this._selectedUnit.info;
             Object.entries(unit).forEach(([key, value]) =>
+                console.warn(`TRIX SELECT ${key} = ${JSON.stringify(value)}`));
+            Object.entries(info).forEach(([key, value]) =>
                 console.warn(`TRIX SELECT ${key} = ${JSON.stringify(value)}`));
             // Object.entries(unit.Combat).forEach(([key, value]) =>
             //     console.warn(`TRIX SELECT Combat.${key} = ${JSON.stringify(value)}`));
             // console.warn(`TRIX SELECT Experience = ${JSON.stringify(unit.Experience)}`);
-            console.warn(`TRIX SELECT district = ${JSON.stringify(this._selectedUnit.district)}`);
-            console.warn(`TRIX SELECT Movement = ${JSON.stringify(unit.Movement)}`);
-            console.warn(`TRIX SELECT Operation = ${this._selectedUnit.operationType} ${JSON.stringify(this._selectedUnit.operation)}`);
+            // console.warn(`TRIX SELECT district = ${JSON.stringify(this._selectedUnit.district)}`);
+            // console.warn(`TRIX SELECT Movement = ${JSON.stringify(unit.Movement)}`);
+            // console.warn(`TRIX SELECT Operation = ${this._selectedUnit.operationType} ${JSON.stringify(this._selectedUnit.operation)}`);
         } else {
             console.warn(`TRIX DESELECT`);
         }

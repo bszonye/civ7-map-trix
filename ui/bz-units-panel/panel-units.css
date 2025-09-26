@@ -4,7 +4,7 @@
   left: 0;
   right: 0.0555555556rem;
   bottom: 0;
-  background-image: url("fs://game/hud_sub_circle_bk.png");
+  background-image: url("blp:hud_sub_circle_bk");
 }
 
 .mini-map__units-panel {
@@ -23,10 +23,33 @@
   transition-duration: 0.25s;
 }
 
+.bz-unit-types .bz-icon,
+.bz-units-entry .bz-icon {
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  filter: drop-shadow(0 0.0555555556rem 0.1111111111rem #000c);
+}
+.bz-unit-types .bz-type-button-bg {
+  background-image: url("blp:hud_sub_circle_bk");
+  transition: transform 0.25s cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+.bz-unit-types .bz-type-button-bg:hover {
+  transform: scale(1.2);
+}
+.bz-unit-types .bz-type-button:hover {
+  background-image: url("blp:hud_sub_circle_hov");
+  filter: drop-shadow(0 0 0.3333333333rem #e5d2ac);
+  animation: fadeIn 0.25s;
+}
+.bz-unit-types .bz-type-icon {
+  pointer-events: none;
+  background-size: 80%;
+}
 .bz-units-frame {
   position: absolute;
   width: 19.7777777777rem;
-  top: 2.3333333333rem;
+  top: 4.4444444444rem;
   left: 0;
   bottom: 1.1111111111rem;
   background: #12151f66;
@@ -43,12 +66,6 @@
 .bz-units-entry:focus, .bz-units-entry:hover, .bz-units-entry.pressed {
   background: linear-gradient(90deg, #8c7e62 0%, #4c473d 100%);
   color: #e5e5e5;
-}
-.bz-units-entry .bz-icon {
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: contain;
-  filter: drop-shadow(0 0.0555555556rem 0.1111111111rem #000c);
 }
 .bz-units-entry.bz-cannot-move {
   color: #85878c;

@@ -3,10 +3,14 @@ import { b as InputEngineEventName } from '../../../core/ui/input/input-support.
 import { A as AnchorType } from '/core/ui/panel-support.chunk.js';
 import { D as Databind } from '/core/ui/utilities/utilities-core-databinding.chunk.js';
 import { C as ComponentID } from '/core/ui/utilities/utilities-component-id.chunk.js';
+import { ScrollIntoViewEvent } from '/core/ui/components/index.js';
 import { MinimapSubpanel } from '/base-standard/ui/mini-map/panel-mini-map.js';
 import { bzUnitList } from '/bz-map-trix/ui/bz-units-panel/model-units.js';
 
 const styles = "fs://game/bz-map-trix/ui/bz-units-panel/panel-units.css";
+
+Controls.preloadImage("blp:hud_sub_circle_bk", "units-panel");
+Controls.preloadImage("blp:hud_sub_circle_hov", "units-panel");
 
 class bzPanelMiniMap {
     static c_prototype;
@@ -105,9 +109,11 @@ Controls.decorate("panel-mini-map", (val) => new bzPanelMiniMap(val));
 class bzUnitsPanel extends MinimapSubpanel {
     panel = document.createElement("fxs-vslot");
     inputContext = InputContext.Dual;
+    activateTypeListener = this.activateType.bind(this);
     activateUnitListener = this.activateUnit.bind(this);
     modelUpdateListener = this.onModelUpdate.bind(this);
-    scrollable = document.createElement("fxs-scrollable");
+    typesContainer = document.createElement("div");
+    unitsContainer = document.createElement("fxs-scrollable");
     constructor(root) {
         super(root);
         this.animateInType = this.animateOutType = AnchorType.Fade;
@@ -125,32 +131,47 @@ class bzUnitsPanel extends MinimapSubpanel {
         closeNavHelp.classList.add("absolute", "-right-4", "-top-3", "z-1");
         Databind.classToggle(closeNavHelp, "hidden", "!{{g_NavTray.isTrayRequired}}");
         this.panel.appendChild(closeNavHelp);
-        const unitsPanelContent = document.createElement("div");
-        unitsPanelContent.classList.add("mb-5");
-        this.panel.appendChild(unitsPanelContent);
         // header
         const header = document.createElement("fxs-header");
-        header.classList.add("mb-3", "font-title-base", "text-secondary");
+        header.classList.add("mb-2", "font-title-base", "text-secondary");
         header.setAttribute("title", "LOC_UI_PRODUCTION_UNITS");
         header.setAttribute("filigree-style", "h4");
-        unitsPanelContent.appendChild(header);
-        // TODO: filter buttons (land, sea, air, support, civilian)
+        this.panel.appendChild(header);
+        // type buttons
+        this.typesContainer.classList.value =
+            "bz-unit-types flex justify-center items-center w-full";
+        this.panel.appendChild(this.typesContainer);
+        const button = document.createElement("div");
+        button.classList.value = "bz-type-button-bg bz-icon size-8 relative";
+        this.typesContainer.appendChild(button);
+        Databind.for(button, "g_bzUnitListModel.typeList", "button");
+        {
+            const face = document.createElement("fxs-activatable");
+            face.classList.value = "bz-type-button bz-icon size-8 absolute";
+            face.addEventListener("action-activate", this.activateTypeListener);
+            Databind.attribute(face, "data-unit-local-id", "button.localId");
+            button.appendChild(face);
+            const icon = document.createElement("div");
+            icon.classList.value = "bz-type-icon bz-icon size-8 absolute";
+            Databind.bgImg(icon, "button.icon");
+            button.appendChild(icon);
+        }
         // units list
         const frame = document.createElement("div");
         frame.classList.value = "bz-units-frame p-1";
         this.panel.appendChild(frame);
-        this.scrollable.classList.value = "bz-units-scrollable";
-        frame.appendChild(this.scrollable);
-        const list = document.createElement("fxs-vslot");
-        this.scrollable.appendChild(list);
-        list.classList.value = "font-body-xs";
-        Databind.for(list, "g_bzUnitListModel.unitList", "entry");
+        this.unitsContainer.classList.value = "bz-units-scrollable";
+        frame.appendChild(this.unitsContainer);
+        const row = document.createElement("div");
+        this.unitsContainer.appendChild(row);
+        Databind.for(row, "g_bzUnitListModel.unitList", "entry");
         {
             const entry = document.createElement("fxs-activatable");
-            entry.classList.value = "bz-units-entry flex items-center";
             entry.addEventListener("action-activate", this.activateUnitListener);
+            entry.classList.value = "bz-units-entry flex items-center text-xs";
             entry.setAttribute("tabindex", "-1");
             Databind.attribute(entry, "data-unit-local-id", "entry.localId");
+            row.appendChild(entry);
             // selected
             Databind.classToggle(entry, "bz-units-entry-selected",
                 "{{entry.localId}}=={{g_bzUnitListModel.selectedUnit.localId}}");
@@ -228,8 +249,6 @@ class bzUnitsPanel extends MinimapSubpanel {
             Databind.bgImg(district, "entry.districtIcon");
             state.appendChild(district);
             entry.appendChild(state);
-            // finish
-            list.appendChild(entry);
         }
         // finish
         this.Root.appendChild(this.panel);
@@ -252,18 +271,47 @@ class bzUnitsPanel extends MinimapSubpanel {
     close() {
         super.close();
     }
-    scrollToUnit(id, interval=0, repeat=5) {
-        if (interval) {
-            const handle = setInterval(() => this.scrollToUnit(id), interval);
-            setTimeout(() => clearInterval(handle), interval * (repeat + 1));
-            return;
-        }
-        if (ComponentID.isInvalid(id)) return;
+    getUnitEntry(id) {
+        if (ComponentID.isInvalid(id)) return void 0;
         const localId = JSON.stringify(id.id);
-        const entry = this.Root.querySelector(`[data-unit-local-id="${localId}"]`);
-        console.warn(`TRIX SCROLL ${localId} ${entry?.tagName}`);
+        return this.unitsContainer.querySelector(`[data-unit-local-id="${localId}"]`);
+    }
+    scrollToTop(id) {
+        const target = this.getUnitEntry(id);
+        if (!target) return;
+        console.warn(`TRIX TARGET ${target.querySelector(".bz-unit-name").getAttribute("data-l10n-id")}`);
+        const c = this.unitsContainer.component;
+        const areaRect = this.unitsContainer.getBoundingClientRect();
+        const targetRect = target.getBoundingClientRect();
+        if (c.scrollableContentSize === 0) {
+            c.resizeScrollThumb();
+        }
+        const distToMove = targetRect.top - areaRect.top;
+        const anchorAsPercent = distToMove / c.scrollableContentSize;
+        c.scrollToPercentage(c.scrollPosition + anchorAsPercent);
+        target.dispatchEvent(new ScrollIntoViewEvent());
+    }
+    scrollToUnit(id, interval=0, repeat=5) {
+        const entry = this.getUnitEntry(id);
         if (!entry) return;
-        this.scrollable.component.scrollIntoView(entry);
+        this.unitsContainer.component.scrollIntoView(entry);
+        if (interval) {
+            const handle = setInterval(() =>
+                this.unitsContainer.component.scrollIntoView(entry),
+                interval
+            );
+            setTimeout(() => clearInterval(handle), interval * (repeat + 1));
+        }
+    }
+    activateType(event) {
+        if (event.target instanceof HTMLElement) {
+            const data = event.target.getAttribute("data-unit-local-id");
+            console.warn(`TRIX ACTIVATE ${data}`);
+            if (!data) return;
+            const localId = JSON.parse(data);
+            const unit = bzUnitList.units.get(localId);
+            this.scrollToTop(unit.id);
+        }
     }
     activateUnit(event) {
         if (event.target instanceof HTMLElement) {
