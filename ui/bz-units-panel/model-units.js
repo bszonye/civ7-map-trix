@@ -236,9 +236,9 @@ class bzUnitListModel {
         // promotion
         const xp = unit.Experience;
         const totalXP = xp ? xp.spentExperience + xp.experiencePoints : void 0;
-        const canPromote = Boolean(
-            xp?.getStoredCommendations || xp?.getStoredPromotionPoints
-        );
+        const canPromote = isCommander &&
+            Boolean(xp?.getStoredCommendations || xp?.getStoredPromotionPoints);
+        if (canPromote) console.warn(`TRIX ${unit.name} ${JSON.stringify(xp)}`);
         const canStartUpgrade = Game.UnitCommands?.canStart(
             unit.id, "UNITCOMMAND_UPGRADE", { X: -9999, Y: -9999 }, false
         );
