@@ -162,9 +162,16 @@ class bzUnitsPanel extends MinimapSubpanel {
             entry.appendChild(title);
             // promotion
             const promotion = document.createElement("div");
-            promotion.classList.value = "bz-unit-promotion bz-icon size-6";
+            promotion.classList.value = "bz-unit-promotion relative size-6";
             Databind.classToggle(entry, "bz-can-promote", "{{entry.canPromote}}");
             Databind.classToggle(entry, "bz-can-upgrade", "{{entry.canUpgrade}}");
+            const promotionBG = document.createElement("div");
+            promotionBG.classList.value = "bz-unit-promotion-bg bz-icon absolute";
+            promotion.appendChild(promotionBG);
+            const promotionIcon = document.createElement("div");
+            promotionIcon.classList.value =
+                "bz-unit-promotion-icon bz-icon absolute size-6";
+            promotion.appendChild(promotionIcon);
             title.appendChild(promotion);
             // icon
             const icon = document.createElement("div");
@@ -207,7 +214,7 @@ class bzUnitsPanel extends MinimapSubpanel {
             const state = document.createElement("div");
             state.classList.value = "bz-unit-status relative size-6";
             const garrison = document.createElement("div");
-            garrison.classList.value = "bz-unit-garrison bz-icon absolute";
+            garrison.classList.value = "bz-unit-garrison-bg bz-icon absolute";
             Databind.classToggle(garrison, "hidden", "!{{entry.isGarrison}}");
             state.appendChild(garrison);
             const activity = document.createElement("div");
