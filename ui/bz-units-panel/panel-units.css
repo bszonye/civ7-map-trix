@@ -77,13 +77,6 @@
 .bz-units-entry.pressed.bz-cannot-move {
   color: #c2c4cc;
 }
-.bz-units-entry .bz-unit-title {
-  width: 14.1111111111rem;
-  coh-font-fit-mode: shrink;
-}
-.bz-units-entry.bz-unit-damaged .bz-unit-title {
-  width: 11rem;
-}
 .bz-units-entry.bz-unit-packed .bz-unit-title {
   padding-left: 1.3333333333rem;
 }

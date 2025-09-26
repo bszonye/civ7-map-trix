@@ -169,7 +169,8 @@ class bzUnitsPanel extends MinimapSubpanel {
         {
             const entry = document.createElement("fxs-activatable");
             entry.addEventListener("action-activate", this.activateUnitListener);
-            entry.classList.value = "bz-units-entry flex items-center text-xs";
+            entry.classList.value =
+                "bz-units-entry flex justify-between items-center text-xs";
             entry.setAttribute("tabindex", "-1");
             Databind.attribute(entry, "data-unit-local-id", "entry.localId");
             row.appendChild(entry);
@@ -178,9 +179,10 @@ class bzUnitsPanel extends MinimapSubpanel {
                 "{{entry.localId}}=={{g_bzUnitListModel.selectedUnit.localId}}");
             // indentation
             Databind.classToggle(entry, "bz-unit-packed", "{{entry.isPacked}}");
-            // title
+            // title section (left side)
             const title = document.createElement("div");
-            title.classList.value = "bz-unit-title flex justify-start items-center";
+            title.classList.value =
+                "bz-unit-title flex shrink justify-start items-center";
             entry.appendChild(title);
             // promotion
             const promotion = document.createElement("div");
@@ -202,13 +204,17 @@ class bzUnitsPanel extends MinimapSubpanel {
             title.appendChild(icon);
             // name
             const name = document.createElement("div");
-            name.classList.value = "bz-unit-name ml-1";
+            name.classList.value = "bz-unit-name shrink font-fit-shrink ml-1";
             Databind.loc(name, "{{entry.name}}");
             title.appendChild(name);
+            // status section (right side)
+            const status = document.createElement("div");
+            status.classList.value =
+                "bz-unit-status flex flex-none justify-end items-center mx-1";
+            entry.appendChild(status);
             // health
             const health = document.createElement("div");
-            health.classList.value =
-                "bz-unit-health flex justify-end items-center w-12 mx-1";
+            health.classList.value = "bz-unit-health flex items-center mr-3";
             Databind.classToggle(entry, "bz-unit-damaged", "{{entry.hasDamage}}");
             Databind.classToggle(health, "hidden", "!{{entry.hasDamage}}");
             const healthIcon = document.createElement("img");
@@ -218,39 +224,37 @@ class bzUnitsPanel extends MinimapSubpanel {
             const healthText = document.createElement("div");
             Databind.loc(healthText, "{{entry.healthLeft}}");
             health.appendChild(healthText);
-            entry.appendChild(health);
+            status.appendChild(health);
             // movement
             const movement = document.createElement("div");
-            movement.classList.value =
-                "bz-unit-movement flex justify-center items-center w-14 mx-1";
+            movement.classList.value = "bz-unit-movement flex items-center mr-2";
             const moveIcon = document.createElement("img");
             moveIcon.classList.value = "bz-icon size-5 -ml-1 mr-1";
-            Databind.classToggle(moveIcon, "hidden", "5<{{entry.slashMoves.size}}");
             moveIcon.setAttribute("src", "blp:Action_Move");
             movement.appendChild(moveIcon);
             const moveText = document.createElement("div");
             Databind.loc(moveText, "{{entry.slashMoves}}");
             movement.appendChild(moveText);
             Databind.classToggle(entry, "bz-cannot-move", "!{{entry.canMove}}");
-            entry.appendChild(movement);
-            // status (activity + garrison)
-            const state = document.createElement("div");
-            state.classList.value = "bz-unit-status relative size-6";
+            status.appendChild(movement);
+            // activity (operations/garrison)
+            const activity = document.createElement("div");
+            activity.classList.value = "bz-unit-status relative size-6";
             const garrison = document.createElement("div");
             garrison.classList.value = "bz-unit-garrison-bg bz-icon absolute";
             Databind.classToggle(garrison, "hidden", "!{{entry.isGarrison}}");
-            state.appendChild(garrison);
-            const activity = document.createElement("div");
-            activity.classList.value = "bz-unit-activity bz-icon absolute size-6";
-            Databind.bgImg(activity, "entry.activityIcon");
-            state.appendChild(activity);
+            activity.appendChild(garrison);
+            const operation = document.createElement("div");
+            operation.classList.value = "bz-unit-operation bz-icon absolute size-6";
+            Databind.bgImg(operation, "entry.operationIcon");
+            activity.appendChild(operation);
             const district = document.createElement("div");
             district.classList.value = "bz-unit-district bz-icon absolute size-6";
             district.style.backgroundSize = "85%";
             Databind.classToggle(district, "hidden", "{{entry.isBusy}}");
             Databind.bgImg(district, "entry.districtIcon");
-            state.appendChild(district);
-            entry.appendChild(state);
+            activity.appendChild(district);
+            status.appendChild(activity);
         }
         // finish
         this.Root.appendChild(this.panel);

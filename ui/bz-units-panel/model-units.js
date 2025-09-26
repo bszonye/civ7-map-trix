@@ -228,13 +228,13 @@ class bzUnitListModel {
         const maxMoves = moves?.maxMoves ?? 0;
         const slashMoves = `${movesLeft}/${maxMoves}`;
         const canMove = moves?.canMove;
-        // activity
+        // operations
+        const activityType = unit.activityType;
         const operationType = unit.operationQueueSize ?
             unit.getOperationType(0) : void 0;
         const operation = operationType && GameInfo.UnitOperations.lookup(operationType);
-        const activityType = unit.activityType;
-        const activityIcon = operation?.Icon ?? ACTIVITY_ICONS.get(activityType);
-        const isBusy = !!activityIcon;
+        const operationIcon = operation?.Icon ?? ACTIVITY_ICONS.get(activityType);
+        const isBusy = !!operationIcon;
         // location
         const location = unit.location;
         const districtID = MapCities.getDistrict(location.x, location.y);
@@ -262,7 +262,7 @@ class bzUnitListModel {
         // collate entry
         const entry = {
             unit, id, localId, armyId, isCommander, isGreatPerson, isPacked, age,
-            operationType, operation, activityType, activityIcon, isBusy,
+            activityType, operationType, operation, operationIcon, isBusy,
             info, type, typeName, icon, name, domain, trait,
             isUnique, isTradeUnit, isVictoryUnit,
             stats, combat,
