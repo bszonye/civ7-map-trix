@@ -289,7 +289,9 @@ class bzUnitsPanel extends MinimapSubpanel {
         }
         const distToMove = targetRect.top - areaRect.top;
         const anchorAsPercent = distToMove / c.scrollableContentSize;
-        c.scrollToPercentage(c.scrollPosition + anchorAsPercent);
+        const newPosition = c.scrollPosition + anchorAsPercent;
+        const maxPosition = 1 - (areaRect.height / c.scrollableContentSize);
+        c.scrollToPercentage(Math.min(newPosition, maxPosition));
         target.dispatchEvent(new ScrollIntoViewEvent());
     }
     scrollToUnit(id, interval=0, repeat=5) {
