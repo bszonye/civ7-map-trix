@@ -150,7 +150,7 @@ class bzUnitsPanel extends MinimapSubpanel {
             face.classList.value = "bz-type-button bz-icon size-8 absolute";
             face.addEventListener("action-activate", this.activateTypeListener);
             Databind.attribute(face, "data-unit-local-id", "button.localId");
-            Databind.attribute(face, "data-tooltip-content", "button.info.Name");
+            Databind.tooltip(face, "button.typeName");
             button.appendChild(face);
             const icon = document.createElement("div");
             icon.classList.value = "bz-type-icon bz-icon size-8 absolute";
@@ -177,7 +177,7 @@ class bzUnitsPanel extends MinimapSubpanel {
             Databind.classToggle(entry, "bz-units-entry-selected",
                 "{{entry.localId}}=={{g_bzUnitListModel.selectedUnit.localId}}");
             // indentation
-            Databind.classToggle(entry, "bz-unit-grouped", "{{entry.isGrouped}}");
+            Databind.classToggle(entry, "bz-unit-packed", "{{entry.isPacked}}");
             // title
             const title = document.createElement("div");
             title.classList.value = "bz-unit-title flex justify-start items-center";
@@ -203,7 +203,7 @@ class bzUnitsPanel extends MinimapSubpanel {
             // name
             const name = document.createElement("div");
             name.classList.value = "bz-unit-name ml-1";
-            name.setAttribute("data-bind-attr-data-l10n-id", "{{entry.name}}");
+            Databind.loc(name, "{{entry.name}}");
             title.appendChild(name);
             // health
             const health = document.createElement("div");
@@ -216,7 +216,7 @@ class bzUnitsPanel extends MinimapSubpanel {
             healthIcon.setAttribute("src", "blp:prod_generic");
             health.appendChild(healthIcon);
             const healthText = document.createElement("div");
-            healthText.setAttribute("data-bind-attr-data-l10n-id", "{{entry.healthLeft}}");
+            Databind.loc(healthText, "{{entry.healthLeft}}");
             health.appendChild(healthText);
             entry.appendChild(health);
             // movement
@@ -225,11 +225,11 @@ class bzUnitsPanel extends MinimapSubpanel {
                 "bz-unit-movement flex justify-center items-center w-14 mx-1";
             const moveIcon = document.createElement("img");
             moveIcon.classList.value = "bz-icon size-5 -ml-1 mr-1";
-            Databind.classToggle(moveIcon, "hidden", "9<{{entry.maxMoves}}");
+            Databind.classToggle(moveIcon, "hidden", "5<{{entry.slashMoves.size}}");
             moveIcon.setAttribute("src", "blp:Action_Move");
             movement.appendChild(moveIcon);
             const moveText = document.createElement("div");
-            moveText.setAttribute("data-bind-attr-data-l10n-id", "{{entry.slashMoves}}");
+            Databind.loc(moveText, "{{entry.slashMoves}}");
             movement.appendChild(moveText);
             Databind.classToggle(entry, "bz-cannot-move", "!{{entry.canMove}}");
             entry.appendChild(movement);

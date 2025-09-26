@@ -7,15 +7,15 @@ const tagTypes = (tag) => GameInfo.TypeTags
 const TRADER_TYPES = new Set(tagTypes("UNIT_CLASS_TRADE_ROUTE"));
 
 const ACTIVITY_ICONS = new Map([
-    [UnitActivityTypes.NONE, "blp:Action_Cancel"],
+    [UnitActivityTypes.NONE, ""],
     [UnitActivityTypes.AWAKE, ""],
     [UnitActivityTypes.HOLD, "blp:Action_Skip"],
     [UnitActivityTypes.SLEEP, "blp:Action_Sleep"],
     [UnitActivityTypes.HEAL, "blp:Action_Heal"],
     [UnitActivityTypes.SENTRY, "blp:Action_Wake"],
-    [UnitActivityTypes.INTERCEPT, "blp:Action_Cancel"],  // TODO
+    [UnitActivityTypes.INTERCEPT, "blp:Action_Alert"],  // TODO
     [UnitActivityTypes.OPERATION, ""],
-    [UnitActivityTypes.JUMP, "blp:Action_Cancel"],  // TODO
+    [UnitActivityTypes.JUMP, "blp:Action_Alert"],  // TODO
 ]);
 const DISTRICT_ICONS = new Map([
     [DistrictTypes.INVALID, ""],
@@ -186,14 +186,23 @@ class bzUnitListModel {
         const localId = unit.localId;
         const armyId = unit.armyId.id;
         const isCommander = unit.isCommanderUnit;
-        const isGrouped = armyId != -1 && !isCommander;
+        const isGreatPerson = unit.isGreatPerson;
+        const isPacked = armyId != -1 && !isCommander;
+        const level = isCommander ? unit.Experience.getLevel : void 0;
         const age = GameInfo.Ages.lookup(unit.age);
         // unit type info
         const info = GameInfo.Units.lookup(unit.type);
         const type = info.UnitType;
+        const typeName = (() => {
+            if (!isGreatPerson) return info.Name;
+            const gplist = GameInfo.GreatPersonIndividuals;
+            const gp = gplist?.find(gp => gp.UnitType == type);
+            const gpclass = gp && GameInfo.GreatPersonClasses
+                .lookup(gp.GreatPersonClassType);
+            return gpclass?.Name ?? info.Name;
+        })();
         const icon = Icon.getUnitIconFromDefinition(info);
-        const name = unit.isCommanderUnit && unit.Experience.getLevel ?
-            `${unit.name} ${unit.Experience.getLevel}` : unit.name;
+        const name = isCommander && level ? `${unit.name} ${level}` : unit.name;
         const domain = info.Domain;
         const trait = info.TraitType;
         const isUnique = Boolean(trait);
@@ -252,9 +261,10 @@ class bzUnitListModel {
         const index = this._units.get(localId)?.index ?? this._units.size;
         // collate entry
         const entry = {
-            unit, id, localId, armyId, isCommander, isGrouped, age,
+            unit, id, localId, armyId, isCommander, isGreatPerson, isPacked, age,
             operationType, operation, activityType, activityIcon, isBusy,
-            info, type, icon, name, domain, trait, isUnique, isTradeUnit, isVictoryUnit,
+            info, type, typeName, icon, name, domain, trait,
+            isUnique, isTradeUnit, isVictoryUnit,
             stats, combat,
             health, healthLeft, maxHealth, slashHealth, hasDamage,
             moves, movesLeft, maxMoves, slashMoves, canMove,
