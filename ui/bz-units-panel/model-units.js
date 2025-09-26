@@ -2,6 +2,10 @@ import { C as ComponentID } from '/core/ui/utilities/utilities-component-id.chun
 import { Icon } from '/core/ui/utilities/utilities-image.chunk.js';
 import { U as UpdateGate } from '/core/ui/utilities/utilities-update-gate.chunk.js';
 
+const tagTypes = (tag) => GameInfo.TypeTags
+    .filter(e => e.Tag == tag).map(e => Game.getHash(e.Type));
+const TRADER_TYPES = new Set(tagTypes("UNIT_CLASS_TRADE_ROUTE"));
+
 const ACTIVITY_ICONS = new Map([
     [UnitActivityTypes.NONE, "blp:Action_Cancel"],
     [UnitActivityTypes.AWAKE, ""],
@@ -142,6 +146,7 @@ class bzUnitListModel {
         const stats = GameInfo.Unit_Stats.lookup(type);
         const combat =
             info.FormationClass == "FORMATION_CLASS_COMMAND" ? 9999 :
+            TRADER_TYPES.has(unit.type) ? -9999 :
             info.CoreClass == "CORE_CLASS_CIVILIAN" ? -1 :
             stats ? Math.max(stats.Combat, stats.RangedCombat) : -1;
         // health
