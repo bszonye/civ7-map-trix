@@ -42,7 +42,8 @@ const DOMAIN_VALUE = new Map(
 );
 class bzUnitListModel {
     onUpdate;
-    updateGate = new UpdateGate(() => { this.update(); });
+    updateGate = new UpdateGate(() => this.update());
+    pauseSelection = false;
     _selectedUnit = null;
     _types = new Map();
     _typeList = [];
@@ -296,12 +297,16 @@ class bzUnitListModel {
         const unit = this._units.get(localId);
         if (!unit) return;
         const group = this._unitGroups.get(unit.armyId);
-        if (group) {
+        if (group && !unit.isCommander) {
             // select the group first
+            this.pauseSelection = true;
             UI.Player.lookAtID(group.id);
             UI.Player.selectUnit(group.id);
             // and give it time to settle
-            requestAnimationFrame(() => UI.Player.selectUnit(unit.id));
+            requestAnimationFrame(() => {
+                this.pauseSelection = false;
+                UI.Player.selectUnit(unit.id);
+            });
         } else {
             // select the unit
             UI.Player.lookAtID(unit.id);
@@ -309,6 +314,7 @@ class bzUnitListModel {
         }
     }
     onUnitSelection(event) {
+        if (this.pauseSelection) return;
         const id = event?.unit;
         if (!id || ComponentID.isInvalid(id)) return;
         this.updateUnit(id);

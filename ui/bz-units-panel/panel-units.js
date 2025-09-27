@@ -4,6 +4,7 @@ import { b as InputEngineEventName } from '../../../core/ui/input/input-support.
 import { A as AnchorType } from '/core/ui/panel-support.chunk.js';
 import { D as Databind } from '/core/ui/utilities/utilities-core-databinding.chunk.js';
 import { C as ComponentID } from '/core/ui/utilities/utilities-component-id.chunk.js';
+import { U as UpdateGate } from '/core/ui/utilities/utilities-update-gate.chunk.js';
 import { ScrollIntoViewEvent } from '/core/ui/components/index.js';
 import { MinimapSubpanel } from '/base-standard/ui/mini-map/panel-mini-map.js';
 import { bzUnitList } from '/bz-map-trix/ui/bz-units-panel/model-units.js';
@@ -108,7 +109,7 @@ class bzPanelMiniMap {
 Controls.decorate("panel-mini-map", (val) => new bzPanelMiniMap(val));
 
 class bzUnitsPanel extends MinimapSubpanel {
-    static scrollPosition = 0;
+    static savedScrollPosition = 0;
     panel = document.createElement("fxs-vslot");
     inputContext = InputContext.Dual;
     activateTypeListener = this.activateType.bind(this);
@@ -116,6 +117,10 @@ class bzUnitsPanel extends MinimapSubpanel {
     modelUpdateListener = this.onModelUpdate.bind(this);
     typesContainer = document.createElement("div");
     unitsContainer = document.createElement("fxs-scrollable");
+    scrollPosition = 0;
+    scrollUnit = null;
+    updateScroll = new UpdateGate(() =>
+        this.scrollToPosition(this.scrollPosition, this.scrollUnit));
     constructor(root) {
         super(root);
         this.animateInType = this.animateOutType = AnchorType.Fade;
@@ -265,17 +270,16 @@ class bzUnitsPanel extends MinimapSubpanel {
         super.onAttach();
         window.addEventListener("bz-model-units-update", this.modelUpdateListener);
         // scroll to the selected unit or the last position
-        const selected = UI.Player.getHeadSelectedUnit();
-        if (selected) {
-            this.scrollToUnit(selected, 100);
-        } else if (bzUnitsPanel.scrollPosition) {
-            this.scrollToPosition(bzUnitsPanel.scrollPosition, 100);
+        this.scrollPosition = bzUnitsPanel.savedScrollPosition;
+        this.scrollUnit = UI.Player.getHeadSelectedUnit();
+        if (this.scrollPosition || this.scrollUnit) {
+            this.updateScroll.call("onAttach");
         }
     }
     onDetach() {
         super.onDetach();
         window.removeEventListener("bz-model-units-update", this.modelUpdateListener);
-        bzUnitsPanel.scrollPosition = this.unitsContainer.component.scrollPosition;
+        bzUnitsPanel.savedScrollPosition = this.unitsContainer.component.scrollPosition;
     }
     onReceiveFocus() {
         super.onReceiveFocus();
@@ -285,59 +289,62 @@ class bzUnitsPanel extends MinimapSubpanel {
         super.close();
     }
     getUnitEntry(id) {
-        if (ComponentID.isInvalid(id)) return void 0;
+        if (!id || ComponentID.isInvalid(id)) return void 0;
         const localId = JSON.stringify(id.id);
         return this.unitsContainer.querySelector(`[data-unit-local-id="${localId}"]`);
     }
-    scrollToPosition(position, interval=0, limit=5*interval) {
-        const scroll = () => {
+    scrollToPosition(position, unitId) {
+        const interval = 100;
+        let audio = position == -1;
+        const scroll = (position, id) => {
+            // get unit location (if requested)
+            const unit = this.getUnitEntry(id);
+            if (id && !unit) return false;
+            // get scroll area metrics
             const c = this.unitsContainer.component;
+            const curPosition = c.scrollPosition;
+            const size = c.scrollableContentSize;
             const area = this.unitsContainer.getBoundingClientRect();
-            if (!area.height || !c.scrollableContentSize) return 0;
-            const maxPosition = 1 - (area.height / c.scrollableContentSize);
+            if (!area?.height || !size) return false;
+            const height = area.height / size;
+            // find new position
+            if (position == null) position = curPosition;
+            if (unit) {
+                const target = unit?.getBoundingClientRect();
+                const topPos = (target.top - area.top) / size + curPosition;
+                const botPos = (target.bottom - area.bottom) / size + curPosition;
+                if (position == -1) {
+                    position = topPos;
+                } else if (topPos < position) {
+                    position = topPos;
+                } else if (position < botPos) {
+                    position = botPos;
+                }
+            }
+            // avoid scrolling past end
+            const maxPosition = 1 - height;
             const newPosition = Math.min(position, maxPosition);
+            // play audio
+            if (audio) {
+                const sound = newPosition == curPosition ?
+                    "data-audio-city-details-exit" :
+                    "data-audio-city-details-enter";
+                Audio.playSound(sound, "city-actions");
+                audio = false;  // only once
+            }
+            if (newPosition == curPosition) return true;
             this.unitsContainer.component.scrollToPercentage(newPosition);
+            unit?.dispatchEvent(new ScrollIntoViewEvent());
         }
-        // first attempt: allow time for DOM construction
-        requestAnimationFrame(() => scroll());
-        if (interval) {
+        const done = scroll(position, unitId);
+        if (interval && !done) {
             // repeated attempts: every interval for several attempts
-            const handle = setInterval(() => scroll(), interval)
-            setTimeout(() => clearInterval(handle), limit);
-        }
-    }
-    scrollToUnit(id, interval=0, limit=5*interval) {
-        let entry = this.getUnitEntry(id);
-        if (entry) this.unitsContainer.component.scrollIntoView(entry);
-        if (interval) {
             const handle = setInterval(() => {
-                if (!entry) entry = this.getUnitEntry(id);
-                if (entry) this.unitsContainer.component.scrollIntoView(entry);
-            }, interval);
-            setTimeout(() => clearInterval(handle), limit);
+                const done = scroll(position, unitId)
+                if (done) clearInterval(handle);
+            }, interval)
+            setTimeout(() => clearInterval(handle), 5 * interval);
         }
-    }
-    scrollUnitToTop(id) {
-        const target = this.getUnitEntry(id);
-        if (!target) return;
-        const c = this.unitsContainer.component;
-        const areaRect = this.unitsContainer.getBoundingClientRect();
-        const targetRect = target.getBoundingClientRect();
-        if (c.scrollableContentSize === 0) {
-            c.resizeScrollThumb();
-        }
-        const distToMove = targetRect.top - areaRect.top;
-        const anchorAsPercent = distToMove / c.scrollableContentSize;
-        const position = c.scrollPosition + anchorAsPercent;
-        const maxPosition = 1 - (areaRect.height / c.scrollableContentSize);
-        const newPosition = Math.min(position, maxPosition);
-        if (newPosition == c.scrollPosition) {
-            Audio.playSound("data-audio-city-details-exit", "city-actions");
-            return;
-        }
-        Audio.playSound("data-audio-city-details-enter", "city-actions");
-        c.scrollToPercentage(newPosition);
-        target.dispatchEvent(new ScrollIntoViewEvent());
     }
     activateType(event) {
         if (event.target instanceof HTMLElement) {
@@ -345,7 +352,9 @@ class bzUnitsPanel extends MinimapSubpanel {
             if (!data) return;
             const localId = JSON.parse(data);
             const unit = bzUnitList.units.get(localId);
-            this.scrollUnitToTop(unit.id);
+            this.scrollPosition = -1;
+            this.scrollUnit = unit.id;
+            this.updateScroll.call("activateType");
         }
     }
     activateUnit(event) {
@@ -361,8 +370,9 @@ class bzUnitsPanel extends MinimapSubpanel {
         }
     }
     onModelUpdate() {
-        const selected = UI.Player.getHeadSelectedUnit();
-        if (selected) this.scrollToUnit(selected, 50);
+        this.scrollPosition = void 0;
+        this.scrollUnit = UI.Player.getHeadSelectedUnit();
+        this.updateScroll.call("onModelUpdate");
     }
 }
 Controls.define("bz-units-panel", {
