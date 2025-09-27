@@ -17,6 +17,17 @@ const ACTIVITY_ICONS = new Map([
     [UnitActivityTypes.OPERATION, ""],
     [UnitActivityTypes.JUMP, "blp:Action_Alert"],  // TODO
 ]);
+const ACTIVITY_NAMES = new Map([
+    [UnitActivityTypes.NONE, ""],
+    [UnitActivityTypes.AWAKE, ""],
+    [UnitActivityTypes.HOLD, "LOC_UNITOPERATION_SKIP_TURN_NAME"],
+    [UnitActivityTypes.SLEEP, "LOC_UNITOPERATION_SLEEP_NAME"],
+    [UnitActivityTypes.HEAL, "LOC_UNITOPERATION_HEAL_NAME"],
+    [UnitActivityTypes.SENTRY, "LOC_UNITOPERATION_ALERT_NAME"],
+    [UnitActivityTypes.INTERCEPT, ""],  // TODO
+    [UnitActivityTypes.OPERATION, ""],
+    [UnitActivityTypes.JUMP, ""],  // TODO
+]);
 const DISTRICT_ICONS = new Map([
     [DistrictTypes.INVALID, ""],
     [DistrictTypes.CITY_CENTER, "blp:city_urban"],
@@ -154,10 +165,11 @@ class bzUnitListModel {
             // sort by moves left
             if (a.movesLeft && !b.movesLeft) return -1;
             if (b.movesLeft && !a.movesLeft) return +1;
-            // sort by activity
-            if (a.isBusy && !b.isBusy) return +1;
-            if (b.isBusy && !a.isBusy) return -1;
-            // group by garrison
+            // sort by unit operation
+            if (a.operationName != b.operationName) {
+                return nameSort(a.operationName, b.operationName);
+            }
+            // sort garrisons last
             if (a.isGarrison && !b.isGarrison) return +1;
             if (b.isGarrison && !a.isGarrison) return -1;
             // fallback: original order
@@ -234,6 +246,7 @@ class bzUnitListModel {
             unit.getOperationType(0) : void 0;
         const operation = operationType && GameInfo.UnitOperations.lookup(operationType);
         const operationIcon = operation?.Icon ?? ACTIVITY_ICONS.get(activityType);
+        const operationName = operation?.Name ?? ACTIVITY_NAMES.get(activityType);
         const isBusy = !!operationIcon;
         // location
         const location = unit.location;
@@ -261,7 +274,7 @@ class bzUnitListModel {
         // collate entry
         const entry = {
             unit, id, localId, armyId, isCommander, isGreatPerson, isPacked, age,
-            activityType, operationType, operation, operationIcon, isBusy,
+            activityType, operationType, operation, operationIcon, operationName, isBusy,
             info, type, typeName, icon, name, domain, trait,
             isUnique, isTradeUnit, isVictoryUnit,
             stats, combat,
