@@ -6,6 +6,7 @@ const tagTypes = (tag) => GameInfo.TypeTags
     .filter(e => e.Tag == tag).map(e => Game.getHash(e.Type));
 const TRADER_TYPES = new Set(tagTypes("UNIT_CLASS_TRADE_ROUTE"));
 
+// TODO: determine which actions use INTERCEPT and JUMP
 const ACTIVITY_ICONS = new Map([
     [UnitActivityTypes.NONE, ""],
     [UnitActivityTypes.AWAKE, ""],
@@ -13,9 +14,9 @@ const ACTIVITY_ICONS = new Map([
     [UnitActivityTypes.SLEEP, "blp:Action_Sleep"],
     [UnitActivityTypes.HEAL, "blp:Action_Heal"],
     [UnitActivityTypes.SENTRY, "blp:Action_Wake"],
-    [UnitActivityTypes.INTERCEPT, "blp:Action_Alert"],  // TODO
+    [UnitActivityTypes.INTERCEPT, "blp:Action_Alert"],
     [UnitActivityTypes.OPERATION, ""],
-    [UnitActivityTypes.JUMP, "blp:Action_Alert"],  // TODO
+    [UnitActivityTypes.JUMP, "blp:Action_Alert"],
 ]);
 const ACTIVITY_NAMES = new Map([
     [UnitActivityTypes.NONE, ""],
@@ -24,9 +25,9 @@ const ACTIVITY_NAMES = new Map([
     [UnitActivityTypes.SLEEP, "LOC_UNITOPERATION_SLEEP_NAME"],
     [UnitActivityTypes.HEAL, "LOC_UNITOPERATION_HEAL_NAME"],
     [UnitActivityTypes.SENTRY, "LOC_UNITOPERATION_ALERT_NAME"],
-    [UnitActivityTypes.INTERCEPT, ""],  // TODO
+    [UnitActivityTypes.INTERCEPT, ""],
     [UnitActivityTypes.OPERATION, ""],
-    [UnitActivityTypes.JUMP, ""],  // TODO
+    [UnitActivityTypes.JUMP, ""],
 ]);
 const DISTRICT_ICONS = new Map([
     [DistrictTypes.INVALID, ""],
