@@ -296,7 +296,7 @@ class bzUnitListModel {
     }
     onUnitSelection(event) {
         const id = event?.unit;
-        if (ComponentID.isInvalid(id)) return;
+        if (!id || ComponentID.isInvalid(id)) return;
         this.updateUnit(id);
         const selected = event.selected ? id : ComponentID.getInvalidID();
         this._selectedUnit = this._units.get(selected.id);
@@ -304,7 +304,7 @@ class bzUnitListModel {
     }
     onUnitUpdate(event) {
         const id = event?.unit;
-        if (ComponentID.isInvalid(id)) return;
+        if (!id || ComponentID.isInvalid(id)) return;
         if (id.owner != GameContext.localObserverID) return;
         this.updateGate.call("onUnitUpdate");
     }
