@@ -333,15 +333,13 @@ class bzUnitsPanel extends MinimapSubpanel {
             if (newPosition == curPosition) return true;
             this.unitsContainer.component.scrollToPercentage(newPosition);
         }
-        const done = scroll(position, unitId);
-        if (!done) {
-            // repeated attempts: every interval for several attempts
-            const handle = setInterval(() => {
-                const done = scroll(position, unitId)
-                if (done) clearInterval(handle);
-            }, 50)
-            setTimeout(() => clearInterval(handle), 500);
-        }
+        if (scroll(position, unitId)) return;
+        // repeated attempts: every interval for several attempts
+        const handle = setInterval(() => {
+            const done = scroll(position, unitId)
+            if (done) clearInterval(handle);
+        }, 50)
+        setTimeout(() => clearInterval(handle), 500);
     }
     activateType(event) {
         if (event.target instanceof HTMLElement) {
