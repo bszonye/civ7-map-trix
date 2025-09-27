@@ -5,7 +5,6 @@ import { A as AnchorType } from '/core/ui/panel-support.chunk.js';
 import { D as Databind } from '/core/ui/utilities/utilities-core-databinding.chunk.js';
 import { C as ComponentID } from '/core/ui/utilities/utilities-component-id.chunk.js';
 import { U as UpdateGate } from '/core/ui/utilities/utilities-update-gate.chunk.js';
-import { ScrollIntoViewEvent } from '/core/ui/components/index.js';
 import { MinimapSubpanel } from '/base-standard/ui/mini-map/panel-mini-map.js';
 import { bzUnitList } from '/bz-map-trix/ui/bz-units-panel/model-units.js';
 
@@ -294,7 +293,6 @@ class bzUnitsPanel extends MinimapSubpanel {
         return this.unitsContainer.querySelector(`[data-unit-local-id="${localId}"]`);
     }
     scrollToPosition(position, unitId) {
-        const interval = 100;
         let audio = position == -1;
         const scroll = (position, id) => {
             // get unit location (if requested)
@@ -334,16 +332,15 @@ class bzUnitsPanel extends MinimapSubpanel {
             }
             if (newPosition == curPosition) return true;
             this.unitsContainer.component.scrollToPercentage(newPosition);
-            unit?.dispatchEvent(new ScrollIntoViewEvent());
         }
         const done = scroll(position, unitId);
-        if (interval && !done) {
+        if (!done) {
             // repeated attempts: every interval for several attempts
             const handle = setInterval(() => {
                 const done = scroll(position, unitId)
                 if (done) clearInterval(handle);
-            }, interval)
-            setTimeout(() => clearInterval(handle), 5 * interval);
+            }, 50)
+            setTimeout(() => clearInterval(handle), 500);
         }
     }
     activateType(event) {
