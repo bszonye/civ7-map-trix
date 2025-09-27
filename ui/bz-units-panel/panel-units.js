@@ -289,25 +289,24 @@ class bzUnitsPanel extends MinimapSubpanel {
         const localId = JSON.stringify(id.id);
         return this.unitsContainer.querySelector(`[data-unit-local-id="${localId}"]`);
     }
-    scrollToPosition(position, interval=0, repeat=5) {
-        const newpos = () => {
+    scrollToPosition(position, interval=0, limit=5*interval) {
+        const scroll = () => {
             const c = this.unitsContainer.component;
             const area = this.unitsContainer.getBoundingClientRect();
             if (!area.height || !c.scrollableContentSize) return 0;
             const maxPosition = 1 - (area.height / c.scrollableContentSize);
-            return Math.min(position, maxPosition);
+            const newPosition = Math.min(position, maxPosition);
+            this.unitsContainer.component.scrollToPercentage(newPosition);
         }
-        requestAnimationFrame(() =>  // allow time for DOM construction
-            this.unitsContainer.component.scrollToPercentage(newpos()));
+        // first attempt: allow time for DOM construction
+        requestAnimationFrame(() => scroll());
         if (interval) {
-            const handle = setInterval(() =>
-                this.unitsContainer.component.scrollToPercentage(newpos()),
-                interval,
-            )
-            setTimeout(() => clearInterval(handle), interval * (repeat + 1));
+            // repeated attempts: every interval for several attempts
+            const handle = setInterval(() => scroll(), interval)
+            setTimeout(() => clearInterval(handle), limit);
         }
     }
-    scrollToUnit(id, interval=0, repeat=5) {
+    scrollToUnit(id, interval=0, limit=5*interval) {
         let entry = this.getUnitEntry(id);
         if (entry) this.unitsContainer.component.scrollIntoView(entry);
         if (interval) {
@@ -315,7 +314,7 @@ class bzUnitsPanel extends MinimapSubpanel {
                 if (!entry) entry = this.getUnitEntry(id);
                 if (entry) this.unitsContainer.component.scrollIntoView(entry);
             }, interval);
-            setTimeout(() => clearInterval(handle), interval * (repeat + 1));
+            setTimeout(() => clearInterval(handle), limit);
         }
     }
     scrollUnitToTop(id) {
