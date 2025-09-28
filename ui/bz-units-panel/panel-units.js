@@ -70,7 +70,7 @@ class bzPanelMiniMap {
         const toggle = () => {
             if (this.toggleQueued) {
                 this.component.toggleSubpanel(this.unitsSubpanel);
-                this.toggleCooldown = setTimeout(() => toggle(), 250);
+                this.toggleCooldown = setTimeout(() => toggle(), 500);
             } else {
                 this.toggleCooldown = 0;
             }
@@ -341,7 +341,7 @@ class bzUnitsPanel extends MinimapSubpanel {
             const done = scroll(position, unitId)
             if (done) clearInterval(handle);
         }, 50)
-        setTimeout(() => clearInterval(handle), 500);
+        setTimeout(() => clearInterval(handle), 400);
     }
     activateType(event) {
         if (event.target instanceof HTMLElement) {
