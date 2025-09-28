@@ -312,7 +312,9 @@ class bzUnitsPanel extends MinimapSubpanel {
                 const topPos = (target.top - area.top) / size + curPosition;
                 const botPos = (target.bottom - area.bottom) / size + curPosition;
                 if (position == -1) {
-                    position = topPos;
+                    position = topPos;  // always scroll to top
+                } else if (position != 0 && curPosition == 0 && botPos <= 0) {
+                    position = 0;  // ignore saved position if already in view at top
                 } else if (topPos < position) {
                     position = topPos;
                 } else if (position < botPos) {
