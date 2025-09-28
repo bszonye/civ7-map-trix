@@ -16,6 +16,7 @@ Controls.preloadImage("blp:hud_sub_circle_hov", "units-panel");
 class bzPanelMiniMap {
     static c_prototype;
     static instance;
+    static toggleCooldownTimer = 500;
     unitsSubpanel = null;
     engineInputListener = this.onEngineInput.bind(this);
     hotkeyListener = this.onHotkey.bind(this);
@@ -69,8 +70,9 @@ class bzPanelMiniMap {
         // (avoids crashes in the minimap)
         const toggle = () => {
             if (this.toggleQueued) {
+                this.toggleCooldown =
+                    setTimeout(() => toggle(), bzPanelMiniMap.toggleCooldownTimer);
                 this.component.toggleSubpanel(this.unitsSubpanel);
-                this.toggleCooldown = setTimeout(() => toggle(), 500);
             } else {
                 this.toggleCooldown = 0;
             }
@@ -274,11 +276,13 @@ class bzUnitsPanel extends MinimapSubpanel {
         if (this.scrollPosition || this.scrollUnit) {
             this.updateScroll.call("onAttach");
         }
+        bzPanelMiniMap.toggleCooldownTimer = 250;
     }
     onDetach() {
         super.onDetach();
         window.removeEventListener("bz-model-units-update", this.modelUpdateListener);
         bzUnitsPanel.savedScrollPosition = this.unitsContainer.component.scrollPosition;
+        bzPanelMiniMap.toggleCooldownTimer = 500;
     }
     onReceiveFocus() {
         super.onReceiveFocus();
