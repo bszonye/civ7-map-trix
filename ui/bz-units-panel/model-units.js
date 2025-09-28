@@ -1,3 +1,4 @@
+import { L as LensManager } from '/core/ui/lenses/lens-manager.chunk.js';
 import { C as ComponentID } from '/core/ui/utilities/utilities-component-id.chunk.js';
 import { Icon } from '/core/ui/utilities/utilities-image.chunk.js';
 import { U as UpdateGate } from '/core/ui/utilities/utilities-update-gate.chunk.js';
@@ -292,6 +293,7 @@ class bzUnitListModel {
     selectUnit(localId) {
         if (UI.Player.getHeadSelectedUnit()?.id == localId) {
             UI.Player.deselectAllUnits();
+            LensManager.setActiveLens("fxs-default-lens");
             return;
         }
         const unit = this._units.get(localId);
