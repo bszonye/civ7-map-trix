@@ -63,6 +63,7 @@
                     <Item>ui/bz-units-panel/panel-units.js</Item>
                     <Item>ui/diplo-ribbon/bz-panel-yield-banner.js</Item>
                     <Item>ui/input/bz-hotkey-manager.js</Item>
+                    <Item>ui/interface-modes/bz-interface-modes.js</Item>
                     <Item>ui/lenses/layer/bz-city-borders-layer.js</Item>
                     <Item>ui/lenses/layer/bz-culture-borders-layer.js</Item>
                     <Item>ui/lenses/layer/bz-discovery-layer.js</Item>
