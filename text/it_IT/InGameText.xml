@@ -79,6 +79,12 @@
         <Replace Tag="LOC_STATE_BZ_UNIQUE" Language="it_IT">
             <Text>Unico</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS" Language="it_IT">
+            <Text>Apri Unità</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS_TT" Language="it_IT">
+            <Text>Apri il panello delle unità</Text>
+        </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS" Language="it_IT">
             <Text>Confini</Text>
         </Replace>

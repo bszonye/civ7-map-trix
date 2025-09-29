@@ -87,6 +87,12 @@
             <Gender>masculine|feminine|masculine|feminine</Gender>
             <Plurality>1|1|2|2</Plurality>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS" Language="fr_FR">
+            <Text>Ouvrir Unités</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS_TT" Language="fr_FR">
+            <Text>Ouvre la fenêtre des unités.</Text>
+        </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS" Language="fr_FR">
             <Text>Frontières</Text>
         </Replace>

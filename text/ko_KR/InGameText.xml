@@ -79,6 +79,12 @@
         <Replace Tag="LOC_STATE_BZ_UNIQUE" Language="ko_KR">
             <Text>특유</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS" Language="ko_KR">
+            <Text>유닛 열기</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS_TT" Language="ko_KR">
+            <Text>유닛 패널 엽니다.</Text>
+        </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS" Language="ko_KR">
             <Text>국경</Text>
         </Replace>

@@ -79,6 +79,12 @@
         <Replace Tag="LOC_STATE_BZ_UNIQUE" Language="ru_RU">
             <Text>Уникальное</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS" Language="ru_RU">
+            <Text>Открыть юниты</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS_TT" Language="ru_RU">
+            <Text>Открыть панель юниты</Text>
+        </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS" Language="ru_RU">
             <Text>Границы</Text>
         </Replace>

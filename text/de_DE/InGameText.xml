@@ -79,6 +79,12 @@
         <Replace Tag="LOC_STATE_BZ_UNIQUE" Language="de_DE">
             <Text>Einzigartig</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS" Language="de_DE">
+            <Text>Einheiten öffnen</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS_TT" Language="de_DE">
+            <Text>Öffnet das Einheitenmenu</Text>
+        </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS" Language="de_DE">
             <Text>Grenzen umschalten</Text>
         </Replace>

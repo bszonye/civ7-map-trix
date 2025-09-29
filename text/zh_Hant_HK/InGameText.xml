@@ -79,6 +79,12 @@
         <Replace Tag="LOC_STATE_BZ_UNIQUE" Language="zh_Hant_HK">
             <Text>獨特</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS" Language="zh_Hant_HK">
+            <Text>開啟單位</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS_TT" Language="zh_Hant_HK">
+            <Text>開啟單位面板</Text>
+        </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS" Language="zh_Hant_HK">
             <Text>開啟/關閉邊界的可見度</Text>
         </Replace>
