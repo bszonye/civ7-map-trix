@@ -12,7 +12,6 @@ engine.whenReady.then(() => {
 });
 
 function RAIM_decorate(overlayGroup, _modelGroup) {
-    console.warn(`TRIX RANGE-ATTACK`);
     const plotOverlay = overlayGroup.addPlotOverlay();
     const plots = [];
     this.validPlots.forEach((p) => plots.push(p));

@@ -94,7 +94,7 @@ function getLensSkips() {
     }
     return BZ_SKIPS;
 }
-// patch USIM.setUnitLens (calling it as a fallback)
+// patch UnitSelectedInterfaceMode.setUnitLens (calling it as a fallback)
 engine.whenReady.then(() => {
     const USIM = InterfaceMode.getInterfaceModeHandler('INTERFACEMODE_UNIT_SELECTED');
     const prototype = Object.getPrototypeOf(USIM);

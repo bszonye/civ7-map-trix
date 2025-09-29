@@ -1,4 +1,5 @@
 import { gatherMovementObstacles } from '/bz-map-trix/ui/tooltips/bz-plot-tooltip.js';
+import { InterfaceMode, InterfaceModeChangedEventName } from '/core/ui/interface-modes/interface-modes.js';
 import { L as LensManager } from '/core/ui/lenses/lens-manager.chunk.js';
 import { O as OVERLAY_PRIORITY } from '/base-standard/ui/utilities/utilities-overlay.chunk.js';
 
@@ -30,7 +31,7 @@ class bzTerrainLensLayer {
     terrainOutline = this.terrainOverlayGroup.addBorderOverlay(BZ_NO_OUTLINE);
     outlineGroup = new Map();
     obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
-    onLayerHotkeyListener = this.onLayerHotkey.bind(this);
+    layerHotkeyListener = this.onLayerHotkey.bind(this);
     initLayer() {
         for (const [type, overlay] of Object.entries(BZ_OVERLAY)) {
             const style = {
@@ -43,15 +44,17 @@ class bzTerrainLensLayer {
             this.outlineGroup.set(type, group);
         }
         this.updateMap();
-        window.addEventListener('layer-hotkey', this.onLayerHotkeyListener);
+        window.addEventListener('layer-hotkey', this.layerHotkeyListener);
         this.terrainOverlayGroup.setVisible(false);
     }
     applyLayer() {
         this.updateMap();
         this.terrainOverlayGroup.setVisible(true);
+        window.addEventListener(InterfaceModeChangedEventName, this.onInterfaceModeChanged);
     }
     removeLayer() {
         this.terrainOverlayGroup.setVisible(false);
+        window.removeEventListener(InterfaceModeChangedEventName, this.onInterfaceModeChanged);
     }
     getTerrainType(loc) {
         // feature types
@@ -102,5 +105,18 @@ class bzTerrainLensLayer {
             LensManager.toggleLayer('bz-terrain-layer');
         }
     }
+    onInterfaceModeChanged = () => {
+        console.warn(`TRIX IM ${InterfaceMode.getCurrent()}`);
+        switch (InterfaceMode.getCurrent()) {
+            case "INTERFACEMODE_DEFAULT":
+            case "INTERFACEMODE_MOVE_TO":
+            case "INTERFACEMODE_UNIT_SELECTED":
+                this.terrainOverlayGroup.setVisible(true);
+                break;
+            default:
+                this.terrainOverlayGroup.setVisible(false);
+                break;
+        }
+    };
 }
 LensManager.registerLensLayer('bz-terrain-layer', new bzTerrainLensLayer());
