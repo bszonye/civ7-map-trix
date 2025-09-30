@@ -3,6 +3,7 @@ import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
 import { L as LensManager } from '/core/ui/lenses/lens-manager.chunk.js';
 // guarantee import order for patching
 import '/base-standard/ui/interface-modes/interface-mode-unit-selected.js';
+import '/base-standard/ui/lenses/lens/default-lens.js';
 
 const BZ_LENSES = {
     "bz-commander-lens": "LOC_UI_MINI_MAP_COMMANDER",
@@ -28,6 +29,11 @@ const BZ_EXTRA_LAYERS = {
         'bz-fortification-layer',
     ],
 };
+const defaultLens = LensManager.lenses.get("fxs-default-lens");
+defaultLens.activeLayers.delete("fxs-culture-borders-layer");
+for (const layer of Object.keys(BZ_LAYERS)) {
+    defaultLens.allowedLayers.add(layer);
+}
 // mini-map extensions
 class bzLensPanel {
     static c_prototype;
@@ -119,7 +125,9 @@ engine.whenReady.then(() => {
         }
         // add extra default layers
         const extra = new Set(BZ_EXTRA_LAYERS[lensType] ?? []);
-        if (layers.has('fxs-resource-layer')) extra.add('bz-discovery-layer');
+        if (layers.has('fxs-resource-layer')) {
+            extra.add('bz-discovery-layer');
+        }
         for (const layerType of extra) layers.add(layerType);
         // if lens is already active, enable any registered layers
         // (event handlers will take care of borders)

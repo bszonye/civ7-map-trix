@@ -1,4 +1,6 @@
 import { L as LensManager } from '/core/ui/lenses/lens-manager.chunk.js';
+// load mini-map first to configure allowed layers for default lens
+import '/bz-map-trix/ui/mini-map/bz-panel-mini-map.js';
 
 const UPSCALE_START = 1080;
 const BZ_ICON_DISCOVERY = "NAR_REW_DEFAULT";
@@ -33,6 +35,9 @@ class bzDiscoveryLensLayer {
     }
     removeLayer() {
         this.bzSpriteGrid.setVisible(false);
+    }
+    getOptionName() {
+        return "bzShowMapDiscoveries";
     }
     updateMap() {
         const width = GameplayMap.getGridWidth();
@@ -69,4 +74,9 @@ class bzDiscoveryLensLayer {
         }
     }
 }
-LensManager.registerLensLayer('bz-discovery-layer', new bzDiscoveryLensLayer());
+const instance = new bzDiscoveryLensLayer();
+// if layer is not configured, enable it by default
+const option = UI.getOption("user", "Gameplay", instance.getOptionName());
+if (option == null) UI.setOption("user", "Gameplay", instance.getOptionName(), 1);
+// register lens
+LensManager.registerLensLayer('bz-discovery-layer', instance);

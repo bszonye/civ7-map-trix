@@ -1,5 +1,8 @@
 import { L as LensManager, c as LensLayerDisabledEventName, b as LensLayerEnabledEventName } from '/core/ui/lenses/lens-manager.chunk.js';
 import { O as OVERLAY_PRIORITY } from '/base-standard/ui/utilities/utilities-overlay.chunk.js';
+// load mini-map first to configure allowed layers for default lens
+import '/bz-map-trix/ui/mini-map/bz-panel-mini-map.js';
+
 var BorderStyleTypes;
 (function (BorderStyleTypes) {
     BorderStyleTypes["Closed"] = "CultureBorder_Closed";
@@ -134,6 +137,9 @@ class bzCultureBordersLayer {
     removeLayer() {
         this.cultureOverlayGroup.setVisible(false);
     }
+    getOptionName() {
+        return "bzShowMapCultureBorders";
+    }
     onLayerHotkey(hotkey) {
         if (hotkey.detail.name == 'toggle-bz-culture-borders-layer') {
             LensManager.toggleLayer('bz-culture-borders-layer');
@@ -169,4 +175,9 @@ class bzCultureBordersLayer {
         }
     }
 }
-LensManager.registerLensLayer('bz-culture-borders-layer', new bzCultureBordersLayer());
+const instance = new bzCultureBordersLayer();
+// if layer is not configured, enable it by default
+const option = UI.getOption("user", "Gameplay", instance.getOptionName());
+if (option == null) UI.setOption("user", "Gameplay", instance.getOptionName(), 1);
+// register lens
+LensManager.registerLensLayer('bz-culture-borders-layer', instance);

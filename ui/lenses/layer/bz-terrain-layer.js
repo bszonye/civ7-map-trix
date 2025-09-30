@@ -4,6 +4,8 @@ import { L as LensManager } from '/core/ui/lenses/lens-manager.chunk.js';
 import ChoosePlotInterfaceMode from '/base-standard/ui/interface-modes/interface-mode-choose-plot.js';
 import { O as OVERLAY_PRIORITY } from '/base-standard/ui/utilities/utilities-overlay.chunk.js';
 import { UpdateOperationTargetEventName } from '/base-standard/ui/lenses/layer/operation-target-layer.js';
+// load mini-map first to configure allowed layers for default lens
+import '/bz-map-trix/ui/mini-map/bz-panel-mini-map.js';
 
 // adapted from ui/tooltips/bz-plot-tooltip.js
 const BZ_OVERLAY = {
@@ -62,6 +64,9 @@ class bzTerrainLensLayer {
     removeLayer() {
         window.removeEventListener(InterfaceModeChangedEventName, this.onInterfaceModeChanged);
         this.terrainOverlayGroup.setVisible(false);
+    }
+    getOptionName() {
+        return "bzShowMapTerrain";
     }
     getInterfaceModeVisibility() {
         const mode = InterfaceMode.getCurrent();

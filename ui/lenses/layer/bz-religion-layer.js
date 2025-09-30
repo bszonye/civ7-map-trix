@@ -1,5 +1,7 @@
 import '/bz-map-trix/ui/lenses/layer/bz-fortification-layer.js';  // force layer order
 import { L as LensManager } from '/core/ui/lenses/lens-manager.chunk.js';
+// load mini-map first to configure allowed layers for default lens
+import '/bz-map-trix/ui/mini-map/bz-panel-mini-map.js';
 
 const SPRITE_OFFSET = { x: 0, y: -18, z: 5 };
 const SPRITE_ALT = "buildicon_open";
@@ -28,6 +30,9 @@ class bzReligionLensLayer {
     }
     removeLayer() {
         this.bzSpriteGrid.setVisible(false);
+    }
+    getOptionName() {
+        return "bzShowMapReligion";
     }
     updateMap() {
         const width = GameplayMap.getGridWidth();

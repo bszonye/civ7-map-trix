@@ -1,5 +1,7 @@
 import { L as LensManager } from '/core/ui/lenses/lens-manager.chunk.js';
 import { U as UpdateGate } from '/core/ui/utilities/utilities-update-gate.chunk.js';
+// load mini-map first to configure allowed layers for default lens
+import '/bz-map-trix/ui/mini-map/bz-panel-mini-map.js';
 
 const SPRITE_CLIFF = "dip_cancel";
 // coordinates for tile edges
@@ -57,6 +59,9 @@ class bzRouteLensLayer {
         this.routeModelGroup.clear();
         this.visible = null;
         this.routeSpriteGrid.setVisible(false);
+    }
+    getOptionName() {
+        return "bzShowMapRoads";
     }
     updatePlot(loc) {
         // this.routeSpriteGrid.clearPlot(loc);
