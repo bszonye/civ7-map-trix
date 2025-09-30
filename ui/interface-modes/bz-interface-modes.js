@@ -14,7 +14,7 @@ function RAIM_decorate(overlayGroup, _modelGroup) {
     const plotOverlay = overlayGroup.addPlotOverlay();
     const plots = [];
     this.validPlots.forEach((p) => plots.push(p));
-    // fill range attack overlay for better visibility
+    // replace overlay with the bright green used for other unit types
     const GREEN_TRANSPARENT_LINEAR = { x: 0, y: 1, z: 0, w: 0.5 };
     plotOverlay.addPlots(plots, { fillColor: GREEN_TRANSPARENT_LINEAR });
     Audio.playSound("data-audio-plot-select-overlay", "interact-unit");
