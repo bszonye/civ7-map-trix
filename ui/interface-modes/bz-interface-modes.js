@@ -1,6 +1,5 @@
 import { A as Audio } from '/core/ui/input/focus-manager.js';
 import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
-import { H as HighlightColors } from '/core/ui/utilities/utilities-color.chunk.js';
 // guarantee import order for patching
 import '/base-standard/ui/interface-modes/interface-mode-ranged-attack.js';
 
@@ -16,8 +15,7 @@ function RAIM_decorate(overlayGroup, _modelGroup) {
     const plots = [];
     this.validPlots.forEach((p) => plots.push(p));
     // fill range attack overlay for better visibility
-    const edgeColor = HighlightColors.unitAttack;
-    const fillColor = HighlightColors.unitAttack & 0xffffff | 0x66000000;
-    plotOverlay.addPlots(plots, { edgeColor, fillColor });
+    const GREEN_TRANSPARENT_LINEAR = { x: 0, y: 1, z: 0, w: 0.5 };
+    plotOverlay.addPlots(plots, { fillColor: GREEN_TRANSPARENT_LINEAR });
     Audio.playSound("data-audio-plot-select-overlay", "interact-unit");
 }
