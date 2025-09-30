@@ -1,6 +1,7 @@
 import { gatherMovementObstacles } from '/bz-map-trix/ui/tooltips/bz-plot-tooltip.js';
 import { InterfaceMode, InterfaceModeChangedEventName } from '/core/ui/interface-modes/interface-modes.js';
 import { L as LensManager } from '/core/ui/lenses/lens-manager.chunk.js';
+import ChoosePlotInterfaceMode from '/base-standard/ui/interface-modes/interface-mode-choose-plot.js';
 import { O as OVERLAY_PRIORITY } from '/base-standard/ui/utilities/utilities-overlay.chunk.js';
 import { UpdateOperationTargetEventName } from '/base-standard/ui/lenses/layer/operation-target-layer.js';
 
@@ -63,13 +64,14 @@ class bzTerrainLensLayer {
         this.terrainOverlayGroup.setVisible(false);
     }
     getInterfaceModeVisibility() {
-        switch (InterfaceMode.getCurrent()) {
-            case "INTERFACEMODE_DEFAULT":
-            case "INTERFACEMODE_MOVE_TO":
-            case "INTERFACEMODE_UNIT_SELECTED":
-                return true;
-        }
-        return false;
+        const mode = InterfaceMode.getCurrent();
+        const handler = InterfaceMode.getInterfaceModeHandler(mode);
+        if (!handler) return true;
+        // hide layer in choose-plot interface modes, except move-to
+        if (mode == "INTERFACEMODE_MOVE_TO") return true;
+        return !Object.prototype.isPrototypeOf.call(
+            ChoosePlotInterfaceMode.prototype, handler
+        );
     }
     getTerrainType(loc) {
         // feature types
