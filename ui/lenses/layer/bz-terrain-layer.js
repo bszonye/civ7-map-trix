@@ -49,7 +49,7 @@ class bzTerrainLensLayer {
             this.outlineGroup.set(type, group);
         }
         this.updateMap();
-        window.addEventListener('layer-hotkey', this.layerHotkeyListener);
+        window.addEventListener("layer-hotkey", this.layerHotkeyListener);
         window.addEventListener(UpdateOperationTargetEventName, this.updateOperationTargetListener);
         engine.on("UnitSelectionChanged", this.unitSelectionChangedListener);
         this.terrainOverlayGroup.setVisible(false);
@@ -122,8 +122,8 @@ class bzTerrainLensLayer {
         this.terrainOverlayGroup.setVisible(this.getInterfaceModeVisibility());
     };
     onLayerHotkey(hotkey) {
-        if (hotkey.detail.name == 'toggle-bz-terrain-layer') {
-            LensManager.toggleLayer('bz-terrain-layer');
+        if (hotkey.detail.name == "toggle-bz-terrain-layer") {
+            LensManager.toggleLayer("bz-terrain-layer");
         }
     }
     onUnitSelectionChanged() {
@@ -137,4 +137,4 @@ class bzTerrainLensLayer {
         this.updateMap();
     }
 }
-LensManager.registerLensLayer('bz-terrain-layer', new bzTerrainLensLayer());
+LensManager.registerLensLayer("bz-terrain-layer", new bzTerrainLensLayer());
