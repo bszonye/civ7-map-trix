@@ -28,11 +28,6 @@ const BZ_EXTRA_LAYERS = {
         "bz-fortification-layer",
     ],
 };
-const defaultLens = LensManager.lenses.get("fxs-default-lens");
-defaultLens.activeLayers.delete("fxs-culture-borders-layer");
-for (const layer of Object.keys(BZ_LAYERS)) {
-    defaultLens.allowedLayers.add(layer);
-}
 // mini-map extensions
 class bzLensPanel {
     static c_prototype;
@@ -109,28 +104,39 @@ engine.whenReady.then(() => {
         if (rv) return original.apply(this, args);
     }
 });
-// patch new layers into registered lenses
+// patch new layers into default lens (before engine startup)
+const defaultLens = LensManager.lenses.get("fxs-default-lens");
+defaultLens.activeLayers.delete("fxs-culture-borders-layer");
+for (const layer of Object.keys(BZ_LAYERS)) {
+    defaultLens.allowedLayers.add(layer);
+}
+// patch new layers into registered lenses (after engine startup)
 engine.whenReady.then(() => {
     for (const [lensType, lens] of LensManager.lenses.entries()) {
-        const layers = lens.activeLayers;
+        if (lensType == "fxs-default-lens") continue;
+        const active = lens.activeLayers;
+        const allowed = lens.allowedLayers;
         // swap in modded borders
-        if (layers.has("fxs-culture-borders-layer")) {
-            layers.delete("fxs-culture-borders-layer");
-            layers.add("bz-culture-borders-layer");
+        if (active.has("fxs-culture-borders-layer")) {
+            active.delete("fxs-culture-borders-layer");
+            active.add("bz-culture-borders-layer");
         }
-        if (layers.has("fxs-city-borders-layer")) {
-            layers.delete("fxs-city-borders-layer");
-            layers.add("bz-city-borders-layer");
+        if (active.has("fxs-city-borders-layer")) {
+            active.delete("fxs-city-borders-layer");
+            active.add("bz-city-borders-layer");
+        }
+        // add discovery layer to every lens that allows Resources
+        if (active.has("fxs-resource-layer") || allowed.has("fxs-resource-layer")) {
+            active.add("bz-discovery-layer");
         }
         // add extra default layers
         const extra = new Set(BZ_EXTRA_LAYERS[lensType] ?? []);
-        if (layers.has("fxs-resource-layer")) extra.add("bz-discovery-layer");
-        for (const layerType of extra) layers.add(layerType);
+        for (const layerType of extra) active.add(layerType);
         // if lens is already active, enable any registered layers
         // (event handlers will take care of borders)
         if (lensType == LensManager.activeLens) {
             for (const layerType of extra) {
-                if (LensManager.layers.get(layerType)) LensManager.enableLayer(layerType);
+                if (LensManager.active.get(layerType)) LensManager.enableLayer(layerType);
             }
         }
     }
