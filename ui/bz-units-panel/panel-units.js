@@ -237,7 +237,7 @@ class bzUnitsPanel extends MinimapSubpanel {
             const movement = document.createElement("div");
             movement.classList.value = "bz-unit-movement flex items-center mr-2";
             const moveIcon = document.createElement("img");
-            moveIcon.classList.value = "bz-icon size-5 -ml-1 mr-1";
+            moveIcon.classList.value = "bz-icon size-5 -ml-0\\.5 mr-0\\.5";
             moveIcon.setAttribute("src", "blp:Action_Move");
             movement.appendChild(moveIcon);
             const moveText = document.createElement("div");
