@@ -55,12 +55,21 @@ class bzTerrainLensLayer {
     }
     applyLayer() {
         this.updateMap();
-        this.terrainOverlayGroup.setVisible(true);
+        this.terrainOverlayGroup.setVisible(this.getInterfaceModeVisibility());
         window.addEventListener(InterfaceModeChangedEventName, this.onInterfaceModeChanged);
     }
     removeLayer() {
         this.terrainOverlayGroup.setVisible(false);
         window.removeEventListener(InterfaceModeChangedEventName, this.onInterfaceModeChanged);
+    }
+    getInterfaceModeVisibility() {
+        switch (InterfaceMode.getCurrent()) {
+            case "INTERFACEMODE_DEFAULT":
+            case "INTERFACEMODE_MOVE_TO":
+            case "INTERFACEMODE_UNIT_SELECTED":
+                return true;
+        }
+        return false;
     }
     getTerrainType(loc) {
         // feature types
@@ -113,16 +122,7 @@ class bzTerrainLensLayer {
         }
     }
     onInterfaceModeChanged = () => {
-        switch (InterfaceMode.getCurrent()) {
-            case "INTERFACEMODE_DEFAULT":
-            case "INTERFACEMODE_MOVE_TO":
-            case "INTERFACEMODE_UNIT_SELECTED":
-                this.terrainOverlayGroup.setVisible(true);
-                break;
-            default:
-                this.terrainOverlayGroup.setVisible(false);
-                break;
-        }
+        this.terrainOverlayGroup.setVisible(this.getInterfaceModeVisibility());
     };
     onUnitSelectionChanged() {
         if (this.operationPlots.size) {
