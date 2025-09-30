@@ -34,6 +34,7 @@ class bzTerrainLensLayer {
     obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
     operationPlots = new Set();
     layerHotkeyListener = this.onLayerHotkey.bind(this);
+    unitSelectionChangedListener = this.onUnitSelectionChanged.bind(this);
     updateOperationTargetListener = this.onUpdateOperationTarget.bind(this);
     initLayer() {
         for (const [type, overlay] of Object.entries(BZ_OVERLAY)) {
@@ -49,6 +50,7 @@ class bzTerrainLensLayer {
         this.updateMap();
         window.addEventListener('layer-hotkey', this.layerHotkeyListener);
         window.addEventListener(UpdateOperationTargetEventName, this.updateOperationTargetListener);
+        engine.on("UnitSelectionChanged", this.unitSelectionChangedListener);
         this.terrainOverlayGroup.setVisible(false);
     }
     applyLayer() {
@@ -123,12 +125,14 @@ class bzTerrainLensLayer {
                 break;
         }
     };
+    onUnitSelectionChanged() {
+        if (this.operationPlots.size) {
+            this.operationPlots = new Set();
+            this.updateMap();
+        }
+    }
     onUpdateOperationTarget(event) {
-        console.warn(`TRIX OP-TARGET`);
-        console.warn(`TRIX OP-TARGET ${event.detail.plots}`);
-        this.operationPlots = new Set();
-        for (const plot of event.detail.plots) this.operationPlots.add(plot);
-        console.warn(`TRIX OPS ${JSON.stringify([...this.operationPlots])}`);
+        this.operationPlots = new Set(event.detail.plots);
         this.updateMap();
     }
 }
