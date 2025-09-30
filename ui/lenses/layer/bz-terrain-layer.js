@@ -2,6 +2,7 @@ import { gatherMovementObstacles } from '/bz-map-trix/ui/tooltips/bz-plot-toolti
 import { InterfaceMode, InterfaceModeChangedEventName } from '/core/ui/interface-modes/interface-modes.js';
 import { L as LensManager } from '/core/ui/lenses/lens-manager.chunk.js';
 import { O as OVERLAY_PRIORITY } from '/base-standard/ui/utilities/utilities-overlay.chunk.js';
+import { UpdateOperationTargetEventName } from '/base-standard/ui/lenses/layer/operation-target-layer.js';
 
 // adapted from ui/tooltips/bz-plot-tooltip.js
 const BZ_OVERLAY = {
@@ -31,7 +32,9 @@ class bzTerrainLensLayer {
     terrainOutline = this.terrainOverlayGroup.addBorderOverlay(BZ_NO_OUTLINE);
     outlineGroup = new Map();
     obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
+    operationPlots = new Set();
     layerHotkeyListener = this.onLayerHotkey.bind(this);
+    updateOperationTargetListener = this.onUpdateOperationTarget.bind(this);
     initLayer() {
         for (const [type, overlay] of Object.entries(BZ_OVERLAY)) {
             const style = {
@@ -45,6 +48,7 @@ class bzTerrainLensLayer {
         }
         this.updateMap();
         window.addEventListener('layer-hotkey', this.layerHotkeyListener);
+        window.addEventListener(UpdateOperationTargetEventName, this.updateOperationTargetListener);
         this.terrainOverlayGroup.setVisible(false);
     }
     applyLayer() {
@@ -92,6 +96,7 @@ class bzTerrainLensLayer {
     }
     updatePlot(loc) {
         const plotIndex = GameplayMap.getIndexFromLocation(loc);
+        if (this.operationPlots.has(plotIndex)) return;
         const type = this.getTerrainType(loc);
         const overlay = BZ_OVERLAY[type];
         if (overlay) {
@@ -118,5 +123,13 @@ class bzTerrainLensLayer {
                 break;
         }
     };
+    onUpdateOperationTarget(event) {
+        console.warn(`TRIX OP-TARGET`);
+        console.warn(`TRIX OP-TARGET ${event.detail.plots}`);
+        this.operationPlots = new Set();
+        for (const plot of event.detail.plots) this.operationPlots.add(plot);
+        console.warn(`TRIX OPS ${JSON.stringify([...this.operationPlots])}`);
+        this.updateMap();
+    }
 }
 LensManager.registerLensLayer('bz-terrain-layer', new bzTerrainLensLayer());
