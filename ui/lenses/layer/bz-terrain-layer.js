@@ -59,8 +59,8 @@ class bzTerrainLensLayer {
         window.addEventListener(InterfaceModeChangedEventName, this.onInterfaceModeChanged);
     }
     removeLayer() {
-        this.terrainOverlayGroup.setVisible(false);
         window.removeEventListener(InterfaceModeChangedEventName, this.onInterfaceModeChanged);
+        this.terrainOverlayGroup.setVisible(false);
     }
     getInterfaceModeVisibility() {
         switch (InterfaceMode.getCurrent()) {
@@ -116,14 +116,14 @@ class bzTerrainLensLayer {
             this.terrainOutline.setPlotGroups(plotIndex, group);
         }
     }
+    onInterfaceModeChanged = () => {
+        this.terrainOverlayGroup.setVisible(this.getInterfaceModeVisibility());
+    };
     onLayerHotkey(hotkey) {
         if (hotkey.detail.name == 'toggle-bz-terrain-layer') {
             LensManager.toggleLayer('bz-terrain-layer');
         }
     }
-    onInterfaceModeChanged = () => {
-        this.terrainOverlayGroup.setVisible(this.getInterfaceModeVisibility());
-    };
     onUnitSelectionChanged() {
         if (this.operationPlots.size) {
             this.operationPlots = new Set();
