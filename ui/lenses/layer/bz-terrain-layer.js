@@ -113,7 +113,6 @@ class bzTerrainLensLayer {
         }
     }
     onInterfaceModeChanged = () => {
-        console.warn(`TRIX IM ${InterfaceMode.getCurrent()}`);
         switch (InterfaceMode.getCurrent()) {
             case "INTERFACEMODE_DEFAULT":
             case "INTERFACEMODE_MOVE_TO":
