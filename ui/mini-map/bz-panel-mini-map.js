@@ -19,14 +19,13 @@ const BZ_LAYERS = {
     "bz-terrain-layer": "LOC_UI_MINI_MAP_BZ_TERRAIN",
 };
 const BZ_EXTRA_LAYERS = {
-    // 'fxs-default-lens': [ 'bz-city-borders-layer', ],
-    'fxs-settler-lens': [ 'bz-city-borders-layer', ],
-    'fxs-trade-lens': [ 'bz-city-borders-layer', ],
-    'mod-fortified-district-lens': [
-        'fxs-resource-layer',
-        'fxs-operation-target-layer',
-        'bz-discovery-layer',
-        'bz-fortification-layer',
+    "fxs-settler-lens": [ "bz-city-borders-layer", ],
+    "fxs-trade-lens": [ "bz-city-borders-layer", ],
+    "mod-fortified-district-lens": [
+        "fxs-resource-layer",
+        "fxs-operation-target-layer",
+        "bz-discovery-layer",
+        "bz-fortification-layer",
     ],
 };
 const defaultLens = LensManager.lenses.get("fxs-default-lens");
@@ -50,9 +49,9 @@ class bzLensPanel {
             this.component.createLayerCheckbox(name, layer);
         }
         // hide checkboxes for fxs borders (added by Border Toggles)
-        for (const layer of ['fxs-city-borders-layer', 'fxs-culture-borders-layer']) {
+        for (const layer of ["fxs-city-borders-layer", "fxs-culture-borders-layer"]) {
             const checkbox = this.component.layerElementMap[layer];
-            if (checkbox) checkbox.parentElement.style.display = 'none';
+            if (checkbox) checkbox.parentElement.style.display = "none";
         }
     }
     beforeDetach() { }
@@ -72,29 +71,29 @@ function bzSetUnitLens(unitID) {
     } else if (skips.has(info.UnitType) || skips.has(info.UnitMovementClass)) {
         // don't interfere with other mods
     } else if (info.SpreadCharges) {
-        lens = 'bz-religion-lens';
+        lens = "bz-religion-lens";
     } else switch (bzMapTrixOptions.commanders) {
         case bzCommanderLens.RECON:
-            if (info.CoreClass == "CORE_CLASS_RECON") lens = 'bz-commander-lens';
+            if (info.CoreClass == "CORE_CLASS_RECON") lens = "bz-commander-lens";
             // falls through
         case bzCommanderLens.MILITARY:
-            if (info.CoreClass == "CORE_CLASS_MILITARY") lens = 'bz-commander-lens';
+            if (info.CoreClass == "CORE_CLASS_MILITARY") lens = "bz-commander-lens";
             // falls through
         case bzCommanderLens.COMMANDERS:
-            if (unit.isCommanderUnit) lens = 'bz-commander-lens';
+            if (unit.isCommanderUnit) lens = "bz-commander-lens";
     }
     if (!lens) return true;  // hand off to original method
     LensManager.setActiveLens(lens);
 }
 // skip lens activation for units handled by other lens mods
 const BZ_MOD_SKIPS = {
-    'mod-discovery-lens': ['UNIT_MOVEMENT_CLASS_RECON', 'UNIT_MOVEMENT_CLASS_NAVAL'],
-    'mod-fortified-district-lens': ['UNIT_ARMY_COMMANDER', 'UNIT_AERODROME_COMMANDER'],
+    "mod-discovery-lens": ["UNIT_MOVEMENT_CLASS_RECON", "UNIT_MOVEMENT_CLASS_NAVAL"],
+    "mod-fortified-district-lens": ["UNIT_ARMY_COMMANDER", "UNIT_AERODROME_COMMANDER"],
 };
 const BZ_SKIPS = new Set();  // cache
 function getLensSkips() {
     if (BZ_SKIPS.size) return BZ_SKIPS;
-    BZ_SKIPS.add('UNIT_SETTLER');  // ensure a non-empty set
+    BZ_SKIPS.add("UNIT_SETTLER");  // ensure a non-empty set
     for (const [mod, skips] of Object.entries(BZ_MOD_SKIPS)) {
         if (LensManager.lenses.has(mod)) skips.forEach(skip => BZ_SKIPS.add(skip));
     }
@@ -102,7 +101,7 @@ function getLensSkips() {
 }
 // patch UnitSelectedInterfaceMode.setUnitLens (calling it as a fallback)
 engine.whenReady.then(() => {
-    const USIM = InterfaceMode.getInterfaceModeHandler('INTERFACEMODE_UNIT_SELECTED');
+    const USIM = InterfaceMode.getInterfaceModeHandler("INTERFACEMODE_UNIT_SELECTED");
     const prototype = Object.getPrototypeOf(USIM);
     const original = prototype.setUnitLens;
     prototype.setUnitLens = function(...args) {
@@ -115,19 +114,17 @@ engine.whenReady.then(() => {
     for (const [lensType, lens] of LensManager.lenses.entries()) {
         const layers = lens.activeLayers;
         // swap in modded borders
-        if (layers.has('fxs-culture-borders-layer')) {
-            layers.delete('fxs-culture-borders-layer');
-            layers.add('bz-culture-borders-layer');
+        if (layers.has("fxs-culture-borders-layer")) {
+            layers.delete("fxs-culture-borders-layer");
+            layers.add("bz-culture-borders-layer");
         }
-        if (layers.has('fxs-city-borders-layer')) {
-            layers.delete('fxs-city-borders-layer');
-            layers.add('bz-city-borders-layer');
+        if (layers.has("fxs-city-borders-layer")) {
+            layers.delete("fxs-city-borders-layer");
+            layers.add("bz-city-borders-layer");
         }
         // add extra default layers
         const extra = new Set(BZ_EXTRA_LAYERS[lensType] ?? []);
-        if (layers.has('fxs-resource-layer')) {
-            extra.add('bz-discovery-layer');
-        }
+        if (layers.has("fxs-resource-layer")) extra.add("bz-discovery-layer");
         for (const layerType of extra) layers.add(layerType);
         // if lens is already active, enable any registered layers
         // (event handlers will take care of borders)
@@ -139,4 +136,4 @@ engine.whenReady.then(() => {
     }
 });
 
-Controls.decorate('lens-panel', (component) => new bzLensPanel(component));
+Controls.decorate("lens-panel", (component) => new bzLensPanel(component));
