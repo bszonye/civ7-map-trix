@@ -23,7 +23,7 @@
         </Criteria>
     </ActionCriteria>
     <ActionGroups>
-        <ActionGroup id="bz-map-trix-menu" scope="shell" criteria="always">
+        <ActionGroup id="bz-map-trix-shell" scope="shell" criteria="always">
             <Properties>
                 <LoadOrder>1000</LoadOrder>
             </Properties>
@@ -31,7 +31,7 @@
                 <UIScripts>
                     <Item>ui/options/editors/bz-editor-keyboard-mapping.js</Item>
                     <Item>ui/options/bz-map-trix-options.js</Item>
-                    <Item>ui/options/mod-options-decorator.js</Item>
+                    <Item>ui/options/mod-options.js</Item>
                 </UIScripts>
                 <UpdateDatabase>
                     <Item>config/bz-input.xml</Item>
@@ -48,7 +48,7 @@
                 </UpdateText>
             </Actions>
         </ActionGroup>
-        <ActionGroup id="bz-map-trix-ui" scope="game" criteria="always">
+        <ActionGroup id="bz-map-trix-game" scope="game" criteria="always">
             <Properties>
                 <LoadOrder>1000</LoadOrder>
             </Properties>
@@ -76,7 +76,7 @@
                     <Item>ui/mini-map/bz-panel-mini-map.js</Item>
                     <Item>ui/options/editors/bz-editor-keyboard-mapping.js</Item>
                     <Item>ui/options/bz-map-trix-options.js</Item>
-                    <Item>ui/options/mod-options-decorator.js</Item>
+                    <Item>ui/options/mod-options.js</Item>
                     <Item>ui/tooltips/bz-plot-tooltip.js</Item>
                 </UIScripts>
                 <UpdateIcons>
