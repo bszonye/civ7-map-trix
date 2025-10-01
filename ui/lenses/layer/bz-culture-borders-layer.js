@@ -187,4 +187,3 @@ const option = UI.getOption("user", "Gameplay", instance.getOptionName());
 if (option == null) UI.setOption("user", "Gameplay", instance.getOptionName(), 1);
 // register lens
 LensManager.registerLensLayer('bz-culture-borders-layer', instance);
-console.warn(`bz-culture-borders-layer: registered`);

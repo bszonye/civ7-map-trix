@@ -80,4 +80,3 @@ const option = UI.getOption("user", "Gameplay", instance.getOptionName());
 if (option == null) UI.setOption("user", "Gameplay", instance.getOptionName(), 1);
 // register lens
 LensManager.registerLensLayer('bz-discovery-layer', instance);
-console.warn(`bz-discovery-layer: registered`);

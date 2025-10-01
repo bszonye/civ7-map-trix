@@ -129,4 +129,3 @@ class bzCityBordersLayer {
     }
 }
 LensManager.registerLensLayer('bz-city-borders-layer', new bzCityBordersLayer());
-console.warn(`bz-city-borders-layer: registered`);
