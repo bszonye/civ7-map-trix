@@ -5,7 +5,7 @@ import '/base-standard/ui/interface-modes/interface-mode-ranged-attack.js';
 
 // patch RangedAttackInterfaceMode.decorate() method
 engine.whenReady.then(() => {
-    const RAIM = InterfaceMode.getInterfaceModeHandler('INTERFACEMODE_RANGE_ATTACK');
+    const RAIM = InterfaceMode.getInterfaceModeHandler("INTERFACEMODE_RANGE_ATTACK");
     const prototype = Object.getPrototypeOf(RAIM);
     prototype.decorate = RAIM_decorate;
 });
