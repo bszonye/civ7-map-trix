@@ -1,10 +1,12 @@
 import { d as CategoryData, C as CategoryType } from '/core/ui/options/editors/index.chunk.js';
 
 CategoryType["Mods"] = "mods";
-CategoryData[CategoryType.Mods] = {
-    title: "LOC_UI_CONTENT_MGR_SUBTITLE",
+CategoryData[CategoryType.Mods] ??= {
+    title: "LOC_PAUSE_MENU_MODS_TITLE",
     description: "LOC_UI_CONTENT_MGR_SUBTITLE_DESCRIPTION",
 };
+requestAnimationFrame(() =>
+    CategoryData[CategoryType.Mods].title = "LOC_PAUSE_MENU_MODS_TITLE");
 
 // fix Options tab spacing
 const MOD_OPTIONS_STYLE = document.createElement('style');

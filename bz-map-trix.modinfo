@@ -30,8 +30,6 @@
             <Actions>
                 <UIScripts>
                     <Item>ui/options/editors/bz-editor-keyboard-mapping.js</Item>
-                    <Item>ui/options/bz-map-trix-options.js</Item>
-                    <Item>ui/options/mod-options.js</Item>
                 </UIScripts>
                 <UpdateDatabase>
                     <Item>config/bz-input.xml</Item>
@@ -54,14 +52,12 @@
             </Properties>
             <Actions>
                 <ImportFiles>
-                    <Item>data/icons/bz-city-dot.png</Item>
-                    <Item>data/icons/bz-town-dot.png</Item>
+                    <Item>ui/bz-style/bz-panel-yield-banner.css</Item>
                     <Item>ui/bz-units-panel/panel-units.css</Item>
                 </ImportFiles>
                 <UIScripts>
                     <Item>ui/bz-units-panel/model-units.js</Item>
                     <Item>ui/bz-units-panel/panel-units.js</Item>
-                    <Item>ui/diplo-ribbon/bz-panel-yield-banner.js</Item>
                     <Item>ui/input/bz-hotkey-manager.js</Item>
                     <Item>ui/interface-modes/bz-interface-modes.js</Item>
                     <Item>ui/lenses/layer/bz-city-borders-layer.js</Item>
@@ -79,9 +75,6 @@
                     <Item>ui/options/mod-options.js</Item>
                     <Item>ui/tooltips/bz-plot-tooltip.js</Item>
                 </UIScripts>
-                <UpdateIcons>
-                    <Item>data/icons/bz-icons.xml</Item>
-                </UpdateIcons>
                 <UpdateText>
                     <Item>text/en_us/InGameText.xml</Item>
                     <Item locale="de_DE">text/de_DE/InGameText.xml</Item>

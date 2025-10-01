@@ -46,14 +46,18 @@ const bzMapTrixOptions = new class {
         },
     };
     load(data) {
-        return UI.getOption("user", "Mod", data.optionName) ?? data.defaultValue;
+        const value = UI.getOption("user", "Mod", data.optionName);
+        console.warn(`LOAD ${data.optionName} = ${JSON.stringify(value)}`);
+        return value ?? data.defaultValue;
     }
     save(data, value) {
         UI.setOption("user", "Mod", data.optionName, value);
+        console.warn(`SAVE ${data.optionName} = ${JSON.stringify(value)}`);
+        Configuration.getUser().saveCheckpoint();
     }
     get commanders() {
         const data = this.data.commanders;
-        if (data.selectedItemIndex == null) this.commanders = this.load(data);
+        data.selectedItemIndex ??= this.load(data);
         return data.selectedItemIndex;
     }
     set commanders(level) {
@@ -63,7 +67,7 @@ const bzMapTrixOptions = new class {
     }
     get verbose() {
         const data = this.data.verbose;
-        if (data.selectedItemIndex == null) this.verbose = this.load(data);
+        data.selectedItemIndex ??= this.load(data);
         return data.selectedItemIndex;
     }
     set verbose(level) {
@@ -73,16 +77,23 @@ const bzMapTrixOptions = new class {
     }
     get yieldBanner() {
         const data = this.data.yieldBanner;
-        if (data.currentValue == null) this.yieldBanner = this.load(data);
+        data.currentValue ??= Boolean(this.load(data));
         return data.currentValue;
     }
     set yieldBanner(flag) {
         const data = this.data.yieldBanner;
-        data.currentValue = !!flag;
+        data.currentValue = Boolean(flag);
         this.save(data, data.currentValue ? 1 : 0);
         document.body.classList.toggle("bz-yield-banner", data.currentValue);
     }
 };
+// log stored values
+bzMapTrixOptions.commanders;
+bzMapTrixOptions.verbose;
+// load optional CSS
+document.body.classList.toggle("bz-yield-banner", bzMapTrixOptions.yieldBanner);
+Controls.loadStyle("fs://game/bz-map-trix/ui/bz-style/bz-panel-yield-banner.css");
+
 Options.addInitCallback(() => {
     Options.addOption({
         category: CategoryType.Mods,

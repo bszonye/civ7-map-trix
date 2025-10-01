@@ -262,8 +262,6 @@ BZ_HEAD_STYLE.map(style => {
     e.textContent = style;
     document.head.appendChild(e);
 });
-// sync optional styling
-document.body.classList.toggle("bz-yield-banner", bzMapTrixOptions.yieldBanner);
 
 // debug style (manually enable)
 document.body.classList.toggle("bz-debug", false);
