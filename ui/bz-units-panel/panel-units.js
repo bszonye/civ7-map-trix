@@ -112,7 +112,7 @@ Controls.decorate("panel-mini-map", (val) => new bzPanelMiniMap(val));
 class bzUnitsPanel extends MinimapSubpanel {
     static savedScrollPosition = 0;
     panel = document.createElement("fxs-vslot");
-    inputContext = InputContext.Dual;
+    inputContext = InputContext.Unit;
     activateTypeListener = this.activateType.bind(this);
     activateUnitListener = this.activateUnit.bind(this);
     modelUpdateListener = this.onModelUpdate.bind(this);
