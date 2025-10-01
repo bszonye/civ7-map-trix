@@ -19,11 +19,11 @@ class bzReligionLensLayer {
     initLayer() {
         this.updateMap();
         this.bzSpriteGrid.setVisible(false);
-        engine.on('PlotVisibilityChanged', this.onPlotChange, this);
-        engine.on('CityReligionChanged', this.onMapChange, this);
-        engine.on('RuralReligionChanged', this.onMapChange, this);
-        engine.on('UrbanReligionChanged', this.onMapChange, this);
-        window.addEventListener('layer-hotkey', this.onLayerHotkeyListener);
+        engine.on("PlotVisibilityChanged", this.onPlotChange, this);
+        engine.on("CityReligionChanged", this.onMapChange, this);
+        engine.on("RuralReligionChanged", this.onMapChange, this);
+        engine.on("UrbanReligionChanged", this.onMapChange, this);
+        window.addEventListener("layer-hotkey", this.onLayerHotkeyListener);
     }
     applyLayer() {
         this.bzSpriteGrid.setVisible(true);
@@ -90,9 +90,9 @@ class bzReligionLensLayer {
         this.updatePlot(data.location);
     }
     onLayerHotkey(hotkey) {
-        if (hotkey.detail.name == 'toggle-bz-religion-layer') {
-            LensManager.toggleLayer('bz-religion-layer');
+        if (hotkey.detail.name == "toggle-bz-religion-layer") {
+            LensManager.toggleLayer("bz-religion-layer");
         }
     }
 }
-LensManager.registerLensLayer('bz-religion-layer', new bzReligionLensLayer());
+LensManager.registerLensLayer("bz-religion-layer", new bzReligionLensLayer());

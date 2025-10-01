@@ -25,10 +25,10 @@ class bzDiscoveryLensLayer {
         }
         this.updateMap();
         this.bzSpriteGrid.setVisible(false);
-        engine.on('PlotVisibilityChanged', this.onPlotChange, this);
-        engine.on('ConstructibleAddedToMap', this.onPlotChange, this);
-        engine.on('ConstructibleRemovedFromMap', this.onPlotChange, this);
-        window.addEventListener('layer-hotkey', this.onLayerHotkeyListener);
+        engine.on("PlotVisibilityChanged", this.onPlotChange, this);
+        engine.on("ConstructibleAddedToMap", this.onPlotChange, this);
+        engine.on("ConstructibleRemovedFromMap", this.onPlotChange, this);
+        window.addEventListener("layer-hotkey", this.onLayerHotkeyListener);
     }
     applyLayer() {
         this.bzSpriteGrid.setVisible(true);
@@ -69,8 +69,8 @@ class bzDiscoveryLensLayer {
         this.updatePlot(data.location);
     }
     onLayerHotkey(hotkey) {
-        if (hotkey.detail.name == 'toggle-bz-discovery-layer') {
-            LensManager.toggleLayer('bz-discovery-layer');
+        if (hotkey.detail.name == "toggle-bz-discovery-layer") {
+            LensManager.toggleLayer("bz-discovery-layer");
         }
     }
 }
@@ -79,4 +79,4 @@ const instance = new bzDiscoveryLensLayer();
 const option = UI.getOption("user", "Gameplay", instance.getOptionName());
 if (option == null) UI.setOption("user", "Gameplay", instance.getOptionName(), 1);
 // register lens
-LensManager.registerLensLayer('bz-discovery-layer', instance);
+LensManager.registerLensLayer("bz-discovery-layer", instance);

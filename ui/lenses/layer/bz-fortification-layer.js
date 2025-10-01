@@ -18,11 +18,11 @@ class bzFortificationLensLayer {
     initLayer() {
         this.updateMap();
         this.bzSpriteGrid.setVisible(false);
-        engine.on('PlotVisibilityChanged', this.onPlotChange, this);
-        engine.on('ConstructibleAddedToMap', this.onPlotChange, this);
-        engine.on('ConstructibleRemovedFromMap', this.onPlotChange, this);
-        engine.on('DistrictControlChanged', this.onPlotChange, this);
-        window.addEventListener('layer-hotkey', this.onLayerHotkeyListener);
+        engine.on("PlotVisibilityChanged", this.onPlotChange, this);
+        engine.on("ConstructibleAddedToMap", this.onPlotChange, this);
+        engine.on("ConstructibleRemovedFromMap", this.onPlotChange, this);
+        engine.on("DistrictControlChanged", this.onPlotChange, this);
+        window.addEventListener("layer-hotkey", this.onLayerHotkeyListener);
     }
     applyLayer() {
         this.bzSpriteGrid.setVisible(true);
@@ -77,9 +77,9 @@ class bzFortificationLensLayer {
         this.updatePlot(data.location);
     }
     onLayerHotkey(hotkey) {
-        if (hotkey.detail.name == 'toggle-bz-fortification-layer') {
-            LensManager.toggleLayer('bz-fortification-layer');
+        if (hotkey.detail.name == "toggle-bz-fortification-layer") {
+            LensManager.toggleLayer("bz-fortification-layer");
         }
     }
 }
-LensManager.registerLensLayer('bz-fortification-layer', new bzFortificationLensLayer());
+LensManager.registerLensLayer("bz-fortification-layer", new bzFortificationLensLayer());
