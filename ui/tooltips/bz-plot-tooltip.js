@@ -1966,7 +1966,7 @@ const BZ_DUMP_SIZE = 12;  // 96px at 4K
 bzPlotTooltip._instance = new bzPlotTooltip();
 function installPlotTooltip(instance) {
     TooltipManager.registerPlotType('plot', PlotTooltipPriority.LOW, instance);
-    console.warn(`bz-plot-tooltip: enabled`);
+    console.warn(`bz-plot-tooltip: registered`);
 }
 // dynamically import the vanilla plot tooltip for timing
 // (but also protect against broken tooltip mods)

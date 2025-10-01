@@ -3,6 +3,12 @@ import { O as OVERLAY_PRIORITY } from '/base-standard/ui/utilities/utilities-ove
 // load mini-map first to configure allowed layers for default lens
 import '/bz-map-trix/ui/mini-map/bz-panel-mini-map.js';
 
+// safely test whether a layer is enabled
+function isLayerEnabled(layerType) {
+    if (!LensManager.layers.get(layerType)) return false;
+    return LensManager.isLayerEnabled(layerType);
+}
+
 var BorderStyleTypes;
 (function (BorderStyleTypes) {
     BorderStyleTypes["Closed"] = "CultureBorder_Closed";
@@ -130,7 +136,7 @@ class bzCultureBordersLayer {
         this.cultureOverlayGroup.setVisible(false);
     }
     applyLayer() {
-        if (LensManager.isLayerEnabled('bz-city-borders-layer')) return;
+        if (isLayerEnabled('bz-city-borders-layer')) return;
         this.updateBorders();
         this.cultureOverlayGroup.setVisible(true);
     }
@@ -148,12 +154,12 @@ class bzCultureBordersLayer {
     onLensLayerDisabled(event) {
         if (event.detail.layer == 'bz-culture-borders-layer') {
             // when Borders are off, City Limits must be off too
-            if (LensManager.isLayerEnabled('bz-city-borders-layer')) {
+            if (isLayerEnabled('bz-city-borders-layer')) {
                 LensManager.disableLayer('bz-city-borders-layer');
             }
         } else if (event.detail.layer == 'bz-city-borders-layer') {
             // when City Limits turn off, reapply Borders
-            if (LensManager.isLayerEnabled('bz-culture-borders-layer')) {
+            if (isLayerEnabled('bz-culture-borders-layer')) {
                 this.applyLayer();
             }
         }
@@ -167,7 +173,7 @@ class bzCultureBordersLayer {
             setTimeout(() => LensManager.disableLayer('fxs-culture-borders-layer'));
         } else if (event.detail.layer == 'bz-city-borders-layer') {
             // when City Limits are on, Borders must be on (but hidden)
-            if (LensManager.isLayerEnabled('bz-culture-borders-layer')) {
+            if (isLayerEnabled('bz-culture-borders-layer')) {
                 this.removeLayer();
             } else {
                 LensManager.enableLayer('bz-culture-borders-layer');
@@ -181,3 +187,4 @@ const option = UI.getOption("user", "Gameplay", instance.getOptionName());
 if (option == null) UI.setOption("user", "Gameplay", instance.getOptionName(), 1);
 // register lens
 LensManager.registerLensLayer('bz-culture-borders-layer', instance);
+console.warn(`bz-culture-borders-layer: registered`);

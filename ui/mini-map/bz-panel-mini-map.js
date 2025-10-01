@@ -104,42 +104,31 @@ engine.whenReady.then(() => {
         if (rv) return original.apply(this, args);
     }
 });
-// patch new layers into default lens (before engine startup)
+// patch new layers into fxs-default-lens (allowedLayers)
 const defaultLens = LensManager.lenses.get("fxs-default-lens");
 defaultLens.activeLayers.delete("fxs-culture-borders-layer");
-for (const layer of Object.keys(BZ_LAYERS)) {
-    defaultLens.allowedLayers.add(layer);
-}
-// patch new layers into registered lenses (after engine startup)
-engine.whenReady.then(() => {
-    for (const [lensType, lens] of LensManager.lenses.entries()) {
-        if (lensType == "fxs-default-lens") continue;
-        const active = lens.activeLayers;
-        const allowed = lens.allowedLayers;
-        // swap in modded borders
-        if (active.has("fxs-culture-borders-layer")) {
-            active.delete("fxs-culture-borders-layer");
-            active.add("bz-culture-borders-layer");
-        }
-        if (active.has("fxs-city-borders-layer")) {
-            active.delete("fxs-city-borders-layer");
-            active.add("bz-city-borders-layer");
-        }
-        // add discovery layer to every lens that allows Resources
-        if (active.has("fxs-resource-layer") || allowed.has("fxs-resource-layer")) {
-            active.add("bz-discovery-layer");
-        }
-        // add extra default layers
-        const extra = new Set(BZ_EXTRA_LAYERS[lensType] ?? []);
-        for (const layerType of extra) active.add(layerType);
-        // if lens is already active, enable any registered layers
-        // (event handlers will take care of borders)
-        if (lensType == LensManager.activeLens) {
-            for (const layerType of extra) {
-                if (LensManager.active.get(layerType)) LensManager.enableLayer(layerType);
-            }
-        }
+for (const layer of Object.keys(BZ_LAYERS)) defaultLens.allowedLayers.add(layer);
+// patch new layers into other lenses (activeLayers)
+for (const [lensType, lens] of LensManager.lenses.entries()) {
+    if (lensType == "fxs-default-lens") continue;
+    const active = lens.activeLayers;
+    const allowed = lens.allowedLayers;
+    // swap in modded borders
+    if (active.has("fxs-city-borders-layer")) {
+        active.delete("fxs-city-borders-layer");
+        active.add("bz-city-borders-layer");
     }
-});
+    if (active.has("fxs-culture-borders-layer")) {
+        active.delete("fxs-culture-borders-layer");
+        active.add("bz-culture-borders-layer");
+    }
+    // add discovery layer to every lens that allows Resources
+    if (active.has("fxs-resource-layer") || allowed.has("fxs-resource-layer")) {
+        active.add("bz-discovery-layer");
+    }
+    // add extra default layers
+    const extra = new Set(BZ_EXTRA_LAYERS[lensType] ?? []);
+    for (const layerType of extra) active.add(layerType);
+}
 
 Controls.decorate("lens-panel", (component) => new bzLensPanel(component));
