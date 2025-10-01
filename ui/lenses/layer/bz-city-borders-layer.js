@@ -2,7 +2,7 @@ import { L as LensManager, b as LensLayerEnabledEventName } from '/core/ui/lense
 import { O as OVERLAY_PRIORITY } from '/base-standard/ui/utilities/utilities-overlay.chunk.js';
 // load mini-map first to configure allowed layers for default lens
 import '/bz-map-trix/ui/mini-map/bz-panel-mini-map.js';
-// load culture borders first to ensure its handlers are active
+// load bz-culture-borders-layer first to ensure its handlers are active
 import '/bz-map-trix/ui/lenses/layer/bz-culture-borders-layer.js';
 
 var BorderStyleTypes;
