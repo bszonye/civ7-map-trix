@@ -1,7 +1,7 @@
 import '/core/ui/options/screen-options.js';  // make sure this loads first
 import { C as CategoryType, O as Options, a as OptionType } from '/core/ui/options/editors/index.chunk.js';
 // set up mod options tab
-import '/bz-map-trix/ui/options/mod-options.js';
+import ModOptions from '/bz-map-trix/ui/options/mod-options.js';
 
 export var bzCommanderLens;
 (function (bzCommanderLens) {
@@ -31,60 +31,50 @@ const verbosityOptions = [
 ];
 
 const bzMapTrixOptions = new class {
-    data = {
-        commanders: {
-            optionName: "bzMapTrixCommanders",
-            defaultValue: bzCommanderLens.MILITARY,
-        },
-        verbose: {
-            optionName: "bzMapTrixVerbosity",
-            defaultValue: bzVerbosity.STANDARD,
-        },
-        yieldBanner: {
-            optionName: "bzMapTrixYieldBanner",
-            defaultValue: true,
-        },
+    modID = "bz-map-trix";
+    defaults = {
+        commanders: bzCommanderLens.MILITARY,
+        verbose: bzVerbosity.STANDARD,
+        yieldBanner: Number(true),
     };
-    load(data) {
-        const value = UI.getOption("user", "Mod", data.optionName);
-        console.warn(`LOAD ${data.optionName} = ${JSON.stringify(value)}`);
-        return value ?? data.defaultValue;
+    data = {};
+    load(optionID) {
+        const value = ModOptions.load(this.modID, optionID);
+        if (value == null) {
+            const value = this.defaults[optionID];
+            console.warn(`LOAD ${this.modID}.${optionID}=${value} (default)`);
+            return value;
+        }
+        return value;
     }
-    save(data, value) {
-        UI.setOption("user", "Mod", data.optionName, value);
-        console.warn(`SAVE ${data.optionName} = ${JSON.stringify(value)}`);
-        Configuration.getUser().saveCheckpoint();
+    save(optionID) {
+        const value = Number(this.data[optionID]);
+        ModOptions.save(this.modID, optionID, value);
     }
     get commanders() {
-        const data = this.data.commanders;
-        data.selectedItemIndex ??= this.load(data);
-        return data.selectedItemIndex;
+        this.data.commanders ??= this.load("commanders");
+        return this.data.commanders;
     }
-    set commanders(level) {
-        const data = this.data.commanders;
-        data.selectedItemIndex = level;
-        this.save(data, data.selectedItemIndex);
+    set commanders(value) {
+        this.data.commanders = value;
+        this.save("commanders");
     }
     get verbose() {
-        const data = this.data.verbose;
-        data.selectedItemIndex ??= this.load(data);
-        return data.selectedItemIndex;
+        this.data.verbose ??= this.load("verbose");
+        return this.data.verbose;
     }
-    set verbose(level) {
-        const data = this.data.verbose;
-        data.selectedItemIndex = level;
-        this.save(data, data.selectedItemIndex);
+    set verbose(value) {
+        this.data.verbose = value;
+        this.save("verbose");
     }
     get yieldBanner() {
-        const data = this.data.yieldBanner;
-        data.currentValue ??= Boolean(this.load(data));
-        return data.currentValue;
+        this.data.yieldBanner ??= Boolean(this.load("yieldBanner"));
+        return this.data.yieldBanner;
     }
     set yieldBanner(flag) {
-        const data = this.data.yieldBanner;
-        data.currentValue = Boolean(flag);
-        this.save(data, data.currentValue ? 1 : 0);
-        document.body.classList.toggle("bz-yield-banner", data.currentValue);
+        this.data.yieldBanner = Boolean(flag);
+        this.save("yieldBanner");
+        document.body.classList.toggle("bz-yield-banner", this.data.yieldBanner);
     }
 };
 // log stored values
@@ -97,16 +87,11 @@ Controls.loadStyle("fs://game/bz-map-trix/ui/bz-style/bz-panel-yield-banner.css"
 Options.addInitCallback(() => {
     Options.addOption({
         category: CategoryType.Mods,
-        // @ts-ignore
         group: "bz_mods",
         type: OptionType.Dropdown,
         id: "bz-commander-lens",
-        initListener: (info) => {
-            info.selectedItemIndex = bzMapTrixOptions.commanders;
-        },
-        updateListener: (_info, value) => {
-            bzMapTrixOptions.commanders = value;
-        },
+        initListener: (info) => { info.selectedItemIndex = bzMapTrixOptions.commanders; },
+        updateListener: (_info, value) => { bzMapTrixOptions.commanders = value; },
         label: "LOC_OPTIONS_BZ_COMMANDER_LENS",
         description: "LOC_OPTIONS_BZ_COMMANDER_LENS_DESCRIPTION",
         dropdownItems: commandOptions,
@@ -115,16 +100,11 @@ Options.addInitCallback(() => {
 Options.addInitCallback(() => {
     Options.addOption({
         category: CategoryType.Mods,
-        // @ts-ignore
         group: "bz_mods",
         type: OptionType.Dropdown,
         id: "bz-map-trix-verbose",
-        initListener: (info) => {
-            info.selectedItemIndex = bzMapTrixOptions.verbose;
-        },
-        updateListener: (_info, value) => {
-            bzMapTrixOptions.verbose = value;
-        },
+        initListener: (info) => { info.selectedItemIndex = bzMapTrixOptions.verbose; },
+        updateListener: (_info, value) => { bzMapTrixOptions.verbose = value; },
         label: "LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE",
         description: "LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE_DESCRIPTION",
         dropdownItems: verbosityOptions,
@@ -136,12 +116,8 @@ Options.addInitCallback(() => {
         group: "bz_mods",
         type: OptionType.Checkbox,
         id: "bz-restyle-yield-banner",
-        initListener: (info) => {
-            info.currentValue = bzMapTrixOptions.yieldBanner;
-        },
-        updateListener: (_info, value) => {
-            bzMapTrixOptions.yieldBanner = value;
-        },
+        initListener: (info) => { info.currentValue = bzMapTrixOptions.yieldBanner; },
+        updateListener: (_info, value) => { bzMapTrixOptions.yieldBanner = value; },
         label: "LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER",
         description: "LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER_DESCRIPTION",
     });
