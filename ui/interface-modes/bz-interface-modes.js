@@ -1,4 +1,4 @@
-import { A as Audio } from '/core/ui/input/focus-manager.js';
+import { A as Audio } from '/core/ui/audio-base/audio-support.chunk.js';
 import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
 // guarantee import order for patching
 import '/base-standard/ui/interface-modes/interface-mode-ranged-attack.js';
