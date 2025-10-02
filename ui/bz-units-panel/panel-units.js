@@ -1,4 +1,4 @@
-import { A as Audio } from '/core/ui/input/focus-manager.js';
+import { A as Audio } from '/core/ui/audio-base/audio-support.chunk.js';
 import { F as Focus } from '/core/ui/input/focus-support.chunk.js';
 import { b as InputEngineEventName } from '../../../core/ui/input/input-support.chunk.js';
 import { A as AnchorType } from '/core/ui/panel-support.chunk.js';
@@ -112,7 +112,7 @@ Controls.decorate("panel-mini-map", (val) => new bzPanelMiniMap(val));
 class bzUnitsPanel extends MinimapSubpanel {
     static savedScrollPosition = 0;
     panel = document.createElement("fxs-vslot");
-    inputContext = InputContext.Dual;
+    inputContext = InputContext.Unit;
     activateTypeListener = this.activateType.bind(this);
     activateUnitListener = this.activateUnit.bind(this);
     modelUpdateListener = this.onModelUpdate.bind(this);
@@ -237,7 +237,7 @@ class bzUnitsPanel extends MinimapSubpanel {
             const movement = document.createElement("div");
             movement.classList.value = "bz-unit-movement flex items-center mr-2";
             const moveIcon = document.createElement("img");
-            moveIcon.classList.value = "bz-icon size-5 -ml-1 mr-1";
+            moveIcon.classList.value = "bz-icon size-5 -ml-0\\.5 mr-0\\.5";
             moveIcon.setAttribute("src", "blp:Action_Move");
             movement.appendChild(moveIcon);
             const moveText = document.createElement("div");

@@ -19,6 +19,7 @@ export default [
                 Color: "readonly",
                 CombatTypes: "readonly",
                 ComponentValueChangeEventName: "readonly",
+                Configuration: "readonly",
                 Constructibles: "readonly",
                 Controls: "readonly",
                 CustomEvent: "readonly",

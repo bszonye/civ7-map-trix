@@ -1,5 +1,7 @@
 import { L as LensManager } from '/core/ui/lenses/lens-manager.chunk.js';
 import { U as UpdateGate } from '/core/ui/utilities/utilities-update-gate.chunk.js';
+// load mini-map first to configure allowed layers for default lens
+import '/bz-map-trix/ui/mini-map/bz-panel-mini-map.js';
 
 const SPRITE_CLIFF = "dip_cancel";
 // coordinates for tile edges
@@ -12,7 +14,7 @@ const SPRITE_OFFSET = [
     { x: -16, y: 28 },   // northwest
 ];
 // VFX constants
-const VFX_ROUTE = 'VFX_3dUI_TradeRoute_01';
+const VFX_ROUTE = "VFX_3dUI_TradeRoute_01";
 const VFX_OFFSET = { x: 0, y: 0, z: 0 };
 const VFX_DIRECTION = [ 6, 1, 2, 3, 4, 5 ];  // northeast is 6, not 0
 // #ebb25f  oklch(0.8 0.12 75)  rgb(235, 178, 95)
@@ -34,29 +36,32 @@ class bzRouteLensLayer {
     visible = null;  // revealed plots (when layer is enabled)
     // event handlers
     updateGate = new UpdateGate(this.updateMap.bind(this));
-    onRouteChange = () => this.updateGate.call('onRouteChange');
+    onRouteChange = () => this.updateGate.call("onRouteChange");
     onLayerHotkeyListener = this.onLayerHotkey.bind(this);
     initLayer() {
         this.updateMap();
-        engine.on('RouteAddedToMap', this.onRouteChange);
-        engine.on('RouteChanged', this.onRouteChange);
-        engine.on('RouteRemovedFromMap', this.onRouteChange);
-        window.addEventListener('layer-hotkey', this.onLayerHotkeyListener);
+        engine.on("RouteAddedToMap", this.onRouteChange);
+        engine.on("RouteChanged", this.onRouteChange);
+        engine.on("RouteRemovedFromMap", this.onRouteChange);
+        window.addEventListener("layer-hotkey", this.onLayerHotkeyListener);
         this.routeSpriteGrid.setVisible(false);
     }
     applyLayer() {
         // initialize visibility map but don't reset it (avoids flicker)
         if (!this.visible) this.visible = [];
         this.updateVFX();
-        engine.on('PlotVisibilityChanged', this.onVisibilityChange, this);
+        engine.on("PlotVisibilityChanged", this.onVisibilityChange, this);
         this.routeSpriteGrid.setVisible(true);
     }
     removeLayer() {
         // disable VFX handlers and clear the map
-        engine.off('PlotVisibilityChanged', this.onVisibilityChange, this);
+        engine.off("PlotVisibilityChanged", this.onVisibilityChange, this);
         this.routeModelGroup.clear();
         this.visible = null;
         this.routeSpriteGrid.setVisible(false);
+    }
+    getOptionName() {
+        return "bzShowMapRoads";
     }
     updatePlot(loc) {
         // this.routeSpriteGrid.clearPlot(loc);
@@ -140,9 +145,9 @@ class bzRouteLensLayer {
         this.updatePlotVFX(plotIndex);
     }
     onLayerHotkey(hotkey) {
-        if (hotkey.detail.name == 'toggle-bz-route-layer') {
-            LensManager.toggleLayer('bz-route-layer');
+        if (hotkey.detail.name == "toggle-bz-route-layer") {
+            LensManager.toggleLayer("bz-route-layer");
         }
     }
 }
-LensManager.registerLensLayer('bz-route-layer', new bzRouteLensLayer());
+LensManager.registerLensLayer("bz-route-layer", new bzRouteLensLayer());

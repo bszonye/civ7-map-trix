@@ -35,6 +35,16 @@ const BZ_ICON_VILLAGE_TYPES = {  // by city-state type and age
         "IMPROVEMENT_MONASTERY",
         "IMPROVEMENT_INSTITUTE",
     ],
+    EXPANSIONIST: [
+        "IMPROVEMENT_ICE_HOUSE",
+        "IMPROVEMENT_SAQIYA",
+        "IMPROVEMENT_ABATTOIR",
+    ],
+    DIPLOMATIC: [
+        "IMPROVEMENT_FESTIVAL_GROUNDS",
+        "IMPROVEMENT_MINOR_EMBASSY",
+        "IMPROVEMENT_CIRCUS_FAIR",
+    ],
     // extra village types from City-States Expanded mod
     AGRICULTURAL: [
         "IMPROVEMENT_FARM",
@@ -59,6 +69,12 @@ const BZ_ICON_TYPES = {
     IMPROVEMENT_ZIGGURAT: ["SCIENTIFIC"],
     IMPROVEMENT_MONASTERY: ["SCIENTIFIC"],
     IMPROVEMENT_INSTITUTE: ["SCIENTIFIC"],
+    IMPROVEMENT_ICE_HOUSE: ["EXPANSIONIST"],
+    IMPROVEMENT_SAQIYA: ["EXPANSIONIST"],
+    IMPROVEMENT_ABATTOIR: ["EXPANSIONIST"],
+    IMPROVEMENT_FESTIVAL_GROUNDS: ["DIPLOMATIC"],
+    IMPROVEMENT_MINOR_EMBASSY: ["DIPLOMATIC"],
+    IMPROVEMENT_CIRCUS_FAIR: ["DIPLOMATIC"],
 };
 
 // color palette
@@ -119,6 +135,8 @@ const BZ_COLOR = {
     scientific: "#4d7c96",
     economic: "#ffd553",
     cultural: "#892bb3",
+    expansionist: "#00a717",
+    diplomatic: "#255be4",
 };
 const BZ_ALERT = {
     primary: { "background-color": BZ_COLOR.primary, },
@@ -154,6 +172,8 @@ const BZ_TYPE_COLOR = {
     ECONOMIC: BZ_COLOR.economic,  // yellow
     MILITARISTIC: BZ_COLOR.militaristic,  // red
     SCIENTIFIC: BZ_COLOR.scientific,  // blue
+    EXPANSIONIST: BZ_COLOR.expansionist,  // green
+    DIPLOMATIC: BZ_COLOR.diplomatic,  // dark blue
     YIELD_CULTURE: BZ_COLOR.culture,  // violet
     YIELD_DIPLOMACY: BZ_COLOR.diplomacy,  // teal
     YIELD_FOOD: BZ_COLOR.food,  // green
@@ -165,17 +185,19 @@ const BZ_TYPE_COLOR = {
 const BZ_TYPE_SORT = {
     [BZ_COLOR.bronze]: 0,  // neutral
     [BZ_COLOR.food]: 1,  // green
-    [BZ_COLOR.production]: 2,  // brown
-    [BZ_COLOR.militaristic]: 3,  // red (city-state)
-    [BZ_COLOR.gold]: 4,  // yellow
-    [BZ_COLOR.economic]: 5,  // yellow (city-state)
-    [BZ_COLOR.science]: 6,  // blue
-    [BZ_COLOR.scientific]: 7,  // blue (city-state)
-    [BZ_COLOR.culture]: 8,  // violet
-    [BZ_COLOR.cultural]: 9,  // purple (city-state)
-    [BZ_COLOR.happiness]: 10,  // orange
-    [BZ_COLOR.diplomacy]: 11,  // teal
-    undefined: 12,
+    [BZ_COLOR.expansionist]: 2,  // green (city-state)
+    [BZ_COLOR.production]: 3,  // brown
+    [BZ_COLOR.militaristic]: 4,  // red (city-state)
+    [BZ_COLOR.gold]: 5,  // yellow
+    [BZ_COLOR.economic]: 6,  // yellow (city-state)
+    [BZ_COLOR.science]: 7,  // blue
+    [BZ_COLOR.scientific]: 8,  // blue (city-state)
+    [BZ_COLOR.culture]: 9,  // violet
+    [BZ_COLOR.cultural]: 10,  // purple (city-state)
+    [BZ_COLOR.happiness]: 11,  // orange
+    [BZ_COLOR.diplomatic]: 12,  // dark blue (city-state)
+    [BZ_COLOR.diplomacy]: 13,  // teal
+    undefined: 14,
 }
 const bzTypeSort = (a, b) => {
     const asort = BZ_TYPE_SORT[a?.substring(0, 7)] ?? BZ_TYPE_SORT[undefined];
@@ -262,8 +284,6 @@ BZ_HEAD_STYLE.map(style => {
     e.textContent = style;
     document.head.appendChild(e);
 });
-// sync optional styling
-document.body.classList.toggle("bz-yield-banner", bzMapTrixOptions.yieldBanner);
 
 // debug style (manually enable)
 document.body.classList.toggle("bz-debug", false);
@@ -1946,7 +1966,7 @@ const BZ_DUMP_SIZE = 12;  // 96px at 4K
 bzPlotTooltip._instance = new bzPlotTooltip();
 function installPlotTooltip(instance) {
     TooltipManager.registerPlotType('plot', PlotTooltipPriority.LOW, instance);
-    console.warn(`bz-plot-tooltip: enabled`);
+    console.warn(`bz-plot-tooltip: registered`);
 }
 // dynamically import the vanilla plot tooltip for timing
 // (but also protect against broken tooltip mods)

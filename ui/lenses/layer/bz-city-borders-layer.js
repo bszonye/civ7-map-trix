@@ -1,5 +1,10 @@
 import { L as LensManager, b as LensLayerEnabledEventName } from '/core/ui/lenses/lens-manager.chunk.js';
 import { O as OVERLAY_PRIORITY } from '/base-standard/ui/utilities/utilities-overlay.chunk.js';
+// load mini-map first to configure allowed layers for default lens
+import '/bz-map-trix/ui/mini-map/bz-panel-mini-map.js';
+// load bz-culture-borders-layer first to ensure its handlers are active
+import '/bz-map-trix/ui/lenses/layer/bz-culture-borders-layer.js';
+
 var BorderStyleTypes;
 (function (BorderStyleTypes) {
     BorderStyleTypes["Closed"] = "CultureBorder_Closed";
@@ -18,7 +23,7 @@ const BZ_VILLAGE_STYLE = {
 };
 const thicknessZoomMultiplier = 3;
 function borderGroup(id) {
-    if (typeof id === 'number') return id < 0 ? id : BZ_GROUP_MAX - id;
+    if (typeof id === "number") return id < 0 ? id : BZ_GROUP_MAX - id;
     if (id.id == -1) return borderGroup(id.owner);
     const city = Cities.get(id);
     return city ? GameplayMap.getIndexFromLocation(city.location) : -1;
@@ -54,7 +59,7 @@ class bzCityBordersLayer {
         };
     }
     getPlayerStyle(player) {
-        if (typeof player === 'number') player = Players.get(player);
+        if (typeof player === "number") player = Players.get(player);
         if (player.isIndependent) return BZ_VILLAGE_STYLE;
         const style = player.isMajor ? BorderStyleTypes.Closed :
             BorderStyleTypes.CityStateClosed;
@@ -92,9 +97,9 @@ class bzCityBordersLayer {
     }
     initLayer() {
         this.updateBorders();
-        engine.on('CameraChanged', this.onCameraChanged);
-        engine.on('PlotOwnershipChanged', this.onPlotOwnershipChanged);
-        window.addEventListener('layer-hotkey', this.onLayerHotkeyListener);
+        engine.on("CameraChanged", this.onCameraChanged);
+        engine.on("PlotOwnershipChanged", this.onPlotOwnershipChanged);
+        window.addEventListener("layer-hotkey", this.onLayerHotkeyListener);
         window.addEventListener(LensLayerEnabledEventName, this.onLensLayerEnabledListener);
         this.cityOverlayGroup.setVisible(false);
     }
@@ -105,19 +110,22 @@ class bzCityBordersLayer {
     removeLayer() {
         this.cityOverlayGroup.setVisible(false);
     }
+    getOptionName() {
+        return "bzShowMapCityBorders";
+    }
     onLayerHotkey(hotkey) {
-        if (hotkey.detail.name == 'toggle-bz-city-borders-layer') {
-            LensManager.toggleLayer('bz-city-borders-layer');
+        if (hotkey.detail.name == "toggle-bz-city-borders-layer") {
+            LensManager.toggleLayer("bz-city-borders-layer");
         }
     }
     onLensLayerEnabled(event) {
-        if (event.detail.layer == 'fxs-city-borders-layer') {
+        if (event.detail.layer == "fxs-city-borders-layer") {
             // replace the vanilla city borders
-            console.warn('bz-city-borders-layer: fxs borders replaced');
-            LensManager.enableLayer('bz-city-borders-layer');
+            console.warn("bz-city-borders-layer: fxs borders replaced");
+            LensManager.enableLayer("bz-city-borders-layer");
             // delay switch to avoid crashing Border Toggles
-            setTimeout(() => LensManager.disableLayer('fxs-city-borders-layer'));
+            setTimeout(() => LensManager.disableLayer("fxs-city-borders-layer"));
         }
     }
 }
-LensManager.registerLensLayer('bz-city-borders-layer', new bzCityBordersLayer());
+LensManager.registerLensLayer("bz-city-borders-layer", new bzCityBordersLayer());

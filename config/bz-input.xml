@@ -11,22 +11,22 @@
         <Replace ActionId="toggle-bz-terrain-layer" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER" Description="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER_TT" />
     </InputActions>
     <InputContextConstraints>
-        <Replace ActionId="open-bz-units-panel" ContextId="World"/>
         <Replace ActionId="open-bz-units-panel" ContextId="Unit"/>
-        <Replace ActionId="toggle-bz-culture-borders-layer" ContextId="World"/>
+        <Replace ActionId="open-bz-units-panel" ContextId="World"/>
         <Replace ActionId="toggle-bz-culture-borders-layer" ContextId="Unit"/>
-        <Replace ActionId="toggle-bz-city-borders-layer" ContextId="World"/>
+        <Replace ActionId="toggle-bz-culture-borders-layer" ContextId="World"/>
         <Replace ActionId="toggle-bz-city-borders-layer" ContextId="Unit"/>
-        <Replace ActionId="toggle-bz-discovery-layer" ContextId="World"/>
+        <Replace ActionId="toggle-bz-city-borders-layer" ContextId="World"/>
         <Replace ActionId="toggle-bz-discovery-layer" ContextId="Unit"/>
-        <Replace ActionId="toggle-bz-fortification-layer" ContextId="World"/>
+        <Replace ActionId="toggle-bz-discovery-layer" ContextId="World"/>
         <Replace ActionId="toggle-bz-fortification-layer" ContextId="Unit"/>
-        <Replace ActionId="toggle-bz-religion-layer" ContextId="World"/>
+        <Replace ActionId="toggle-bz-fortification-layer" ContextId="World"/>
         <Replace ActionId="toggle-bz-religion-layer" ContextId="Unit"/>
-        <Replace ActionId="toggle-bz-route-layer" ContextId="World"/>
+        <Replace ActionId="toggle-bz-religion-layer" ContextId="World"/>
         <Replace ActionId="toggle-bz-route-layer" ContextId="Unit"/>
-        <Replace ActionId="toggle-bz-terrain-layer" ContextId="World"/>
+        <Replace ActionId="toggle-bz-route-layer" ContextId="World"/>
         <Replace ActionId="toggle-bz-terrain-layer" ContextId="Unit"/>
+        <Replace ActionId="toggle-bz-terrain-layer" ContextId="World"/>
     </InputContextConstraints>
     <InputActionDefaultGestures>
         <Replace ActionId="open-bz-units-panel" Index="0" GestureType="KBMouse" GestureData="KEY_SHIFT+KEY_U"/>

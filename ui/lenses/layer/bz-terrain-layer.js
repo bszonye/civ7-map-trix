@@ -1,6 +1,11 @@
 import { gatherMovementObstacles } from '/bz-map-trix/ui/tooltips/bz-plot-tooltip.js';
+import { InterfaceMode, InterfaceModeChangedEventName } from '/core/ui/interface-modes/interface-modes.js';
 import { L as LensManager } from '/core/ui/lenses/lens-manager.chunk.js';
+import ChoosePlotInterfaceMode from '/base-standard/ui/interface-modes/interface-mode-choose-plot.js';
 import { O as OVERLAY_PRIORITY } from '/base-standard/ui/utilities/utilities-overlay.chunk.js';
+import { UpdateOperationTargetEventName } from '/base-standard/ui/lenses/layer/operation-target-layer.js';
+// load mini-map first to configure allowed layers for default lens
+import '/bz-map-trix/ui/mini-map/bz-panel-mini-map.js';
 
 // adapted from ui/tooltips/bz-plot-tooltip.js
 const BZ_OVERLAY = {
@@ -30,7 +35,10 @@ class bzTerrainLensLayer {
     terrainOutline = this.terrainOverlayGroup.addBorderOverlay(BZ_NO_OUTLINE);
     outlineGroup = new Map();
     obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
-    onLayerHotkeyListener = this.onLayerHotkey.bind(this);
+    operationPlots = new Set();
+    layerHotkeyListener = this.onLayerHotkey.bind(this);
+    unitSelectionChangedListener = this.onUnitSelectionChanged.bind(this);
+    updateOperationTargetListener = this.onUpdateOperationTarget.bind(this);
     initLayer() {
         for (const [type, overlay] of Object.entries(BZ_OVERLAY)) {
             const style = {
@@ -43,15 +51,32 @@ class bzTerrainLensLayer {
             this.outlineGroup.set(type, group);
         }
         this.updateMap();
-        window.addEventListener('layer-hotkey', this.onLayerHotkeyListener);
+        window.addEventListener("layer-hotkey", this.layerHotkeyListener);
+        window.addEventListener(UpdateOperationTargetEventName, this.updateOperationTargetListener);
+        engine.on("UnitSelectionChanged", this.unitSelectionChangedListener);
         this.terrainOverlayGroup.setVisible(false);
     }
     applyLayer() {
         this.updateMap();
-        this.terrainOverlayGroup.setVisible(true);
+        this.terrainOverlayGroup.setVisible(this.getInterfaceModeVisibility());
+        window.addEventListener(InterfaceModeChangedEventName, this.onInterfaceModeChanged);
     }
     removeLayer() {
+        window.removeEventListener(InterfaceModeChangedEventName, this.onInterfaceModeChanged);
         this.terrainOverlayGroup.setVisible(false);
+    }
+    getOptionName() {
+        return "bzShowMapTerrain";
+    }
+    getInterfaceModeVisibility() {
+        const mode = InterfaceMode.getCurrent();
+        const handler = InterfaceMode.getInterfaceModeHandler(mode);
+        if (!handler) return true;
+        // hide layer in choose-plot interface modes, except move-to
+        if (mode == "INTERFACEMODE_MOVE_TO") return true;
+        return !Object.prototype.isPrototypeOf.call(
+            ChoosePlotInterfaceMode.prototype, handler
+        );
     }
     getTerrainType(loc) {
         // feature types
@@ -89,6 +114,7 @@ class bzTerrainLensLayer {
     }
     updatePlot(loc) {
         const plotIndex = GameplayMap.getIndexFromLocation(loc);
+        if (this.operationPlots.has(plotIndex)) return;
         const type = this.getTerrainType(loc);
         const overlay = BZ_OVERLAY[type];
         if (overlay) {
@@ -97,10 +123,23 @@ class bzTerrainLensLayer {
             this.terrainOutline.setPlotGroups(plotIndex, group);
         }
     }
+    onInterfaceModeChanged = () => {
+        this.terrainOverlayGroup.setVisible(this.getInterfaceModeVisibility());
+    };
     onLayerHotkey(hotkey) {
-        if (hotkey.detail.name == 'toggle-bz-terrain-layer') {
-            LensManager.toggleLayer('bz-terrain-layer');
+        if (hotkey.detail.name == "toggle-bz-terrain-layer") {
+            LensManager.toggleLayer("bz-terrain-layer");
         }
     }
+    onUnitSelectionChanged() {
+        if (this.operationPlots.size) {
+            this.operationPlots = new Set();
+            this.updateMap();
+        }
+    }
+    onUpdateOperationTarget(event) {
+        this.operationPlots = new Set(event.detail.plots);
+        this.updateMap();
+    }
 }
-LensManager.registerLensLayer('bz-terrain-layer', new bzTerrainLensLayer());
+LensManager.registerLensLayer("bz-terrain-layer", new bzTerrainLensLayer());

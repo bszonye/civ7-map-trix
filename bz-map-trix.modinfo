@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Mod id="bz-map-trix" version="30500"
+<Mod id="bz-map-trix" version="30600"
     xmlns="ModInfo">
     <Properties>
         <Name>LOC_MOD_BZ_MAP_TRIX_NAME</Name>
-        <Version>3.5.0</Version>
+        <Version>3.6.0</Version>
         <Description>LOC_MOD_BZ_MAP_TRIX_DESCRIPTION</Description>
         <Authors>beezany</Authors>
         <URL>https://forums.civfanatics.com/resources/map-trix.31950/</URL>
@@ -23,7 +23,7 @@
         </Criteria>
     </ActionCriteria>
     <ActionGroups>
-        <ActionGroup id="bz-map-trix-menu" scope="shell" criteria="always">
+        <ActionGroup id="bz-map-trix-shell" scope="shell" criteria="always">
             <Properties>
                 <LoadOrder>1000</LoadOrder>
             </Properties>
@@ -31,7 +31,7 @@
                 <UIScripts>
                     <Item>ui/options/editors/bz-editor-keyboard-mapping.js</Item>
                     <Item>ui/options/bz-map-trix-options.js</Item>
-                    <Item>ui/options/mod-options-decorator.js</Item>
+                    <Item>ui/options/mod-options.js</Item>
                 </UIScripts>
                 <UpdateDatabase>
                     <Item>config/bz-input.xml</Item>
@@ -48,21 +48,20 @@
                 </UpdateText>
             </Actions>
         </ActionGroup>
-        <ActionGroup id="bz-map-trix-ui" scope="game" criteria="always">
+        <ActionGroup id="bz-map-trix-game" scope="game" criteria="always">
             <Properties>
                 <LoadOrder>1000</LoadOrder>
             </Properties>
             <Actions>
                 <ImportFiles>
-                    <Item>data/icons/bz-city-dot.png</Item>
-                    <Item>data/icons/bz-town-dot.png</Item>
+                    <Item>ui/bz-style/bz-panel-yield-banner.css</Item>
                     <Item>ui/bz-units-panel/panel-units.css</Item>
                 </ImportFiles>
                 <UIScripts>
                     <Item>ui/bz-units-panel/model-units.js</Item>
                     <Item>ui/bz-units-panel/panel-units.js</Item>
-                    <Item>ui/diplo-ribbon/bz-panel-yield-banner.js</Item>
                     <Item>ui/input/bz-hotkey-manager.js</Item>
+                    <Item>ui/interface-modes/bz-interface-modes.js</Item>
                     <Item>ui/lenses/layer/bz-city-borders-layer.js</Item>
                     <Item>ui/lenses/layer/bz-culture-borders-layer.js</Item>
                     <Item>ui/lenses/layer/bz-discovery-layer.js</Item>
@@ -75,12 +74,9 @@
                     <Item>ui/mini-map/bz-panel-mini-map.js</Item>
                     <Item>ui/options/editors/bz-editor-keyboard-mapping.js</Item>
                     <Item>ui/options/bz-map-trix-options.js</Item>
-                    <Item>ui/options/mod-options-decorator.js</Item>
+                    <Item>ui/options/mod-options.js</Item>
                     <Item>ui/tooltips/bz-plot-tooltip.js</Item>
                 </UIScripts>
-                <UpdateIcons>
-                    <Item>data/icons/bz-icons.xml</Item>
-                </UpdateIcons>
                 <UpdateText>
                     <Item>text/en_us/InGameText.xml</Item>
                     <Item locale="de_DE">text/de_DE/InGameText.xml</Item>

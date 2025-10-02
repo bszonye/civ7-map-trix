@@ -1,4 +1,6 @@
 import { L as LensManager } from '/core/ui/lenses/lens-manager.chunk.js';
+// load mini-map first to configure allowed layers for default lens
+import '/bz-map-trix/ui/mini-map/bz-panel-mini-map.js';
 
 const SPRITE_OFFSET = { x: 0, y: 0, z: 5 };
 const SPRITE_SCALE = 2;
@@ -16,17 +18,20 @@ class bzFortificationLensLayer {
     initLayer() {
         this.updateMap();
         this.bzSpriteGrid.setVisible(false);
-        engine.on('PlotVisibilityChanged', this.onPlotChange, this);
-        engine.on('ConstructibleAddedToMap', this.onPlotChange, this);
-        engine.on('ConstructibleRemovedFromMap', this.onPlotChange, this);
-        engine.on('DistrictControlChanged', this.onPlotChange, this);
-        window.addEventListener('layer-hotkey', this.onLayerHotkeyListener);
+        engine.on("PlotVisibilityChanged", this.onPlotChange, this);
+        engine.on("ConstructibleAddedToMap", this.onPlotChange, this);
+        engine.on("ConstructibleRemovedFromMap", this.onPlotChange, this);
+        engine.on("DistrictControlChanged", this.onPlotChange, this);
+        window.addEventListener("layer-hotkey", this.onLayerHotkeyListener);
     }
     applyLayer() {
         this.bzSpriteGrid.setVisible(true);
     }
     removeLayer() {
         this.bzSpriteGrid.setVisible(false);
+    }
+    getOptionName() {
+        return "bzShowMapFortifications";
     }
     updateMap() {
         const width = GameplayMap.getGridWidth();
@@ -72,9 +77,9 @@ class bzFortificationLensLayer {
         this.updatePlot(data.location);
     }
     onLayerHotkey(hotkey) {
-        if (hotkey.detail.name == 'toggle-bz-fortification-layer') {
-            LensManager.toggleLayer('bz-fortification-layer');
+        if (hotkey.detail.name == "toggle-bz-fortification-layer") {
+            LensManager.toggleLayer("bz-fortification-layer");
         }
     }
 }
-LensManager.registerLensLayer('bz-fortification-layer', new bzFortificationLensLayer());
+LensManager.registerLensLayer("bz-fortification-layer", new bzFortificationLensLayer());
