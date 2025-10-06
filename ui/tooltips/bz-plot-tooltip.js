@@ -4,6 +4,7 @@ import TooltipManager, { PlotTooltipPriority } from '/core/ui/tooltips/tooltip-m
 import { C as ComponentID } from '/core/ui/utilities/utilities-component-id.chunk.js';
 import { L as LensManager } from '/core/ui/lenses/lens-manager.chunk.js';
 import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
+import { C as ConstructibleHasTagType } from '/base-standard/ui/utilities/utilities-tags.chunk.js';
 
 // custom & adapted icons
 const BZ_ICON_SIZE = 12;
@@ -441,9 +442,6 @@ function dotJoin(list) {
 function localeJoin(list, divider=" ") {
     return list.map(s => s && Locale.compose(s)).filter(e => e).join(divider);
 }
-function gatherBuildingsTagged(tag) {
-    return new Set(GameInfo.TypeTags.filter(e => e.Tag == tag).map(e => e.Type));
-}
 // get the set of obstacles that end movement for a movement class
 const BZ_OBSTACLES = {};  // cache
 export function gatherMovementObstacles(mclass) {
@@ -650,11 +648,6 @@ class bzPlotTooltip {
         this.totalYields = 0;
         // units
         this.units = [];
-        // lookup tables
-        this.agelessBuildings = gatherBuildingsTagged("AGELESS");
-        this.bridgeBuildings = gatherBuildingsTagged("BRIDGE");
-        this.extraBuildings = gatherBuildingsTagged("IGNORE_DISTRICT_PLACEMENT_CAP");
-        this.largeBuildings = gatherBuildingsTagged("FULL_TILE");
         Loading.runWhenFinished(() => {
             for (const y of GameInfo.Yields) {
                 // Controls.preloadImage(url, 'plot-tooltip');
@@ -1073,6 +1066,7 @@ class bzPlotTooltip {
             const info = GameInfo.Constructibles.lookup(item.type);
             if (!info) continue;
             // properties
+            const type = info.ConstructibleType;
             const name = info.Name;
             const notes = [];
             const age = info.Age ? GameInfo.Ages.lookup(info.Age) : null;
@@ -1082,18 +1076,18 @@ class bzPlotTooltip {
             const isWonder = info.ConstructibleClass == "WONDER";
             if (!(isWonder || isBuilding || isImprovement)) continue;
             const isAgeless = isWonder ||
-                this.agelessBuildings.has(info.ConstructibleType);
-            const isBridge = this.bridgeBuildings.has(info.ConstructibleType);
+                ConstructibleHasTagType(type, "AGELESS");
+            const isBridge = ConstructibleHasTagType(type, "BRIDGE");
             const isComplete = item.complete;
             const isDamaged = item.damaged;
-            const isExtra = this.extraBuildings.has(info.ConstructibleType);
-            const isLarge = this.largeBuildings.has(info.ConstructibleType);
+            const isExtra = ConstructibleHasTagType(type, "IGNORE_DISTRICT_PLACEMENT_CAP");
+            const isLarge = ConstructibleHasTagType(type, "FULL_TILE");
             const isOverbuildable = isBuilding && isComplete && !isAgeless &&
                 age?.AgeType != this.age.AgeType;
             const xinfo =  // subtype-specific info
-                isBuilding ? GameInfo.Buildings.lookup(info.ConstructibleType) :
-                isImprovement ? GameInfo.Improvements.lookup(info.ConstructibleType) :
-                isWonder ? GameInfo.Wonders.lookup(info.ConstructibleType) :
+                isBuilding ? GameInfo.Buildings.lookup(type) :
+                isImprovement ? GameInfo.Improvements.lookup(type) :
+                isWonder ? GameInfo.Wonders.lookup(type) :
                 null;
             if (xinfo.TraitType && this.district.isUniqueQuarter) {
                 this.quarter ??= GameInfo.UniqueQuarters
@@ -1112,7 +1106,7 @@ class bzPlotTooltip {
                 notes.push("LOC_PLOT_TOOLTIP_OVERBUILDABLE");
             }
             const row = {
-                name, notes, age,
+                type, name, notes, age,
                 isBuilding, isImprovement, isWonder,
                 isAgeless, isBridge, isComplete, isDamaged, isExtra,
                 isLarge, isOverbuildable,
@@ -1131,7 +1125,7 @@ class bzPlotTooltip {
             this.constructibles.sort(wallSort);
             this.buildings.sort(wallSort);
             if (this.wonder || this.improvement) {  // should only be one
-                const types = this.constructibles.map(c => c.info?.ConstructibleType);
+                const types = this.constructibles.map(c => c.type);
                 console.warn(`bz-plot-tooltip: expected 1 constructible, not ${n} (${types})`);
             }
         }
@@ -1170,7 +1164,7 @@ class bzPlotTooltip {
                 this.improvement.icon = getVillageIcon(this.owner, this.age);
                 this.improvement.districtName = "LOC_DISTRICT_BZ_INDEPENDENT";
             } else {
-                this.improvement.icon = info.ConstructibleType;
+                this.improvement.icon = this.improvement.type;
             }
         }
         // get the free constructible (standard tile improvement)
@@ -1183,6 +1177,8 @@ class bzPlotTooltip {
         const fcID = Districts.getFreeConstructible(loc, this.observerID);
         const info = GameInfo.Constructibles.lookup(fcID);
         if (!info) return;  // mountains, open ocean
+        const type = info.ConstructibleType;
+        const icon = `[icon:${type}]`;
         const name = info.Name;
         if (name == this.improvement?.info?.Name) return;  // redundant
         if (this.improvement) {
@@ -1193,9 +1189,8 @@ class bzPlotTooltip {
         const format =
             this.resource ? "LOC_BZ_IMPROVEMENT_FOR_RESOURCE" :
             "LOC_BZ_IMPROVEMENT_FOR_TILE";
-        const icon = `[icon:${info.ConstructibleType}]`;
         const text = Locale.compose(format, icon, name);
-        this.freeConstructible = { info, name, format, icon, text };
+        this.freeConstructible = { info, type, icon, name, format, text };
     }
     modelYields() {
         const loc = this.plotCoord;
@@ -1532,7 +1527,7 @@ class bzPlotTooltip {
         }
         const colors = constructibleColors(this.wonder.info);
         const icon = {
-            icon: info.ConstructibleType,
+            icon: this.wonder.type,
             isSquare: true,
             ringsize: 11.5,
             colors,
@@ -1690,7 +1685,7 @@ class bzPlotTooltip {
         for (const slot of slots) {
             // if the building has more than one yield type, like the
             // Palace, use one type for the ring and one for the glow
-            const icon = slot?.info.ConstructibleType ?? BZ_ICON_EMPTY_SLOT;
+            const icon = slot?.type ?? BZ_ICON_EMPTY_SLOT;
             const colors = constructibleColors(slot?.info);
             const glow = slot && slot.isComplete && !slot.isOverbuildable;
             const info = { icon, colors, glow, collapse: false, style: ["-my-0\\.5"], };
