@@ -942,7 +942,9 @@ class bzPlotTooltip {
         const type = info.FeatureType;
         const ctype = info.FeatureClassType;
         const isFloodplain = ctype == "FEATURE_CLASS_FLOODPLAIN";
-        const text = this.isVerbose ? name : Locale.compose(name).replace(/ \(.*\)/, "");
+        const text = this.isVerbose ? name :
+            // hide "(feature class)" in standard verbosity
+            Locale.compose(name).replace(/\s*\(.*\)|\s*（.*）/, "");
         const highlight = this.obstacles.has(type) ? ctype : null;
         const feature = {
             text, name, volcano: null, isFloodplain, highlight, type, ctype, info,
