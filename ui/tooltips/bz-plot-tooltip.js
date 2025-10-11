@@ -1202,7 +1202,10 @@ class bzPlotTooltip {
             const type = info.YieldType;
             const yvalue = GameplayMap.getYield(loc.x, loc.y, type, this.observerID);
             if (yvalue) {
-                const value = (Math.round(10 * yvalue) / 10).toString();
+                const value = (
+                    // round to #.# (below 10) or to ## (above 10)
+                    yvalue < 10 ? Math.round(10 * yvalue) / 10 : Math.round(yvalue)
+                ).toString();
                 const column = { name, type, value, };
                 this.yields.push(column);
                 this.totalYields += yvalue;
