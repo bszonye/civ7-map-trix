@@ -942,7 +942,7 @@ class bzPlotTooltip {
         const type = info.FeatureType;
         const ctype = info.FeatureClassType;
         const isFloodplain = ctype == "FEATURE_CLASS_FLOODPLAIN";
-        const text = name;
+        const text = this.isVerbose ? name : Locale.compose(name).replace(/ \(.*\)/, "");
         const highlight = this.obstacles.has(type) ? ctype : null;
         const feature = {
             text, name, volcano: null, isFloodplain, highlight, type, ctype, info,
@@ -1203,8 +1203,8 @@ class bzPlotTooltip {
             const yvalue = GameplayMap.getYield(loc.x, loc.y, type, this.observerID);
             if (yvalue) {
                 const value = (
-                    // round to #.# (below 10) or to ## (above 10)
-                    yvalue < 10 ? Math.round(10 * yvalue) / 10 : Math.round(yvalue)
+                    // round to #.# in verbose mode, ## otherwise
+                    this.isVerbose ? Math.round(10 * yvalue) / 10 : Math.round(yvalue)
                 ).toString();
                 const column = { name, type, value, };
                 this.yields.push(column);
