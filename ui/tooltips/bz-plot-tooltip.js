@@ -542,13 +542,12 @@ function getReligionInfo(id) {
     return { name, icon, info, };
 }
 function getSpecialists(loc, city) {
-    if (!city || city.isTown) return null;  // no specialists in towns
-    const maximum = city.Workers?.getCityWorkerCap();
+    const maximum = city?.Workers?.getCityWorkerCap();
     if (!maximum) return null;
     const plotIndex = GameplayMap.getIndexFromLocation(loc);
     const plot = city.Workers.GetAllPlacementInfo().find(p => p.PlotIndex == plotIndex);
-    const workers = plot?.NumWorkers ?? -1;
-    if (workers < 0) return null;
+    const workers = plot?.NumWorkers;
+    if (workers == null) return null;
     return { workers, maximum };
 }
 function getTownFocus(city) {
