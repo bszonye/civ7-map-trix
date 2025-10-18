@@ -1076,12 +1076,11 @@ class bzPlotTooltip {
             const isImprovement = info.ConstructibleClass == "IMPROVEMENT";
             const isWonder = info.ConstructibleClass == "WONDER";
             if (!(isWonder || isBuilding || isImprovement)) continue;
-            const isAgeless = isWonder ||
-                ConstructibleHasTagType(type, "AGELESS");
+            const isAgeless = isWonder || ConstructibleHasTagType(type, "AGELESS");
             const isBridge = ConstructibleHasTagType(type, "BRIDGE");
             const isComplete = item.complete;
             const isDamaged = item.damaged;
-            const isExtra = ConstructibleHasTagType(type, "IGNORE_DISTRICT_PLACEMENT_CAP");
+            const isExtra = info.ExistingDistrictOnly;
             const isLarge = ConstructibleHasTagType(type, "FULL_TILE");
             const isOverbuildable = isBuilding && isComplete && !isAgeless &&
                 age?.AgeType != this.age.AgeType;
