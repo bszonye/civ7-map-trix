@@ -541,10 +541,9 @@ function getReligionInfo(id) {
     const icon = info.ReligionType;
     return { name, icon, info, };
 }
-function getSpecialists(loc, city) {
+function getSpecialists(city, plotIndex) {
     const maximum = city?.Workers?.getCityWorkerCap();
-    if (!maximum) return null;
-    const plotIndex = GameplayMap.getIndexFromLocation(loc);
+    if (maximum == null) return null;
     const plot = city.Workers.GetAllPlacementInfo().find(p => p.PlotIndex == plotIndex);
     const workers = plot?.NumWorkers;
     if (workers == null) return null;
@@ -1175,26 +1174,24 @@ class bzPlotTooltip {
         this.freeConstructible = { info, type, icon, name, format, text };
     }
     modelPopulation() {
-        const loc = this.plotCoord;
-        if (this.city && this.district) {
-            // get populaton & religion info
-            const isUrban = this.district.isUrbanCore;
-            const pop = this.constructibles
-                .map(c => c.info.Population)
-                .reduce((a, b) => a + b, 0);
-            const urban = isUrban ? pop : 0;
-            const rural = !isUrban ? pop : 0;
-            const special = getSpecialists(loc, this.city);
-            // religion
-            const religion = { majority: null, urban: null, rural: null, };
-            if (this.city.Religion) {
-                const info = this.city.Religion;
-                religion.majority = getReligionInfo(info.majorityReligion);
-                religion.urban = getReligionInfo(info.urbanReligion);
-                religion.rural = getReligionInfo(info.ruralReligion);
-            }
-            this.population = { urban, rural, special, religion, };
+        if (!this.city || !this.district) return;
+        // get populaton & religion info
+        const isUrban = this.district.isUrbanCore;
+        const pop = this.constructibles
+            .map(c => c.info.Population)
+            .reduce((a, b) => a + b, 0);
+        const urban = isUrban ? pop : 0;
+        const rural = !isUrban ? pop : 0;
+        const special = getSpecialists(this.city, this.plotIndex);
+        // religion
+        const religion = { majority: null, urban: null, rural: null, };
+        if (this.city.Religion) {
+            const info = this.city.Religion;
+            religion.majority = getReligionInfo(info.majorityReligion);
+            religion.urban = getReligionInfo(info.urbanReligion);
+            religion.rural = getReligionInfo(info.ruralReligion);
         }
+        this.population = { urban, rural, special, religion, };
     }
     modelYields() {
         const loc = this.plotCoord;
@@ -1592,7 +1589,7 @@ class bzPlotTooltip {
             label: "LOC_UI_CITY_STATUS_RURAL_POPULATION",
             value: rural.toFixed(),
         });
-        if (special?.maximum && (special?.workers || this.isVerbose)) layout.push({
+        if (special && (special.workers || this.isVerbose)) layout.push({
             icon: BZ_ICON_SPECIAL,
             label: "LOC_UI_SPECIALISTS_SUBTITLE",
             value: `${special.workers.toFixed()}/${special.maximum.toFixed()}`,
