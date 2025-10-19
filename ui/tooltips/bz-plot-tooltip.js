@@ -14,7 +14,7 @@ const BZ_ICON_FRAME = "url('hud_sub_circle_bk')";
 const BZ_ICON_UNIMPROVED = "CITY_UNIMPROVED";  // unimproved yield
 const BZ_ICON_RURAL = "CITY_RURAL";  // urban population/yield
 const BZ_ICON_URBAN = "CITY_URBAN";  // rural population/yield
-const BZ_ICON_SPECIAL = "CITY_SPECIAL_BASE";  // specialists
+const BZ_ICON_SPECIAL = "url('specialist_tile_pip_full')";  // specialists
 const BZ_ICON_VILLAGE_TYPES = {  // by city-state type and age
     CULTURAL: [
         "IMPROVEMENT_MEGALITH",
