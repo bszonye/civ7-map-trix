@@ -794,7 +794,8 @@ class bzPlotTooltip {
         this.modelBanners();
         this.modelGeography();
         this.modelSettlement();
-        this.modelWorkers();
+        this.modelImprovements();
+        this.modelPopulation();
         this.modelYields();
         this.modelUnits();
         // set title
@@ -1130,27 +1131,7 @@ class bzPlotTooltip {
             }
         }
     }
-    modelWorkers() {
-        const loc = this.plotCoord;
-        if (this.city && this.district) {
-            // get populaton & religion info
-            const isUrban = this.district.isUrbanCore;
-            const pop = this.constructibles
-                .map(c => c.info.Population)
-                .reduce((a, b) => a + b, 0);
-            const urban = isUrban ? pop : 0;
-            const rural = !isUrban ? pop : 0;
-            const special = getSpecialists(loc, this.city);
-            // religion
-            const religion = { majority: null, urban: null, rural: null, };
-            if (this.city.Religion) {
-                const info = this.city.Religion;
-                religion.majority = getReligionInfo(info.majorityReligion);
-                religion.urban = getReligionInfo(info.urbanReligion);
-                religion.rural = getReligionInfo(info.ruralReligion);
-            }
-            this.population = { urban, rural, special, religion, };
-        }
+    modelImprovements() {
         if (this.improvement) {
             // set up icons and special district names for improvements
             const info = this.improvement.info;
@@ -1174,6 +1155,7 @@ class bzPlotTooltip {
         // outside player territory, only show resources (unless verbose)
         if (this.city?.owner != this.observerID && !this.resource &&
             !this.isVerbose) return;
+        const loc = this.plotCoord;
         const fcID = Districts.getFreeConstructible(loc, this.observerID);
         const info = GameInfo.Constructibles.lookup(fcID);
         if (!info) return;  // mountains, open ocean
@@ -1191,6 +1173,28 @@ class bzPlotTooltip {
             "LOC_BZ_IMPROVEMENT_FOR_TILE";
         const text = Locale.compose(format, icon, name);
         this.freeConstructible = { info, type, icon, name, format, text };
+    }
+    modelPopulation() {
+        const loc = this.plotCoord;
+        if (this.city && this.district) {
+            // get populaton & religion info
+            const isUrban = this.district.isUrbanCore;
+            const pop = this.constructibles
+                .map(c => c.info.Population)
+                .reduce((a, b) => a + b, 0);
+            const urban = isUrban ? pop : 0;
+            const rural = !isUrban ? pop : 0;
+            const special = getSpecialists(loc, this.city);
+            // religion
+            const religion = { majority: null, urban: null, rural: null, };
+            if (this.city.Religion) {
+                const info = this.city.Religion;
+                religion.majority = getReligionInfo(info.majorityReligion);
+                religion.urban = getReligionInfo(info.urbanReligion);
+                religion.rural = getReligionInfo(info.ruralReligion);
+            }
+            this.population = { urban, rural, special, religion, };
+        }
     }
     modelYields() {
         const loc = this.plotCoord;
