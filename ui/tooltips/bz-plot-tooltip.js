@@ -4,6 +4,7 @@ import TooltipManager, { PlotTooltipPriority } from '/core/ui/tooltips/tooltip-m
 import { C as ComponentID } from '/core/ui/utilities/utilities-component-id.chunk.js';
 import { L as LensManager } from '/core/ui/lenses/lens-manager.chunk.js';
 import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
+import { C as ConstructibleHasTagType } from '/base-standard/ui/utilities/utilities-tags.chunk.js';
 
 // custom & adapted icons
 const BZ_ICON_SIZE = 12;
@@ -13,7 +14,7 @@ const BZ_ICON_FRAME = "url('hud_sub_circle_bk')";
 const BZ_ICON_UNIMPROVED = "CITY_UNIMPROVED";  // unimproved yield
 const BZ_ICON_RURAL = "CITY_RURAL";  // urban population/yield
 const BZ_ICON_URBAN = "CITY_URBAN";  // rural population/yield
-const BZ_ICON_SPECIAL = "CITY_SPECIAL_BASE";  // specialists
+const BZ_ICON_SPECIAL = "url('specialist_tile_pip_full')";  // specialists
 const BZ_ICON_VILLAGE_TYPES = {  // by city-state type and age
     CULTURAL: [
         "IMPROVEMENT_MEGALITH",
@@ -441,9 +442,6 @@ function dotJoin(list) {
 function localeJoin(list, divider=" ") {
     return list.map(s => s && Locale.compose(s)).filter(e => e).join(divider);
 }
-function gatherBuildingsTagged(tag) {
-    return new Set(GameInfo.TypeTags.filter(e => e.Tag == tag).map(e => e.Type));
-}
 // get the set of obstacles that end movement for a movement class
 const BZ_OBSTACLES = {};  // cache
 export function gatherMovementObstacles(mclass) {
@@ -543,14 +541,12 @@ function getReligionInfo(id) {
     const icon = info.ReligionType;
     return { name, icon, info, };
 }
-function getSpecialists(loc, city) {
-    if (!city || city.isTown) return null;  // no specialists in towns
-    const maximum = city.Workers?.getCityWorkerCap();
-    if (!maximum) return null;
-    const plotIndex = GameplayMap.getIndexFromLocation(loc);
+function getSpecialists(city, plotIndex) {
+    const maximum = city?.Workers?.getCityWorkerCap();
+    if (maximum == null) return null;
     const plot = city.Workers.GetAllPlacementInfo().find(p => p.PlotIndex == plotIndex);
-    const workers = plot?.NumWorkers ?? -1;
-    if (workers < 0) return null;
+    const workers = plot?.NumWorkers;
+    if (workers == null) return null;
     return { workers, maximum };
 }
 function getTownFocus(city) {
@@ -650,11 +646,6 @@ class bzPlotTooltip {
         this.totalYields = 0;
         // units
         this.units = [];
-        // lookup tables
-        this.agelessBuildings = gatherBuildingsTagged("AGELESS");
-        this.bridgeBuildings = gatherBuildingsTagged("BRIDGE");
-        this.extraBuildings = gatherBuildingsTagged("IGNORE_DISTRICT_PLACEMENT_CAP");
-        this.largeBuildings = gatherBuildingsTagged("FULL_TILE");
         Loading.runWhenFinished(() => {
             for (const y of GameInfo.Yields) {
                 // Controls.preloadImage(url, 'plot-tooltip');
@@ -802,7 +793,8 @@ class bzPlotTooltip {
         this.modelBanners();
         this.modelGeography();
         this.modelSettlement();
-        this.modelWorkers();
+        this.modelImprovements();
+        this.modelPopulation();
         this.modelYields();
         this.modelUnits();
         // set title
@@ -949,7 +941,9 @@ class bzPlotTooltip {
         const type = info.FeatureType;
         const ctype = info.FeatureClassType;
         const isFloodplain = ctype == "FEATURE_CLASS_FLOODPLAIN";
-        const text = name;
+        const text = this.isVerbose ? name :
+            // hide "(feature class)" in standard verbosity
+            Locale.compose(name).replace(/\s*\(.*\)|\s*（.*）/, "");
         const highlight = this.obstacles.has(type) ? ctype : null;
         const feature = {
             text, name, volcano: null, isFloodplain, highlight, type, ctype, info,
@@ -1073,6 +1067,7 @@ class bzPlotTooltip {
             const info = GameInfo.Constructibles.lookup(item.type);
             if (!info) continue;
             // properties
+            const type = info.ConstructibleType;
             const name = info.Name;
             const notes = [];
             const age = info.Age ? GameInfo.Ages.lookup(info.Age) : null;
@@ -1081,19 +1076,18 @@ class bzPlotTooltip {
             const isImprovement = info.ConstructibleClass == "IMPROVEMENT";
             const isWonder = info.ConstructibleClass == "WONDER";
             if (!(isWonder || isBuilding || isImprovement)) continue;
-            const isAgeless = isWonder ||
-                this.agelessBuildings.has(info.ConstructibleType);
-            const isBridge = this.bridgeBuildings.has(info.ConstructibleType);
+            const isAgeless = isWonder || ConstructibleHasTagType(type, "AGELESS");
+            const isBridge = ConstructibleHasTagType(type, "BRIDGE");
             const isComplete = item.complete;
             const isDamaged = item.damaged;
-            const isExtra = this.extraBuildings.has(info.ConstructibleType);
-            const isLarge = this.largeBuildings.has(info.ConstructibleType);
+            const isExtra = info.ExistingDistrictOnly;
+            const isLarge = ConstructibleHasTagType(type, "FULL_TILE");
             const isOverbuildable = isBuilding && isComplete && !isAgeless &&
                 age?.AgeType != this.age.AgeType;
             const xinfo =  // subtype-specific info
-                isBuilding ? GameInfo.Buildings.lookup(info.ConstructibleType) :
-                isImprovement ? GameInfo.Improvements.lookup(info.ConstructibleType) :
-                isWonder ? GameInfo.Wonders.lookup(info.ConstructibleType) :
+                isBuilding ? GameInfo.Buildings.lookup(type) :
+                isImprovement ? GameInfo.Improvements.lookup(type) :
+                isWonder ? GameInfo.Wonders.lookup(type) :
                 null;
             if (xinfo.TraitType && this.district.isUniqueQuarter) {
                 this.quarter ??= GameInfo.UniqueQuarters
@@ -1112,7 +1106,7 @@ class bzPlotTooltip {
                 notes.push("LOC_PLOT_TOOLTIP_OVERBUILDABLE");
             }
             const row = {
-                name, notes, age,
+                type, name, notes, age,
                 isBuilding, isImprovement, isWonder,
                 isAgeless, isBridge, isComplete, isDamaged, isExtra,
                 isLarge, isOverbuildable,
@@ -1131,32 +1125,12 @@ class bzPlotTooltip {
             this.constructibles.sort(wallSort);
             this.buildings.sort(wallSort);
             if (this.wonder || this.improvement) {  // should only be one
-                const types = this.constructibles.map(c => c.info?.ConstructibleType);
+                const types = this.constructibles.map(c => c.type);
                 console.warn(`bz-plot-tooltip: expected 1 constructible, not ${n} (${types})`);
             }
         }
     }
-    modelWorkers() {
-        const loc = this.plotCoord;
-        if (this.city && this.district) {
-            // get populaton & religion info
-            const isUrban = this.district.isUrbanCore;
-            const pop = this.constructibles
-                .map(c => c.info.Population)
-                .reduce((a, b) => a + b, 0);
-            const urban = isUrban ? pop : 0;
-            const rural = !isUrban ? pop : 0;
-            const special = getSpecialists(loc, this.city);
-            // religion
-            const religion = { majority: null, urban: null, rural: null, };
-            if (this.city.Religion) {
-                const info = this.city.Religion;
-                religion.majority = getReligionInfo(info.majorityReligion);
-                religion.urban = getReligionInfo(info.urbanReligion);
-                religion.rural = getReligionInfo(info.ruralReligion);
-            }
-            this.population = { urban, rural, special, religion, };
-        }
+    modelImprovements() {
         if (this.improvement) {
             // set up icons and special district names for improvements
             const info = this.improvement.info;
@@ -1170,7 +1144,7 @@ class bzPlotTooltip {
                 this.improvement.icon = getVillageIcon(this.owner, this.age);
                 this.improvement.districtName = "LOC_DISTRICT_BZ_INDEPENDENT";
             } else {
-                this.improvement.icon = info.ConstructibleType;
+                this.improvement.icon = this.improvement.type;
             }
         }
         // get the free constructible (standard tile improvement)
@@ -1180,9 +1154,12 @@ class bzPlotTooltip {
         // outside player territory, only show resources (unless verbose)
         if (this.city?.owner != this.observerID && !this.resource &&
             !this.isVerbose) return;
+        const loc = this.plotCoord;
         const fcID = Districts.getFreeConstructible(loc, this.observerID);
         const info = GameInfo.Constructibles.lookup(fcID);
         if (!info) return;  // mountains, open ocean
+        const type = info.ConstructibleType;
+        const icon = `[icon:${type}]`;
         const name = info.Name;
         if (name == this.improvement?.info?.Name) return;  // redundant
         if (this.improvement) {
@@ -1193,9 +1170,28 @@ class bzPlotTooltip {
         const format =
             this.resource ? "LOC_BZ_IMPROVEMENT_FOR_RESOURCE" :
             "LOC_BZ_IMPROVEMENT_FOR_TILE";
-        const icon = `[icon:${info.ConstructibleType}]`;
         const text = Locale.compose(format, icon, name);
-        this.freeConstructible = { info, name, format, icon, text };
+        this.freeConstructible = { info, type, icon, name, format, text };
+    }
+    modelPopulation() {
+        if (!this.city || !this.district) return;
+        // get populaton & religion info
+        const isUrban = this.district.isUrbanCore;
+        const pop = this.constructibles
+            .map(c => c.info.Population)
+            .reduce((a, b) => a + b, 0);
+        const urban = isUrban ? pop : 0;
+        const rural = !isUrban ? pop : 0;
+        const special = getSpecialists(this.city, this.plotIndex);
+        // religion
+        const religion = { majority: null, urban: null, rural: null, };
+        if (this.city.Religion) {
+            const info = this.city.Religion;
+            religion.majority = getReligionInfo(info.majorityReligion);
+            religion.urban = getReligionInfo(info.urbanReligion);
+            religion.rural = getReligionInfo(info.ruralReligion);
+        }
+        this.population = { urban, rural, special, religion, };
     }
     modelYields() {
         const loc = this.plotCoord;
@@ -1207,7 +1203,10 @@ class bzPlotTooltip {
             const type = info.YieldType;
             const yvalue = GameplayMap.getYield(loc.x, loc.y, type, this.observerID);
             if (yvalue) {
-                const value = (Math.round(10 * yvalue) / 10).toString();
+                const value = (
+                    // round to #.# in verbose mode, ## otherwise
+                    this.isVerbose ? Math.round(10 * yvalue) / 10 : Math.round(yvalue)
+                ).toString();
                 const column = { name, type, value, };
                 this.yields.push(column);
                 this.totalYields += yvalue;
@@ -1532,7 +1531,7 @@ class bzPlotTooltip {
         }
         const colors = constructibleColors(this.wonder.info);
         const icon = {
-            icon: info.ConstructibleType,
+            icon: this.wonder.type,
             isSquare: true,
             ringsize: 11.5,
             colors,
@@ -1590,7 +1589,7 @@ class bzPlotTooltip {
             label: "LOC_UI_CITY_STATUS_RURAL_POPULATION",
             value: rural.toFixed(),
         });
-        if (special?.maximum && (special?.workers || this.isVerbose)) layout.push({
+        if (special && (special.workers || this.isVerbose)) layout.push({
             icon: BZ_ICON_SPECIAL,
             label: "LOC_UI_SPECIALISTS_SUBTITLE",
             value: `${special.workers.toFixed()}/${special.maximum.toFixed()}`,
@@ -1690,7 +1689,7 @@ class bzPlotTooltip {
         for (const slot of slots) {
             // if the building has more than one yield type, like the
             // Palace, use one type for the ring and one for the glow
-            const icon = slot?.info.ConstructibleType ?? BZ_ICON_EMPTY_SLOT;
+            const icon = slot?.type ?? BZ_ICON_EMPTY_SLOT;
             const colors = constructibleColors(slot?.info);
             const glow = slot && slot.isComplete && !slot.isOverbuildable;
             const info = { icon, colors, glow, collapse: false, style: ["-my-0\\.5"], };
