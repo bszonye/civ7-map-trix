@@ -95,7 +95,7 @@
             <Text>Città</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_BORDERS_TT" Language="it_IT">
-            <Text>Alterna i confini della città e dell'impero</Text>
+            <Text>Alterna i confini della città e dell’impero</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_DISCOVERY_ICONS" Language="it_IT">
             <Text>Icone di scoperta</Text>

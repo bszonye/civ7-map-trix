@@ -59,7 +59,7 @@
             <Text>Map Trix • restyle yield banner</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER_DESCRIPTION">
-            <Text>Restyles the top bar to match the rounded color highlights in trixie's mods.</Text>
+            <Text>Restyles the top bar to match the rounded color highlights in trixie’s mods.</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_BZ_VERBOSITY_HIDDEN">
             <Text>Hidden</Text>
@@ -74,7 +74,7 @@
             <Text>Verbose</Text>
         </Replace>
         <Replace Tag="LOC_OPTIONS_GROUP_BZ_MODS">
-            <Text>trixie's mods</Text>
+            <Text>trixie’s mods</Text>
         </Replace>
         <Replace Tag="LOC_STATE_BZ_UNIQUE">
             <Text>Unique</Text>
