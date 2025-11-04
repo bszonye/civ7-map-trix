@@ -15,6 +15,7 @@ const BZ_ICON_UNIMPROVED = "CITY_UNIMPROVED";  // unimproved yield
 const BZ_ICON_RURAL = "CITY_RURAL";  // urban population/yield
 const BZ_ICON_URBAN = "CITY_URBAN";  // rural population/yield
 const BZ_ICON_SPECIAL = "url('specialist_tile_pip_full')";  // specialists
+const BZ_ICON_TREASURE = "url('restype_distant')";  // treasure fleet points
 const BZ_ICON_VILLAGE_TYPES = {  // by city-state type and age
     CULTURAL: [
         "IMPROVEMENT_MEGALITH",
@@ -656,6 +657,7 @@ class bzPlotTooltip {
                 BZ_ICON_RURAL,
                 BZ_ICON_URBAN,
                 BZ_ICON_SPECIAL,
+                BZ_ICON_TREASURE,
             ];
             for (const y of icons) preloadIcon(y);
         });
@@ -1231,11 +1233,19 @@ class bzPlotTooltip {
             if (this.observer && !Visibility.isVisible(this.observerID, id)) continue;
             const unit = Units.get(id);
             if (!unit) continue;
+            const type = unit.type;
             const name = unit.name;
             const owner = Players.get(unit.owner);
+            const originCityId = owner.Cities.getCityIds()
+                .find(id => id.id == unit.originCityId);
+            const originCity = originCityId && Cities.get(originCityId);
             const civ = this.getCivName(owner);
             const relationship = this.getCivRelationship(owner);
-            units.push({ id, name, owner, civ, relationship, });
+            // TODO: get actual Treasure Fleet points
+            const treasure = unit.hasAbility("ABILITY_TREASURE_FLEET") ? "X" : 0;
+            units.push({
+                id, type, name, owner, originCity, civ, relationship, treasure,
+            });
         }
         this.units = units;
     }
@@ -1748,8 +1758,30 @@ class bzPlotTooltip {
             if (owner.id !== this.observerID) {
                 rows.push(dotJoin([this.getCivName(owner), relationship.type]));
             }
+            const treasure = [];
             for (const unit of this.units.filter(unit => unit.owner === owner)) {
-                rows.push(unit.name);
+                if (unit.treasure) {  // save treasure convoys for last
+                    treasure.push(unit);
+                } else {
+                    rows.push(unit.name);
+                }
+            }
+            for (const unit of treasure) {
+                const size = metrics.body.spacing.css;
+                const row = document.createElement("div");
+                row.classList.value = "flex items-center text-secondary";
+                row.appendChild(docText(unit.name));
+                if (unit.treasure) {
+                    row.appendChild(docIcon(BZ_ICON_TREASURE, size, size, "mx-1"));
+                    row.appendChild(docText(unit.treasure));
+                }
+                rows.push(row);
+                if (unit.originCity) {
+                    const city = unit.originCity;
+                    const name = Locale.compose("LOC_UI_RESOURCE_ORIGIN", city.name);
+                    const origin = docText(name, "text-2xs text-secondary");
+                    rows.push(origin);
+                }
             }
             const style = relationship.isEnemy ? BZ_ALERT.enemy : null;
             const banner = docBanner(rows, style);
