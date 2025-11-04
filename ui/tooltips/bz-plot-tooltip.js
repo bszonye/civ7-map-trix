@@ -4,6 +4,7 @@ import TooltipManager, { PlotTooltipPriority } from '/core/ui/tooltips/tooltip-m
 import { C as ComponentID } from '/core/ui/utilities/utilities-component-id.chunk.js';
 import { L as LensManager } from '/core/ui/lenses/lens-manager.chunk.js';
 import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
+import { g_OceanTerrain } from '/base-standard/maps/map-globals.js';
 import { C as ConstructibleHasTagType } from '/base-standard/ui/utilities/utilities-tags.chunk.js';
 
 // custom & adapted icons
@@ -985,12 +986,13 @@ class bzPlotTooltip {
         const info = GameInfo.Terrains.lookup(id);
         if (!info) return null;
         const isLake = GameplayMap.isLake(loc.x, loc.y);
+        const isOcean = id == g_OceanTerrain;
         // assemble info
         const name = isLake ? "LOC_TERRAIN_LAKE_NAME" : info.Name;
         const type = info.TerrainType;
         const text = name;
         const highlight = this.obstacles.has(type) ? type : null;
-        const terrain = { text, name, isLake, highlight, type, info, };
+        const terrain = { text, name, isLake, isOcean, highlight, type, info, };
         return terrain;
     }
     getBiome() {
@@ -1006,12 +1008,12 @@ class bzPlotTooltip {
         return biome;
     }
     getContinent() {
+        if (this.terrain.isOcean) return null;
         const loc = this.plotCoord;
         const id = GameplayMap.getContinentType(loc.x, loc.y);
         const info = GameInfo.Continents.lookup(id);
-        if (!info) return null;
-        const name = info.Description;
-        const type = info.ContinentType;
+        const name = info?.Description;
+        const type = info?.ContinentType;
         const isDistant = this.observer && this.observer.isDistantLands(loc);
         const hemisphere =
             isDistant ? "LOC_PLOT_TOOLTIP_HEMISPHERE_WEST" :
