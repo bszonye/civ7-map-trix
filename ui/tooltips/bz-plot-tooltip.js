@@ -1236,15 +1236,13 @@ class bzPlotTooltip {
             const type = unit.type;
             const name = unit.name;
             const owner = Players.get(unit.owner);
-            const originCityId = owner.Cities.getCityIds()
-                .find(id => id.id == unit.originCityId);
-            const originCity = originCityId && Cities.get(originCityId);
+            const disbandCityId = unit.getAssociatedDisbandCityId();
+            const originCity = disbandCityId && Cities.get(disbandCityId);
+            const treasure = disbandCityId && unit.getDisbandVictoryPoints();
             const civ = this.getCivName(owner);
             const relationship = this.getCivRelationship(owner);
-            // TODO: get actual Treasure Fleet points
-            const treasure = unit.hasAbility("ABILITY_TREASURE_FLEET") ? "X" : 0;
             units.push({
-                id, type, name, owner, originCity, civ, relationship, treasure,
+                id, type, name, owner, originCity, treasure, civ, relationship,
             });
         }
         this.units = units;
