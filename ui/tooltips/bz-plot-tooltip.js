@@ -1008,7 +1008,7 @@ class bzPlotTooltip {
         return biome;
     }
     getContinent() {
-        if (this.terrain.isOcean) return null;
+        if (this.terrain?.isOcean) return null;
         const loc = this.plotCoord;
         const id = GameplayMap.getContinentType(loc.x, loc.y);
         const info = GameInfo.Continents.lookup(id);
