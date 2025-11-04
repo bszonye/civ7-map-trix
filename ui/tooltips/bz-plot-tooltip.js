@@ -1378,8 +1378,13 @@ class bzPlotTooltip {
             return { type: "LOC_PLOT_TOOLTIP_YOU", isEnemy: false };
         }
         if (!owner.Diplomacy) return null;
-        // is the other player a city-state or village?
-        if (owner.isMinor || owner.isIndependent) {
+        // is the other player a village or city-state?
+        if (owner.isIndependent) {
+            const isEnemy = owner.Diplomacy?.isAtWarWith(this.observerID);
+            const type = Game.IndependentPowers
+                .getIndependentHostility(owner.id, this.observerID);
+            return { type, isEnemy };
+        } else if (owner.isMinor) {
             const isVassal = owner.Influence?.hasSuzerain &&
                 owner.Influence.getSuzerain() == this.observerID;
             const isEnemy = owner.Diplomacy?.isAtWarWith(this.observerID);
