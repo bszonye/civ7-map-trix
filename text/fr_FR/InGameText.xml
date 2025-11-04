@@ -103,7 +103,7 @@
             <Text>Colonies</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_BORDERS_TT" Language="fr_FR">
-            <Text>Change les frontières entre les colonies et l'empire.</Text>
+            <Text>Change les frontières entre les colonies et l’empire.</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_DISCOVERY_ICONS" Language="fr_FR">
             <Text>Icônes de découverte</Text>

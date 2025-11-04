@@ -4,6 +4,7 @@ import TooltipManager, { PlotTooltipPriority } from '/core/ui/tooltips/tooltip-m
 import { C as ComponentID } from '/core/ui/utilities/utilities-component-id.chunk.js';
 import { L as LensManager } from '/core/ui/lenses/lens-manager.chunk.js';
 import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
+import { g_OceanTerrain } from '/base-standard/maps/map-globals.js';
 import { C as ConstructibleHasTagType } from '/base-standard/ui/utilities/utilities-tags.chunk.js';
 
 // custom & adapted icons
@@ -15,6 +16,7 @@ const BZ_ICON_UNIMPROVED = "CITY_UNIMPROVED";  // unimproved yield
 const BZ_ICON_RURAL = "CITY_RURAL";  // urban population/yield
 const BZ_ICON_URBAN = "CITY_URBAN";  // rural population/yield
 const BZ_ICON_SPECIAL = "url('specialist_tile_pip_full')";  // specialists
+const BZ_ICON_TREASURE = "url('restype_distant')";  // treasure fleet points
 const BZ_ICON_VILLAGE_TYPES = {  // by city-state type and age
     CULTURAL: [
         "IMPROVEMENT_MEGALITH",
@@ -656,6 +658,7 @@ class bzPlotTooltip {
                 BZ_ICON_RURAL,
                 BZ_ICON_URBAN,
                 BZ_ICON_SPECIAL,
+                BZ_ICON_TREASURE,
             ];
             for (const y of icons) preloadIcon(y);
         });
@@ -983,12 +986,13 @@ class bzPlotTooltip {
         const info = GameInfo.Terrains.lookup(id);
         if (!info) return null;
         const isLake = GameplayMap.isLake(loc.x, loc.y);
+        const isOcean = id == g_OceanTerrain;
         // assemble info
         const name = isLake ? "LOC_TERRAIN_LAKE_NAME" : info.Name;
         const type = info.TerrainType;
         const text = name;
         const highlight = this.obstacles.has(type) ? type : null;
-        const terrain = { text, name, isLake, highlight, type, info, };
+        const terrain = { text, name, isLake, isOcean, highlight, type, info, };
         return terrain;
     }
     getBiome() {
@@ -1004,12 +1008,12 @@ class bzPlotTooltip {
         return biome;
     }
     getContinent() {
+        if (this.terrain?.isOcean) return null;
         const loc = this.plotCoord;
         const id = GameplayMap.getContinentType(loc.x, loc.y);
         const info = GameInfo.Continents.lookup(id);
-        if (!info) return null;
-        const name = info.Description;
-        const type = info.ContinentType;
+        const name = info?.Description;
+        const type = info?.ContinentType;
         const isDistant = this.observer && this.observer.isDistantLands(loc);
         const hemisphere =
             isDistant ? "LOC_PLOT_TOOLTIP_HEMISPHERE_WEST" :
@@ -1231,11 +1235,17 @@ class bzPlotTooltip {
             if (this.observer && !Visibility.isVisible(this.observerID, id)) continue;
             const unit = Units.get(id);
             if (!unit) continue;
+            const type = unit.type;
             const name = unit.name;
             const owner = Players.get(unit.owner);
+            const disbandCityId = unit.getAssociatedDisbandCityId();
+            const originCity = disbandCityId && Cities.get(disbandCityId);
+            const treasure = disbandCityId && unit.getDisbandVictoryPoints();
             const civ = this.getCivName(owner);
             const relationship = this.getCivRelationship(owner);
-            units.push({ id, name, owner, civ, relationship, });
+            units.push({
+                id, type, name, owner, originCity, treasure, civ, relationship,
+            });
         }
         this.units = units;
     }
@@ -1368,8 +1378,13 @@ class bzPlotTooltip {
             return { type: "LOC_PLOT_TOOLTIP_YOU", isEnemy: false };
         }
         if (!owner.Diplomacy) return null;
-        // is the other player a city-state or village?
-        if (owner.isMinor || owner.isIndependent) {
+        // is the other player a village or city-state?
+        if (owner.isIndependent) {
+            const isEnemy = owner.Diplomacy?.isAtWarWith(this.observerID);
+            const type = Game.IndependentPowers
+                .getIndependentHostility(owner.id, this.observerID);
+            return { type, isEnemy };
+        } else if (owner.isMinor) {
             const isVassal = owner.Influence?.hasSuzerain &&
                 owner.Influence.getSuzerain() == this.observerID;
             const isEnemy = owner.Diplomacy?.isAtWarWith(this.observerID);
@@ -1748,8 +1763,30 @@ class bzPlotTooltip {
             if (owner.id !== this.observerID) {
                 rows.push(dotJoin([this.getCivName(owner), relationship.type]));
             }
+            const treasure = [];
             for (const unit of this.units.filter(unit => unit.owner === owner)) {
-                rows.push(unit.name);
+                if (unit.treasure) {  // save treasure convoys for last
+                    treasure.push(unit);
+                } else {
+                    rows.push(unit.name);
+                }
+            }
+            for (const unit of treasure) {
+                const size = metrics.body.spacing.css;
+                const row = document.createElement("div");
+                row.classList.value = "flex items-center text-secondary";
+                row.appendChild(docText(unit.name));
+                if (unit.treasure) {
+                    row.appendChild(docIcon(BZ_ICON_TREASURE, size, size, "mx-1"));
+                    row.appendChild(docText(unit.treasure));
+                }
+                rows.push(row);
+                if (unit.originCity) {
+                    const city = unit.originCity;
+                    const name = Locale.compose("LOC_UI_RESOURCE_ORIGIN", city.name);
+                    const origin = docText(name, "text-2xs text-secondary");
+                    rows.push(origin);
+                }
             }
             const style = relationship.isEnemy ? BZ_ALERT.enemy : null;
             const banner = docBanner(rows, style);

@@ -84,6 +84,15 @@ bzMapTrixOptions.verbose;
 document.body.classList.toggle("bz-yield-banner", bzMapTrixOptions.yieldBanner);
 Controls.loadStyle("fs://game/bz-map-trix/ui/bz-style/bz-panel-yield-banner.css");
 
+// fix Options initialization
+Options.addInitCallback = function(callback) {
+    if (this.optionsReInitCallbacks.length && !this.optionsInitCallbacks.length) {
+        throw new Error("Options already initialized, cannot add init callback");
+    }
+    this.optionsInitCallbacks.push(callback);
+    this.optionsReInitCallbacks.push(callback);
+}
+
 Options.addInitCallback(() => {
     Options.addOption({
         category: CategoryType.Mods,
@@ -96,8 +105,6 @@ Options.addInitCallback(() => {
         description: "LOC_OPTIONS_BZ_COMMANDER_LENS_DESCRIPTION",
         dropdownItems: commandOptions,
     });
-});
-Options.addInitCallback(() => {
     Options.addOption({
         category: CategoryType.Mods,
         group: "bz_mods",
@@ -109,8 +116,6 @@ Options.addInitCallback(() => {
         description: "LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE_DESCRIPTION",
         dropdownItems: verbosityOptions,
     });
-});
-Options.addInitCallback(() => {
     Options.addOption({
         category: CategoryType.Mods,
         group: "bz_mods",
