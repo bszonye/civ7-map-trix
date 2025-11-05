@@ -6,6 +6,7 @@ import '/base-standard/ui/interface-modes/interface-mode-unit-selected.js';
 import '/base-standard/ui/lenses/lens/default-lens.js';
 
 const BZ_LENSES = {
+    "fxs-discovery-lens": "LOC_DISTRICT_BZ_DISCOVERY",
     "bz-commander-lens": "LOC_UI_MINI_MAP_COMMANDER",
     "bz-religion-lens": "LOC_UI_MINI_MAP_RELIGION",
 };
