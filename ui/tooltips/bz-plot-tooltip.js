@@ -118,6 +118,7 @@ const BZ_COLOR = {
     note: "#ff800033",  // note = orange 20% opacity
     // geographic colors
     hill: "#ea995266",  // Rough terrain = orange 40% opacity
+    aquatic: "#00ffee66",  // Aquaticy = teal 40% opacity
     vegetated: "#aaff0033",  // Vegetated features = green 20% opacity
     wet: "#55ffff33",  // Wet features = teal 20% opacity
     floodplain: "#ff800033",  // Floodplains = orange 20% opacity
@@ -157,6 +158,8 @@ const BZ_STYLE = {
     // movement & obstacle types
     TERRAIN_HILL: { "background-color": BZ_COLOR.hill, color: BZ_COLOR.bronze, },
     TERRAIN_OCEAN: {},  // don't need to highlight this
+    FEATURE_CLASS_AQUATIC:
+    { "background-color": BZ_COLOR.aquatic, color: BZ_COLOR.accent1, },
     FEATURE_CLASS_FLOODPLAIN:  { "background-color": BZ_COLOR.floodplain, },
     FEATURE_CLASS_VEGETATED: { "background-color": BZ_COLOR.vegetated, },
     FEATURE_CLASS_WET: { "background-color": BZ_COLOR.wet, },

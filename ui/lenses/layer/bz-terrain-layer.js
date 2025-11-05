@@ -11,6 +11,8 @@ import '/bz-map-trix/ui/mini-map/bz-panel-mini-map.js';
 const BZ_OVERLAY = {
     // #c07e45  oklch(0.65 0.11 60)   #633e1d  oklch(0.40 0.07 60)
     TERRAIN_HILL: { fillColor: 0xaa457ec0, edgeColor: 0xff1d3e63, },
+    // #10a49e  oklch(0.65 0.11 190)  #08b6af  oklch(0.7 0.12 190)
+    FEATURE_CLASS_AQUATIC: { fillColor: 0x999ea410, edgeColor: 0xffafb608, },
     // #6ba211  oklch(0.65 0.17 130)  #3b4f25  oklch(0.40 0.07 130)
     FEATURE_CLASS_VEGETATED: { fillColor: 0xaa11a26b, edgeColor: 0xff254f3b, },
     // #08a2af  oklch(0.65 0.11 205)  #00525a  oklch(0.40 0.07 205)
