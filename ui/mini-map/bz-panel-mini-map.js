@@ -145,6 +145,8 @@ for (const [lensType, lens] of LensManager.lenses.entries()) {
     const extra = new Set(BZ_EXTRA_LAYERS[lensType] ?? []);
     for (const layerType of extra) active.add(layerType);
 }
+// fix Yields config option
+defaultLens.allowedLayers.add("fxs-yields-layer");
 // patch Discovery lens to restore layer memory
 const discoveryLens = LensManager.lenses.get("fxs-discovery-lens");
 delete discoveryLens.ignoreEnabledLayers;
