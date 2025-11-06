@@ -4,6 +4,7 @@ import { L as LensManager } from '/core/ui/lenses/lens-manager.chunk.js';
 // guarantee import order for patching
 import '/base-standard/ui/interface-modes/interface-mode-unit-selected.js';
 import '/base-standard/ui/lenses/lens/default-lens.js';
+import '/base-standard/ui/lenses/lens/discovery-lens.js';
 
 const BZ_LENSES = {
     "fxs-discovery-lens": "LOC_DISTRICT_BZ_DISCOVERY",
@@ -144,5 +145,8 @@ for (const [lensType, lens] of LensManager.lenses.entries()) {
     const extra = new Set(BZ_EXTRA_LAYERS[lensType] ?? []);
     for (const layerType of extra) active.add(layerType);
 }
+// patch Discovery lens to restore layer memory
+const discoveryLens = LensManager.lenses.get("fxs-discovery-lens");
+delete discoveryLens.ignoreEnabledLayers;
 
 Controls.decorate("lens-panel", (component) => new bzLensPanel(component));
