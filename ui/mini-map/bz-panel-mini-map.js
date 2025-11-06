@@ -6,8 +6,9 @@ import '/base-standard/ui/interface-modes/interface-mode-unit-selected.js';
 import '/base-standard/ui/lenses/lens/default-lens.js';
 
 const BZ_LENSES = {
-    "bz-commander-lens": "LOC_UI_MINI_MAP_COMMANDER",
+    "fxs-discovery-lens": "LOC_DISTRICT_BZ_DISCOVERY",
     "bz-religion-lens": "LOC_UI_MINI_MAP_RELIGION",
+    "bz-commander-lens": "LOC_UI_MINI_MAP_COMMANDER",
 };
 const BZ_LAYERS = {
     "bz-discovery-layer": "LOC_UI_MINI_MAP_BZ_DISCOVERY",
@@ -19,6 +20,7 @@ const BZ_LAYERS = {
     "bz-terrain-layer": "LOC_UI_MINI_MAP_BZ_TERRAIN",
 };
 const BZ_EXTRA_LAYERS = {
+    "fxs-discovery-lens": [ "bz-route-layer", ],
     "fxs-settler-lens": [ "bz-city-borders-layer", ],
     "fxs-trade-lens": [ "bz-city-borders-layer", ],
     "mod-fortified-district-lens": [
@@ -54,11 +56,23 @@ class bzLensPanel {
     onAttributeChanged(_name, _prev, _next) { }
 }
 
+// recon units: instead of CoreClass, use fxs-discovery-lens rules
+const reconUnits = new Set();
+GameInfo.TypeTags.forEach((tag) => {
+    if (tag.Tag == "UNIT_CLASS_AUTOEXPLORE") reconUnits.add(tag.Type);
+});
+if (GameInfo.Ages.lookup(Game.age).AgeType == "AGE_EXPLORATION") {
+    GameInfo.Units.forEach((row) => {
+        if (row.FormationClass == "FORMATION_CLASS_NAVAL") reconUnits.add(row.UnitType);
+    });
+}
 // extend UnitSelectedInterfaceMode.setUnitLens(unitID)
 function bzSetUnitLens(unitID) {
     const unit = Units.get(unitID);
     if (!unit) return true;  // hand off errors to original method
     const info = GameInfo.Units.lookup(unit.type);
+    const isRecon = reconUnits.has(info.UnitType);
+    const isMilitary = info.CoreClass == "CORE_CLASS_MILITARY" && !isRecon;
     const skips = getLensSkips();
     let lens;
     if (info.FoundCity || info.MakeTradeRoute || info.ExtractsArtifacts) {
@@ -69,10 +83,10 @@ function bzSetUnitLens(unitID) {
         lens = "bz-religion-lens";
     } else switch (bzMapTrixOptions.commanders) {
         case bzCommanderLens.RECON:
-            if (info.CoreClass == "CORE_CLASS_RECON") lens = "bz-commander-lens";
+            if (isRecon) lens = "bz-commander-lens";
             // falls through
         case bzCommanderLens.MILITARY:
-            if (info.CoreClass == "CORE_CLASS_MILITARY") lens = "bz-commander-lens";
+            if (isMilitary) lens = "bz-commander-lens";
             // falls through
         case bzCommanderLens.COMMANDERS:
             if (unit.isCommanderUnit) lens = "bz-commander-lens";
