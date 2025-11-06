@@ -3,6 +3,7 @@ import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
 import { L as LensManager } from '/core/ui/lenses/lens-manager.chunk.js';
 // guarantee import order for patching
 import '/base-standard/ui/interface-modes/interface-mode-unit-selected.js';
+import '/base-standard/ui/lenses/layer/hexgrid-layer.js';
 import '/base-standard/ui/lenses/lens/default-lens.js';
 import '/base-standard/ui/lenses/lens/discovery-lens.js';
 
@@ -147,6 +148,11 @@ for (const [lensType, lens] of LensManager.lenses.entries()) {
 }
 // fix Yields config option
 defaultLens.allowedLayers.add("fxs-yields-layer");
+// fix Hex Grid visibility
+if (!LensManager.enabledLayers.has("fxs-hexgrid-layer")) {
+    const hexGrid = LensManager.layers.get("fxs-hexgrid-layer");
+    hexGrid.group.setVisible(false);
+}
 // patch Discovery lens to restore layer memory
 const discoveryLens = LensManager.lenses.get("fxs-discovery-lens");
 delete discoveryLens.ignoreEnabledLayers;
