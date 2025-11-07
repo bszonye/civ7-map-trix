@@ -153,7 +153,7 @@ if (!LensManager.enabledLayers.has("fxs-hexgrid-layer")) {
     const hexGrid = LensManager.layers.get("fxs-hexgrid-layer");
     hexGrid.removeLayer();
 }
-// patch Discovery lens to restore layer memory
+// patch Discovery lens to track enabled layers
 const discoveryLens = LensManager.lenses.get("fxs-discovery-lens");
 delete discoveryLens.ignoreEnabledLayers;
 
