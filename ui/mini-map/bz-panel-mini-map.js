@@ -3,7 +3,9 @@ import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
 import { L as LensManager } from '/core/ui/lenses/lens-manager.chunk.js';
 // guarantee import order for patching
 import '/base-standard/ui/interface-modes/interface-mode-unit-selected.js';
+import '/base-standard/ui/lenses/layer/hexgrid-layer.js';
 import '/base-standard/ui/lenses/lens/default-lens.js';
+import '/base-standard/ui/lenses/lens/discovery-lens.js';
 
 const BZ_LENSES = {
     "fxs-discovery-lens": "LOC_DISTRICT_BZ_DISCOVERY",
@@ -144,5 +146,15 @@ for (const [lensType, lens] of LensManager.lenses.entries()) {
     const extra = new Set(BZ_EXTRA_LAYERS[lensType] ?? []);
     for (const layerType of extra) active.add(layerType);
 }
+// fix Yields config option
+defaultLens.allowedLayers.add("fxs-yields-layer");
+// fix Hex Grid initial visibility
+if (!LensManager.enabledLayers.has("fxs-hexgrid-layer")) {
+    const hexGrid = LensManager.layers.get("fxs-hexgrid-layer");
+    hexGrid.removeLayer();
+}
+// patch Discovery lens to track enabled layers
+const discoveryLens = LensManager.lenses.get("fxs-discovery-lens");
+delete discoveryLens.ignoreEnabledLayers;
 
 Controls.decorate("lens-panel", (component) => new bzLensPanel(component));
