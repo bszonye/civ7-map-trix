@@ -148,10 +148,10 @@ for (const [lensType, lens] of LensManager.lenses.entries()) {
 }
 // fix Yields config option
 defaultLens.allowedLayers.add("fxs-yields-layer");
-// fix Hex Grid visibility
+// fix Hex Grid initial visibility
 if (!LensManager.enabledLayers.has("fxs-hexgrid-layer")) {
     const hexGrid = LensManager.layers.get("fxs-hexgrid-layer");
-    hexGrid.group.setVisible(false);
+    hexGrid.removeLayer();
 }
 // patch Discovery lens to restore layer memory
 const discoveryLens = LensManager.lenses.get("fxs-discovery-lens");
