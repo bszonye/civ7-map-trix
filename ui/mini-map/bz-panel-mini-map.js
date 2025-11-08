@@ -142,6 +142,11 @@ for (const [lensType, lens] of LensManager.lenses.entries()) {
     if (active.has("fxs-resource-layer") || allowed.has("fxs-resource-layer")) {
         active.add("bz-discovery-layer");
     }
+    // fix Hex Grid configurability (use "allowed" instead of "active")
+    if (active.has("fxs-hexgrid-layer")) {
+        active.delete("fxs-hexgrid-layer");
+        allowed.add("fxs-hexgrid-layer");
+    }
     // add extra default layers
     const extra = new Set(BZ_EXTRA_LAYERS[lensType] ?? []);
     for (const layerType of extra) active.add(layerType);
