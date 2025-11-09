@@ -127,6 +127,7 @@ class bzRouteLensLayer {
         }
     }
     updatePlotVFX(plotIndex) {
+        if (!this.visible) return;  // layer inactive
         if (this.visible[plotIndex]) return;  // already visible
         const loc = GameplayMap.getLocationFromIndex(plotIndex);
         if (GameplayMap.getRevealedState(GameContext.localObserverID, loc.x, loc.y) ==
