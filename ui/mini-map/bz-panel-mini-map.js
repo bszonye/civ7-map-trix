@@ -151,15 +151,16 @@ for (const [lensType, lens] of LensManager.lenses.entries()) {
     const extra = new Set(BZ_EXTRA_LAYERS[lensType] ?? []);
     for (const layerType of extra) active.add(layerType);
 }
-// fix Yields config option
-defaultLens.allowedLayers.add("fxs-yields-layer");
 // fix Hex Grid initial visibility
 if (!LensManager.enabledLayers.has("fxs-hexgrid-layer")) {
     const hexGrid = LensManager.layers.get("fxs-hexgrid-layer");
     hexGrid.removeLayer();
 }
-// patch Discovery lens to track enabled layers
+// fix Yields configuration (add to default, remove from Discovery)
 const discoveryLens = LensManager.lenses.get("fxs-discovery-lens");
+discoveryLens.allowedLayers.delete("fxs-yields-layer");
+defaultLens.allowedLayers.add("fxs-yields-layer");
+// patch Discovery lens to track enabled layers
 delete discoveryLens.ignoreEnabledLayers;
 
 Controls.decorate("lens-panel", (component) => new bzLensPanel(component));
