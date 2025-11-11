@@ -54,10 +54,13 @@
             </Properties>
             <Actions>
                 <ImportFiles>
+                    <Item>ui/bz-city-panel/panel-city-list.css</Item>
                     <Item>ui/bz-style/bz-panel-yield-banner.css</Item>
                     <Item>ui/bz-units-panel/panel-units.css</Item>
                 </ImportFiles>
                 <UIScripts>
+                    <Item>ui/bz-city-panel/model-city-list.js</Item>
+                    <Item>ui/bz-city-panel/panel-city-list.js</Item>
                     <Item>ui/bz-units-panel/model-units.js</Item>
                     <Item>ui/bz-units-panel/panel-units.js</Item>
                     <Item>ui/input/bz-hotkey-manager.js</Item>

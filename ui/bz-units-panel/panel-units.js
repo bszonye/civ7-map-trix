@@ -18,7 +18,7 @@ class bzUnitsPanel extends MinimapSubpanel {
     activateUnitListener = this.activateUnit.bind(this);
     modelUpdateListener = this.onModelUpdate.bind(this);
     typesContainer = document.createElement("div");
-    unitsContainer = document.createElement("fxs-scrollable");
+    listContainer = document.createElement("fxs-scrollable");
     scrollPosition = 0;
     scrollUnit = null;
     updateScroll = new UpdateGate(() =>
@@ -70,10 +70,10 @@ class bzUnitsPanel extends MinimapSubpanel {
         const frame = document.createElement("div");
         frame.classList.value = "bz-units-frame p-1";
         this.panel.appendChild(frame);
-        this.unitsContainer.classList.value = "bz-units-scrollable";
-        frame.appendChild(this.unitsContainer);
+        this.listContainer.classList.value = "bz-units-scrollable";
+        frame.appendChild(this.listContainer);
         const row = document.createElement("div");
-        this.unitsContainer.appendChild(row);
+        this.listContainer.appendChild(row);
         Databind.for(row, "g_bzUnitListModel.unitList", "entry");
         {
             const entry = document.createElement("fxs-activatable");
@@ -148,7 +148,7 @@ class bzUnitsPanel extends MinimapSubpanel {
             status.appendChild(movement);
             // activity (operations/garrison)
             const activity = document.createElement("div");
-            activity.classList.value = "bz-unit-status relative size-6";
+            activity.classList.value = "bz-unit-activity relative size-6";
             const garrison = document.createElement("div");
             garrison.classList.value = "bz-unit-garrison-bg bz-icon absolute";
             Databind.classToggle(garrison, "hidden", "!{{entry.isGarrison}}");
@@ -182,7 +182,7 @@ class bzUnitsPanel extends MinimapSubpanel {
     onDetach() {
         super.onDetach();
         window.removeEventListener("bz-model-units-update", this.modelUpdateListener);
-        bzUnitsPanel.savedScrollPosition = this.unitsContainer.component.scrollPosition;
+        bzUnitsPanel.savedScrollPosition = this.listContainer.component.scrollPosition;
         bzPanelMiniMap.toggleCooldownTimer = 500;
     }
     onReceiveFocus() {
@@ -195,7 +195,7 @@ class bzUnitsPanel extends MinimapSubpanel {
     getUnitEntry(id) {
         if (!id || ComponentID.isInvalid(id)) return void 0;
         const localId = JSON.stringify(id.id);
-        return this.unitsContainer.querySelector(`[data-unit-local-id="${localId}"]`);
+        return this.listContainer.querySelector(`[data-unit-local-id="${localId}"]`);
     }
     scrollToPosition(position, unitId) {
         let audio = position == -1;
@@ -204,10 +204,10 @@ class bzUnitsPanel extends MinimapSubpanel {
             const unit = this.getUnitEntry(id);
             if (id && !unit) return false;
             // get scroll area metrics
-            const c = this.unitsContainer.component;
+            const c = this.listContainer.component;
             const curPosition = c.scrollPosition;
             const size = c.scrollableContentSize;
-            const area = this.unitsContainer.getBoundingClientRect();
+            const area = this.listContainer.getBoundingClientRect();
             if (!area?.height || !size) return false;
             const height = area.height / size;
             // find new position
@@ -238,7 +238,7 @@ class bzUnitsPanel extends MinimapSubpanel {
                 audio = false;  // only once
             }
             if (newPosition == curPosition) return true;
-            this.unitsContainer.component.scrollToPercentage(newPosition);
+            this.listContainer.component.scrollToPercentage(newPosition);
         }
         if (scroll(position, unitId)) return;
         // repeated attempts: every interval for several attempts

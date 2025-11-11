@@ -140,15 +140,21 @@ defaultLens.allowedLayers.add("fxs-yields-layer");
 delete discoveryLens.ignoreEnabledLayers;
 
 // PanelMiniMap extensions
-Controls.preloadImage("blp:hud_sub_circle_bk", "units-panel");
-Controls.preloadImage("blp:hud_sub_circle_hov", "units-panel");
+const BZ_ICON_CITY_BUTTON = "blp:Yield_Cities_20";
+const BZ_ICON_UNIT_BUTTON = "blp:Action_Promote";
+Controls.preloadImage(BZ_ICON_CITY_BUTTON, "bz-mini-map");
+Controls.preloadImage(BZ_ICON_UNIT_BUTTON, "bz-mini-map");
+Controls.preloadImage("blp:hud_sub_circle_bk", "bz-mini-map");
+Controls.preloadImage("blp:hud_sub_circle_hov", "bz-mini-map");
 class bzPanelMiniMap {
     static c_prototype;
     static instance;
     static toggleCooldownTimer = 500;
+    citySubpanel = null;
     unitsSubpanel = null;
     engineInputListener = this.onEngineInput.bind(this);
-    hotkeyListener = this.onHotkey.bind(this);
+    cityHotkeyListener = this.onCityHotkey.bind(this);
+    unitsHotkeyListener = this.onUnitsHotkey.bind(this);
     toggleCooldown = 0;
     toggleQueued = false;
     constructor(component) {
@@ -176,37 +182,45 @@ class bzPanelMiniMap {
         this.component.addSubpanel(
             "bz-city-panel",
             "LOC_UI_RESOURCE_ALLOCATION_SETTLEMENTS",
-            "blp:Yield_Cities_20",
+            BZ_ICON_CITY_BUTTON,
         );
+        this.citySubpanel = this.component.subpanels.at(-1);
         this.component.addSubpanel(
             "bz-units-panel",
             "LOC_UI_PRODUCTION_UNITS",
-            "blp:Action_Promote",
+            BZ_ICON_UNIT_BUTTON,
         );
         this.unitsSubpanel = this.component.subpanels.at(-1);
     }
     beforeAttach() { }
     afterAttach() {
-        window.addEventListener("hotkey-open-bz-units-panel", this.hotkeyListener);
+        window.addEventListener("hotkey-open-bz-city-panel", this.cityHotkeyListener);
+        window.addEventListener("hotkey-open-bz-units-panel", this.unitsHotkeyListener);
         this.component.Root
             .addEventListener(InputEngineEventName, this.engineInputListener);
     }
     beforeDetach() {
-        window.removeEventListener("hotkey-open-bz-units-panel", this.hotkeyListener);
+        window.removeEventListener("hotkey-open-bz-city-panel", this.cityHotkeyListener);
+        window.removeEventListener("hotkey-open-bz-units-panel", this.unitsHotkeyListener);
         this.component.Root
             .removeEventListener(InputEngineEventName, this.engineInputListener);
     }
     afterDetach() { }
-    togglePanel() {
+    togglePanel(panel) {
         this.toggleQueued = true;
         if (this.toggleCooldown) return;
         // limit panel toggles to 4 per second
         // (avoids crashes in the minimap)
+        console.warn(`TRIX COOLDOWN ${bzPanelMiniMap.toggleCooldownTimer}`);
         const toggle = () => {
             if (this.toggleQueued) {
                 this.toggleCooldown =
                     setTimeout(() => toggle(), bzPanelMiniMap.toggleCooldownTimer);
-                this.component.toggleSubpanel(this.unitsSubpanel);
+                if (panel) {
+                    this.component.toggleSubpanel(panel);
+                } else {
+                    this.component.closeSubpanels();
+                }
             } else {
                 this.toggleCooldown = 0;
             }
@@ -237,8 +251,11 @@ class bzPanelMiniMap {
                 break;
         }
     }
-    onHotkey(_event) {
-        this.togglePanel();
+    onCityHotkey(_event) {
+        this.togglePanel(this.citySubpanel);
+    }
+    onUnitsHotkey(_event) {
+        this.togglePanel(this.unitsSubpanel);
     }
 }
 Controls.decorate("panel-mini-map", (val) => new bzPanelMiniMap(val));

@@ -15,6 +15,7 @@ export default [
         },
         languageOptions: {
             globals: {
+                Camera: "readonly",
                 Cities: "readonly",
                 Color: "readonly",
                 CombatTypes: "readonly",

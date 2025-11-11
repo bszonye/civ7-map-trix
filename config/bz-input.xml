@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Database>
     <InputActions>
+        <Replace ActionId="open-bz-city-panel" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_OPEN_BZ_SETTLEMENTS" Description="LOC_UI_KBM_MAPPING_OPEN_BZ_SETTLEMENTS_TT" />
         <Replace ActionId="open-bz-units-panel" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS" Description="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS_TT" />
         <Replace ActionId="toggle-bz-culture-borders-layer" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS" Description="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS_TT" />
         <Replace ActionId="toggle-bz-city-borders-layer" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_BORDERS" Description="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_BORDERS_TT" />
@@ -11,6 +12,8 @@
         <Replace ActionId="toggle-bz-terrain-layer" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER" Description="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER_TT" />
     </InputActions>
     <InputContextConstraints>
+        <Replace ActionId="open-bz-city-panel" ContextId="Unit"/>
+        <Replace ActionId="open-bz-city-panel" ContextId="World"/>
         <Replace ActionId="open-bz-units-panel" ContextId="Unit"/>
         <Replace ActionId="open-bz-units-panel" ContextId="World"/>
         <Replace ActionId="toggle-bz-culture-borders-layer" ContextId="Unit"/>
@@ -29,6 +32,7 @@
         <Replace ActionId="toggle-bz-terrain-layer" ContextId="World"/>
     </InputContextConstraints>
     <InputActionDefaultGestures>
+        <Replace ActionId="open-bz-city-panel" Index="0" GestureType="KBMouse" GestureData="KEY_SHIFT+KEY_S"/>
         <Replace ActionId="open-bz-units-panel" Index="0" GestureType="KBMouse" GestureData="KEY_SHIFT+KEY_U"/>
         <Replace ActionId="toggle-bz-culture-borders-layer" Index="0" GestureType="KBMouse" GestureData="KEY_SHIFT+KEY_B"/>
         <Replace ActionId="toggle-bz-city-borders-layer" Index="0" GestureType="KBMouse" GestureData="KEY_SHIFT+KEY_C"/>
