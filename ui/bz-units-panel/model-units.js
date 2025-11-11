@@ -203,7 +203,11 @@ class bzUnitListModel {
         const isCommander = unit.isCommanderUnit;
         const isGreatPerson = unit.isGreatPerson;
         const isPacked = armyId != -1 && !isCommander;
-        const level = isCommander ? unit.Experience.getLevel : void 0;
+        const isTreasureFleet = Boolean(unit.getAssociatedDisbandCityId());
+        const level =
+            isCommander ? unit.Experience.getLevel :
+            isTreasureFleet ? unit.getDisbandVictoryPoints() :
+            void 0;
         const age = GameInfo.Ages.lookup(unit.age);
         // unit type info
         const info = GameInfo.Units.lookup(unit.type);
@@ -217,7 +221,7 @@ class bzUnitListModel {
             return gpclass?.Name ?? info.Name;
         })();
         const icon = Icon.getUnitIconFromDefinition(info);
-        const name = isCommander && level ? `${unit.name} ${level}` : unit.name;
+        const name = level ? `${unit.name} ${level}` : unit.name;
         const domain = info.Domain;
         const trait = info.TraitType;
         const isUnique = Boolean(trait);
@@ -279,7 +283,7 @@ class bzUnitListModel {
             unit, id, localId, armyId, isCommander, isGreatPerson, isPacked, age,
             activityType, operationType, operation, operationIcon, operationName, isBusy,
             info, type, typeName, icon, name, domain, trait,
-            isUnique, isTradeUnit, isVictoryUnit,
+            isTreasureFleet, isUnique, isTradeUnit, isVictoryUnit,
             stats, combat,
             health, healthLeft, maxHealth, slashHealth, hasDamage,
             moves, movesLeft, maxMoves, slashMoves, canMove,

@@ -10,7 +10,6 @@ import { C as ConstructibleHasTagType } from '/base-standard/ui/utilities/utilit
 // custom & adapted icons
 const BZ_ICON_SIZE = 12;
 const BZ_ICON_DISCOVERY = "NAR_REW_DEFAULT";
-const BZ_ICON_EMPTY_SLOT = "BUILDING_OPEN";
 const BZ_ICON_FRAME = "url('hud_sub_circle_bk')";
 const BZ_ICON_UNIMPROVED = "CITY_UNIMPROVED";  // unimproved yield
 const BZ_ICON_RURAL = "CITY_RURAL";  // urban population/yield
@@ -1446,11 +1445,11 @@ class bzPlotTooltip {
             hexRules.push(rule);
         } else if (this.district.isQuarter) {
             hexName = "LOC_PLOT_TOOLTIP_URBAN_QUARTER";
-        } else if (this.buildings.length == 0) {
-            // urban tile with canceled production
-            hexName = "LOC_DISTRICT_BZ_URBAN_VACANT";
-        } else {
+        } else if (this.buildings.length) {
             hexName = "LOC_PLOT_TOOLTIP_URBAN_DISTRICT";
+        } else {
+            // urban tile with canceled production
+            hexName = "LOC_DISTRICT_URBAN_NAME";
         }
         // title bar & district defense
         if (!this.isCompact) this.renderTitleHeading(hexName);
@@ -1496,7 +1495,10 @@ class bzPlotTooltip {
             hexName = this.city.name;
         } else if (this.district?.type) {
             // rural
-            hexName = "LOC_PLOT_TOOLTIP_RURAL_DISTRICT";
+            // note: LOC_PLOT_TOOLTIP_RURAL_DISTRICT "Rural District"
+            // creates confusion between Urban and Rural tiles, because
+            // Districts are Urban tiles with at least one building.
+            hexName = "LOC_DISTRICT_RURAL_NAME";
         } else if (this.city && this.freeConstructible) {
             // claimed but undeveloped
             hexName = "LOC_PLOT_TOOLTIP_UNIMPROVED";
@@ -1707,10 +1709,16 @@ class bzPlotTooltip {
         for (const slot of slots) {
             // if the building has more than one yield type, like the
             // Palace, use one type for the ring and one for the glow
-            const icon = slot?.type ?? BZ_ICON_EMPTY_SLOT;
+            const icon = slot?.type;
             const colors = constructibleColors(slot?.info);
             const glow = slot && slot.isComplete && !slot.isOverbuildable;
             const info = { icon, colors, glow, collapse: false, style: ["-my-0\\.5"], };
+            if (!info.icon) {
+                // show the empty slot icon in a matching frame
+                info.icon = "BUILDING_OPEN";
+                info.overlay = "BUILDING_EMPTY";
+                info.oversize = 8/9 * BZ_ICON_SIZE;
+            }
             this.renderIcon(layout, info);
         }
         this.container.appendChild(layout);
@@ -1988,6 +1996,7 @@ function dump_yields() {
         "url(Yield_Culture)", "url(Yield_Happiness)",
         "url(yield_influence)",
         "BUILDING_OPEN",
+        "BUILDING_EMPTY",
         "url(city_buildingslist)", "url(city_citizenslist)",
         "url(city_foodlist)", "url(city_improvementslist)",
         "url(city_resourceslistlist)", "url(city_wonderslist)",
