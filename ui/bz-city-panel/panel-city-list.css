@@ -11,6 +11,9 @@
   bottom: 0;
   background-image: url("blp:hud_sub_circle_bk");
 }
+.bz-city-button .mini-map__lens-button__icon {
+  top: 0.3333333333rem;
+}
 
 .mini-map__city-panel {
   height: calc(100vh - 14rem);
@@ -51,18 +54,4 @@
 .bz-city-list-entry:focus, .bz-city-list-entry:hover, .bz-city-list-entry.pressed {
   background: linear-gradient(90deg, #8c7e62 0%, #4c473d 100%);
   color: #e5e5e5;
-}
-.bz-city-list-entry.bz-cannot-move {
-  color: #85878c;
-}
-.bz-city-list-entry.bz-cannot-move .bz-icon {
-  filter: brightness(0.65) drop-shadow(0 0.0555555556rem 0.1111111111rem #000c);
-}
-.bz-city-list-entry:focus.bz-cannot-move, .bz-city-list-entry:hover.bz-cannot-move,
-.bz-city-list-entry.pressed.bz-cannot-move {
-  color: #c2c4cc;
-}
-.bz-city-list-entry.bz-can-promote .bz-city-list-icon,
-.bz-city-list-entry.bz-can-upgrade .bz-city-list-icon {
-  display: none;
 }

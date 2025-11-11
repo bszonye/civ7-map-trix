@@ -140,7 +140,7 @@ defaultLens.allowedLayers.add("fxs-yields-layer");
 delete discoveryLens.ignoreEnabledLayers;
 
 // PanelMiniMap extensions
-const BZ_ICON_CITY_BUTTON = "blp:Yield_Cities_20";
+const BZ_ICON_CITY_BUTTON = "blp:Yield_Cities";
 const BZ_ICON_UNIT_BUTTON = "blp:Action_Promote";
 Controls.preloadImage(BZ_ICON_CITY_BUTTON, "bz-mini-map");
 Controls.preloadImage(BZ_ICON_UNIT_BUTTON, "bz-mini-map");
@@ -185,12 +185,16 @@ class bzPanelMiniMap {
             BZ_ICON_CITY_BUTTON,
         );
         this.citySubpanel = this.component.subpanels.at(-1);
+        this.cityButton = this.component.miniMapButtonRow.lastChild;
+        this.cityButton.classList.add("bz-city-button");
         this.component.addSubpanel(
             "bz-units-panel",
             "LOC_UI_PRODUCTION_UNITS",
             BZ_ICON_UNIT_BUTTON,
         );
         this.unitsSubpanel = this.component.subpanels.at(-1);
+        this.unitsButton = this.component.miniMapButtonRow.lastChild;
+        this.cityButton.classList.add("bz-units-button");
     }
     beforeAttach() { }
     afterAttach() {
@@ -211,7 +215,6 @@ class bzPanelMiniMap {
         if (this.toggleCooldown) return;
         // limit panel toggles to 4 per second
         // (avoids crashes in the minimap)
-        console.warn(`TRIX COOLDOWN ${bzPanelMiniMap.toggleCooldownTimer}`);
         const toggle = () => {
             if (this.toggleQueued) {
                 this.toggleCooldown =

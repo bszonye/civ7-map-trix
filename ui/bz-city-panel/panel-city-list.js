@@ -49,7 +49,7 @@ class bzCityPanel extends MinimapSubpanel {
             const entry = document.createElement("fxs-activatable");
             entry.addEventListener("action-activate", this.activateCityListener);
             entry.classList.value =
-                "bz-city-list-entry flex justify-between items-center text-xs";
+                "bz-city-list-entry flex justify-between items-center text-base";
             entry.setAttribute("tabindex", "-1");
             Databind.attribute(entry, "data-city-local-id", "entry.localId");
             row.appendChild(entry);
@@ -130,7 +130,7 @@ class bzCityPanel extends MinimapSubpanel {
     }
     activateCity(event) {
         if (event.target instanceof HTMLElement) {
-            const data = event.target.getAttribute("data-unit-local-id");
+            const data = event.target.getAttribute("data-city-local-id");
             if (!data) return;
             const localId = JSON.parse(data);
             const city = bzCityList.cities.get(localId);

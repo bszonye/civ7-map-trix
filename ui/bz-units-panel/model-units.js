@@ -89,7 +89,7 @@ class bzUnitListModel {
         this._units = new Map();
         this._unitGroups = new Map();
         const player = Players.get(GameContext.localObserverID);
-        if (player?.Units == void 0) return;
+        if (player?.Units == null) return;
         for (const id of player.Units.getUnitIds()) {
             this.updateUnit(id);
         }
@@ -278,7 +278,7 @@ class bzUnitListModel {
         const data = JSON.stringify({ lookId, selectId });
         // original sort order
         const index = this._units.get(localId)?.index ?? this._units.size;
-        // collate entry
+        // compile entry
         const entry = {
             unit, id, localId, armyId, isCommander, isGreatPerson, isPacked, age,
             activityType, operationType, operation, operationIcon, operationName, isBusy,
