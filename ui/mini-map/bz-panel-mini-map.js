@@ -172,7 +172,12 @@ class bzPanelMiniMap {
         }
     }
     afterInitialize() {
-        this.component.Root.classList.add("bz-units");
+        this.component.Root.classList.add("bz-mini-map");
+        this.component.addSubpanel(
+            "bz-city-panel",
+            "LOC_UI_RESOURCE_ALLOCATION_SETTLEMENTS",
+            "blp:Yield_Cities_20",
+        );
         this.component.addSubpanel(
             "bz-units-panel",
             "LOC_UI_PRODUCTION_UNITS",
