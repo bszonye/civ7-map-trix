@@ -1,113 +1,14 @@
 import { A as Audio } from '/core/ui/audio-base/audio-support.chunk.js';
 import { F as Focus } from '/core/ui/input/focus-support.chunk.js';
-import { b as InputEngineEventName } from '../../../core/ui/input/input-support.chunk.js';
 import { A as AnchorType } from '/core/ui/panel-support.chunk.js';
 import { D as Databind } from '/core/ui/utilities/utilities-core-databinding.chunk.js';
 import { C as ComponentID } from '/core/ui/utilities/utilities-component-id.chunk.js';
 import { U as UpdateGate } from '/core/ui/utilities/utilities-update-gate.chunk.js';
 import { MinimapSubpanel } from '/base-standard/ui/mini-map/panel-mini-map.js';
+import { bzPanelMiniMap } from '/bz-map-trix/ui/mini-map/bz-panel-mini-map.js';
 import { bzUnitList } from '/bz-map-trix/ui/bz-units-panel/model-units.js';
 
 const styles = "fs://game/bz-map-trix/ui/bz-units-panel/panel-units.css";
-
-Controls.preloadImage("blp:hud_sub_circle_bk", "units-panel");
-Controls.preloadImage("blp:hud_sub_circle_hov", "units-panel");
-
-class bzPanelMiniMap {
-    static c_prototype;
-    static instance;
-    static toggleCooldownTimer = 500;
-    unitsSubpanel = null;
-    engineInputListener = this.onEngineInput.bind(this);
-    hotkeyListener = this.onHotkey.bind(this);
-    toggleCooldown = 0;
-    toggleQueued = false;
-    constructor(component) {
-        bzPanelMiniMap.instance = this;
-        this.component = component;
-        component.bzComponent = this;
-        this.patchPrototypes(this.component);
-    }
-    patchPrototypes(component) {
-        const c_prototype = Object.getPrototypeOf(component);
-        if (bzPanelMiniMap.c_prototype == c_prototype) return;
-        // patch component methods
-        const proto = bzPanelMiniMap.c_prototype = c_prototype;
-        // afterInitialize
-        const afterInitialize = this.afterInitialize;
-        const onInitialize = proto.onInitialize;
-        proto.onInitialize = function(...args) {
-            const c_rv = onInitialize.apply(this, args);
-            const after_rv = afterInitialize.apply(this.bzComponent, args);
-            return after_rv ?? c_rv;
-        }
-    }
-    afterInitialize() {
-        this.component.Root.classList.add("bz-units");
-        this.component.addSubpanel(
-            "bz-units-panel",
-            "LOC_UI_PRODUCTION_UNITS",
-            "blp:Action_Promote",
-        );
-        this.unitsSubpanel = this.component.subpanels.at(-1);
-    }
-    beforeAttach() { }
-    afterAttach() {
-        window.addEventListener("hotkey-open-bz-units-panel", this.hotkeyListener);
-        this.component.Root
-            .addEventListener(InputEngineEventName, this.engineInputListener);
-    }
-    beforeDetach() {
-        window.removeEventListener("hotkey-open-bz-units-panel", this.hotkeyListener);
-        this.component.Root
-            .removeEventListener(InputEngineEventName, this.engineInputListener);
-    }
-    afterDetach() { }
-    togglePanel() {
-        this.toggleQueued = true;
-        if (this.toggleCooldown) return;
-        // limit panel toggles to 4 per second
-        // (avoids crashes in the minimap)
-        const toggle = () => {
-            if (this.toggleQueued) {
-                this.toggleCooldown =
-                    setTimeout(() => toggle(), bzPanelMiniMap.toggleCooldownTimer);
-                this.component.toggleSubpanel(this.unitsSubpanel);
-            } else {
-                this.toggleCooldown = 0;
-            }
-            this.toggleQueued = false;
-        }
-        toggle();
-    }
-    onEngineInput(inputEvent) {
-        if (inputEvent.detail.status != InputActionStatuses.FINISH) {
-            return;
-        }
-        switch (inputEvent.detail.name) {
-            case "keyboard-escape":
-                if (this.component.chatPanelState) {
-                    this.component.toggleChatPanel();
-                }
-                if (this.component.lensPanelState) {
-                    this.component.toggleLensPanel();
-                }
-                // fall through
-            case "cancel":
-            case "sys-menu":
-                if (this.component.activeSubpanel) {
-                    this.togglePanel();
-                }
-                inputEvent.stopPropagation();
-                inputEvent.preventDefault();
-                break;
-        }
-    }
-    onHotkey(_event) {
-        this.togglePanel();
-    }
-}
-Controls.decorate("panel-mini-map", (val) => new bzPanelMiniMap(val));
 
 class bzUnitsPanel extends MinimapSubpanel {
     static savedScrollPosition = 0;
