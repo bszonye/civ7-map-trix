@@ -116,11 +116,11 @@ class bzUnitsPanel extends MinimapSubpanel {
             name.classList.value = "bz-unit-name shrink font-fit-shrink ml-1";
             Databind.loc(name, "{{entry.name}}");
             title.appendChild(name);
-            // status section (right side)
-            const status = document.createElement("div");
-            status.classList.value =
-                "bz-unit-status flex flex-none justify-end items-center mx-1";
-            entry.appendChild(status);
+            // stats section (right side)
+            const stats = document.createElement("div");
+            stats.classList.value =
+                "bz-unit-stats flex flex-none justify-end items-center mx-1";
+            entry.appendChild(stats);
             // health
             const health = document.createElement("div");
             health.classList.value = "bz-unit-health flex items-center mr-3";
@@ -133,7 +133,7 @@ class bzUnitsPanel extends MinimapSubpanel {
             const healthText = document.createElement("div");
             Databind.loc(healthText, "{{entry.healthLeft}}");
             health.appendChild(healthText);
-            status.appendChild(health);
+            stats.appendChild(health);
             // movement
             const movement = document.createElement("div");
             movement.classList.value = "bz-unit-movement flex items-center mr-2";
@@ -145,7 +145,7 @@ class bzUnitsPanel extends MinimapSubpanel {
             Databind.loc(moveText, "{{entry.slashMoves}}");
             movement.appendChild(moveText);
             Databind.classToggle(entry, "bz-cannot-move", "!{{entry.canMove}}");
-            status.appendChild(movement);
+            stats.appendChild(movement);
             // activity (operations/garrison)
             const activity = document.createElement("div");
             activity.classList.value = "bz-unit-activity relative size-6";
@@ -163,7 +163,7 @@ class bzUnitsPanel extends MinimapSubpanel {
             Databind.classToggle(district, "hidden", "{{entry.isBusy}}");
             Databind.bgImg(district, "entry.districtIcon");
             activity.appendChild(district);
-            status.appendChild(activity);
+            stats.appendChild(activity);
         }
         // finish
         this.Root.appendChild(this.panel);

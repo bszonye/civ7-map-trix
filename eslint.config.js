@@ -51,6 +51,7 @@ export default [
                 MapUnits: "readonly",
                 PlayerIds: "readonly",
                 Players: "readonly",
+                ProductionKind: "readonly",
                 ResourceTypes: "readonly",
                 RevealedStates: "readonly",
                 RiverTypes: "readonly",

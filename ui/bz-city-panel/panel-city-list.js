@@ -49,7 +49,7 @@ class bzCityPanel extends MinimapSubpanel {
             const entry = document.createElement("fxs-activatable");
             entry.addEventListener("action-activate", this.activateCityListener);
             entry.classList.value =
-                "bz-city-list-entry flex justify-between items-center text-base";
+                "bz-city-list-entry flex justify-between items-center text-base py-px";
             entry.setAttribute("tabindex", "-1");
             Databind.attribute(entry, "data-city-local-id", "entry.localId");
             row.appendChild(entry);
@@ -62,51 +62,32 @@ class bzCityPanel extends MinimapSubpanel {
             const icon = document.createElement("div");
             icon.classList.value = "bz-city-list-icon bz-icon size-6";
             Databind.bgImg(icon, "entry.icon");
+            Databind.tooltip(icon, "entry.iconTT");
             title.appendChild(icon);
             // name
             const name = document.createElement("div");
             name.classList.value = "bz-city-list-name shrink font-fit-shrink ml-1";
             Databind.loc(name, "{{entry.name}}");
             title.appendChild(name);
-            // status section (right side)
-            const status = document.createElement("div");
-            status.classList.value =
-                "bz-city-list-status flex flex-none justify-end items-center mx-1";
-            entry.appendChild(status);
-            // TODO: remove unit info, for reference only
-            const isUnit = false;
-            if (isUnit) {
-                // movement
-                const movement = document.createElement("div");
-                movement.classList.value = "bz-unit-movement flex items-center mr-2";
-                const moveIcon = document.createElement("img");
-                moveIcon.classList.value = "bz-icon size-5 -ml-0\\.5 mr-0\\.5";
-                moveIcon.setAttribute("src", "blp:Action_Move");
-                movement.appendChild(moveIcon);
-                const moveText = document.createElement("div");
-                Databind.loc(moveText, "{{entry.slashMoves}}");
-                movement.appendChild(moveText);
-                Databind.classToggle(entry, "bz-cannot-move", "!{{entry.canMove}}");
-                status.appendChild(movement);
-                // activity (operations/garrison)
-                const activity = document.createElement("div");
-                activity.classList.value = "bz-unit-activity relative size-6";
-                const garrison = document.createElement("div");
-                garrison.classList.value = "bz-unit-garrison-bg bz-icon absolute";
-                Databind.classToggle(garrison, "hidden", "!{{entry.isGarrison}}");
-                activity.appendChild(garrison);
-                const operation = document.createElement("div");
-                operation.classList.value = "bz-unit-operation bz-icon absolute size-6";
-                Databind.bgImg(operation, "entry.operationIcon");
-                activity.appendChild(operation);
-                const district = document.createElement("div");
-                district.classList.value = "bz-unit-district bz-icon absolute size-6";
-                district.style.backgroundSize = "85%";
-                Databind.classToggle(district, "hidden", "{{entry.isBusy}}");
-                Databind.bgImg(district, "entry.districtIcon");
-                activity.appendChild(district);
-                status.appendChild(activity);
-            }
+            // stats section (right side)
+            const stats = document.createElement("div");
+            stats.classList.value =
+                "bz-city-list-stats flex flex-none justify-end items-center mx-1";
+            entry.appendChild(stats);
+            // project (city production or town focus)
+            const project = document.createElement("div");
+            project.classList.value = "bz-city-list-project relative size-6";
+            const projectBG = document.createElement("div");
+            projectBG.classList.value = "bz-city-list-project-bg bz-icon absolute size-6";
+            Databind.classToggle(projectBG, "hidden", "!{{entry.projectIcon}}");
+            Databind.classToggle(projectBG, "bz-is-growing", "{{entry.isGrowing}}");
+            project.appendChild(projectBG);
+            const projectIcon = document.createElement("div");
+            projectIcon.classList.value = "bz-city-list-project bz-icon absolute size-6";
+            Databind.bgImg(projectIcon, "entry.projectIcon");
+            Databind.tooltip(projectIcon, "entry.projectTooltip");
+            project.appendChild(projectIcon);
+            stats.appendChild(project);
         }
         // finish
         this.Root.appendChild(this.panel);

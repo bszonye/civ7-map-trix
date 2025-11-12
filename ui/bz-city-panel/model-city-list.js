@@ -1,9 +1,8 @@
-// TODO: change unit info to settlement info
-// TODO: remove all unit-specific stuff
 import { C as ComponentID } from '/core/ui/utilities/utilities-component-id.chunk.js';
 import { U as UpdateGate } from '/core/ui/utilities/utilities-update-gate.chunk.js';
 
 class bzCityListModel {
+    onCityUpdateListener = this.onCityUpdate.bind(this);
     onUpdate;
     updateGate = new UpdateGate(() => this.update());
     _cities = new Map();
@@ -11,40 +10,40 @@ class bzCityListModel {
     constructor() {
         this.updateGate.call("constructor");
         // from city-banner-manager
-        engine.on("AffinityLevelChanged", this.onCityUpdate);
-        engine.on("CityAddedToMap", this.onCityUpdate);
-        engine.on("CityInitialized", this.onCityUpdate);
-        engine.on("CityNameChanged", this.onCityUpdate);
-        engine.on("CapitalCityChanged", this.onCityUpdate);
-        engine.on("CityPopulationChanged", this.onCityUpdate);
-        engine.on("CityProductionChanged", this.onCityUpdate);
-        engine.on("CityYieldChanged", this.onCityUpdate);
-        engine.on("CityProductionUpdated", this.onCityUpdate);
-        engine.on("CityProductionQueueChanged", this.onCityUpdate);
-        engine.on("CityReligionChanged", this.onCityUpdate);
-        engine.on("DiplomacyEventStarted", this.onCityUpdate);
-        engine.on("DiplomacyEventEnded", this.onCityUpdate);
-        engine.on("DiplomacyRelationshipChanged", this.onCityUpdate);
-        engine.on("UrbanReligionChanged", this.onCityUpdate);
-        engine.on("RuralReligionChanged", this.onCityUpdate);
-        engine.on("CityRemovedFromMap", this.onCityUpdate);
-        engine.on("CitySelectionChanged", this.onCityUpdate);
-        engine.on("CityStateBonusChosen", this.onCityUpdate);
-        engine.on("CityGovernmentLevelChanged", this.onCityUpdate);
-        engine.on("FoodQueueChanged", this.onCityUpdate);
-        engine.on("CityGrowthModeChanged", this.onCityUpdate);
-        engine.on("CityYieldGranted", this.onCityUpdate);
-        engine.on("PlotVisibilityChanged", this.onCityUpdate);
-        engine.on("ConqueredSettlementIntegrated", this.onCityUpdate);
-        engine.on("DistrictAddedToMap", this.onCityUpdate);
-        engine.on("DistrictRemovedFromMap", this.onCityUpdate);
-        engine.on("NotificationAdded", this.onCityUpdate);
+        engine.on("AffinityLevelChanged", this.onCityUpdateListener);
+        engine.on("CityAddedToMap", this.onCityUpdateListener);
+        engine.on("CityInitialized", this.onCityUpdateListener);
+        engine.on("CityNameChanged", this.onCityUpdateListener);
+        engine.on("CapitalCityChanged", this.onCityUpdateListener);
+        engine.on("CityPopulationChanged", this.onCityUpdateListener);
+        engine.on("CityProductionChanged", this.onCityUpdateListener);
+        engine.on("CityYieldChanged", this.onCityUpdateListener);
+        engine.on("CityProductionUpdated", this.onCityUpdateListener);
+        engine.on("CityProductionQueueChanged", this.onCityUpdateListener);
+        engine.on("CityReligionChanged", this.onCityUpdateListener);
+        engine.on("DiplomacyEventStarted", this.onCityUpdateListener);
+        engine.on("DiplomacyEventEnded", this.onCityUpdateListener);
+        engine.on("DiplomacyRelationshipChanged", this.onCityUpdateListener);
+        engine.on("UrbanReligionChanged", this.onCityUpdateListener);
+        engine.on("RuralReligionChanged", this.onCityUpdateListener);
+        engine.on("CityRemovedFromMap", this.onCityUpdateListener);
+        engine.on("CitySelectionChanged", this.onCityUpdateListener);
+        engine.on("CityStateBonusChosen", this.onCityUpdateListener);
+        engine.on("CityGovernmentLevelChanged", this.onCityUpdateListener);
+        engine.on("FoodQueueChanged", this.onCityUpdateListener);
+        engine.on("CityGrowthModeChanged", this.onCityUpdateListener);
+        engine.on("CityYieldGranted", this.onCityUpdateListener);
+        engine.on("PlotVisibilityChanged", this.onCityUpdateListener);
+        engine.on("ConqueredSettlementIntegrated", this.onCityUpdateListener);
+        engine.on("DistrictAddedToMap", this.onCityUpdateListener);
+        engine.on("DistrictRemovedFromMap", this.onCityUpdateListener);
+        engine.on("NotificationAdded", this.onCityUpdateListener);
         // from bz-flag-corps
-        engine.on('CityRazingStarted', this.onCityUpdate);
-        engine.on('DiplomacyEventEnded', this.onCityUpdate);
-        engine.on('DistrictDamageChanged', this.onCityUpdate);
-        engine.on('PlayerResourceChanged', this.onCityUpdate);
-        engine.on('PlayerTurnActivated', this.onCityUpdate);
+        engine.on('CityRazingStarted', this.onCityUpdateListener);
+        engine.on('DiplomacyEventEnded', this.onCityUpdateListener);
+        engine.on('DistrictDamageChanged', this.onCityUpdateListener);
+        engine.on('PlayerResourceChanged', this.onCityUpdateListener);
+        engine.on('PlayerTurnActivated', this.onCityUpdateListener);
     }
     set updateCallback(callback) {
         this.onUpdate = callback;
@@ -92,17 +91,44 @@ class bzCityListModel {
         const name = city.name;
         const location = city.location;
         // icon
-        const focusId = isTown && city.Growth ? city.Growth.projectType : -1;
-        const focus = GameInfo.Projects.lookup(focusId);
-        const focusType = focus?.ProjectType ?? "Yield_Towns";
         const icon =
             isCapital ? "res_capital" :
-            isTown ? UI.getIcon(focusType) :
-            "Yield_Cities"
+            isTown ? "Yield_Towns" :
+            "Yield_Cities";
         // compile entry
         const entry = {
-            city, id, localId, isCapital, isTown, focusType, icon, name, location,
+            city, id, localId, icon, name, isCapital, isTown, location,
         };
+        // project (city build queue or town focus)
+        if (isTown) {
+            const focusId = isTown && city.Growth ? city.Growth.projectType : -1;
+            const focus = GameInfo.Projects.lookup(focusId);
+            const ftype = focus?.ProjectType ?? "PROJECT_GROWTH";
+            const fname = focus?.Name ?? "LOC_UI_FOOD_CHOOSER_FOCUS_GROWTH";
+            const fdesc = focus?.Description ??
+                "LOC_PROJECT_TOWN_FOOD_INCREASE_DESCRIPTION";
+            entry.projectIcon = UI.getIcon(ftype);
+            entry.projectTooltip =
+                `[b]${Locale.compose(fname)}[/b][n]${Locale.compose(fdesc)}`;
+            entry.isGrowing = city.Growth?.growthType == GrowthTypes.EXPAND;
+        } else {
+            const kind = city.BuildQueue.currentProductionKind;
+            const type = city.BuildQueue.currentProductionTypeHash;
+            entry.queueTurns = city.BuildQueue.currentTurnsLeft;
+            if (kind == ProductionKind.CONSTRUCTIBLE) {
+                const info = GameInfo.Constructibles.lookup(type);
+                entry.projectIcon = UI.getIcon(info.ConstructibleType);
+                entry.projectTooltip = info.Name;
+            } else if (kind == ProductionKind.UNIT) {
+                const info = GameInfo.Units.lookup(type);
+                entry.projectIcon = UI.getIcon(info.UnitType);
+                entry.projectTooltip = info.Name;
+            } else if (kind == ProductionKind.PROJECT) {
+                const info = GameInfo.Projects.lookup(type);
+                entry.projectIcon = UI.getIcon(info.ProjectType);
+                entry.projectTooltip = info.Name;
+            }
+        }
         this._cities.set(localId, entry);
     }
     onCityUpdate(event) {

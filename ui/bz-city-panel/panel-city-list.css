@@ -55,3 +55,12 @@
   background: linear-gradient(90deg, #8c7e62 0%, #4c473d 100%);
   color: #e5e5e5;
 }
+.bz-city-list-entry .bz-city-list-project-bg {
+  border-radius: 1rem;
+  filter: drop-shadow(0 0.0555555556rem 0.1111111111rem #000c);
+  background-color: #4c5366aa;
+  /* background: linear-gradient(180deg, #333640 0%, #4c5366 100%); */
+}
+.bz-city-list-entry .bz-is-growing {
+  background-color: #80b34d55;
+}
