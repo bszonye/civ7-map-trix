@@ -6,7 +6,9 @@ class bzCityListModel {
     onUpdate;
     updateGate = new UpdateGate(() => this.update());
     _cities = new Map();
+    _settlementList = [];
     _cityList = [];
+    _townList = [];
     constructor() {
         this.updateGate.call("constructor");
         // from city-banner-manager
@@ -51,8 +53,14 @@ class bzCityListModel {
     get cities() {
         return this._cities;
     }
+    get settlementList() {
+        return this._settlementList;
+    }
     get cityList() {
         return this._cityList;
+    }
+    get townList() {
+        return this._townList;
     }
     update() {
         this._cities = new Map();
@@ -64,7 +72,7 @@ class bzCityListModel {
         this.updateDisplay();
     }
     updateDisplay() {
-        this._cityList = [...this._cities.values()];
+        this._settlementList = [...this._cities.values()];
         const citySort = (a, b) => {
             // sort capital first
             if (a.isCapital && !b.isCapital) return -1;
@@ -77,7 +85,9 @@ class bzCityListModel {
             const bName = Locale.compose(b.name).toUpperCase();
             return Locale.compare(aName, bName);
         };
-        this._cityList.sort(citySort);
+        this._settlementList.sort(citySort);
+        this._cityList = this._settlementList.filter(c => !c.isTown);
+        this._townList = this._settlementList.filter(c => c.isTown);
         if (this.onUpdate) this.onUpdate(this);
         window.dispatchEvent(new CustomEvent("bz-model-city-list-update"));
     }
@@ -85,6 +95,7 @@ class bzCityListModel {
         const city = Cities.get(id);
         if (!city) return;
         // city details
+        const owner = city.owner;
         const localId = city.localId;
         const isCapital = city.isCapital;
         const isTown = city.isTown;
@@ -100,38 +111,40 @@ class bzCityListModel {
             "Yield_Cities";
         // compile entry
         const entry = {
-            city, id, localId, icon, name, isCapital, isTown, isGrowing,
+            city, id, owner, localId, icon, name, isCapital, isTown, isGrowing,
             location, population, growthTurns,
         };
-        // project (city build queue or town focus)
         if (isTown) {
+            // town focus
             entry.queueTurns = -1;  // no queue
             const focusId = isTown && city.Growth ? city.Growth.projectType : -1;
             const focus = GameInfo.Projects.lookup(focusId);
             const ftype = focus?.ProjectType ?? "PROJECT_GROWTH";
-            const fname = focus?.Name ?? "LOC_UI_FOOD_CHOOSER_FOCUS_GROWTH";
-            const fdesc = focus?.Description ??
-                "LOC_PROJECT_TOWN_FOOD_INCREASE_DESCRIPTION";
-            entry.projectIcon = UI.getIcon(ftype);
-            entry.projectTooltip =
-                `[b]${Locale.compose(fname)}[/b][n]${Locale.compose(fdesc)}`;
+            const gname = isGrowing ? "LOC_UI_FOOD_CHOOSER_FOCUS_GROWTH" : void 0;
+            const fname = focus?.Name;
+            const name =
+                gname && fname ? Locale.compose("LOC_BZ_PARENTHESIS", gname, fname) :
+                fname ? Locale.compose(fname) : gname && Locale.compose(gname);
+            const gdesc = gname && "LOC_PROJECT_TOWN_FOOD_INCREASE_DESCRIPTION";
+            const fdesc = focus && focus.Description;
+            const desc = gdesc ? Locale.compose(gdesc) : fdesc && Locale.compose(fdesc);
+            entry.focusIcon = UI.getIcon(ftype);
+            entry.focusTooltip = name && desc && `[b]${name}[/b][n]${desc}`;
             entry.focusGrowing = focus && isGrowing;
         } else {
+            // city build queue
             entry.queueTurns = city.BuildQueue.currentTurnsLeft;
             const kind = city.BuildQueue.currentProductionKind;
             const type = city.BuildQueue.currentProductionTypeHash;
             if (kind == ProductionKind.CONSTRUCTIBLE) {
                 const info = GameInfo.Constructibles.lookup(type);
-                entry.projectIcon = UI.getIcon(info.ConstructibleType);
-                entry.projectTooltip = info.Name;
+                entry.queueIcon = UI.getIcon(info.ConstructibleType);
             } else if (kind == ProductionKind.UNIT) {
                 const info = GameInfo.Units.lookup(type);
-                entry.projectIcon = UI.getIcon(info.UnitType);
-                entry.projectTooltip = info.Name;
+                entry.queueIcon = UI.getIcon(info.UnitType);
             } else if (kind == ProductionKind.PROJECT) {
                 const info = GameInfo.Projects.lookup(type);
-                entry.projectIcon = UI.getIcon(info.ProjectType);
-                entry.projectTooltip = info.Name;
+                entry.queueIcon = UI.getIcon(info.ProjectType);
             }
         }
         this._cities.set(localId, entry);

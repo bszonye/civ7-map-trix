@@ -1,9 +1,13 @@
+// TODO: localization
 import { F as Focus } from '/core/ui/input/focus-support.chunk.js';
 import { A as AnchorType } from '/core/ui/panel-support.chunk.js';
+import TooltipManager from '/core/ui/tooltips/tooltip-manager.js';
 import { D as Databind } from '/core/ui/utilities/utilities-core-databinding.chunk.js';
 import { MinimapSubpanel } from '/base-standard/ui/mini-map/panel-mini-map.js';
 import { bzPanelMiniMap } from '/bz-map-trix/ui/mini-map/bz-panel-mini-map.js';
 import { bzCityList } from '/bz-map-trix/ui/bz-city-panel/model-city-list.js';
+
+const BZ_CITY_TOOLTIP_STYLE = "bz-city-tooltip";
 
 const styles = "fs://game/bz-map-trix/ui/bz-city-panel/panel-city-list.css";
 
@@ -42,15 +46,37 @@ class bzCityPanel extends MinimapSubpanel {
         this.panel.appendChild(frame);
         this.listContainer.classList.value = "bz-city-list-scrollable";
         frame.appendChild(this.listContainer);
+        this.renderList(
+            "LOC_UI_SETTLEMENT_TAB_BAR_CITIES",
+            "g_bzCityListModel.cityList",
+        );
+        this.renderList(
+            "LOC_UI_SETTLEMENT_TAB_BAR_TOWNS",
+            "g_bzCityListModel.townList",
+            "mt-2",
+        );
+    }
+    renderList(headline, list, ...style) {
+        const header = document.createElement("fxs-header");
+        header.classList.add("font-title-sm", "text-secondary");
+        if (style.length) header.classList.add(...style);
+        header.setAttribute("title", headline);
+        header.setAttribute("filigree-style", "h4");
+        this.listContainer.appendChild(header);
+        // table rows
         const row = document.createElement("div");
         this.listContainer.appendChild(row);
-        Databind.for(row, "g_bzCityListModel.cityList", "entry");
+        Databind.for(row, list, "entry");
         {
             const entry = document.createElement("fxs-activatable");
             entry.addEventListener("action-activate", this.activateCityListener);
             entry.classList.value =
                 "bz-city-list-entry flex justify-between items-center text-sm py-px";
             entry.setAttribute("tabindex", "-1");
+            if (TooltipManager.types[BZ_CITY_TOOLTIP_STYLE] != null) {
+                entry.setAttribute("data-tooltip-style", BZ_CITY_TOOLTIP_STYLE);
+            }
+            Databind.attribute(entry, "data-city-owner", "entry.owner");
             Databind.attribute(entry, "data-city-local-id", "entry.localId");
             row.appendChild(entry);
             // title section (left side)
@@ -72,58 +98,81 @@ class bzCityPanel extends MinimapSubpanel {
             // stats section (right side)
             const stats = document.createElement("div");
             stats.classList.value =
-                "bz-city-list-stats flex flex-none justify-end items-center mx-1";
+                "bz-city-list-stats flex flex-none justify-end items-center";
             entry.appendChild(stats);
-            // population
-            const population = document.createElement("div");
-            population.classList.value = "bz-city-list-population text-center mr-3";
-            population.style.width = "1.2em";  // two digits
-            Databind.value(population, "{{entry.population}}");
-            stats.appendChild(population);
-            // growth turns and queue turns
             function turnTimer(style, turns) {
+                const column = document.createElement("div");
+                column.classList.add("text-center");
+                column.style.width = "calc(1.2em + 1.6666666667rem)";  // two digits
                 const timer = document.createElement("div");
                 timer.classList.value = style;
-                timer.classList.add(
-                    "flex",
-                    "items-center",
-                    "justify-end",
-                    "pl-1",
-                );
-                Databind.classToggle(timer, "invisible", `{{${turns}}}==-1`);
+                timer.classList.add("flex", "items-center", "justify-center", "pl-1\\.5");
+                Databind.classToggle(column, "invisible", `{{${turns}}}==-1`);
                 const timerTurns = document.createElement("div");
                 timerTurns.classList.value = "text-right";
-                timerTurns.style.width = "1.2em";  // two digits
+                timerTurns.style.width = "calc(1.2em)";  // two digits
                 Databind.value(timerTurns, turns);
                 timer.appendChild(timerTurns);
                 const timerClock = document.createElement("div");
                 timerClock.classList.value = "bz-icon size-6";
                 timerClock.style.backgroundImage = "url('hud_turn-timer')";
                 timer.appendChild(timerClock);
-                stats.appendChild(timer);
-                return timer;
+                column.appendChild(timer);
+                stats.appendChild(column);
+                return column;
             }
+            // population
+            const growth = document.createElement("div");
+            growth.classList.value = "bz-city-growth flex items-center";
+            const population = document.createElement("div");
+            population.classList.value = "bz-city-list-population text-center mr-1";
+            population.style.width = "1.2em";  // two digits
+            Databind.value(population, "{{entry.population}}");
+            growth.appendChild(population);
             const growthTurns = turnTimer(
                 "bz-city-growth-turns",
                 "entry.growthTurns",
             );
-            stats.appendChild(growthTurns);
-            const queueTurns = turnTimer("bz-city-queue-turns", "entry.queueTurns");
-            stats.appendChild(queueTurns);
-            // project (city production or town focus)
-            const project = document.createElement("div");
-            project.classList.value = "bz-city-list-project relative size-6 ml-3";
-            const projectBG = document.createElement("div");
-            projectBG.classList.value = "bz-city-list-project-bg bz-icon absolute size-6";
-            Databind.classToggle(projectBG, "hidden", "!{{entry.projectIcon}}");
-            Databind.classToggle(projectBG, "bz-city-growing", "{{entry.focusGrowing}}");
-            project.appendChild(projectBG);
-            const projectIcon = document.createElement("div");
-            projectIcon.classList.value = "bz-city-list-project bz-icon absolute size-6";
-            Databind.bgImg(projectIcon, "entry.projectIcon");
-            Databind.tooltip(projectIcon, "entry.projectTooltip");
-            project.appendChild(projectIcon);
-            stats.appendChild(project);
+            growthTurns.classList.add("mx-1");
+            growth.appendChild(growthTurns);
+            stats.appendChild(growth);
+            // city queue
+            const queue = document.createElement("div");
+            Databind.classToggle(queue, "hidden", "{{entry.isTown}}");
+            queue.classList.value = "bz-city-queue flex items-center";
+            const queueTurns = turnTimer(
+                "bz-city-queue-turns",
+                "entry.queueTurns",
+            );
+            queueTurns.classList.add("mx-1");
+            queue.appendChild(queueTurns);
+            const qslot = document.createElement("div");
+            qslot.classList.value = "bz-city-list-queue-slot relative mx-1";
+            const queueBG = document.createElement("div");
+            queueBG.classList.value = "bz-city-list-queue-bg bz-icon absolute size-6";
+            Databind.classToggle(queueBG, "hidden", "!{{entry.queueIcon}}");
+            qslot.appendChild(queueBG);
+            const queueIcon = document.createElement("div");
+            queueIcon.classList.value = "bz-city-list-queue-icon bz-icon size-6";
+            Databind.bgImg(queueIcon, "entry.queueIcon");
+            qslot.appendChild(queueIcon);
+            queue.appendChild(qslot);
+            stats.appendChild(queue);
+            // town focus
+            const focus = document.createElement("div");
+            Databind.classToggle(focus, "hidden", "!{{entry.isTown}}");
+            focus.classList.value = "bz-city-list-focus relative mx-1";
+            const focusBG = document.createElement("div");
+            focusBG.classList.value = "bz-city-list-focus-bg bz-icon absolute size-6";
+            Databind.classToggle(focusBG, "hidden", "!{{entry.focusIcon}}");
+            Databind.classToggle(focusBG, "bz-city-growing", "{{entry.focusGrowing}}");
+            focus.appendChild(focusBG);
+            const focusIcon = document.createElement("div");
+            focusIcon.classList.value = "bz-city-list-focus-icon bz-icon size-6";
+            Databind.bgImg(focusIcon, "entry.focusIcon");
+            Databind.tooltip(focusIcon, "entry.focusTooltip");
+            focus.appendChild(focusIcon);
+            stats.appendChild(focus);
         }
         // finish
         this.Root.appendChild(this.panel);

@@ -55,19 +55,18 @@
   background: linear-gradient(90deg, #8c7e62 0%, #4c473d 100%);
   color: #e5e5e5;
 }
-.bz-city-growth-turns .bz-icon {
-  filter: brightness(1.667) fxs-color-tint(#80b34d)
-    drop-shadow(0 0.0555555556rem 0.1111111111rem #000c);
+.bz-city-growth-turns {
+  background-color: #80b34d55;
+  border-radius: 1em;
 }
-.bz-city-queue-turns .bz-icon {
-  filter: brightness(2.000) fxs-color-tint(#a33d29)
-    drop-shadow(0 0.0555555556rem 0.1111111111rem #000c);
+.bz-city-queue-turns {
+  background-color: #a33d2955;
+  border-radius: 1em;
 }
-.bz-city-list-entry .bz-city-list-project-bg {
+.bz-city-list-entry .bz-city-list-queue-bg,
+.bz-city-list-entry .bz-city-list-focus-bg {
   border-radius: 1rem;
   filter: drop-shadow(0 0.0555555556rem 0.1111111111rem #000c);
-  background-color: #8c7e62;
-  background-color: #4c5366;
   background-color: #333640;
 }
 .bz-city-list-entry .bz-city-growing {
