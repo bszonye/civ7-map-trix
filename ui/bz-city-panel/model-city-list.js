@@ -90,7 +90,8 @@ class bzCityListModel {
         const isTown = city.isTown;
         const name = city.name;
         const location = city.location;
-        const growthTurns = city.Growth?.turnsUntilGrowth ?? -1;
+        const population = city.population;
+        const growthTurns = city.Growth.turnsUntilGrowth ?? -1;
         // icon
         const icon =
             isCapital ? "res_capital" :
@@ -98,7 +99,8 @@ class bzCityListModel {
             "Yield_Cities";
         // compile entry
         const entry = {
-            city, id, localId, icon, name, isCapital, isTown, location, growthTurns,
+            city, id, localId, icon, name, isCapital, isTown,
+            location, population, growthTurns,
         };
         // project (city build queue or town focus)
         if (isTown) {

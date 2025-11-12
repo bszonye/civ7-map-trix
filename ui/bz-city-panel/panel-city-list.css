@@ -56,10 +56,12 @@
   color: #e5e5e5;
 }
 .bz-city-growth-turns .bz-icon {
-  filter: brightness(1.667) fxs-color-tint(#80b34d);
+  filter: brightness(1.667) fxs-color-tint(#80b34d)
+    drop-shadow(0 0.0555555556rem 0.1111111111rem #000c);
 }
 .bz-city-queue-turns .bz-icon {
-  filter: brightness(2.000) fxs-color-tint(#a33d29);
+  filter: brightness(2.000) fxs-color-tint(#a33d29)
+    drop-shadow(0 0.0555555556rem 0.1111111111rem #000c);
 }
 .bz-city-list-entry .bz-city-list-project-bg {
   border-radius: 1rem;

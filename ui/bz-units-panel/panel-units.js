@@ -113,7 +113,7 @@ class bzUnitsPanel extends MinimapSubpanel {
             title.appendChild(icon);
             // name
             const name = document.createElement("div");
-            name.classList.value = "bz-unit-name shrink font-fit-shrink ml-1";
+            name.classList.value = "bz-unit-name shrink font-fit-shrink overflow-hidden ml-1";
             Databind.loc(name, "{{entry.name}}");
             title.appendChild(name);
             // stats section (right side)
