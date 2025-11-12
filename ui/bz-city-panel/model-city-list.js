@@ -90,6 +90,7 @@ class bzCityListModel {
         const isTown = city.isTown;
         const name = city.name;
         const location = city.location;
+        const growthTurns = city.Growth?.turnsUntilGrowth ?? -1;
         // icon
         const icon =
             isCapital ? "res_capital" :
@@ -97,10 +98,11 @@ class bzCityListModel {
             "Yield_Cities";
         // compile entry
         const entry = {
-            city, id, localId, icon, name, isCapital, isTown, location,
+            city, id, localId, icon, name, isCapital, isTown, location, growthTurns,
         };
         // project (city build queue or town focus)
         if (isTown) {
+            entry.queueTurns = -1;  // no queue
             const focusId = isTown && city.Growth ? city.Growth.projectType : -1;
             const focus = GameInfo.Projects.lookup(focusId);
             const ftype = focus?.ProjectType ?? "PROJECT_GROWTH";
@@ -110,11 +112,11 @@ class bzCityListModel {
             entry.projectIcon = UI.getIcon(ftype);
             entry.projectTooltip =
                 `[b]${Locale.compose(fname)}[/b][n]${Locale.compose(fdesc)}`;
-            entry.isGrowing = city.Growth?.growthType == GrowthTypes.EXPAND;
+            entry.isGrowing = focus && city.Growth.growthType == GrowthTypes.EXPAND;
         } else {
+            entry.queueTurns = 5 + city.BuildQueue.currentTurnsLeft;
             const kind = city.BuildQueue.currentProductionKind;
             const type = city.BuildQueue.currentProductionTypeHash;
-            entry.queueTurns = city.BuildQueue.currentTurnsLeft;
             if (kind == ProductionKind.CONSTRUCTIBLE) {
                 const info = GameInfo.Constructibles.lookup(type);
                 entry.projectIcon = UI.getIcon(info.ConstructibleType);
