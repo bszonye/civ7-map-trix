@@ -88,7 +88,7 @@ class bzCityPanel extends MinimapSubpanel {
                     "items-center",
                     "justify-end",
                     "w-14",
-                    // "bg-primary",  // TODO: remove
+                    // "bg-primary",  // TODO: remove debug
                 );
                 Databind.classToggle(timer, "invisible", `{{${turns}}}==-1`);
                 const timerTurns = document.createElement("div");
@@ -114,7 +114,7 @@ class bzCityPanel extends MinimapSubpanel {
             const projectBG = document.createElement("div");
             projectBG.classList.value = "bz-city-list-project-bg bz-icon absolute size-6";
             Databind.classToggle(projectBG, "hidden", "!{{entry.projectIcon}}");
-            Databind.classToggle(projectBG, "bz-city-growing", "{{entry.isGrowing}}");
+            Databind.classToggle(projectBG, "bz-city-growing", "{{entry.focusGrowing}}");
             project.appendChild(projectBG);
             const projectIcon = document.createElement("div");
             projectIcon.classList.value = "bz-city-list-project bz-icon absolute size-6";

@@ -91,7 +91,8 @@ class bzCityListModel {
         const name = city.name;
         const location = city.location;
         const population = city.population;
-        const growthTurns = city.Growth.turnsUntilGrowth ?? -1;
+        const isGrowing = city.Growth.growthType == GrowthTypes.EXPAND;
+        const growthTurns = isGrowing ? city.Growth.turnsUntilGrowth : -1;
         // icon
         const icon =
             isCapital ? "res_capital" :
@@ -99,7 +100,7 @@ class bzCityListModel {
             "Yield_Cities";
         // compile entry
         const entry = {
-            city, id, localId, icon, name, isCapital, isTown,
+            city, id, localId, icon, name, isCapital, isTown, isGrowing,
             location, population, growthTurns,
         };
         // project (city build queue or town focus)
@@ -114,9 +115,9 @@ class bzCityListModel {
             entry.projectIcon = UI.getIcon(ftype);
             entry.projectTooltip =
                 `[b]${Locale.compose(fname)}[/b][n]${Locale.compose(fdesc)}`;
-            entry.isGrowing = focus && city.Growth.growthType == GrowthTypes.EXPAND;
+            entry.focusGrowing = focus && isGrowing;
         } else {
-            entry.queueTurns = 5 + city.BuildQueue.currentTurnsLeft;
+            entry.queueTurns = city.BuildQueue.currentTurnsLeft;
             const kind = city.BuildQueue.currentProductionKind;
             const type = city.BuildQueue.currentProductionTypeHash;
             if (kind == ProductionKind.CONSTRUCTIBLE) {
@@ -133,6 +134,9 @@ class bzCityListModel {
                 entry.projectTooltip = info.Name;
             }
         }
+        if (entry.population != -1) entry.population -= 5;  // TODO: remove debug
+        if (entry.growthTurns != -1) entry.growthTurns += 3;  // TODO: remove debug
+        if (entry.queueTurns != -1) entry.queueTurns += 5;  // TODO: remove debug
         this._cities.set(localId, entry);
     }
     onCityUpdate(event) {

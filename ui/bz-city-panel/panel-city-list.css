@@ -66,8 +66,7 @@
 .bz-city-list-entry .bz-city-list-project-bg {
   border-radius: 1rem;
   filter: drop-shadow(0 0.0555555556rem 0.1111111111rem #000c);
-  background-color: #4c5366aa;
-  /* background: linear-gradient(180deg, #333640 0%, #4c5366 100%); */
+  background-color: #4c473d;
 }
 .bz-city-list-entry .bz-city-growing {
   background-color: #80b34d99;
