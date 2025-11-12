@@ -57,6 +57,7 @@ class bzCityPanel extends MinimapSubpanel {
         );
     }
     renderList(headline, list, ...style) {
+        const hasCityTooltip = TooltipManager.types[BZ_CITY_TOOLTIP_STYLE] != null;
         const header = document.createElement("fxs-header");
         header.classList.add("font-title-sm", "text-secondary");
         if (style.length) header.classList.add(...style);
@@ -73,7 +74,7 @@ class bzCityPanel extends MinimapSubpanel {
             entry.classList.value =
                 "bz-city-list-entry flex justify-between items-center text-sm py-px";
             entry.setAttribute("tabindex", "-1");
-            if (TooltipManager.types[BZ_CITY_TOOLTIP_STYLE] != null) {
+            if (hasCityTooltip) {
                 entry.setAttribute("data-tooltip-style", BZ_CITY_TOOLTIP_STYLE);
             }
             Databind.attribute(entry, "data-city-owner", "entry.owner");
@@ -86,13 +87,22 @@ class bzCityPanel extends MinimapSubpanel {
             entry.appendChild(title);
             // icon
             const icon = document.createElement("div");
-            icon.classList.value = "bz-city-list-icon bz-icon size-6";
-            Databind.bgImg(icon, "entry.icon");
-            Databind.tooltip(icon, "entry.iconTT");
+            icon.classList.value = "bz-city-list-icon bz-icon relative size-6";
+            const typeIcon = document.createElement("div");
+            typeIcon.classList.value = "bz-icon absolute size-full";
+            Databind.classToggle(typeIcon, "hidden", "!!{{entry.religionIcon}}");
+            Databind.bgImg(typeIcon, "entry.icon");
+            icon.appendChild(typeIcon);
+            const religionIcon = document.createElement("div");
+            religionIcon.classList.value = "bz-icon absolute size-full";
+            religionIcon.style.backgroundSize = "1.1111111111rem";
+            Databind.bgImg(religionIcon, "entry.religionIcon");
+            icon.appendChild(religionIcon);
             title.appendChild(icon);
             // name
             const name = document.createElement("div");
-            name.classList.value = "bz-city-list-name shrink font-fit-shrink overflow-hidden ml-1";
+            name.classList.value =
+                "bz-city-list-name shrink font-fit-shrink overflow-hidden mx-1";
             Databind.loc(name, "{{entry.name}}");
             title.appendChild(name);
             // stats section (right side)
@@ -125,7 +135,7 @@ class bzCityPanel extends MinimapSubpanel {
             const growth = document.createElement("div");
             growth.classList.value = "bz-city-growth flex items-center";
             const population = document.createElement("div");
-            population.classList.value = "bz-city-list-population text-center mr-1";
+            population.classList.value = "bz-city-list-population text-center mx-1";
             population.style.width = "1.2em";  // two digits
             Databind.value(population, "{{entry.population}}");
             growth.appendChild(population);
@@ -147,28 +157,29 @@ class bzCityPanel extends MinimapSubpanel {
             queueTurns.classList.add("mx-1");
             queue.appendChild(queueTurns);
             const qslot = document.createElement("div");
-            qslot.classList.value = "bz-city-list-queue-slot relative mx-1";
+            qslot.classList.value = "bz-city-list-queue-slot relative size-6 mx-1";
             const queueBG = document.createElement("div");
-            queueBG.classList.value = "bz-city-list-queue-bg bz-icon absolute size-6";
+            queueBG.classList.value = "bz-city-list-queue-bg bz-icon absolute size-full";
             Databind.classToggle(queueBG, "hidden", "!{{entry.queueIcon}}");
             qslot.appendChild(queueBG);
             const queueIcon = document.createElement("div");
-            queueIcon.classList.value = "bz-city-list-queue-icon bz-icon size-6";
+            queueIcon.classList.value = "bz-city-list-queue-icon bz-icon size-full";
             Databind.bgImg(queueIcon, "entry.queueIcon");
+            if (!hasCityTooltip) Databind.tooltip(queueIcon, "entry.queueTooltip");
             qslot.appendChild(queueIcon);
             queue.appendChild(qslot);
             stats.appendChild(queue);
             // town focus
             const focus = document.createElement("div");
             Databind.classToggle(focus, "hidden", "!{{entry.isTown}}");
-            focus.classList.value = "bz-city-list-focus relative mx-1";
+            focus.classList.value = "bz-city-list-focus relative size-6 mx-1";
             const focusBG = document.createElement("div");
-            focusBG.classList.value = "bz-city-list-focus-bg bz-icon absolute size-6";
+            focusBG.classList.value = "bz-city-list-focus-bg bz-icon absolute size-full";
             Databind.classToggle(focusBG, "hidden", "!{{entry.focusIcon}}");
             Databind.classToggle(focusBG, "bz-city-growing", "{{entry.focusGrowing}}");
             focus.appendChild(focusBG);
             const focusIcon = document.createElement("div");
-            focusIcon.classList.value = "bz-city-list-focus-icon bz-icon size-6";
+            focusIcon.classList.value = "bz-city-list-focus-icon bz-icon size-full";
             Databind.bgImg(focusIcon, "entry.focusIcon");
             Databind.tooltip(focusIcon, "entry.focusTooltip");
             focus.appendChild(focusIcon);

@@ -104,6 +104,8 @@ class bzCityListModel {
         const population = city.population;
         const isGrowing = city.Growth.growthType == GrowthTypes.EXPAND;
         const growthTurns = isGrowing ? city.Growth.turnsUntilGrowth : -1;
+        const religion = GameInfo.Religions.lookup(city.Religion?.majorityReligion ?? -1);
+        const religionIcon = religion && UI.getIconURL(religion.ReligionType);
         // icon
         const icon =
             isCapital ? "res_capital" :
@@ -112,7 +114,7 @@ class bzCityListModel {
         // compile entry
         const entry = {
             city, id, owner, localId, icon, name, isCapital, isTown, isGrowing,
-            location, population, growthTurns,
+            location, population, growthTurns, religion, religionIcon,
         };
         if (isTown) {
             // town focus
@@ -139,12 +141,15 @@ class bzCityListModel {
             if (kind == ProductionKind.CONSTRUCTIBLE) {
                 const info = GameInfo.Constructibles.lookup(type);
                 entry.queueIcon = UI.getIcon(info.ConstructibleType);
+                entry.queueTooltip = info.Name;
             } else if (kind == ProductionKind.UNIT) {
                 const info = GameInfo.Units.lookup(type);
                 entry.queueIcon = UI.getIcon(info.UnitType);
+                entry.queueTooltip = info.Name;
             } else if (kind == ProductionKind.PROJECT) {
                 const info = GameInfo.Projects.lookup(type);
                 entry.queueIcon = UI.getIcon(info.ProjectType);
+                entry.queueTooltip = info.Name;
             }
         }
         this._cities.set(localId, entry);
