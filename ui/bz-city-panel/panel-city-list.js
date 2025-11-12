@@ -76,7 +76,8 @@ class bzCityPanel extends MinimapSubpanel {
             entry.appendChild(stats);
             // population
             const population = document.createElement("div");
-            population.classList.value = "bz-city-list-population mx-1";
+            population.classList.value = "bz-city-list-population text-center mr-3";
+            population.style.width = "1.2em";  // two digits
             Databind.value(population, "{{entry.population}}");
             stats.appendChild(population);
             // growth turns and queue turns
@@ -87,11 +88,12 @@ class bzCityPanel extends MinimapSubpanel {
                     "flex",
                     "items-center",
                     "justify-end",
-                    "w-14",
-                    // "bg-primary",  // TODO: remove debug
+                    "pl-1",
                 );
                 Databind.classToggle(timer, "invisible", `{{${turns}}}==-1`);
                 const timerTurns = document.createElement("div");
+                timerTurns.classList.value = "text-right";
+                timerTurns.style.width = "1.2em";  // two digits
                 Databind.value(timerTurns, turns);
                 timer.appendChild(timerTurns);
                 const timerClock = document.createElement("div");
@@ -102,7 +104,7 @@ class bzCityPanel extends MinimapSubpanel {
                 return timer;
             }
             const growthTurns = turnTimer(
-                "bz-city-growth-turns mr-1",
+                "bz-city-growth-turns",
                 "entry.growthTurns",
             );
             stats.appendChild(growthTurns);
@@ -110,7 +112,7 @@ class bzCityPanel extends MinimapSubpanel {
             stats.appendChild(queueTurns);
             // project (city production or town focus)
             const project = document.createElement("div");
-            project.classList.value = "bz-city-list-project relative size-6 ml-2";
+            project.classList.value = "bz-city-list-project relative size-6 ml-3";
             const projectBG = document.createElement("div");
             projectBG.classList.value = "bz-city-list-project-bg bz-icon absolute size-6";
             Databind.classToggle(projectBG, "hidden", "!{{entry.projectIcon}}");

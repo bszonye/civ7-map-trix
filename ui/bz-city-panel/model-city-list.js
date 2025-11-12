@@ -134,9 +134,6 @@ class bzCityListModel {
                 entry.projectTooltip = info.Name;
             }
         }
-        if (entry.population != -1) entry.population -= 5;  // TODO: remove debug
-        if (entry.growthTurns != -1) entry.growthTurns += 3;  // TODO: remove debug
-        if (entry.queueTurns != -1) entry.queueTurns += 5;  // TODO: remove debug
         this._cities.set(localId, entry);
     }
     onCityUpdate(event) {
