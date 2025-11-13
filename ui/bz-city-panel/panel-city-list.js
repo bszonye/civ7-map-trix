@@ -102,7 +102,7 @@ class bzCityPanel extends MinimapSubpanel {
             // name
             const name = document.createElement("div");
             name.classList.value =
-                "bz-city-list-name shrink font-fit-shrink overflow-hidden mx-1";
+                "bz-city-list-name shrink font-fit-shrink truncate mx-1";
             Databind.loc(name, "{{entry.name}}");
             title.appendChild(name);
             // stats section (right side)
