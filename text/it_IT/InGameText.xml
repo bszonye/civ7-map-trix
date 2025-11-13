@@ -82,6 +82,12 @@
         <Replace Tag="LOC_STATE_BZ_UNIQUE" Language="it_IT">
             <Text>Unico</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_SETTLEMENTS" Language="it_IT">
+            <Text>Apri Insediamenti</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_SETTLEMENTS_TT" Language="it_IT">
+            <Text>Apri il panello delle insediamenti</Text>
+        </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS" Language="it_IT">
             <Text>Apri Unità</Text>
         </Replace>

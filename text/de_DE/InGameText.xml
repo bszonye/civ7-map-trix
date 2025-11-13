@@ -82,6 +82,12 @@
         <Replace Tag="LOC_STATE_BZ_UNIQUE" Language="de_DE">
             <Text>Einzigartig</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_SETTLEMENTS" Language="de_DE">
+            <Text>Siedlungen öffnen</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_SETTLEMENTS_TT" Language="de_DE">
+            <Text>Öffnet das Siedlungenmenu</Text>
+        </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS" Language="de_DE">
             <Text>Einheiten öffnen</Text>
         </Replace>

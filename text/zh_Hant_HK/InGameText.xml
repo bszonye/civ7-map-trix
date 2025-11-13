@@ -82,6 +82,12 @@
         <Replace Tag="LOC_STATE_BZ_UNIQUE" Language="zh_Hant_HK">
             <Text>獨特</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_SETTLEMENTS" Language="zh_Hant_HK">
+            <Text>開啟聚落</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_SETTLEMENTS_TT" Language="zh_Hant_HK">
+            <Text>開啟聚落面板</Text>
+        </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS" Language="zh_Hant_HK">
             <Text>開啟單位</Text>
         </Replace>
