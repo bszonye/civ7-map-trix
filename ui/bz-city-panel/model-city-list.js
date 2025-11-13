@@ -121,18 +121,20 @@ class bzCityListModel {
             entry.queueTurns = -1;  // no queue
             const focusId = isTown && city.Growth ? city.Growth.projectType : -1;
             const focus = GameInfo.Projects.lookup(focusId);
-            const ftype = focus?.ProjectType ?? "PROJECT_GROWTH";
-            const gname = isGrowing ? "LOC_UI_FOOD_CHOOSER_FOCUS_GROWTH" : void 0;
-            const fname = focus?.Name;
-            const name =
-                gname && fname ? Locale.compose("LOC_BZ_PARENTHESIS", gname, fname) :
-                fname ? Locale.compose(fname) : gname && Locale.compose(gname);
-            const gdesc = gname && "LOC_PROJECT_TOWN_FOOD_INCREASE_DESCRIPTION";
-            const fdesc = focus && focus.Description;
-            const desc = gdesc ? Locale.compose(gdesc) : fdesc && Locale.compose(fdesc);
-            entry.focusIcon = UI.getIcon(ftype);
-            entry.focusTooltip = name && desc && `[b]${name}[/b][n]${desc}`;
-            entry.focusGrowing = focus && isGrowing;
+            const ftype = isGrowing ? "PROJECT_GROWTH" : focus?.ProjectType;
+            if (ftype) {
+                const fname = focus?.Name;
+                const gname = "LOC_UI_FOOD_CHOOSER_FOCUS_GROWTH";
+                const name = isGrowing && focus ?
+                    Locale.compose("LOC_BZ_PARENTHESIS", gname, fname) :
+                    Locale.compose(fname ?? gname);
+                const desc = isGrowing ?
+                    Locale.compose("LOC_PROJECT_TOWN_FOOD_INCREASE_DESCRIPTION") :
+                    Locale.compose(focus.Description);
+                entry.hasFocus = Boolean(focus);
+                entry.focusIcon = UI.getIcon(ftype);
+                entry.focusTooltip = name && desc && `[b]${name}[/b][n]${desc}`;
+            }
         } else {
             // city build queue
             entry.queueTurns = city.BuildQueue.currentTurnsLeft;

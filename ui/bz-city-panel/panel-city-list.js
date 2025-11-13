@@ -176,7 +176,7 @@ class bzCityPanel extends MinimapSubpanel {
             const focusBG = document.createElement("div");
             focusBG.classList.value = "bz-city-list-focus-bg bz-icon absolute size-full";
             Databind.classToggle(focusBG, "hidden", "!{{entry.focusIcon}}");
-            Databind.classToggle(focusBG, "bz-city-growing", "{{entry.focusGrowing}}");
+            Databind.classToggle(focusBG, "bz-city-no-focus", "!{{entry.hasFocus}}");
             focus.appendChild(focusBG);
             const focusIcon = document.createElement("div");
             focusIcon.classList.value = "bz-city-list-focus-icon bz-icon size-full";
