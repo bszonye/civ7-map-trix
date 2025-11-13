@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Database>
     <LocalizedText>
+        <Replace Tag="LOC_BZ_PARENTHESIS" Language="zh_Hans_CN">
+            <Text>{1_text}（{2_parenthesis}）</Text>
+        </Replace>
         <Replace Tag="LOC_BZ_PEOPLE_NAME" Language="zh_Hans_CN">
             <Text>{1_name} 民族</Text>
         </Replace>
