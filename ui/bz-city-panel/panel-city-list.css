@@ -68,9 +68,8 @@
   border-radius: 1rem;
   filter: drop-shadow(0 0.0555555556rem 0.1111111111rem #000c);
   background-color: #333640;
-  border: 0.0555555556rem solid #4c5366;
 }
 .bz-city-list-entry .bz-city-list-focus-bg.bz-city-no-focus {
-  background-color: #80b34d66;
-  border: none;
+  background-color: #80b34d55;
+  border: 0.0555555556rem solid #80b34d80;
 }
