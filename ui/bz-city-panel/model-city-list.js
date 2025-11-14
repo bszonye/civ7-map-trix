@@ -102,6 +102,8 @@ class bzCityListModel {
         const name = city.name;
         const location = city.location;
         const population = city.population;
+        const hasUnrest = Boolean(city.Happiness?.hasUnrest);
+        const isRazing = city.isBeingRazed;
         const isGrowing = city.Growth.growthType == GrowthTypes.EXPAND;
         const growthTurns = isGrowing ? city.Growth.turnsUntilGrowth : -1;
         const religion = GameInfo.Religions.lookup(city.Religion?.majorityReligion ?? -1);
@@ -113,7 +115,8 @@ class bzCityListModel {
             "Yield_Cities";
         // compile entry
         const entry = {
-            city, id, owner, localId, icon, name, isCapital, isTown, isGrowing,
+            city, id, owner, localId, icon, name, isCapital, isTown,
+            hasUnrest, isRazing, isGrowing,
             location, population, growthTurns, religion, religionIcon,
         };
         if (isTown) {

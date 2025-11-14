@@ -159,7 +159,7 @@ class bzCityPanel extends MinimapSubpanel {
             const qslot = document.createElement("div");
             qslot.classList.value = "bz-city-list-queue-slot relative size-6 mx-1";
             const queueBG = document.createElement("div");
-            queueBG.classList.value = "bz-city-list-queue-bg bz-icon absolute size-full";
+            queueBG.classList.value = "bz-city-list-queue-bg absolute size-full";
             Databind.classToggle(queueBG, "hidden", "!{{entry.queueIcon}}");
             qslot.appendChild(queueBG);
             const queueIcon = document.createElement("div");
@@ -176,7 +176,7 @@ class bzCityPanel extends MinimapSubpanel {
             Databind.classToggle(focus, "bz-town-has-focus", "!!{{entry.focus}}");
             Databind.classToggle(focus, "bz-town-is-growing", "!!{{entry.isGrowing}}");
             const focusBG = document.createElement("div");
-            focusBG.classList.value = "bz-city-list-focus-bg bz-icon absolute size-full";
+            focusBG.classList.value = "bz-city-list-focus-bg absolute size-full";
             Databind.classToggle(focusBG, "hidden", "!{{entry.focusIcon}}");
             focus.appendChild(focusBG);
             const focusIcon = document.createElement("div");
@@ -185,6 +185,19 @@ class bzCityPanel extends MinimapSubpanel {
             Databind.tooltip(focusIcon, "entry.focusTooltip");
             focus.appendChild(focusIcon);
             stats.appendChild(focus);
+            // unrest and razing
+            Databind.classToggle(entry, "bz-city-has-unrest", "!!{{entry.hasUnrest}}");
+            Databind.classToggle(entry, "bz-city-is-razing", "!!{{entry.isRazing}}");
+            const unrest = document.createElement("div");
+            unrest.classList.value = "bz-city-list-unrest hidden relative size-6 mx-1";
+            const unrestBG = document.createElement("div");
+            unrestBG.classList.value = "bz-city-list-unrest-bg absolute size-full";
+            unrest.appendChild(unrestBG);
+            const unrestIcon = document.createElement("div");
+            unrestIcon.classList.value = "bz-city-list-unrest-icon bz-icon size-full";
+            Databind.bgImg(unrestIcon, "entry.unrestIcon");
+            unrest.appendChild(unrestIcon);
+            stats.appendChild(unrest);
         }
         // finish
         this.Root.appendChild(this.panel);

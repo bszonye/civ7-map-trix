@@ -77,5 +77,28 @@
   border: 0.0555555556rem solid #8c7e62;
 }
 .bz-city-list-entry .bz-town-has-focus.bz-town-is-growing .bz-city-list-focus-icon {
-  filter: sepia(1) brightness(1.2) saturate(2);
+  filter: sepia(1) brightness(1.2) saturate(2)
+          drop-shadow(0 0.0555555556rem 0.1111111111rem #000c);
+}
+.bz-city-list-entry.bz-city-has-unrest .bz-city-list-queue-slot,
+.bz-city-list-entry.bz-city-is-razing .bz-city-list-queue-slot,
+.bz-city-list-entry.bz-city-has-unrest .bz-city-list-focus,
+.bz-city-list-entry.bz-city-is-razing .bz-city-list-focus {
+  display: none;
+}
+.bz-city-list-entry.bz-city-has-unrest .bz-city-list-unrest,
+.bz-city-list-entry.bz-city-is-razing .bz-city-list-unrest {
+  display: flex;
+}
+.bz-city-list-entry .bz-city-list-unrest-bg {
+  border-radius: 1rem;
+  filter: drop-shadow(0 0.0555555556rem 0.1111111111rem #000c);
+  background-color: #660600;
+  border: 0.0555555556rem solid #990900;
+}
+.bz-city-list-entry.bz-city-has-unrest .bz-city-list-unrest-icon {
+  background-image: url("icon_unrest");
+}
+.bz-city-list-entry.bz-city-is-razing .bz-city-list-unrest-icon {
+  background-image: url("icon_razed");
 }
