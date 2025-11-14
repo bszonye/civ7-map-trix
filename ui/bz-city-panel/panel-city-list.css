@@ -77,5 +77,5 @@
   border: 0.0555555556rem solid #8c7e62;
 }
 .bz-city-list-entry .bz-town-has-focus.bz-town-is-growing .bz-city-list-focus-icon {
-  filter: saturate(0) brightness(1.5) fxs-color-tint(#e5d2ac);
+  filter: sepia(1) brightness(1.2) saturate(2);
 }
