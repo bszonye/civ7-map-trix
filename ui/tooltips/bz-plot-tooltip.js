@@ -51,11 +51,14 @@ const BZ_ICON_VILLAGE_TYPES = {  // by city-state type and age
     AGRICULTURAL: [
         "IMPROVEMENT_FARM",
     ],
+    HAPPINESS: [
+        "IMPROVEMENT_EXPEDITION_BASE",
+    ],
     INDUSTRIAL: [
         "IMPROVEMENT_MINE",
     ],
-    HAPPINESS: [
-        "IMPROVEMENT_EXPEDITION_BASE",
+    MARITIME: [
+        "IMPROVEMENT_FISHING_BOAT",
     ],
 };
 const BZ_ICON_TYPES = {
