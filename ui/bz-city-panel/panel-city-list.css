@@ -69,7 +69,13 @@
   filter: drop-shadow(0 0.0555555556rem 0.1111111111rem #000c);
   background-color: #333640;
 }
-.bz-city-list-entry .bz-city-list-focus-bg.bz-city-no-focus {
-  background-color: #80b34d55;
-  border: 0.0555555556rem solid #80b34d80;
+.bz-city-list-entry .bz-town-has-focus .bz-city-list-focus-bg,
+.bz-city-list-entry .bz-town-is-growing .bz-city-list-focus-bg {
+  border: 0.0555555556rem solid #4c5366;
+}
+.bz-city-list-entry .bz-town-has-focus.bz-town-is-growing .bz-city-list-focus-bg {
+  border: 0.0555555556rem solid #8c7e62;
+}
+.bz-city-list-entry .bz-town-has-focus.bz-town-is-growing .bz-city-list-focus-icon {
+  filter: saturate(0) brightness(1.5) fxs-color-tint(#e5d2ac);
 }

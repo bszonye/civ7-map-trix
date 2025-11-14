@@ -120,20 +120,29 @@ class bzCityListModel {
             // town focus
             entry.queueTurns = -1;  // no queue
             const focusId = isTown && city.Growth ? city.Growth.projectType : -1;
-            const focus = GameInfo.Projects.lookup(focusId);
-            const ftype = isGrowing ? "PROJECT_GROWTH" : focus?.ProjectType;
-            if (ftype) {
-                const fname = focus?.Name;
-                const gname = "LOC_UI_FOOD_CHOOSER_FOCUS_GROWTH";
-                const name = isGrowing && focus ?
-                    Locale.compose("LOC_BZ_PARENTHESIS", gname, fname) :
-                    Locale.compose(fname ?? gname);
-                const desc = isGrowing ?
-                    Locale.compose("LOC_PROJECT_TOWN_FOOD_INCREASE_DESCRIPTION") :
-                    Locale.compose(focus.Description);
-                entry.hasFocus = Boolean(focus);
-                entry.focusIcon = UI.getIcon(ftype);
-                entry.focusTooltip = name && desc && `[b]${name}[/b][n]${desc}`;
+            const focus = entry.focus = GameInfo.Projects.lookup(focusId);
+            if (isGrowing) {
+                entry.focusIcon = UI.getIcon("PROJECT_GROWTH");
+                const name = "LOC_UI_FOOD_CHOOSER_FOCUS_GROWTH";
+                const desc = "LOC_PROJECT_TOWN_FOOD_INCREASE_DESCRIPTION";
+                entry.focusTooltip =
+                    `[b]${Locale.compose(name)}[/b][n]${Locale.compose(desc)}`;
+            }
+            if (focus) {
+                if (isGrowing) {
+                    entry.focusName = Locale.compose(
+                        "LOC_BZ_PARENTHESIS",
+                        focus.Name,
+                        "LOC_UI_PAUSE_SUBTITLE",
+                    );
+                } else {
+                    entry.focusIcon = UI.getIcon(focus.ProjectType);
+                    entry.focusName = Locale.compose(focus.Name);
+                }
+                entry.focusDescription = Locale.compose(focus.Description);
+                const tooltip = `[b]${entry.focusName}[/b][n]${entry.focusDescription}`;
+                entry.focusTooltip =
+                    isGrowing ? `${entry.focusTooltip}[n] [n]${tooltip}` : tooltip;
             }
         } else {
             // city build queue
