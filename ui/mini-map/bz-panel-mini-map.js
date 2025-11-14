@@ -23,7 +23,7 @@ const BZ_LAYERS = {
     "bz-terrain-layer": "LOC_UI_MINI_MAP_BZ_TERRAIN",
 };
 const BZ_EXTRA_LAYERS = {
-    "fxs-discovery-lens": [ "bz-route-layer", ],
+    "fxs-discovery-lens": [ "bz-fortification-layer", "bz-route-layer", ],
     "fxs-settler-lens": [ "bz-city-borders-layer", ],
     "fxs-trade-lens": [ "bz-city-borders-layer", ],
     "mod-fortified-district-lens": [
