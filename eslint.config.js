@@ -15,6 +15,7 @@ export default [
         },
         languageOptions: {
             globals: {
+                Camera: "readonly",
                 Cities: "readonly",
                 Color: "readonly",
                 CombatTypes: "readonly",
@@ -50,6 +51,7 @@ export default [
                 MapUnits: "readonly",
                 PlayerIds: "readonly",
                 Players: "readonly",
+                ProductionKind: "readonly",
                 ResourceTypes: "readonly",
                 RevealedStates: "readonly",
                 RiverTypes: "readonly",

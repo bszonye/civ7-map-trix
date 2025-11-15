@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Mod id="bz-map-trix" version="30605"
+<Mod id="bz-map-trix" version="30700"
     xmlns="ModInfo">
     <Properties>
         <Name>LOC_MOD_BZ_MAP_TRIX_NAME</Name>
-        <Version>3.6.5</Version>
+        <Version>3.7.0</Version>
         <Description>LOC_MOD_BZ_MAP_TRIX_DESCRIPTION</Description>
         <Authors>beezany</Authors>
         <URL>https://forums.civfanatics.com/resources/map-trix.31950/</URL>
@@ -54,10 +54,13 @@
             </Properties>
             <Actions>
                 <ImportFiles>
+                    <Item>ui/bz-city-panel/panel-city-list.css</Item>
                     <Item>ui/bz-style/bz-panel-yield-banner.css</Item>
                     <Item>ui/bz-units-panel/panel-units.css</Item>
                 </ImportFiles>
                 <UIScripts>
+                    <Item>ui/bz-city-panel/model-city-list.js</Item>
+                    <Item>ui/bz-city-panel/panel-city-list.js</Item>
                     <Item>ui/bz-units-panel/model-units.js</Item>
                     <Item>ui/bz-units-panel/panel-units.js</Item>
                     <Item>ui/input/bz-hotkey-manager.js</Item>

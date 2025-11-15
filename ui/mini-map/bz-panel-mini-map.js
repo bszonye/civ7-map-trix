@@ -1,4 +1,5 @@
 import bzMapTrixOptions, { bzCommanderLens } from '/bz-map-trix/ui/options/bz-map-trix-options.js';
+import { b as InputEngineEventName } from '/core/ui/input/input-support.chunk.js';
 import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
 import { L as LensManager } from '/core/ui/lenses/lens-manager.chunk.js';
 // guarantee import order for patching
@@ -22,7 +23,7 @@ const BZ_LAYERS = {
     "bz-terrain-layer": "LOC_UI_MINI_MAP_BZ_TERRAIN",
 };
 const BZ_EXTRA_LAYERS = {
-    "fxs-discovery-lens": [ "bz-route-layer", ],
+    "fxs-discovery-lens": [ "bz-fortification-layer", "bz-route-layer", ],
     "fxs-settler-lens": [ "bz-city-borders-layer", ],
     "fxs-trade-lens": [ "bz-city-borders-layer", ],
     "mod-fortified-district-lens": [
@@ -32,31 +33,6 @@ const BZ_EXTRA_LAYERS = {
         "bz-fortification-layer",
     ],
 };
-// mini-map extensions
-class bzLensPanel {
-    static c_prototype;
-    constructor(component) {
-        component.bzComponent = this;
-        this.component = component;
-    }
-    beforeAttach() { }
-    afterAttach() {
-        for (const [lens, name] of Object.entries(BZ_LENSES)) {
-            this.component.createLensButton(name, lens, "lens-group");
-        }
-        for (const [layer, name] of Object.entries(BZ_LAYERS)) {
-            this.component.createLayerCheckbox(name, layer);
-        }
-        // hide checkboxes for fxs borders (added by Border Toggles)
-        for (const layer of ["fxs-city-borders-layer", "fxs-culture-borders-layer"]) {
-            const checkbox = this.component.layerElementMap[layer];
-            if (checkbox) checkbox.parentElement.style.display = "none";
-        }
-    }
-    beforeDetach() { }
-    afterDetach() { }
-    onAttributeChanged(_name, _prev, _next) { }
-}
 
 // recon units: instead of CoreClass, use fxs-discovery-lens rules
 const reconUnits = new Set();
@@ -163,4 +139,155 @@ defaultLens.allowedLayers.add("fxs-yields-layer");
 // patch Discovery lens to track enabled layers
 delete discoveryLens.ignoreEnabledLayers;
 
+// PanelMiniMap extensions
+const BZ_ICON_CITY_BUTTON = "blp:Yield_Cities";
+const BZ_ICON_UNIT_BUTTON = "blp:Action_Promote";
+Controls.preloadImage(BZ_ICON_CITY_BUTTON, "bz-mini-map");
+Controls.preloadImage(BZ_ICON_UNIT_BUTTON, "bz-mini-map");
+Controls.preloadImage("blp:hud_sub_circle_bk", "bz-mini-map");
+Controls.preloadImage("blp:hud_sub_circle_hov", "bz-mini-map");
+class bzPanelMiniMap {
+    static c_prototype;
+    static instance;
+    static toggleCooldownTimer = 500;
+    citySubpanel = null;
+    unitsSubpanel = null;
+    engineInputListener = this.onEngineInput.bind(this);
+    cityHotkeyListener = this.onCityHotkey.bind(this);
+    unitsHotkeyListener = this.onUnitsHotkey.bind(this);
+    toggleCooldown = 0;
+    toggleQueued = false;
+    constructor(component) {
+        bzPanelMiniMap.instance = this;
+        this.component = component;
+        component.bzComponent = this;
+        this.patchPrototypes(this.component);
+    }
+    patchPrototypes(component) {
+        const c_prototype = Object.getPrototypeOf(component);
+        if (bzPanelMiniMap.c_prototype == c_prototype) return;
+        // patch component methods
+        const proto = bzPanelMiniMap.c_prototype = c_prototype;
+        // afterInitialize
+        const afterInitialize = this.afterInitialize;
+        const onInitialize = proto.onInitialize;
+        proto.onInitialize = function(...args) {
+            const c_rv = onInitialize.apply(this, args);
+            const after_rv = afterInitialize.apply(this.bzComponent, args);
+            return after_rv ?? c_rv;
+        }
+    }
+    afterInitialize() {
+        this.component.Root.classList.add("bz-mini-map");
+        this.component.addSubpanel(
+            "bz-city-panel",
+            "LOC_UI_RESOURCE_ALLOCATION_SETTLEMENTS",
+            BZ_ICON_CITY_BUTTON,
+        );
+        this.citySubpanel = this.component.subpanels.at(-1);
+        this.cityButton = this.component.miniMapButtonRow.lastChild;
+        this.cityButton.classList.add("bz-city-button");
+        this.component.addSubpanel(
+            "bz-units-panel",
+            "LOC_UI_PRODUCTION_UNITS",
+            BZ_ICON_UNIT_BUTTON,
+        );
+        this.unitsSubpanel = this.component.subpanels.at(-1);
+        this.unitsButton = this.component.miniMapButtonRow.lastChild;
+        this.cityButton.classList.add("bz-units-button");
+    }
+    beforeAttach() { }
+    afterAttach() {
+        window.addEventListener("hotkey-open-bz-city-panel", this.cityHotkeyListener);
+        window.addEventListener("hotkey-open-bz-units-panel", this.unitsHotkeyListener);
+        this.component.Root
+            .addEventListener(InputEngineEventName, this.engineInputListener);
+    }
+    beforeDetach() {
+        window.removeEventListener("hotkey-open-bz-city-panel", this.cityHotkeyListener);
+        window.removeEventListener("hotkey-open-bz-units-panel", this.unitsHotkeyListener);
+        this.component.Root
+            .removeEventListener(InputEngineEventName, this.engineInputListener);
+    }
+    afterDetach() { }
+    togglePanel(panel) {
+        this.toggleQueued = true;
+        if (this.toggleCooldown) return;
+        // limit panel toggles to 4 per second
+        // (avoids crashes in the minimap)
+        const toggle = () => {
+            if (this.toggleQueued) {
+                this.toggleCooldown =
+                    setTimeout(() => toggle(), bzPanelMiniMap.toggleCooldownTimer);
+                if (panel) {
+                    this.component.toggleSubpanel(panel);
+                } else {
+                    this.component.closeSubpanels();
+                }
+            } else {
+                this.toggleCooldown = 0;
+            }
+            this.toggleQueued = false;
+        }
+        toggle();
+    }
+    onEngineInput(inputEvent) {
+        if (inputEvent.detail.status != InputActionStatuses.FINISH) {
+            return;
+        }
+        switch (inputEvent.detail.name) {
+            case "keyboard-escape":
+                if (this.component.chatPanelState) {
+                    this.component.toggleChatPanel();
+                }
+                if (this.component.lensPanelState) {
+                    this.component.toggleLensPanel();
+                }
+                // fall through
+            case "cancel":
+            case "sys-menu":
+                if (this.component.activeSubpanel) {
+                    this.togglePanel();
+                }
+                inputEvent.stopPropagation();
+                inputEvent.preventDefault();
+                break;
+        }
+    }
+    onCityHotkey(_event) {
+        this.togglePanel(this.citySubpanel);
+    }
+    onUnitsHotkey(_event) {
+        this.togglePanel(this.unitsSubpanel);
+    }
+}
+Controls.decorate("panel-mini-map", (val) => new bzPanelMiniMap(val));
+
+// LensPanel extensions
+class bzLensPanel {
+    static c_prototype;
+    constructor(component) {
+        component.bzComponent = this;
+        this.component = component;
+    }
+    beforeAttach() { }
+    afterAttach() {
+        for (const [lens, name] of Object.entries(BZ_LENSES)) {
+            this.component.createLensButton(name, lens, "lens-group");
+        }
+        for (const [layer, name] of Object.entries(BZ_LAYERS)) {
+            this.component.createLayerCheckbox(name, layer);
+        }
+        // hide checkboxes for fxs borders (added by Border Toggles)
+        for (const layer of ["fxs-city-borders-layer", "fxs-culture-borders-layer"]) {
+            const checkbox = this.component.layerElementMap[layer];
+            if (checkbox) checkbox.parentElement.style.display = "none";
+        }
+    }
+    beforeDetach() { }
+    afterDetach() { }
+    onAttributeChanged(_name, _prev, _next) { }
+}
 Controls.decorate("lens-panel", (component) => new bzLensPanel(component));
+
+export { bzPanelMiniMap };

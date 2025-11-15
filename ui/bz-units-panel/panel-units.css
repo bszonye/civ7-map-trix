@@ -1,5 +1,10 @@
-.bz-units .mini-map__lens-button__bg,
-.bz-units .mini-map__map-tacks-button__bg {
+.bz-mini-map .mini-map__map-tacks-button,
+.bz-mini-map .mini-map__lens-button {
+    margin-left: 0.1111111111rem;
+    margin-right: 0.1111111111rem;
+}
+.bz-mini-map .mini-map__lens-button__bg,
+.bz-mini-map .mini-map__map-tacks-button__bg {
   top: 0;
   left: 0;
   right: 0.0555555556rem;

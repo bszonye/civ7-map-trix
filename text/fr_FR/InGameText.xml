@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Database>
     <LocalizedText>
+        <Replace Tag="LOC_BZ_PARENTHESIS" Language="fr_FR">
+            <Text>{1_text} ({2_parenthesis})</Text>
+        </Replace>
         <Replace Tag="LOC_BZ_PEOPLE_NAME" Language="fr_FR">
             <Text>Les gens de {1_name}</Text>
         </Replace>
@@ -86,6 +89,12 @@
             <Text>Exclusif|Exclusive|Exclusifs|Exclusives</Text>
             <Gender>masculine|feminine|masculine|feminine</Gender>
             <Plurality>1|1|2|2</Plurality>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_SETTLEMENTS" Language="fr_FR">
+            <Text>Ouvrir Colonies</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_SETTLEMENTS_TT" Language="fr_FR">
+            <Text>Ouvre la fenêtre des colonies.</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS" Language="fr_FR">
             <Text>Ouvrir Unités</Text>
