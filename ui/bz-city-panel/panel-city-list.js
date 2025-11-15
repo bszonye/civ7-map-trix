@@ -79,6 +79,10 @@ class bzCityPanel extends MinimapSubpanel {
             }
             Databind.attribute(entry, "data-city-owner", "entry.owner");
             Databind.attribute(entry, "data-city-local-id", "entry.localId");
+            Databind.classToggle(entry, "bz-town-has-focus", "!!{{entry.focus}}");
+            Databind.classToggle(entry, "bz-town-is-growing", "!!{{entry.isGrowing}}");
+            Databind.classToggle(entry, "bz-city-has-unrest", "!!{{entry.hasUnrest}}");
+            Databind.classToggle(entry, "bz-city-is-razing", "!!{{entry.isRazing}}");
             row.appendChild(entry);
             // title section (left side)
             const title = document.createElement("div");
@@ -173,8 +177,6 @@ class bzCityPanel extends MinimapSubpanel {
             const focus = document.createElement("div");
             Databind.classToggle(focus, "hidden", "!{{entry.isTown}}");
             focus.classList.value = "bz-city-list-focus relative size-6 mx-1";
-            Databind.classToggle(focus, "bz-town-has-focus", "!!{{entry.focus}}");
-            Databind.classToggle(focus, "bz-town-is-growing", "!!{{entry.isGrowing}}");
             const focusBG = document.createElement("div");
             focusBG.classList.value = "bz-city-list-focus-bg absolute size-full";
             Databind.classToggle(focusBG, "hidden", "!{{entry.focusIcon}}");
@@ -186,8 +188,6 @@ class bzCityPanel extends MinimapSubpanel {
             focus.appendChild(focusIcon);
             stats.appendChild(focus);
             // unrest and razing
-            Databind.classToggle(entry, "bz-city-has-unrest", "!!{{entry.hasUnrest}}");
-            Databind.classToggle(entry, "bz-city-is-razing", "!!{{entry.isRazing}}");
             const unrest = document.createElement("div");
             unrest.classList.value = "bz-city-list-unrest hidden relative size-6 mx-1";
             const unrestBG = document.createElement("div");
