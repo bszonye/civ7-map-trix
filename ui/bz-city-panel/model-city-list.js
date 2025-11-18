@@ -80,6 +80,9 @@ class bzCityListModel {
             // sort cities before towns
             if (a.isTown && !b.isTown) return +1;
             if (b.isTown && !a.isTown) return -1;
+            // sort homelands before distant lands
+            if (a.isDistantLands && !b.isDistantLands) return +1;
+            if (b.isDistantLands && !a.isDistantLands) return -1;
             // group by localized name
             const aName = Locale.compose(a.name).toUpperCase();
             const bName = Locale.compose(b.name).toUpperCase();
@@ -101,6 +104,7 @@ class bzCityListModel {
         const isTown = city.isTown;
         const name = city.name;
         const location = city.location;
+        const isDistantLands = city.isDistantLands;
         const population = city.population;
         const hasUnrest = Boolean(city.Happiness?.hasUnrest);
         const isRazing = city.isBeingRazed;
@@ -115,7 +119,7 @@ class bzCityListModel {
             "Yield_Cities";
         // compile entry
         const entry = {
-            city, id, owner, localId, icon, name, isCapital, isTown,
+            city, id, owner, localId, icon, name, isCapital, isTown, isDistantLands,
             hasUnrest, isRazing, isGrowing,
             location, population, growthTurns, religion, religionIcon,
         };
