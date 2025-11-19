@@ -45,6 +45,7 @@ class bzUnitsPanel extends MinimapSubpanel {
         header.classList.add("mb-2", "font-title-base", "text-secondary");
         header.setAttribute("title", "LOC_UI_PRODUCTION_UNITS");
         header.setAttribute("filigree-style", "h4");
+        header.setAttribute("header-bg-glow", true);
         this.panel.appendChild(header);
         // type buttons
         this.typesContainer.classList.value =

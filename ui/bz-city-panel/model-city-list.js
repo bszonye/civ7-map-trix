@@ -89,8 +89,19 @@ class bzCityListModel {
             return Locale.compare(aName, bName);
         };
         this._settlementList.sort(citySort);
+        // separate settlements into cities and towns
         this._cityList = this._settlementList.filter(c => !c.isTown);
         this._townList = this._settlementList.filter(c => c.isTown);
+        // mark subhead dividers for Distant Lands cities and towns
+        const cityDL = this._cityList.find(s => s.isDistantLands);
+        if (cityDL !== this._cityList.at(0) && cityDL !== this._cityList.at(-1)) {
+            cityDL.subhead = "LOC_PLOT_TOOLTIP_HEMISPHERE_WEST";
+        }
+        const townDL = this._townList.find(s => s.isDistantLands);
+        if (townDL !== this._townList.at(0) && townDL !== this._townList.at(-1)) {
+            townDL.subhead = "LOC_PLOT_TOOLTIP_HEMISPHERE_WEST";
+        }
+        // send update callback and event
         if (this.onUpdate) this.onUpdate(this);
         window.dispatchEvent(new CustomEvent("bz-model-city-list-update"));
     }
