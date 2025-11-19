@@ -292,7 +292,7 @@ class bzUnitListModel {
                 pushDetail("leading-normal", desc);
             }
             for (const fail of upgradeReady.FailureReasons || []) {
-                pushDetail("text-negative", fail);
+                pushDetail("leading-normal text-negative", fail);
             }
         }
         const promotionTooltip = promotionDetail.join("[n]");
