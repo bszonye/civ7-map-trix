@@ -96,19 +96,22 @@ class bzUnitsPanel extends MinimapSubpanel {
             // promotion
             const promotion = document.createElement("div");
             promotion.classList.value = "bz-unit-promotion relative size-6";
-            Databind.classToggle(entry, "bz-can-promote", "{{entry.canPromote}}");
-            Databind.classToggle(entry, "bz-can-upgrade", "{{entry.canUpgrade}}");
+            Databind.classToggle(promotion, "hidden", "!{{entry.promotionIcon}}");
             const promotionBG = document.createElement("div");
             promotionBG.classList.value = "bz-unit-promotion-bg bz-icon absolute";
+            Databind.style(promotionBG, "background-color", "entry.promotionBG");
             promotion.appendChild(promotionBG);
             const promotionIcon = document.createElement("div");
             promotionIcon.classList.value =
                 "bz-unit-promotion-icon bz-icon absolute size-6";
+            Databind.bgImg(promotionIcon, "entry.promotionIcon");
+            Databind.tooltip(promotionIcon, "entry.promotionTooltip");
             promotion.appendChild(promotionIcon);
             title.appendChild(promotion);
             // icon
             const icon = document.createElement("div");
             icon.classList.value = "bz-unit-icon bz-icon size-6";
+            Databind.classToggle(icon, "hidden", "!!{{entry.promotionIcon}}");
             Databind.bgImg(icon, "entry.icon");
             title.appendChild(icon);
             // name

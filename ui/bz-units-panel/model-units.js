@@ -263,14 +263,39 @@ class bzUnitListModel {
         const districtIcon = DISTRICT_ICONS.get(isHome ? district.type : -1);
         const isGarrison = isHome && district.type == DistrictTypes.CITY_CENTER;
         // promotion
+        const promote = GameInfo.UnitCommands.lookup("UNITCOMMAND_PROMOTE");
+        const upgrade = GameInfo.UnitCommands.lookup("UNITCOMMAND_UPGRADE");
         const xp = unit.Experience;
         const totalXP = xp ? xp.spentExperience + xp.experiencePoints : void 0;
         const canPromote = isCommander &&
             Boolean(xp?.getStoredCommendations || xp?.getStoredPromotionPoints);
-        const canStartUpgrade = Game.UnitCommands?.canStart(
-            unit.id, "UNITCOMMAND_UPGRADE", { X: -9999, Y: -9999 }, false
+        const canStartUpgrade = (filter) => Game.UnitCommands?.canStart(
+            unit.id, upgrade.CommandType, { X: -9999, Y: -9999 }, filter
         );
-        const canUpgrade = canStartUpgrade?.Success;
+        const upgradeAvailable = canStartUpgrade(true);
+        const upgradeReady = canStartUpgrade(false);
+        const canUpgrade = upgradeAvailable?.Success;
+        const promotionBG =
+            canPromote ? "#00ccffaa" :  // commander promotion
+            upgradeReady?.Success ? "#e5d2ac66" :  // unit upgrade
+            canUpgrade ? "#662211" :  // unit upgrade (disabled)
+            null;
+        const promotionIcon =
+            canPromote ? promote.Icon :
+            canUpgrade ? upgrade.Icon :
+            null;
+        const promotionDetail = [];
+        if (canUpgrade) {
+            const pushDetail = (style, text) =>
+                promotionDetail.push(`[style:${style}]${Locale.compose(text)}[/style]`);
+            for (const desc of upgradeReady.AdditionalDescription || []) {
+                pushDetail("leading-normal", desc);
+            }
+            for (const fail of upgradeReady.FailureReasons || []) {
+                pushDetail("text-negative", fail);
+            }
+        }
+        const promotionTooltip = promotionDetail.join("[n]");
         // activation details
         const selectId = { ...id };  // unit to select
         const lookId = { ...id };  // unit or army to view
@@ -288,7 +313,7 @@ class bzUnitListModel {
             health, healthLeft, maxHealth, slashHealth, hasDamage,
             moves, movesLeft, maxMoves, slashMoves, canMove,
             location, district, districtIcon, isGarrison,
-            totalXP, canPromote, canUpgrade,
+            totalXP, promotionBG, promotionIcon, promotionTooltip,
             data, index,
         };
         if (isCommander) this._unitGroups.set(armyId, entry);
