@@ -199,10 +199,8 @@ class bzUnitListModel {
         if (!unit) return;
         // unit details
         const localId = unit.localId;
-        const armyId = unit.armyId.id;
         const isCommander = unit.isCommanderUnit;
         const isGreatPerson = unit.isGreatPerson;
-        const isPacked = armyId != -1 && !isCommander;
         const isTreasureFleet = Boolean(unit.getAssociatedDisbandCityId());
         const level =
             isCommander ? unit.Experience.getLevel :
@@ -255,6 +253,13 @@ class bzUnitListModel {
         const operationIcon = operation?.Icon ?? ACTIVITY_ICONS.get(activityType);
         const operationName = operation?.Name ?? ACTIVITY_NAMES.get(activityType);
         const isBusy = !!operationIcon;
+        // army
+        const owner = Players.get(unit.owner);
+        const reinforcementArmyId = owner.Armies
+            .getUnitReinforcementCommanderId(unit.id, owner.id);
+        const isReinforcement = reinforcementArmyId != -1;
+        const armyId = isReinforcement ? reinforcementArmyId : unit.armyId.id;
+        const isPacked = armyId != -1 && !isCommander;
         // location
         const location = unit.location;
         const districtID = MapCities.getDistrict(location.x, location.y);
@@ -305,7 +310,8 @@ class bzUnitListModel {
         const index = this._units.get(localId)?.index ?? this._units.size;
         // compile entry
         const entry = {
-            unit, id, localId, armyId, isCommander, isGreatPerson, isPacked, age,
+            unit, id, localId, isCommander, isGreatPerson, age,
+            reinforcementArmyId, isReinforcement, armyId, isPacked,
             activityType, operationType, operation, operationIcon, operationName, isBusy,
             info, type, typeName, icon, name, domain, trait,
             isTreasureFleet, isUnique, isTradeUnit, isVictoryUnit,
@@ -328,7 +334,11 @@ class bzUnitListModel {
         const unit = this._units.get(localId);
         if (!unit) return;
         const group = this._unitGroups.get(unit.armyId);
-        if (group && !unit.isCommander) {
+        if (group && unit.isReinforcement) {
+            // select the reinforcement target group
+            UI.Player.lookAtID(group.id);
+            UI.Player.selectUnit(group.id);
+        } else if (group && !unit.isCommander) {
             // select the group first
             this.pauseSelection = true;
             UI.Player.lookAtID(group.id);
