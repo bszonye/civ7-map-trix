@@ -1,3 +1,8 @@
+body .army-panel__commander-portrait-container .army-panel__unit-button {
+    /* fix commander selection bug */
+    pointer-events: auto;
+}
+
 .bz-mini-map .mini-map__map-tacks-button,
 .bz-mini-map .mini-map__lens-button {
     margin-left: 0.1111111111rem;
