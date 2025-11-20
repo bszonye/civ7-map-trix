@@ -160,6 +160,7 @@ class bzUnitsPanel extends MinimapSubpanel {
             const operation = document.createElement("div");
             operation.classList.value = "bz-unit-operation bz-icon absolute size-6";
             Databind.bgImg(operation, "entry.operationIcon");
+            Databind.tooltip(operation, "entry.operationName");
             activity.appendChild(operation);
             const district = document.createElement("div");
             district.classList.value = "bz-unit-district bz-icon absolute size-6";
