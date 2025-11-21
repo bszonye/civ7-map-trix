@@ -42,6 +42,7 @@ const DOMAIN_VALUE = new Map(
     ["DOMAIN_LAND", "DOMAIN_SEA", "DOMAIN_AIR"].map((d, i) => [d, i])
 );
 class bzUnitListModel {
+    player = Players.get(GameContext.localObserverID);
     onUpdate;
     updateGate = new UpdateGate(() => this.update());
     pauseSelection = false;
@@ -88,9 +89,9 @@ class bzUnitListModel {
     update() {
         this._units = new Map();
         this._unitGroups = new Map();
-        const player = Players.get(GameContext.localObserverID);
-        if (player?.Units == null) return;
-        for (const id of player.Units.getUnitIds()) {
+        this.player = Players.get(GameContext.localObserverID);
+        if (this.player?.Units == null) return;
+        for (const id of this.player.Units.getUnitIds()) {
             this.updateUnit(id);
         }
         this.updateDisplay();
@@ -199,6 +200,7 @@ class bzUnitListModel {
         if (!unit) return;
         // unit details
         const localId = unit.localId;
+        const isOnMap = unit.isOnMap;
         const isCommander = unit.isCommanderUnit;
         const isGreatPerson = unit.isGreatPerson;
         const isTreasureFleet = Boolean(unit.getAssociatedDisbandCityId());
@@ -254,9 +256,8 @@ class bzUnitListModel {
         const operationName = operation?.Name ?? ACTIVITY_NAMES.get(activityType);
         const isBusy = !!operationIcon;
         // army
-        const owner = Players.get(unit.owner);
-        const reinforcementArmyId = owner.Armies
-            .getUnitReinforcementCommanderId(unit.id, owner.id);
+        const reinforcementArmyId = this.player.Armies
+            .getUnitReinforcementCommanderId(unit.id, this.player.id);
         const isReinforcement = reinforcementArmyId != -1;
         const armyId = isReinforcement ? reinforcementArmyId : unit.armyId.id;
         const isPacked = armyId != -1 && !isCommander;
@@ -264,7 +265,7 @@ class bzUnitListModel {
         const location = unit.location;
         const districtID = MapCities.getDistrict(location.x, location.y);
         const district = districtID && Districts.get(districtID);
-        const isHome = district?.owner == GameContext.localObserverID;
+        const isHome = district?.owner == this.player.id;
         const districtIcon = DISTRICT_ICONS.get(isHome ? district.type : -1);
         const isGarrison = isHome && district.type == DistrictTypes.CITY_CENTER;
         // promotion
@@ -302,6 +303,7 @@ class bzUnitListModel {
         }
         const promotionTooltip = promotionDetail.join("[n]");
         // activation details
+        const isDisabled = !canMove || isReinforcement || !isOnMap && !isPacked;
         const selectId = { ...id };  // unit to select
         const lookId = { ...id };  // unit or army to view
         if (armyId != -1) lookId.id = armyId;
@@ -310,7 +312,7 @@ class bzUnitListModel {
         const index = this._units.get(localId)?.index ?? this._units.size;
         // compile entry
         const entry = {
-            unit, id, localId, isCommander, isGreatPerson, age,
+            unit, id, localId, isOnMap, isCommander, isGreatPerson, age,
             reinforcementArmyId, isReinforcement, armyId, isPacked,
             activityType, operationType, operation, operationIcon, operationName, isBusy,
             info, type, typeName, icon, name, domain, trait,
@@ -320,7 +322,7 @@ class bzUnitListModel {
             moves, movesLeft, maxMoves, slashMoves, canMove,
             location, district, districtIcon, isGarrison,
             totalXP, promotionBG, promotionIcon, promotionTooltip,
-            data, index,
+            isDisabled, data, index,
         };
         if (isCommander) this._unitGroups.set(armyId, entry);
         this._units.set(localId, entry);
@@ -348,7 +350,7 @@ class bzUnitListModel {
                 this.pauseSelection = false;
                 UI.Player.selectUnit(unit.id);
             });
-        } else {
+        } else if (unit.isOnMap) {
             // select the unit
             UI.Player.lookAtID(unit.id);
             UI.Player.selectUnit(unit.id);
@@ -366,7 +368,7 @@ class bzUnitListModel {
     onUnitUpdate(event) {
         const id = event?.unit;
         if (!id || ComponentID.isInvalid(id)) return;
-        if (id.owner != GameContext.localObserverID) return;
+        if (id.owner != this.player.id) return;
         this.updateGate.call("onUnitUpdate");
     }
 }

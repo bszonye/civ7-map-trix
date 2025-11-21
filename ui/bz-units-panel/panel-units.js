@@ -87,6 +87,8 @@ class bzUnitsPanel extends MinimapSubpanel {
             // selected
             Databind.classToggle(entry, "bz-units-entry-selected",
                 "{{entry.localId}}=={{g_bzUnitListModel.selectedUnit.localId}}");
+            // disabled
+            Databind.classToggle(entry, "bz-unit-disabled", "!!{{entry.isDisabled}}");
             // indentation
             Databind.classToggle(entry, "bz-unit-packed", "{{entry.isPacked}}");
             // title section (left side)
@@ -148,7 +150,6 @@ class bzUnitsPanel extends MinimapSubpanel {
             const moveText = document.createElement("div");
             Databind.loc(moveText, "{{entry.slashMoves}}");
             movement.appendChild(moveText);
-            Databind.classToggle(entry, "bz-cannot-move", "!{{entry.canMove}}");
             stats.appendChild(movement);
             // activity (operations/garrison)
             const activity = document.createElement("div");
