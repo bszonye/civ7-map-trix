@@ -318,12 +318,12 @@ class bzUnitListModel {
         const entry = {
             unit, id, localId, isOnMap, isCommander, isGreatPerson, age,
             reinforcementArmyId, isReinforcement, armyId, isPacked,
-            activityType, operationType, operation, operationIcon, operationName, isBusy,
             info, type, typeName, icon, name, domain, trait,
             isTreasureFleet, isUnique, isTradeUnit, isVictoryUnit,
             stats, combat,
             health, healthLeft, maxHealth, slashHealth, hasDamage,
             moves, movesLeft, maxMoves, slashMoves, canMove,
+            activityType, operationType, operation, operationIcon, operationName, isBusy,
             location, district, districtIcon, isGarrison,
             totalXP, promotionBG, promotionIcon, promotionTooltip,
             isDisabled, data, index,
