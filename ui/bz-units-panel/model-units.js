@@ -42,6 +42,7 @@ const DOMAIN_VALUE = new Map(
     ["DOMAIN_LAND", "DOMAIN_SEA", "DOMAIN_AIR"].map((d, i) => [d, i])
 );
 class bzUnitListModel {
+    player = Players.get(GameContext.localObserverID);
     onUpdate;
     updateGate = new UpdateGate(() => this.update());
     pauseSelection = false;
@@ -88,9 +89,9 @@ class bzUnitListModel {
     update() {
         this._units = new Map();
         this._unitGroups = new Map();
-        const player = Players.get(GameContext.localObserverID);
-        if (player?.Units == null) return;
-        for (const id of player.Units.getUnitIds()) {
+        this.player = Players.get(GameContext.localObserverID);
+        if (this.player?.Units == null) return;
+        for (const id of this.player.Units.getUnitIds()) {
             this.updateUnit(id);
         }
         this.updateDisplay();
@@ -129,6 +130,10 @@ class bzUnitListModel {
                 // commander first
                 if (a.isCommander) return -1;
                 if (b.isCommander) return +1;
+                // reinforcements last
+                if (a.isReinforcement && !b.isReinforcement) return +1;
+                if (b.isReinforcement && !a.isReinforcement) return -1;
+                // original order
                 return a.index - b.index;
             }
             // otherwise, group army units with their commanders
@@ -199,16 +204,21 @@ class bzUnitListModel {
         if (!unit) return;
         // unit details
         const localId = unit.localId;
-        const armyId = unit.armyId.id;
+        const isOnMap = unit.isOnMap;
         const isCommander = unit.isCommanderUnit;
         const isGreatPerson = unit.isGreatPerson;
-        const isPacked = armyId != -1 && !isCommander;
         const isTreasureFleet = Boolean(unit.getAssociatedDisbandCityId());
         const level =
             isCommander ? unit.Experience.getLevel :
             isTreasureFleet ? unit.getDisbandVictoryPoints() :
             void 0;
         const age = GameInfo.Ages.lookup(unit.age);
+        // army grouping
+        const reinforcementArmyId = this.player.Armies
+            .getUnitReinforcementCommanderId(unit.id, this.player.id);
+        const isReinforcement = reinforcementArmyId != -1;
+        const armyId = isReinforcement ? reinforcementArmyId : unit.armyId.id;
+        const isPacked = armyId != -1 && !isCommander;
         // unit type info
         const info = GameInfo.Units.lookup(unit.type);
         const type = info.UnitType;
@@ -259,19 +269,45 @@ class bzUnitListModel {
         const location = unit.location;
         const districtID = MapCities.getDistrict(location.x, location.y);
         const district = districtID && Districts.get(districtID);
-        const isHome = district?.owner == GameContext.localObserverID;
+        const isHome = district?.owner == this.player.id;
         const districtIcon = DISTRICT_ICONS.get(isHome ? district.type : -1);
         const isGarrison = isHome && district.type == DistrictTypes.CITY_CENTER;
         // promotion
+        const promote = GameInfo.UnitCommands.lookup("UNITCOMMAND_PROMOTE");
+        const upgrade = GameInfo.UnitCommands.lookup("UNITCOMMAND_UPGRADE");
         const xp = unit.Experience;
         const totalXP = xp ? xp.spentExperience + xp.experiencePoints : void 0;
         const canPromote = isCommander &&
             Boolean(xp?.getStoredCommendations || xp?.getStoredPromotionPoints);
-        const canStartUpgrade = Game.UnitCommands?.canStart(
-            unit.id, "UNITCOMMAND_UPGRADE", { X: -9999, Y: -9999 }, false
+        const canStartUpgrade = (filter) => Game.UnitCommands?.canStart(
+            unit.id, upgrade.CommandType, { X: -9999, Y: -9999 }, filter
         );
-        const canUpgrade = canStartUpgrade?.Success;
+        const upgradeAvailable = canStartUpgrade(true);
+        const upgradeReady = canStartUpgrade(false);
+        const canUpgrade = upgradeAvailable?.Success;
+        const promotionBG =
+            canPromote ? "#00ccffaa" :  // commander promotion
+            upgradeReady?.Success ? "#e5d2ac66" :  // unit upgrade
+            canUpgrade ? "#662211" :  // unit upgrade (disabled)
+            null;
+        const promotionIcon =
+            canPromote ? promote.Icon :
+            canUpgrade ? upgrade.Icon :
+            null;
+        const promotionDetail = [];
+        if (canUpgrade) {
+            const pushDetail = (style, text) =>
+                promotionDetail.push(`[style:${style}]${Locale.compose(text)}[/style]`);
+            for (const desc of upgradeReady.AdditionalDescription || []) {
+                pushDetail("leading-normal", desc);
+            }
+            for (const fail of upgradeReady.FailureReasons || []) {
+                pushDetail("leading-normal text-negative", fail);
+            }
+        }
+        const promotionTooltip = promotionDetail.join("[n]");
         // activation details
+        const isDisabled = !canMove || isReinforcement || !isOnMap && !isPacked;
         const selectId = { ...id };  // unit to select
         const lookId = { ...id };  // unit or army to view
         if (armyId != -1) lookId.id = armyId;
@@ -280,16 +316,17 @@ class bzUnitListModel {
         const index = this._units.get(localId)?.index ?? this._units.size;
         // compile entry
         const entry = {
-            unit, id, localId, armyId, isCommander, isGreatPerson, isPacked, age,
-            activityType, operationType, operation, operationIcon, operationName, isBusy,
+            unit, id, localId, isOnMap, isCommander, isGreatPerson, age,
+            reinforcementArmyId, isReinforcement, armyId, isPacked,
             info, type, typeName, icon, name, domain, trait,
             isTreasureFleet, isUnique, isTradeUnit, isVictoryUnit,
             stats, combat,
             health, healthLeft, maxHealth, slashHealth, hasDamage,
             moves, movesLeft, maxMoves, slashMoves, canMove,
+            activityType, operationType, operation, operationIcon, operationName, isBusy,
             location, district, districtIcon, isGarrison,
-            totalXP, canPromote, canUpgrade,
-            data, index,
+            totalXP, promotionBG, promotionIcon, promotionTooltip,
+            isDisabled, data, index,
         };
         if (isCommander) this._unitGroups.set(armyId, entry);
         this._units.set(localId, entry);
@@ -303,7 +340,11 @@ class bzUnitListModel {
         const unit = this._units.get(localId);
         if (!unit) return;
         const group = this._unitGroups.get(unit.armyId);
-        if (group && !unit.isCommander) {
+        if (group && unit.isReinforcement) {
+            // select the reinforcement target group
+            UI.Player.lookAtID(group.id);
+            UI.Player.selectUnit(group.id);
+        } else if (group && !unit.isCommander) {
             // select the group first
             this.pauseSelection = true;
             UI.Player.lookAtID(group.id);
@@ -313,7 +354,7 @@ class bzUnitListModel {
                 this.pauseSelection = false;
                 UI.Player.selectUnit(unit.id);
             });
-        } else {
+        } else if (unit.isOnMap) {
             // select the unit
             UI.Player.lookAtID(unit.id);
             UI.Player.selectUnit(unit.id);
@@ -331,7 +372,7 @@ class bzUnitListModel {
     onUnitUpdate(event) {
         const id = event?.unit;
         if (!id || ComponentID.isInvalid(id)) return;
-        if (id.owner != GameContext.localObserverID) return;
+        if (id.owner != this.player.id) return;
         this.updateGate.call("onUnitUpdate");
     }
 }

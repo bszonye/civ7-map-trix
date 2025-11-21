@@ -39,6 +39,7 @@ class bzCityPanel extends MinimapSubpanel {
         header.classList.add("mb-2", "font-title-base", "text-secondary");
         header.setAttribute("title", "LOC_UI_RESOURCE_ALLOCATION_SETTLEMENTS");
         header.setAttribute("filigree-style", "h4");
+        header.setAttribute("header-bg-glow", true);
         this.panel.appendChild(header);
         // city list
         const frame = document.createElement("div");
@@ -49,6 +50,7 @@ class bzCityPanel extends MinimapSubpanel {
         this.renderList(
             "LOC_UI_SETTLEMENT_TAB_BAR_CITIES",
             "g_bzCityListModel.cityList",
+            "mt-1",
         );
         this.renderList(
             "LOC_UI_SETTLEMENT_TAB_BAR_TOWNS",
@@ -59,20 +61,30 @@ class bzCityPanel extends MinimapSubpanel {
     renderList(headline, list, ...style) {
         const hasCityTooltip = TooltipManager.types[BZ_CITY_TOOLTIP_STYLE] != null;
         const header = document.createElement("fxs-header");
-        header.classList.add("font-title-sm", "text-secondary");
+        header.classList.add("font-title-sm");
         if (style.length) header.classList.add(...style);
         header.setAttribute("title", headline);
         header.setAttribute("filigree-style", "h4");
+        Databind.classToggle(header, "hidden", `{{${list}.length}}==0`);
         this.listContainer.appendChild(header);
         // table rows
         const row = document.createElement("div");
+        row.classList.value = "flex flex-col text.sm";
         this.listContainer.appendChild(row);
         Databind.for(row, list, "entry");
         {
+            const subhead = document.createElement("fxs-header");
+            subhead.setAttribute("filigree-style", "none");
+            subhead.setAttribute("header-bg-glow", true);
+            // match height of entry row (6px above, 3px below)
+            subhead.classList.add("font-title-xs", "py-px", "mt-1\\.25", "mb-0\\.5");
+            Databind.classToggle(subhead, "hidden", "!{{entry.subhead}}");
+            Databind.attribute(subhead, "title", "entry.subhead");
+            row.appendChild(subhead);
             const entry = document.createElement("fxs-activatable");
             entry.addEventListener("action-activate", this.activateCityListener);
             entry.classList.value =
-                "bz-city-list-entry flex justify-between items-center text-sm py-px";
+                "bz-city-list-entry flex justify-between items-center py-px";
             entry.setAttribute("tabindex", "-1");
             if (hasCityTooltip) {
                 entry.setAttribute("data-tooltip-style", BZ_CITY_TOOLTIP_STYLE);

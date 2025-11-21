@@ -1,3 +1,8 @@
+body .army-panel__commander-portrait-container .army-panel__unit-button {
+    /* fix commander selection bug */
+    pointer-events: auto;
+}
+
 .bz-mini-map .mini-map__map-tacks-button,
 .bz-mini-map .mini-map__lens-button {
     margin-left: 0.1111111111rem;
@@ -54,9 +59,9 @@
 .bz-units-frame {
   position: absolute;
   width: 19.7777777777rem;
-  top: 4.4444444444rem;
+  top: 4.3333333333rem;
   left: 0;
-  bottom: 1.1111111111rem;
+  bottom: 1.2222222222rem;
   background: #12151f66;
 }
 .bz-units-frame .fxs-scrollbar__track--vertical {
@@ -72,35 +77,18 @@
   background: linear-gradient(90deg, #8c7e62 0%, #4c473d 100%);
   color: #e5e5e5;
 }
-.bz-units-entry.bz-cannot-move {
+.bz-units-entry.bz-unit-disabled {
   color: #85878c;
 }
-.bz-units-entry.bz-cannot-move .bz-icon {
+.bz-units-entry.bz-unit-disabled .bz-icon {
   filter: brightness(0.65) drop-shadow(0 0.0555555556rem 0.1111111111rem #000c);
 }
-.bz-units-entry:focus.bz-cannot-move, .bz-units-entry:hover.bz-cannot-move,
-.bz-units-entry.pressed.bz-cannot-move {
+.bz-units-entry:focus.bz-unit-disabled, .bz-units-entry:hover.bz-unit-disabled,
+.bz-units-entry.pressed.bz-unit-disabled {
   color: #c2c4cc;
 }
 .bz-units-entry.bz-unit-packed .bz-unit-title {
   padding-left: 1.3333333333rem;
-}
-.bz-units-entry .bz-unit-promotion {
-  display: none;
-}
-.bz-units-entry.bz-can-promote .bz-unit-promotion,
-.bz-units-entry.bz-can-upgrade .bz-unit-promotion {
-  display: flex;
-}
-.bz-units-entry.bz-can-promote .bz-unit-promotion-icon {
-  background-image: url("blp:Action_Promote");
-}
-.bz-units-entry.bz-can-upgrade .bz-unit-promotion-icon {
-  background-image: url("blp:Action_Upgrade");
-}
-.bz-units-entry.bz-can-promote .bz-unit-icon,
-.bz-units-entry.bz-can-upgrade .bz-unit-icon {
-  display: none;
 }
 .bz-units-entry .bz-unit-promotion-bg,
 .bz-units-entry .bz-unit-garrison-bg {
@@ -109,12 +97,6 @@
   top: 0.0555555556rem;
   left: 0.0555555556rem;
   border-radius: 1rem;
-}
-.bz-units-entry.bz-can-promote .bz-unit-promotion-bg {
-  background-color: #00ccffaa;
-}
-.bz-units-entry.bz-can-upgrade .bz-unit-promotion-bg {
-  background-color: #e5d2ac66;
 }
 .bz-units-entry .bz-unit-garrison-bg {
   background-color: #e5d2ac66;

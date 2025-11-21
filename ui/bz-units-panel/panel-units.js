@@ -45,6 +45,7 @@ class bzUnitsPanel extends MinimapSubpanel {
         header.classList.add("mb-2", "font-title-base", "text-secondary");
         header.setAttribute("title", "LOC_UI_PRODUCTION_UNITS");
         header.setAttribute("filigree-style", "h4");
+        header.setAttribute("header-bg-glow", true);
         this.panel.appendChild(header);
         // type buttons
         this.typesContainer.classList.value =
@@ -86,6 +87,8 @@ class bzUnitsPanel extends MinimapSubpanel {
             // selected
             Databind.classToggle(entry, "bz-units-entry-selected",
                 "{{entry.localId}}=={{g_bzUnitListModel.selectedUnit.localId}}");
+            // disabled
+            Databind.classToggle(entry, "bz-unit-disabled", "!!{{entry.isDisabled}}");
             // indentation
             Databind.classToggle(entry, "bz-unit-packed", "{{entry.isPacked}}");
             // title section (left side)
@@ -96,19 +99,22 @@ class bzUnitsPanel extends MinimapSubpanel {
             // promotion
             const promotion = document.createElement("div");
             promotion.classList.value = "bz-unit-promotion relative size-6";
-            Databind.classToggle(entry, "bz-can-promote", "{{entry.canPromote}}");
-            Databind.classToggle(entry, "bz-can-upgrade", "{{entry.canUpgrade}}");
+            Databind.classToggle(promotion, "hidden", "!{{entry.promotionIcon}}");
             const promotionBG = document.createElement("div");
             promotionBG.classList.value = "bz-unit-promotion-bg bz-icon absolute";
+            Databind.style(promotionBG, "background-color", "entry.promotionBG");
             promotion.appendChild(promotionBG);
             const promotionIcon = document.createElement("div");
             promotionIcon.classList.value =
                 "bz-unit-promotion-icon bz-icon absolute size-6";
+            Databind.bgImg(promotionIcon, "entry.promotionIcon");
+            Databind.tooltip(promotionIcon, "entry.promotionTooltip");
             promotion.appendChild(promotionIcon);
             title.appendChild(promotion);
             // icon
             const icon = document.createElement("div");
             icon.classList.value = "bz-unit-icon bz-icon size-6";
+            Databind.classToggle(icon, "hidden", "!!{{entry.promotionIcon}}");
             Databind.bgImg(icon, "entry.icon");
             title.appendChild(icon);
             // name
@@ -144,7 +150,6 @@ class bzUnitsPanel extends MinimapSubpanel {
             const moveText = document.createElement("div");
             Databind.loc(moveText, "{{entry.slashMoves}}");
             movement.appendChild(moveText);
-            Databind.classToggle(entry, "bz-cannot-move", "!{{entry.canMove}}");
             stats.appendChild(movement);
             // activity (operations/garrison)
             const activity = document.createElement("div");
@@ -156,6 +161,7 @@ class bzUnitsPanel extends MinimapSubpanel {
             const operation = document.createElement("div");
             operation.classList.value = "bz-unit-operation bz-icon absolute size-6";
             Databind.bgImg(operation, "entry.operationIcon");
+            Databind.tooltip(operation, "entry.operationName");
             activity.appendChild(operation);
             const district = document.createElement("div");
             district.classList.value = "bz-unit-district bz-icon absolute size-6";
