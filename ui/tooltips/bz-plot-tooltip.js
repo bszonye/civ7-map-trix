@@ -119,7 +119,7 @@ const BZ_TYPE_COLOR = {
     YIELD_HAPPINESS: BZ_COLOR.happiness,  // orange
     YIELD_PRODUCTION: BZ_COLOR.production,  // brown
     YIELD_SCIENCE: BZ_COLOR.science,  // blue
-    // city-state types
+    // independent and city-state types
     CRISIS: BZ_COLOR.militaristic,  // red
     CULTURAL: BZ_COLOR.cultural,  // purple
     ECONOMIC: BZ_COLOR.economic,  // yellow
