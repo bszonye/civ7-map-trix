@@ -213,6 +213,12 @@ class bzUnitListModel {
             isTreasureFleet ? unit.getDisbandVictoryPoints() :
             void 0;
         const age = GameInfo.Ages.lookup(unit.age);
+        // army grouping
+        const reinforcementArmyId = this.player.Armies
+            .getUnitReinforcementCommanderId(unit.id, this.player.id);
+        const isReinforcement = reinforcementArmyId != -1;
+        const armyId = isReinforcement ? reinforcementArmyId : unit.armyId.id;
+        const isPacked = armyId != -1 && !isCommander;
         // unit type info
         const info = GameInfo.Units.lookup(unit.type);
         const type = info.UnitType;
@@ -259,12 +265,6 @@ class bzUnitListModel {
         const operationIcon = operation?.Icon ?? ACTIVITY_ICONS.get(activityType);
         const operationName = operation?.Name ?? ACTIVITY_NAMES.get(activityType);
         const isBusy = !!operationIcon;
-        // army
-        const reinforcementArmyId = this.player.Armies
-            .getUnitReinforcementCommanderId(unit.id, this.player.id);
-        const isReinforcement = reinforcementArmyId != -1;
-        const armyId = isReinforcement ? reinforcementArmyId : unit.armyId.id;
-        const isPacked = armyId != -1 && !isCommander;
         // location
         const location = unit.location;
         const districtID = MapCities.getDistrict(location.x, location.y);
