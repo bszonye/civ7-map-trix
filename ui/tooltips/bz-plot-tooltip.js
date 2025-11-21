@@ -111,13 +111,7 @@ const BZ_STYLE = {
 // accent colors for icon types
 const BZ_TYPE_COLOR = {
     undefined: BZ_COLOR.bronze,  // default
-    CRISIS: BZ_COLOR.militaristic,  // red
-    CULTURAL: BZ_COLOR.cultural,  // purple
-    ECONOMIC: BZ_COLOR.economic,  // yellow
-    MILITARISTIC: BZ_COLOR.militaristic,  // red
-    SCIENTIFIC: BZ_COLOR.scientific,  // blue
-    EXPANSIONIST: BZ_COLOR.expansionist,  // green
-    DIPLOMATIC: BZ_COLOR.diplomatic,  // dark blue
+    // yield types
     YIELD_CULTURE: BZ_COLOR.culture,  // violet
     YIELD_DIPLOMACY: BZ_COLOR.diplomacy,  // teal
     YIELD_FOOD: BZ_COLOR.food,  // green
@@ -125,6 +119,19 @@ const BZ_TYPE_COLOR = {
     YIELD_HAPPINESS: BZ_COLOR.happiness,  // orange
     YIELD_PRODUCTION: BZ_COLOR.production,  // brown
     YIELD_SCIENCE: BZ_COLOR.science,  // blue
+    // city-state types
+    CRISIS: BZ_COLOR.militaristic,  // red
+    CULTURAL: BZ_COLOR.cultural,  // purple
+    ECONOMIC: BZ_COLOR.economic,  // yellow
+    MILITARISTIC: BZ_COLOR.militaristic,  // red
+    SCIENTIFIC: BZ_COLOR.scientific,  // blue
+    EXPANSIONIST: BZ_COLOR.expansionist,  // green
+    DIPLOMATIC: BZ_COLOR.diplomatic,  // dark blue
+    // city-states expanded by Maple_Leaves
+    MARITIME: "#00ffff",  // cyan
+    INDUSTRIAL: "#f8f8ff",  // white
+    HAPPINESS: "#ff8c00",  // orange
+    AGRICULTURAL: "#7fff00",  // bright green
 }
 const BZ_TYPE_SORT = {
     [BZ_COLOR.bronze]: 0,  // neutral
@@ -1457,8 +1464,9 @@ class bzPlotTooltip {
                 icon.isTurned = true;
                 // color villages & encampments according to type
                 if (this.improvement.districtName == "LOC_DISTRICT_BZ_INDEPENDENT") {
-                    const cstype = getIndependentType(this.owner);
-                    icon.colors = [BZ_TYPE_COLOR[cstype]];
+                    const itype = getIndependentType(this.owner);
+                    const icolor = BZ_TYPE_COLOR[itype];
+                    if (icolor) icon.colors = [icolor];
                 }
             } else {
                 icon.icon = resourceIcon;
