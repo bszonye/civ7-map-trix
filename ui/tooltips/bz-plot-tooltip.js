@@ -506,7 +506,7 @@ function getIndependentType(owner) {
     if (indy) return indy.CityStateType;
     // crisis encampments use the adjectives as their names
     if (owner.name == owner.civilizationAdjective) return "CRISIS";
-    return null;  // unknown independent type
+    return undefined;  // unknown independent type
 }
 const BZ_PRELOADED_ICONS = {};
 function preloadIcon(icon, context) {
