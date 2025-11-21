@@ -130,6 +130,10 @@ class bzUnitListModel {
                 // commander first
                 if (a.isCommander) return -1;
                 if (b.isCommander) return +1;
+                // reinforcements last
+                if (a.isReinforcement && !b.isReinforcement) return +1;
+                if (b.isReinforcement && !a.isReinforcement) return -1;
+                // original order
                 return a.index - b.index;
             }
             // otherwise, group army units with their commanders
