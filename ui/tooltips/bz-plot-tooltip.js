@@ -16,71 +16,6 @@ const BZ_ICON_RURAL = "CITY_RURAL";  // urban population/yield
 const BZ_ICON_URBAN = "CITY_URBAN";  // rural population/yield
 const BZ_ICON_SPECIAL = "url('specialist_tile_pip_full')";  // specialists
 const BZ_ICON_TREASURE = "url('restype_distant')";  // treasure fleet points
-const BZ_ICON_VILLAGE_TYPES = {  // by city-state type and age
-    CULTURAL: [
-        "IMPROVEMENT_MEGALITH",
-        "IMPROVEMENT_STONE_HEAD",
-        "IMPROVEMENT_OPEN_AIR_MUSEUM",
-    ],
-    ECONOMIC: [
-        "IMPROVEMENT_SOUQ",
-        "IMPROVEMENT_TRADING_FACTORY",
-        "IMPROVEMENT_ENTREPOT",
-    ],
-    MILITARISTIC: [
-        "IMPROVEMENT_HILLFORT",
-        "IMPROVEMENT_KASBAH",
-        "IMPROVEMENT_SHORE_BATTERY",
-    ],
-    SCIENTIFIC: [
-        "IMPROVEMENT_ZIGGURAT",
-        "IMPROVEMENT_MONASTERY",
-        "IMPROVEMENT_INSTITUTE",
-    ],
-    EXPANSIONIST: [
-        "IMPROVEMENT_ICE_HOUSE",
-        "IMPROVEMENT_SAQIYA",
-        "IMPROVEMENT_ABATTOIR",
-    ],
-    DIPLOMATIC: [
-        "IMPROVEMENT_FESTIVAL_GROUNDS",
-        "IMPROVEMENT_MINOR_EMBASSY",
-        "IMPROVEMENT_CIRCUS_FAIR",
-    ],
-    // extra village types from City-States Expanded mod
-    AGRICULTURAL: [
-        "IMPROVEMENT_FARM",
-    ],
-    HAPPINESS: [
-        "IMPROVEMENT_EXPEDITION_BASE",
-    ],
-    INDUSTRIAL: [
-        "IMPROVEMENT_MINE",
-    ],
-    MARITIME: [
-        "IMPROVEMENT_FISHING_BOAT",
-    ],
-};
-const BZ_ICON_TYPES = {
-    IMPROVEMENT_MEGALITH: ["CULTURAL"],
-    IMPROVEMENT_STONE_HEAD: ["CULTURAL"],
-    IMPROVEMENT_OPEN_AIR_MUSEUM: ["CULTURAL"],
-    IMPROVEMENT_SOUQ: ["ECONOMIC"],
-    IMPROVEMENT_TRADING_FACTORY: ["ECONOMIC"],
-    IMPROVEMENT_ENTREPOT: ["ECONOMIC"],
-    IMPROVEMENT_HILLFORT: ["MILITARISTIC"],
-    IMPROVEMENT_KASBAH: ["MILITARISTIC"],
-    IMPROVEMENT_SHORE_BATTERY: ["MILITARISTIC"],
-    IMPROVEMENT_ZIGGURAT: ["SCIENTIFIC"],
-    IMPROVEMENT_MONASTERY: ["SCIENTIFIC"],
-    IMPROVEMENT_INSTITUTE: ["SCIENTIFIC"],
-    IMPROVEMENT_ICE_HOUSE: ["EXPANSIONIST"],
-    IMPROVEMENT_SAQIYA: ["EXPANSIONIST"],
-    IMPROVEMENT_ABATTOIR: ["EXPANSIONIST"],
-    IMPROVEMENT_FESTIVAL_GROUNDS: ["DIPLOMATIC"],
-    IMPROVEMENT_MINOR_EMBASSY: ["DIPLOMATIC"],
-    IMPROVEMENT_CIRCUS_FAIR: ["DIPLOMATIC"],
-};
 
 // color palette
 const BZ_COLOR = {
@@ -176,12 +111,7 @@ const BZ_STYLE = {
 // accent colors for icon types
 const BZ_TYPE_COLOR = {
     undefined: BZ_COLOR.bronze,  // default
-    CULTURAL: BZ_COLOR.cultural,  // purple
-    ECONOMIC: BZ_COLOR.economic,  // yellow
-    MILITARISTIC: BZ_COLOR.militaristic,  // red
-    SCIENTIFIC: BZ_COLOR.scientific,  // blue
-    EXPANSIONIST: BZ_COLOR.expansionist,  // green
-    DIPLOMATIC: BZ_COLOR.diplomatic,  // dark blue
+    // yield types
     YIELD_CULTURE: BZ_COLOR.culture,  // violet
     YIELD_DIPLOMACY: BZ_COLOR.diplomacy,  // teal
     YIELD_FOOD: BZ_COLOR.food,  // green
@@ -189,6 +119,19 @@ const BZ_TYPE_COLOR = {
     YIELD_HAPPINESS: BZ_COLOR.happiness,  // orange
     YIELD_PRODUCTION: BZ_COLOR.production,  // brown
     YIELD_SCIENCE: BZ_COLOR.science,  // blue
+    // independent and city-state types
+    CRISIS: BZ_COLOR.militaristic,  // red
+    CULTURAL: BZ_COLOR.cultural,  // purple
+    ECONOMIC: BZ_COLOR.economic,  // yellow
+    MILITARISTIC: BZ_COLOR.militaristic,  // red
+    SCIENTIFIC: BZ_COLOR.scientific,  // blue
+    EXPANSIONIST: BZ_COLOR.expansionist,  // green
+    DIPLOMATIC: BZ_COLOR.diplomatic,  // dark blue
+    // city-states expanded by Maple_Leaves
+    MARITIME: "#00ffff",  // cyan
+    INDUSTRIAL: "#f8f8ff",  // white
+    HAPPINESS: "#ff8c00",  // orange
+    AGRICULTURAL: "#7fff00",  // bright green
 }
 const BZ_TYPE_SORT = {
     [BZ_COLOR.bronze]: 0,  // neutral
@@ -318,10 +261,6 @@ function bonusYields(info) {
 function constructibleColors(info) {
     if (!info) return null;
     const colorize = (list) => list.map(type => BZ_TYPE_COLOR[type]);
-    if (info.ConstructibleClass == "IMPROVEMENT") {
-        const types = BZ_ICON_TYPES[info.ConstructibleType];
-        return types && colorize(types).sort(bzTypeSort);
-    }
     const base = colorize(baseYields(info)).sort(bzTypeSort);
     const bonus = colorize(bonusYields(info)).sort(bzTypeSort);
     const ageless = BZ_TYPE_COLOR[undefined];
@@ -567,15 +506,14 @@ function getTownFocus(city) {
     const icon = isGrowing ? "PROJECT_GROWTH" : info.ProjectType;
     return { isGrowing, name, note, icon, info, };
 }
-function getVillageIcon(owner, age) {
-    // get the village's city-state type
-    const ctype = GameInfo.Independents
-        .find(i => i.CityStateName == owner.civilizationAdjective)?.CityStateType;
-    // select an icon based on type, with Expedition Base as default
-    const icons = BZ_ICON_VILLAGE_TYPES[ctype] ?? ["IMPROVEMENT_EXPEDITION_BASE"];
-    const index = age?.ChronologyIndex ?? 0;
-    const icon = icons.at(index) ?? icons.at(-1);
-    return icon;
+function getIndependentType(owner) {
+    // look up villages by their civ adjective
+    const indy = GameInfo.Independents
+        .find(i => i.CityStateName == owner.civilizationAdjective);
+    if (indy) return indy.CityStateType;
+    // crisis encampments use the adjectives as their names
+    if (owner.name == owner.civilizationAdjective) return "CRISIS";
+    return undefined;  // unknown independent type
 }
 const BZ_PRELOADED_ICONS = {};
 function preloadIcon(icon, context) {
@@ -1147,13 +1085,11 @@ class bzPlotTooltip {
                 // use the narrative reward icon for discoveries
                 this.improvement.icon = BZ_ICON_DISCOVERY;
                 this.improvement.districtName = "LOC_DISTRICT_BZ_DISCOVERY";
-            } else if (info.Age == null && info.Population == 0) {
-                // villages and encampments get icons based on their unique
-                // improvements, appropriate for the age and minor civ type
-                this.improvement.icon = getVillageIcon(this.owner, this.age);
-                this.improvement.districtName = "LOC_DISTRICT_BZ_INDEPENDENT";
             } else {
                 this.improvement.icon = this.improvement.type;
+                if (info.Age == null && info.Population == 0) {
+                    this.improvement.districtName = "LOC_DISTRICT_BZ_INDEPENDENT";
+                }
             }
         }
         // get the free constructible (standard tile improvement)
@@ -1526,7 +1462,12 @@ class bzPlotTooltip {
                 icon.overlay = resourceIcon;
                 icon.oversize = 8;
                 icon.isTurned = true;
-                icon.colors = BZ_ICON_TYPES[hexIcon]?.map(type => BZ_TYPE_COLOR[type]);
+                // color villages & encampments according to type
+                if (this.improvement.districtName == "LOC_DISTRICT_BZ_INDEPENDENT") {
+                    const itype = getIndependentType(this.owner);
+                    const icolor = BZ_TYPE_COLOR[itype];
+                    if (icolor) icon.colors = [icolor];
+                }
             } else {
                 icon.icon = resourceIcon;
             }

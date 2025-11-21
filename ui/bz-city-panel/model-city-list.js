@@ -94,11 +94,11 @@ class bzCityListModel {
         this._townList = this._settlementList.filter(c => c.isTown);
         // mark subhead dividers for Distant Lands cities and towns
         const cityDL = this._cityList.find(s => s.isDistantLands);
-        if (cityDL !== this._cityList.at(0) && cityDL !== this._cityList.at(-1)) {
+        if (cityDL && cityDL !== this._cityList[0] && cityDL !== this._cityList.at(-1)) {
             cityDL.subhead = "LOC_PLOT_TOOLTIP_HEMISPHERE_WEST";
         }
         const townDL = this._townList.find(s => s.isDistantLands);
-        if (townDL !== this._townList.at(0) && townDL !== this._townList.at(-1)) {
+        if (townDL && townDL !== this._townList[0] && townDL !== this._townList.at(-1)) {
             townDL.subhead = "LOC_PLOT_TOOLTIP_HEMISPHERE_WEST";
         }
         // send update callback and event
