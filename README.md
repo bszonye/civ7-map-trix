@@ -1,4 +1,4 @@
-# Map Trix 3.7.3
+# Map Trix 3.8.0
 better map tools for Civilization VII
 
 ## better tooltips
