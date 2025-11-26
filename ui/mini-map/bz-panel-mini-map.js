@@ -23,7 +23,6 @@ const BZ_LAYERS = {
     "bz-terrain-layer": "LOC_UI_MINI_MAP_BZ_TERRAIN",
 };
 const BZ_EXTRA_LAYERS = {
-    "fxs-discovery-lens": [ "bz-fortification-layer", "bz-route-layer", ],
     "fxs-settler-lens": [ "bz-city-borders-layer", ],
     "fxs-trade-lens": [ "bz-city-borders-layer", ],
     "mod-fortified-district-lens": [
@@ -96,24 +95,23 @@ engine.whenReady.then(() => {
         if (rv) return original.apply(this, args);
     }
 });
-// patch new layers into fxs-default-lens (allowedLayers)
-const defaultLens = LensManager.lenses.get("fxs-default-lens");
-defaultLens.activeLayers.delete("fxs-culture-borders-layer");
-for (const layer of Object.keys(BZ_LAYERS)) defaultLens.allowedLayers.add(layer);
 // patch new layers into other lenses (activeLayers)
 for (const [lensType, lens] of LensManager.lenses.entries()) {
-    if (lensType == "fxs-default-lens") continue;
     const active = lens.activeLayers;
     const allowed = lens.allowedLayers;
+    // add extra default layers
+    const extra = new Set(BZ_EXTRA_LAYERS[lensType] ?? []);
+    for (const layerType of extra) active.add(layerType);
     // swap in modded borders
-    if (active.has("fxs-city-borders-layer")) {
-        active.delete("fxs-city-borders-layer");
+    if (active.has("bz-city-borders-layer")) {
+        // already configured
+    } else if (active.has("fxs-city-borders-layer")) {
         active.add("bz-city-borders-layer");
-    }
-    if (active.has("fxs-culture-borders-layer")) {
-        active.delete("fxs-culture-borders-layer");
+    } else if (active.has("fxs-culture-borders-layer")) {
         active.add("bz-culture-borders-layer");
     }
+    active.delete("fxs-city-borders-layer");
+    active.delete("fxs-culture-borders-layer");
     // add discovery layer to every lens that allows Resources
     if (active.has("fxs-resource-layer") || allowed.has("fxs-resource-layer")) {
         active.add("bz-discovery-layer");
@@ -123,20 +121,20 @@ for (const [lensType, lens] of LensManager.lenses.entries()) {
         active.delete("fxs-hexgrid-layer");
         allowed.add("fxs-hexgrid-layer");
     }
-    // add extra default layers
-    const extra = new Set(BZ_EXTRA_LAYERS[lensType] ?? []);
-    for (const layerType of extra) active.add(layerType);
 }
 // fix Hex Grid initial visibility
 if (!LensManager.enabledLayers.has("fxs-hexgrid-layer")) {
     const hexGrid = LensManager.layers.get("fxs-hexgrid-layer");
     hexGrid.removeLayer();
 }
-// fix Yields configuration (add to default, remove from Discovery)
+// override vanilla layer configuration system
+const defaultLens = LensManager.lenses.get("fxs-default-lens");
+for (const layerType of defaultLens.allowedLayers) {
+    defaultLens.activeLayers.add(layerType);  // enable optional layers by default
+}
+defaultLens.allowedLayers.clear();
 const discoveryLens = LensManager.lenses.get("fxs-discovery-lens");
 discoveryLens.allowedLayers.delete("fxs-yields-layer");
-defaultLens.allowedLayers.add("fxs-yields-layer");
-// patch Discovery lens to track enabled layers
 delete discoveryLens.ignoreEnabledLayers;
 
 // PanelMiniMap extensions
@@ -283,10 +281,40 @@ class bzLensPanel {
             const checkbox = this.component.layerElementMap[layer];
             if (checkbox) checkbox.parentElement.style.display = "none";
         }
+        // checkbox handlers for configuration tracking
+        for (const layer of LensManager.layers.keys()) this.createLayerTracker(layer);
     }
     beforeDetach() { }
     afterDetach() { }
-    onAttributeChanged(_name, _prev, _next) { }
+    createLayerTracker(layerType) {
+        const checkbox = this.component.layerElementMap[layerType];
+        if (!checkbox) return;
+        checkbox.addEventListener(ComponentValueChangeEventName, (event) => {
+            if (event.detail.forced) return;  // ignore initialization
+            // set config option for lenses and layers in the panel
+            const lensType = LensManager.getActiveLens();
+            const value = event.detail.value ? 1 : 0;
+            this.trackLayer(lensType, layerType, value);
+            // reconcile border layers
+            if (layerType == "bz-city-borders-layer") {
+                this.trackLayer(lensType, "bz-culture-borders-layer", 1 - value);
+            } else if (layerType == "bz-culture-borders-layer") {
+                this.trackLayer(lensType, "bz-city-borders-layer", 0);
+            }
+        });
+    }
+    trackLayer(lensType, layerType, value) {
+        // only track lenses and layers with Lens panel controls
+        if (this.component.lensElementMap[lensType] == null) return;
+        if (this.component.layerElementMap[layerType] == null) return;
+        const layerOption = LensManager.getLayerOption(layerType);
+        if (!layerOption || layerOption == layerType) return;  // option name not set
+        const optionName = `bz-map-trix.${lensType}.${layerOption}`;
+        const ovalue = UI.getOption("user", "Mod", optionName);
+        if (value == ovalue) return;  // unchanged
+        UI.setOption("user", "Mod", optionName, value);
+        Configuration.getUser().saveCheckpoint();
+    }
 }
 Controls.decorate("lens-panel", (component) => new bzLensPanel(component));
 

@@ -9,8 +9,6 @@ class bzReligionLens {
     allowedLayers = new Set([
         "fxs-hexgrid-layer",
         "fxs-resource-layer",
-        "bz-route-layer",
-        "bz-terrain-layer",
     ]);
     blendEnabledLayersOnTransition = false;
 }

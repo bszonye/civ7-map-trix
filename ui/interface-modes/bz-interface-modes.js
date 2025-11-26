@@ -1,16 +1,34 @@
 import { A as Audio } from '/core/ui/audio-base/audio-support.chunk.js';
 import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
+import { L as LensManager } from '/core/ui/lenses/lens-manager.chunk.js';
 // guarantee import order for patching
 import '/base-standard/ui/interface-modes/interface-mode-ranged-attack.js';
 
-// patch RangedAttackInterfaceMode.decorate() method
-engine.whenReady.then(() => {
-    const RAIM = InterfaceMode.getInterfaceModeHandler("INTERFACEMODE_RANGE_ATTACK");
-    const prototype = Object.getPrototypeOf(RAIM);
-    prototype.decorate = RAIM_decorate;
+// configure lenses just before default interface startup
+window.addEventListener("interface-mode-ready", (_event) => {
+    for (const [lensType, lens] of LensManager.lenses.entries()) {
+        for (const layerType of LensManager.layers.keys()) {
+            const layerOption = LensManager.getLayerOption(layerType);
+            if (!layerOption) continue;
+            const optionName = `bz-map-trix.${lensType}.${layerOption}`;
+            const ovalue = UI.getOption("user", "Mod", optionName);
+            if (ovalue == null) {
+                continue;  // not set
+            } else if (ovalue) {
+                lens.activeLayers.add(layerType);
+            } else {
+                lens.activeLayers.delete(layerType);
+            }
+            lens.allowedLayers.delete(layerType);
+            console.warn(`LENS ${optionName}=${ovalue}`);
+        }
+    }
 });
 
-function RAIM_decorate(overlayGroup, _modelGroup) {
+// patch RangedAttackInterfaceMode.decorate() method
+const RAIM = InterfaceMode.getInterfaceModeHandler("INTERFACEMODE_RANGE_ATTACK");
+const RAIM_prototype = Object.getPrototypeOf(RAIM);
+RAIM_prototype.decorate = function(overlayGroup, _modelGroup) {
     const plotOverlay = overlayGroup.addPlotOverlay();
     const plots = [];
     this.validPlots.forEach((p) => plots.push(p));

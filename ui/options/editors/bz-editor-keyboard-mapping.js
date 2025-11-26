@@ -34,7 +34,6 @@ class bzEditorKeyboardMapping {
     afterAttach() { }
     beforeDetach() { }
     afterDetach() { }
-    onAttributeChanged(_name, _prev, _next) { }
     afterAddActionsForContext(inputContext) {
         for (const actionIdString of BZ_KEYS_TO_ADD) {
             const actionId = Input.getActionIdByName(actionIdString);
