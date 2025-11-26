@@ -80,6 +80,15 @@
   filter: sepia(1) brightness(1.2) saturate(2)
           drop-shadow(0 0.0555555556rem 0.1111111111rem #000c);
 }
+.bz-city-list-entry.bz-city-has-damage .bz-city-list-queue-bg,
+.bz-city-list-entry.bz-city-has-damage .bz-city-list-focus-bg {
+  background-color: #cea92f;
+  border: 0.0555555556rem solid #ffd663;
+}
+.bz-city-list-entry.bz-city-has-damage [bz-qclass=BUILDING] .bz-city-list-queue-icon,
+.bz-city-list-entry.bz-city-has-damage [bz-qclass=WONDER] .bz-city-list-queue-icon {
+  background-size: 70%;
+}
 .bz-city-list-entry.bz-city-has-unrest .bz-city-list-queue-slot,
 .bz-city-list-entry.bz-city-is-razing .bz-city-list-queue-slot,
 .bz-city-list-entry.bz-city-has-unrest .bz-city-list-focus,
