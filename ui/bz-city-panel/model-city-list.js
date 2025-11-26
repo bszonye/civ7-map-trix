@@ -117,8 +117,12 @@ class bzCityListModel {
         const location = city.location;
         const isDistantLands = city.isDistantLands;
         const population = city.population;
-        const hasDamage = Boolean(city.Constructibles.getIds().find(id =>
-            Constructibles.getByComponentID(id)?.damaged));
+        const hasDamage = Boolean(city.Constructibles.getIds().find(id => {
+            const item = Constructibles.getByComponentID(id);
+            if (!item?.damaged) return false;  // not damaged
+            const info = GameInfo.Constructibles.lookup(item.type);
+            return (!info.ExistingDistrictOnly);  // not a wall
+        }));
         const hasUnrest = Boolean(city.Happiness?.hasUnrest);
         const isRazing = city.isBeingRazed;
         const isGrowing = city.Growth.growthType == GrowthTypes.EXPAND;
