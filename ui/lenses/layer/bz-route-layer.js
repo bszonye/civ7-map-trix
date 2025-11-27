@@ -4,8 +4,7 @@ import { U as UpdateGate } from '/core/ui/utilities/utilities-update-gate.chunk.
 import '/bz-map-trix/ui/mini-map/bz-panel-mini-map.js';
 
 const SPRITE_CLIFF = "dip_cancel";
-// coordinates for tile edges
-const SPRITE_OFFSET = [
+const SPRITE_EDGE_OFFSET = [
     { x: 16, y: 28 },    // northeast
     { x: 32, y: 0 },     // east
     { x: 16, y: -28 },   // southeast
@@ -68,6 +67,7 @@ class bzRouteLensLayer {
         const plotIndex = GameplayMap.getIndexFromLocation(loc);
         const links = this.routes[plotIndex] = [];
         const rtype = GameplayMap.getRouteType(loc.x, loc.y);
+        if (rtype == -1 && GameplayMap.isImpassable(loc.x, loc.y)) return;
         // road & rail links are distinct only if this tile has rail
         const road = [];
         const rail = this.railTypes.has(rtype) ? [] : road;
@@ -76,9 +76,10 @@ class bzRouteLensLayer {
             if (GameplayMap.isCliffCrossing(loc.x, loc.y, dir)) {
                 // add a sprite at the top of the cliff
                 const adj = GameplayMap.getAdjacentPlotLocation(loc, dir);
-                if (GameplayMap.getElevation(adj.x, adj.y)
-                    <= GameplayMap.getElevation(loc.x, loc.y)) {
-                    const offset = SPRITE_OFFSET[dir];
+                const el0 = GameplayMap.getElevation(loc.x, loc.y);
+                const el1 = GameplayMap.getElevation(adj.x, adj.y);
+                if (el1 <= el0) {
+                    const offset = SPRITE_EDGE_OFFSET[dir];
                     this.routeSpriteGrid.addSprite(loc, SPRITE_CLIFF, offset);
                 }
                 continue;  // no roads across cliffs
