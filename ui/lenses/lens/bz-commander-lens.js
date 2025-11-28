@@ -11,7 +11,6 @@ class bzCommanderLens {
     allowedLayers = new Set([
         "fxs-hexgrid-layer",
         "fxs-resource-layer",
-        "bz-city-borders-layer",
     ]);
     blendEnabledLayersOnTransition = false;
 }

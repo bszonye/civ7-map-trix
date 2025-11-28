@@ -181,9 +181,4 @@ class bzCultureBordersLayer {
         }
     }
 }
-const instance = new bzCultureBordersLayer();
-// if layer is not configured, enable it by default
-const option = UI.getOption("user", "Gameplay", instance.getOptionName());
-if (option == null) UI.setOption("user", "Gameplay", instance.getOptionName(), 1);
-// register lens
-LensManager.registerLensLayer("bz-culture-borders-layer", instance);
+LensManager.registerLensLayer("bz-culture-borders-layer", new bzCultureBordersLayer());

@@ -74,9 +74,4 @@ class bzDiscoveryLensLayer {
         }
     }
 }
-const instance = new bzDiscoveryLensLayer();
-// if layer is not configured, enable it by default
-const option = UI.getOption("user", "Gameplay", instance.getOptionName());
-if (option == null) UI.setOption("user", "Gameplay", instance.getOptionName(), 1);
-// register lens
-LensManager.registerLensLayer("bz-discovery-layer", instance);
+LensManager.registerLensLayer("bz-discovery-layer", new bzDiscoveryLensLayer());

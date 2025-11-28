@@ -117,6 +117,12 @@ class bzCityListModel {
         const location = city.location;
         const isDistantLands = city.isDistantLands;
         const population = city.population;
+        const hasDamage = Boolean(city.Constructibles.getIds().find(id => {
+            const item = Constructibles.getByComponentID(id);
+            if (!item?.damaged) return false;  // not damaged
+            const info = GameInfo.Constructibles.lookup(item.type);
+            return (!info.ExistingDistrictOnly);  // not a wall
+        }));
         const hasUnrest = Boolean(city.Happiness?.hasUnrest);
         const isRazing = city.isBeingRazed;
         const isGrowing = city.Growth.growthType == GrowthTypes.EXPAND;
@@ -131,7 +137,7 @@ class bzCityListModel {
         // compile entry
         const entry = {
             city, id, owner, localId, icon, name, isCapital, isTown, isDistantLands,
-            hasUnrest, isRazing, isGrowing,
+            hasDamage, hasUnrest, isRazing, isGrowing,
             location, population, growthTurns, religion, religionIcon,
         };
         if (isTown) {
@@ -169,14 +175,18 @@ class bzCityListModel {
             const type = city.BuildQueue.currentProductionTypeHash;
             if (kind == ProductionKind.CONSTRUCTIBLE) {
                 const info = GameInfo.Constructibles.lookup(type);
+                entry.queueKind = "CONSTRUCTIBLE";
+                entry.queueClass = info.ConstructibleClass;
                 entry.queueIcon = UI.getIcon(info.ConstructibleType);
                 entry.queueTooltip = info.Name;
             } else if (kind == ProductionKind.UNIT) {
                 const info = GameInfo.Units.lookup(type);
+                entry.queueKind = "UNIT";
                 entry.queueIcon = UI.getIcon(info.UnitType);
                 entry.queueTooltip = info.Name;
             } else if (kind == ProductionKind.PROJECT) {
                 const info = GameInfo.Projects.lookup(type);
+                entry.queueKind = "PROJECT";
                 entry.queueIcon = UI.getIcon(info.ProjectType);
                 entry.queueTooltip = info.Name;
             }

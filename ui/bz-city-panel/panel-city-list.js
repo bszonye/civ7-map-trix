@@ -93,6 +93,7 @@ class bzCityPanel extends MinimapSubpanel {
             Databind.attribute(entry, "data-city-local-id", "entry.localId");
             Databind.classToggle(entry, "bz-town-has-focus", "!!{{entry.focus}}");
             Databind.classToggle(entry, "bz-town-is-growing", "!!{{entry.isGrowing}}");
+            Databind.classToggle(entry, "bz-city-has-damage", "!!{{entry.hasDamage}}");
             Databind.classToggle(entry, "bz-city-has-unrest", "!!{{entry.hasUnrest}}");
             Databind.classToggle(entry, "bz-city-is-razing", "!!{{entry.isRazing}}");
             row.appendChild(entry);
@@ -166,6 +167,8 @@ class bzCityPanel extends MinimapSubpanel {
             const queue = document.createElement("div");
             Databind.classToggle(queue, "hidden", "{{entry.isTown}}");
             queue.classList.value = "bz-city-queue flex items-center";
+            Databind.attribute(queue, "bz-qkind", "entry.queueKind");
+            Databind.attribute(queue, "bz-qclass", "entry.queueClass");
             const queueTurns = turnTimer(
                 "bz-city-queue-turns",
                 "entry.queueTurns",
