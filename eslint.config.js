@@ -58,6 +58,7 @@ export default [
                 SpriteMode: "readonly",
                 UI: "readonly",
                 UIHTMLCursorTypes: "readonly",
+                UniqueQuarterTypes: "readonly",
                 UnitActivityTypes: "readonly",
                 Units: "readonly",
                 Visibility: "readonly",
