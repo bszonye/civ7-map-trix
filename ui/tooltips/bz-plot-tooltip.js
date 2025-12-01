@@ -1709,6 +1709,7 @@ class bzPlotTooltip {
         // show unit section
         if (this.isCompact || !this.units.length) return;
         const owners = [...new Set(this.units.map(unit => unit.owner))];
+        owners.sort((a, b) => a.id - b.id);  // sort by owner id
         for (const owner of owners) {
             this.renderDivider();
             const rows = [];
