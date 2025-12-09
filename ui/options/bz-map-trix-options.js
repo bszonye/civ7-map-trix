@@ -84,15 +84,6 @@ bzMapTrixOptions.verbose;
 document.body.classList.toggle("bz-yield-banner", bzMapTrixOptions.yieldBanner);
 Controls.loadStyle("fs://game/bz-map-trix/ui/bz-style/bz-panel-yield-banner.css");
 
-// fix Options initialization
-Options.addInitCallback = function(callback) {
-    if (this.optionsReInitCallbacks.length && !this.optionsInitCallbacks.length) {
-        throw new Error("Options already initialized, cannot add init callback");
-    }
-    this.optionsInitCallbacks.push(callback);
-    this.optionsReInitCallbacks.push(callback);
-}
-
 Options.addInitCallback(() => {
     Options.addOption({
         category: CategoryType.Mods,
