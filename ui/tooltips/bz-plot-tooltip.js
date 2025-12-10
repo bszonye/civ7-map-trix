@@ -1018,6 +1018,8 @@ class bzPlotTooltip {
             const name = info.Name;
             const notes = [];
             const age = info.Age ? GameInfo.Ages.lookup(info.Age) : null;
+            const uqtype = item.uniqueQuarterType;
+            if (uqtype != -1) this.quarter ??= GameInfo.UniqueQuarters.lookup(uqtype);
             // boolean properties
             const isBuilding = info.ConstructibleClass == "BUILDING";
             const isImprovement = info.ConstructibleClass == "IMPROVEMENT";
@@ -1036,10 +1038,6 @@ class bzPlotTooltip {
                 isImprovement ? GameInfo.Improvements.lookup(type) :
                 isWonder ? GameInfo.Wonders.lookup(type) :
                 null;
-            if (xinfo.TraitType && this.district.isUniqueQuarter) {
-                this.quarter ??= GameInfo.UniqueQuarters
-                    .find(e => e.TraitType == xinfo.TraitType);
-            }
 
             if (isDamaged) notes.push("LOC_PLOT_TOOLTIP_DAMAGED");
             if (!isComplete) notes.push("LOC_PLOT_TOOLTIP_IN_PROGRESS");
@@ -1053,7 +1051,7 @@ class bzPlotTooltip {
                 notes.push("LOC_PLOT_TOOLTIP_OVERBUILDABLE");
             }
             const row = {
-                type, name, notes, age,
+                type, name, notes, age, uqtype,
                 isBuilding, isImprovement, isWonder,
                 isAgeless, isBridge, isComplete, isDamaged, isExtra,
                 isLarge, isOverbuildable,
@@ -1711,6 +1709,7 @@ class bzPlotTooltip {
         // show unit section
         if (this.isCompact || !this.units.length) return;
         const owners = [...new Set(this.units.map(unit => unit.owner))];
+        owners.sort((a, b) => a.id - b.id);  // sort by owner id
         for (const owner of owners) {
             this.renderDivider();
             const rows = [];
