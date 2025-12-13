@@ -3,39 +3,51 @@ import PlotIconsManager from '/core/ui/plot-icons/plot-icons-manager.js';
 // load mini-map first to configure allowed layers for default lens
 import '/bz-map-trix/ui/mini-map/bz-panel-mini-map.js';
 
-const UPSCALE_START = 1080;
-const BZ_ICON_WONDER = "CITY_WONDERS_LIST";  // TODO
-const SPRITE_OFFSET = { x: 0, y: 0, z: 5 };
-const SPRITE_SIZE = 1;
-var SpriteGroup;
-(function (SpriteGroup) {
-    SpriteGroup[SpriteGroup["bzWonder"] = 0] = "bzWonder";
-    SpriteGroup[SpriteGroup["All"] = Number.MAX_VALUE] = "All";
-})(SpriteGroup || (SpriteGroup = {}));
+class bzPlotIconWonders extends Component {
+    location = { x: -1, y: -1 };
+    onInitialize() {
+        const wonderType = this.Root.getAttribute("wonder");
+        this.location.x = parseInt(this.Root.getAttribute("x") ?? "-1");
+        this.location.y = parseInt(this.Root.getAttribute("y") ?? "-1");
+        let iconName = "";
+        if (wonderType) {
+            if (wonderType == "NATURAL_WONDER") {
+                iconName = "action_naturalartifacts.png";
+                this.Root.classList.add("size-24");
+            } else {
+                iconName = "city_wonderslist";
+                // iconName = "fonticon_wonders";
+                // iconName = "ntf_wonder_completed";
+                this.Root.classList.add("size-12");
+                this.Root.style.filter = "saturate(0)";
+            }
+            this.Root.style.backgroundImage = `url(fs://game/${iconName})`;
+        }
+        this.Root.classList.add(
+            "bg-cover",
+            "bg-no-repeat",
+            "bg-center",
+            "cursor-info",
+            "pointer-events-auto"
+        );
+        this.Root.setAttribute("data-pointer-passthrough", "true");
+        this.Root.dataset.tooltipStyle = "wonders";
+        this.Root.setAttribute("node-id", `${this.location.x},${this.location.y}`);
+    }
+}
+Controls.define("bz-plot-icon-wonders", {
+  createInstance: bzPlotIconWonders
+});
 class bzWonderLensLayer {
-    bzSpriteGrid = WorldUI.createSpriteGrid(
-        "bzWonderLayer_SpriteGroup",
-        SpriteMode.Billboard
-    );
-    upscaleMultiplier = 1;
     onLayerHotkeyListener = this.onLayerHotkey.bind(this);
     initLayer() {
-        if (window.innerHeight > UPSCALE_START) {
-          this.upscaleMultiplier = window.innerHeight / UPSCALE_START;
-        }
-        this.updateMap();
-        this.bzSpriteGrid.setVisible(false);
-        engine.on("PlotVisibilityChanged", this.onPlotChange, this);
-        engine.on("ConstructibleAddedToMap", this.onPlotChange, this);
-        engine.on("ConstructibleRemovedFromMap", this.onPlotChange, this);
         window.addEventListener("layer-hotkey", this.onLayerHotkeyListener);
     }
     applyLayer() {
-        this.bzSpriteGrid.setVisible(true);
+        this.updateMap();
     }
     removeLayer() {
-        this.bzSpriteGrid.setVisible(false);
-        PlotIconsManager.removePlotIcons("bz-plot-icon-wonder");
+        PlotIconsManager.removePlotIcons("bz-plot-icon-wonders");
     }
     getOptionName() {
         return "bzShowMapDiscoveries";
@@ -50,17 +62,14 @@ class bzWonderLensLayer {
         }
     }
     updatePlot(loc) {
-        this.bzSpriteGrid.clearPlot(loc);
         const observer = GameContext.localObserverID;
         const revealed = GameplayMap.getRevealedState(observer, loc.x, loc.y);
         if (revealed == RevealedStates.HIDDEN) return;
         if (GameplayMap.isNaturalWonder(loc.x, loc.y)) {
-            console.warn(`TRIX NATURAL`);
-            const plotIndex = GameplayMap.getIndexFromLocation(loc);
             PlotIconsManager.addPlotIcon(
-              "bz-plot-icon-wonder",
-              plotIndex,
-              new Map([["archeology", "NATURAL_WONDER"]])
+              "bz-plot-icon-wonders",
+              loc,
+              new Map([["wonder", "NATURAL_WONDER"]])
             );
             return;
         }
@@ -71,9 +80,11 @@ class bzWonderLensLayer {
             const info = GameInfo.Constructibles.lookup(item.type);
             if (!info || info.ConstructibleClass != "WONDER") continue;
             console.warn(`TRIX WONDER`);
-            const asset = UI.getIconBLP(BZ_ICON_WONDER);
-            const params = { scale: SPRITE_SIZE * this.upscaleMultiplier };
-            this.bzSpriteGrid.addSprite(loc, asset, SPRITE_OFFSET, params);
+            PlotIconsManager.addPlotIcon(
+              "bz-plot-icon-wonders",
+              loc,
+              new Map([["wonder", "WONDER"]])
+            );
             return;
         }
     }
