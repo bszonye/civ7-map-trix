@@ -9,21 +9,12 @@ class bzPlotIconWonders extends Component {
         const wonderType = this.Root.getAttribute("wonder");
         this.location.x = parseInt(this.Root.getAttribute("x") ?? "-1");
         this.location.y = parseInt(this.Root.getAttribute("y") ?? "-1");
-        let iconName = "";
-        if (wonderType) {
-            if (wonderType == "NATURAL_WONDER") {
-                iconName = "action_naturalartifacts.png";
-                this.Root.classList.add("size-24");
-            } else {
-                iconName = "city_wonderslist";
-                // iconName = "fonticon_wonders";
-                // iconName = "ntf_wonder_completed";
-                this.Root.classList.add("size-12");
-                this.Root.style.filter = "saturate(0)";
-            }
-            this.Root.style.backgroundImage = `url(fs://game/${iconName})`;
-        }
+        let iconName = wonderType == "NATURAL_WONDER" ?
+            "action_naturalartifacts.png" :
+            "bz-map-trix/icons/bz-wonder-decoration.png";
+        this.Root.style.backgroundImage = `url(fs://game/${iconName})`;
         this.Root.classList.add(
+            "size-24",
             "bg-cover",
             "bg-no-repeat",
             "bg-center",
@@ -67,9 +58,7 @@ class bzWonderLensLayer {
         if (revealed == RevealedStates.HIDDEN) return;
         if (GameplayMap.isNaturalWonder(loc.x, loc.y)) {
             PlotIconsManager.addPlotIcon(
-              "bz-plot-icon-wonders",
-              loc,
-              new Map([["wonder", "NATURAL_WONDER"]])
+              "bz-plot-icon-wonders", loc, new Map([["wonder", "NATURAL_WONDER"]])
             );
             return;
         }
@@ -81,15 +70,10 @@ class bzWonderLensLayer {
             if (!info || info.ConstructibleClass != "WONDER") continue;
             console.warn(`TRIX WONDER`);
             PlotIconsManager.addPlotIcon(
-              "bz-plot-icon-wonders",
-              loc,
-              new Map([["wonder", "WONDER"]])
+              "bz-plot-icon-wonders", loc, new Map([["wonder", "WONDER"]])
             );
             return;
         }
-    }
-    onPlotChange(data) {
-        this.updatePlot(data.location);
     }
     onLayerHotkey(hotkey) {
         if (hotkey.detail.name == "toggle-bz-wonder-layer") {
