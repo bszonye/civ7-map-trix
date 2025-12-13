@@ -137,10 +137,10 @@
             <Text>Attiva/disattiva la visibilità delle caratteristiche del terreno</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_WONDER_LAYER" Language="it_IT">
-            <Text>Toggle Wonder Icons</Text>
+            <Text>Icone meravigliose</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_WONDER_LAYER_TT" Language="it_IT">
-            <Text>Toggles visibility of wonder icons</Text>
+            <Text>Attiva/disattiva la visibilità delle icone delle meraviglie</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_BORDERS" Language="it_IT">
             <Text>Confini</Text>

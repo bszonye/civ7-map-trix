@@ -145,10 +145,10 @@
             <Text>Affiche ou masque les caractéristiques du terrain.</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_WONDER_LAYER" Language="fr_FR">
-            <Text>Toggle Wonder Icons</Text>
+            <Text>Icônes merveilleuses</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_WONDER_LAYER_TT" Language="fr_FR">
-            <Text>Toggles visibility of wonder icons</Text>
+            <Text>Affiche ou masque les icônes de merveille.</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_BORDERS" Language="fr_FR">
             <Text>Frontières</Text>
