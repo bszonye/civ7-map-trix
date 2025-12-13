@@ -8,6 +8,7 @@ const BZ_KEYS_TO_ADD = [
     "toggle-bz-religion-layer",
     "toggle-bz-route-layer",
     "toggle-bz-terrain-layer",
+    "toggle-bz-wonder-layer",
 ];
 class bzEditorKeyboardMapping {
     static c_prototype;
