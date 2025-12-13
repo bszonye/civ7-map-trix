@@ -21,6 +21,7 @@ const BZ_LAYERS = {
     "bz-route-layer": "LOC_UI_MINI_MAP_BZ_ROUTE",
     "bz-religion-layer": "LOC_UI_MINI_MAP_RELIGION",
     "bz-terrain-layer": "LOC_UI_MINI_MAP_BZ_TERRAIN",
+    "bz-wonder-layer": "LOC_UI_PRODUCTION_WONDERS",
 };
 const BZ_EXTRA_LAYERS = {
     "fxs-settler-lens": [ "bz-city-borders-layer", ],

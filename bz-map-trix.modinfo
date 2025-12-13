@@ -72,6 +72,7 @@
                     <Item>ui/lenses/layer/bz-religion-layer.js</Item>
                     <Item>ui/lenses/layer/bz-route-layer.js</Item>
                     <Item>ui/lenses/layer/bz-terrain-layer.js</Item>
+                    <Item>ui/lenses/layer/bz-wonder-layer.js</Item>
                     <Item>ui/lenses/lens/bz-commander-lens.js</Item>
                     <Item>ui/lenses/lens/bz-religion-lens.js</Item>
                     <Item>ui/mini-map/bz-panel-mini-map.js</Item>
