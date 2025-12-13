@@ -31,13 +31,18 @@ Controls.define("bz-plot-icon-wonders", {
 });
 class bzWonderLensLayer {
     onLayerHotkeyListener = this.onLayerHotkey.bind(this);
+    visible = false;
     initLayer() {
+        engine.on("ConstructibleAddedToMap", this.onPlotChange, this);
+        engine.on("PlotVisibilityChanged", this.onPlotChange, this);
         window.addEventListener("layer-hotkey", this.onLayerHotkeyListener);
     }
     applyLayer() {
+        this.visible = true;
         this.updateMap();
     }
     removeLayer() {
+        this.visible = false;
         PlotIconsManager.removePlotIcons("bz-plot-icon-wonders");
     }
     getOptionName() {
@@ -74,6 +79,9 @@ class bzWonderLensLayer {
             );
             return;
         }
+    }
+    onPlotChange(data) {
+        if (this.visible) this.updatePlot(data.location);
     }
     onLayerHotkey(hotkey) {
         if (hotkey.detail.name == "toggle-bz-wonder-layer") {
