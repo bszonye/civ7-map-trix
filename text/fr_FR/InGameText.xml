@@ -144,6 +144,12 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER_TT" Language="fr_FR">
             <Text>Affiche ou masque les caractéristiques du terrain.</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_WONDER_LAYER" Language="fr_FR">
+            <Text>Toggle Wonder Icons</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_WONDER_LAYER_TT" Language="fr_FR">
+            <Text>Toggles visibility of wonder icons</Text>
+        </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_BORDERS" Language="fr_FR">
             <Text>Frontières</Text>
         </Replace>

@@ -136,6 +136,12 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER_TT">
             <Text>Toggles visibility of terrain features</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_WONDER_LAYER">
+            <Text>Toggle Wonder Icons</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_WONDER_LAYER_TT">
+            <Text>Toggles visibility of wonder icons</Text>
+        </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_BORDERS">
             <Text>Borders</Text>
         </Replace>

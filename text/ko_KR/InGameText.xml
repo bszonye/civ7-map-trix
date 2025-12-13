@@ -136,6 +136,12 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER_TT" Language="ko_KR">
             <Text>지형 특성의 가시성을 전환합니다.</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_WONDER_LAYER" Language="ko_KR">
+            <Text>Toggle Wonder Icons</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_WONDER_LAYER_TT" Language="ko_KR">
+            <Text>Toggles visibility of wonder icons</Text>
+        </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_BORDERS" Language="ko_KR">
             <Text>국경</Text>
         </Replace>
