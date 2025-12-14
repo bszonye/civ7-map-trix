@@ -93,7 +93,7 @@ const BZ_ALERT = {
 const BZ_STYLE = {
     debug: { "background-color": `${BZ_COLOR.bronze6}99`, },
     // movement & obstacle types
-    TERRAIN_HILL: { "background-color": BZ_COLOR.hill, color: BZ_COLOR.bronze, },
+    TERRAIN_HILL: { "background-color": BZ_COLOR.hill, },
     TERRAIN_OCEAN: {},  // don't need to highlight this
     FEATURE_CLASS_AQUATIC:
     { "background-color": BZ_COLOR.aquatic, color: BZ_COLOR.accent1, },
@@ -561,6 +561,7 @@ class bzPlotTooltip {
         // title
         this.banners = null;
         this.title = null;
+        this.subtitle = null;
         // constructibles
         this.constructibles = [];
         this.buildings = [];  // omits walls
@@ -677,6 +678,7 @@ class bzPlotTooltip {
         // title
         this.banners = null;
         this.title = null;
+        this.subtitle = null;
         // constructibles
         this.constructibles = [];
         this.buildings = [];  // omits walls
@@ -743,28 +745,8 @@ class bzPlotTooltip {
         this.modelPopulation();
         this.modelYields();
         this.modelUnits();
-        // set title
-        if (this.title) {
-            // already set
-        } else if (this.district?.isUniqueQuarter) {
-            this.title = this.quarter.Name;
-        } else if (this.resource) {
-            this.title = this.resource.Name;
-        } else if (this.feature?.info.Tooltip) {  // natural wonder
-            this.title = this.feature.info.Name;
-        } else if (this.wonder) {
-            this.title = this.wonder.info.Name;
-        } else if (this.river?.isNavigable) {
-            this.title = this.river.name;
-        } else if (this.city && this.isCompact) {
-            this.title = this.city.name;
-        } else if (this.biome?.type == "BIOME_MARINE") {
-            this.title = this.terrain.name;
-        } else if (this.settlementType) {
-            this.title = this.settlementType;
-        } else {
-            this.title = GameInfo.Districts.lookup(DistrictTypes.WILDERNESS).Name;
-        }
+        // title and subtitle
+        this.modelTitles();
     }
     render() {
         if (BZ_DUMP_ICONS) return this.dumpIcons();
@@ -777,6 +759,50 @@ class bzPlotTooltip {
         if (this.isDebug) this.renderDebugInfo();
     }
     // data modeling methods
+    modelTitles() {
+        // title: focal element of the tile
+        if (this.title) {
+            // already set
+        } else if (this.district?.isUniqueQuarter) {
+            this.title = this.quarter.Name;
+        } else if (this.resource) {
+            this.title = this.resource.Name;
+        } else if (this.feature?.isNaturalWonder) {
+            this.title = this.feature.text;
+        } else if (this.wonder) {
+            this.title = this.wonder.info.Name;
+        } else if (this.river?.isNavigable) {
+            this.title = this.river.name;
+        } else if (this.city && this.isCompact) {
+            this.title = this.city.name;
+        } else if (this.settlementType) {
+            this.title = this.settlementType;
+        } else if (this.biome?.type == "BIOME_MARINE") {
+            this.title = this.biome.name;
+        } else {
+            this.title = GameInfo.Districts.lookup(DistrictTypes.WILDERNESS).Name;
+        }
+        // subtitle: terrain type and biome (usually)
+        if (this.feature?.isFloodplain) {
+            const text = this.feature.text;
+            const highlight = this.feature.ctype;
+            this.subtitle = { text, highlight };
+        } else if (this.terrain?.type == "TERRAIN_NAVIGABLE_RIVER") {
+            const text = this.biome.name;
+            this.subtitle = { text };
+        } else if (this.biome?.type == "BIOME_MARINE") {
+            const text = this.terrain.text;
+            this.subtitle = { text };
+        } else {
+            const text = Locale.compose(
+                "LOC_PLOT_TOOLTIP_TERRAIN_WITH_BIOME",
+                this.terrain.text,
+                this.biome.text
+            );
+            const highlight = this.terrain.highlight;
+            this.subtitle = { text, highlight };
+        }
+    }
     modelBanners() {
         // requires: this.city, this.resource
         const loc = this.plotCoord;
@@ -846,19 +872,6 @@ class bzPlotTooltip {
         this.terrain = this.getTerrain();
         this.biome = this.getBiome();
         this.continent = this.getContinent();
-        // tighten up loose & redundant text
-        if (this.terrain?.type == "TERRAIN_NAVIGABLE_RIVER" ||
-            this.terrain?.type == "TERRAIN_FLAT" && this.feature) {
-            // clear redundant & unremarkable terrain
-            this.terrain.text = null;
-            this.terrain.highlight = null;
-        }
-        if (this.feature?.isFloodplain) {
-            // merge redundant floodplain & biome
-            this.biome.text = this.feature.text;
-            this.biome.highlight = this.feature.ctype;
-            this.feature.text = null;
-        }
     }
     getRoute() {
         const loc = this.plotCoord;
@@ -887,12 +900,13 @@ class bzPlotTooltip {
         const type = info.FeatureType;
         const ctype = info.FeatureClassType;
         const isFloodplain = ctype == "FEATURE_CLASS_FLOODPLAIN";
-        const text = this.isVerbose ? name :
+        const isNaturalWonder = Boolean(info.Tooltip);
+        const text = this.isVerbose ? Locale.compose(name) :
             // hide "(feature class)" in standard verbosity
             Locale.compose(name).replace(/\s*\(.*\)|\s*（.*）/, "");
         const highlight = this.obstacles.has(type) ? ctype : null;
         const feature = {
-            text, name, volcano: null, isFloodplain, highlight, type, ctype, info,
+            text, name, isFloodplain, isNaturalWonder, highlight, type, ctype, info,
         };
         if (GameplayMap.isVolcano(loc.x, loc.y)) {
             // get extra info about volcano features
@@ -1236,6 +1250,22 @@ class bzPlotTooltip {
             }
         }
         this.renderTitleHeading(this.title);
+        if (this.subtitle) {
+            const tt = document.createElement("div");
+            tt.classList.value = "text-center";
+            tt.style.lineHeight = metrics.body.ratio;
+            const text = this.subtitle.text;
+            const highlight = this.subtitle.highlight;
+            if (highlight) {
+                const cap = docCapsule(text, BZ_STYLE[highlight], metrics.body);
+                cap.style.marginTop = cap.style.marginBottom =
+                    metrics.body.leading.half.px;
+                tt.appendChild(cap);
+            } else {
+                tt.appendChild(docText(text));
+            }
+            this.container.appendChild(tt);
+        }
     }
     renderGeography() {
         // show geographical features
@@ -1243,8 +1273,10 @@ class bzPlotTooltip {
         tt.classList.value = "text-center";
         tt.style.lineHeight = metrics.body.ratio;
         const geography = [
-            this.route, this.river, this.feature, this.terrain, this.biome,
-        ].filter(item => item?.text && item.text != this.title);
+            this.feature, this.river, this.route,
+        ].filter(item =>
+            item?.text && item.text != this.title && item.text != this.subtitle.text
+        );
         // highlighted rows
         for (const item of geography.filter(item => item.highlight)) {
             const cap = docCapsule(item.text, BZ_STYLE[item.highlight], metrics.body);
@@ -1412,7 +1444,7 @@ class bzPlotTooltip {
             hexName = this.isCompact && this.owner?.isAlive ?
                 this.getCivName(this.owner) :
                 this.improvement?.districtName;
-        } else if (this.feature?.info.Tooltip) {
+        } else if (this.feature?.isNaturalWonder) {
             // natural wonder
             hexName = "LOC_PLOT_TOOLTIP_NATURAL_WONDER";
             if (!this.improvement || this.isVerbose) {
