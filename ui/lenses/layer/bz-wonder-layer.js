@@ -19,11 +19,7 @@ class bzPlotIconWonders extends Component {
             "bg-no-repeat",
             "bg-center",
             "cursor-info",
-            "pointer-events-auto"
         );
-        this.Root.setAttribute("data-pointer-passthrough", "true");
-        this.Root.dataset.tooltipStyle = "wonders";
-        this.Root.setAttribute("node-id", `${this.location.x},${this.location.y}`);
     }
 }
 Controls.define("bz-plot-icon-wonders", {
@@ -38,6 +34,7 @@ class bzWonderLensLayer {
         window.addEventListener("layer-hotkey", this.onLayerHotkeyListener);
     }
     applyLayer() {
+        PlotIconsManager.removePlotIcons("bz-plot-icon-wonders");
         this.visible = true;
         this.updateMap();
     }
@@ -62,7 +59,13 @@ class bzWonderLensLayer {
         const revealed = GameplayMap.getRevealedState(observer, loc.x, loc.y);
         if (revealed == RevealedStates.HIDDEN) return;
         if (GameplayMap.isNaturalWonder(loc.x, loc.y)) {
-            PlotIconsManager.addPlotIcon(
+            const feature = GameplayMap.getFeatureType(loc.x, loc.y);
+            const player = Players.get(GameContext.localPlayerID);
+            const hasArtifact =
+                Game.age == Game.getHash("AGE_MODERN") &&
+                LensManager.getActiveLens() == "fxs-continent-lens" &&
+                player.Stats?.hasNaturalWonderArtifact(feature);
+            if (!hasArtifact) PlotIconsManager.addPlotIcon(
               "bz-plot-icon-wonders", loc, new Map([["wonder", "NATURAL_WONDER"]])
             );
             return;
@@ -73,7 +76,6 @@ class bzWonderLensLayer {
             if (!item) continue;
             const info = GameInfo.Constructibles.lookup(item.type);
             if (!info || info.ConstructibleClass != "WONDER") continue;
-            console.warn(`TRIX WONDER`);
             PlotIconsManager.addPlotIcon(
               "bz-plot-icon-wonders", loc, new Map([["wonder", "WONDER"]])
             );
