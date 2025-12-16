@@ -570,14 +570,15 @@ class bzPlotTooltip {
         this.quarter = null;
         this.bridge = null;
         // world
-        this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
-        this.plotEffects = null;
-        this.route = null;
-        this.river = null;
-        this.feature = null;
+        this.isFreshWater = null;
         this.biome = null;
-        this.terrain = null;
         this.continent = null;
+        this.feature = null;
+        this.plotEffects = null;
+        this.river = null;
+        this.route = null;
+        this.terrain = null;
+        this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
         // settlement
         this.owner = null;
         this.originalOwner = null;
@@ -687,14 +688,15 @@ class bzPlotTooltip {
         this.quarter = null;
         this.bridge = null;
         // world
-        this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
-        this.plotEffects = null;
-        this.route = null;
-        this.river = null;
-        this.feature = null;
+        this.isFreshWater = null;
         this.biome = null;
-        this.terrain = null;
         this.continent = null;
+        this.feature = null;
+        this.plotEffects = null;
+        this.river = null;
+        this.route = null;
+        this.terrain = null;
+        this.obstacles = gatherMovementObstacles("UNIT_MOVEMENT_CLASS_FOOT");
         // settlement
         this.owner = null;
         this.originalOwner = null;
@@ -821,12 +823,11 @@ class bzPlotTooltip {
             }
         }
         // check fresh water
-        const isFreshWater = GameplayMap.isFreshWater(loc.x, loc.y);
-        const wloc = this.city?.location ?? loc;  // only check city water at center
-        if (isFreshWater && wloc.x == loc.x && wloc.y == loc.y) {
-            this.plotEffects.names.unshift("LOC_PLOTKEY_FRESHWATER");
+        const wloc = this.city?.location;  // only check city water at center
+        if (!wloc || wloc.x == loc.x && wloc.y == loc.y) {
+            this.isFreshWater = GameplayMap.isFreshWater(loc.x, loc.y);
         }
-        // merge all plot effects + fresh water indicator
+        // merge all plot effects
         this.plotEffects.text = dotJoin(this.plotEffects.names);
         // remainder is for settler lens only, on habitable land
         if (LensManager.getActiveLens() != "fxs-settler-lens" ||
@@ -854,7 +855,7 @@ class bzPlotTooltip {
                 // resource too close
                 this.banners.danger.push("LOC_PLOT_TOOLTIP_CANT_SETTLE_RESOURCES");
             }
-        } else if (!isFreshWater && !this.city) {
+        } else if (!this.isFreshWater && !this.city) {
             // show fresh water warning
             this.banners.caution.push("LOC_PLOT_TOOLTIP_NO_FRESH_WATER");
         }
@@ -1281,12 +1282,14 @@ class bzPlotTooltip {
             tt.appendChild(cap);
         }
         if (!this.isCompact) {
-            // plot effects
-            if (this.plotEffects?.text) tt.appendChild(docText(this.plotEffects.text));
             // other geography (merged)
             const items = geography.filter(item => item && !item.highlight);
             const merge = dotJoin(items.map(item => item.text));
             if (merge) tt.appendChild(docText(merge));
+            // fresh water
+            if (this.isFreshWater) tt.appendChild(docText("LOC_PLOTKEY_FRESHWATER"));
+            // plot effects
+            if (this.plotEffects?.text) tt.appendChild(docText(this.plotEffects.text));
             // continent & hemisphere
             if (this.continent?.text) tt.appendChild(docText(this.continent.text));
         }
