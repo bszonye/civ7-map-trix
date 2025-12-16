@@ -783,17 +783,13 @@ class bzPlotTooltip {
             this.title = GameInfo.Districts.lookup(DistrictTypes.WILDERNESS).Name;
         }
         // subtitle: terrain type and biome (usually)
-        if (this.feature?.isFloodplain) {
-            const text = this.feature.text;
-            const highlight = this.feature.ctype;
-            this.subtitle = { text, highlight };
+        if (this.biome?.type == "BIOME_MARINE") {
+            const text = this.terrain.text;
+            this.subtitle = { text };
         } else if (this.terrain?.type == "TERRAIN_NAVIGABLE_RIVER") {
             const text = this.biome.name;
             this.subtitle = { text };
-        } else if (this.biome?.type == "BIOME_MARINE") {
-            const text = this.terrain.text;
-            this.subtitle = { text };
-        } else {
+        } else if (this.terrain) {
             const text = Locale.compose(
                 "LOC_PLOT_TOOLTIP_TERRAIN_WITH_BIOME",
                 this.terrain.text,
@@ -904,7 +900,7 @@ class bzPlotTooltip {
         const text = this.isVerbose ? Locale.compose(name) :
             // hide "(feature class)" in standard verbosity
             Locale.compose(name).replace(/\s*\(.*\)|\s*（.*）/, "");
-        const highlight = this.obstacles.has(type) ? ctype : null;
+        const highlight = isFloodplain || this.obstacles.has(type) ? ctype : null;
         const feature = {
             text, name, isFloodplain, isNaturalWonder, highlight, type, ctype, info,
         };
@@ -1273,7 +1269,7 @@ class bzPlotTooltip {
         tt.classList.value = "text-center";
         tt.style.lineHeight = metrics.body.ratio;
         const geography = [
-            this.feature, this.river, this.route,
+            this.river, this.feature, this.route,
         ].filter(item =>
             item?.text && item.text != this.title && item.text != this.subtitle.text
         );
