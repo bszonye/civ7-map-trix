@@ -25,9 +25,9 @@ class bzDiscoveryLensLayer {
         }
         this.updateMap();
         this.bzSpriteGrid.setVisible(false);
-        engine.on("PlotVisibilityChanged", this.onPlotChange, this);
         engine.on("ConstructibleAddedToMap", this.onPlotChange, this);
         engine.on("ConstructibleRemovedFromMap", this.onPlotChange, this);
+        engine.on("PlotVisibilityChanged", this.onPlotChange, this);
         window.addEventListener("layer-hotkey", this.onLayerHotkeyListener);
     }
     applyLayer() {

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Mod id="bz-map-trix" version="30801"
+<Mod id="bz-map-trix" version="30900"
     xmlns="ModInfo">
     <Properties>
         <Name>LOC_MOD_BZ_MAP_TRIX_NAME</Name>
-        <Version>3.8.1</Version>
+        <Version>3.9.0</Version>
         <Description>LOC_MOD_BZ_MAP_TRIX_DESCRIPTION</Description>
         <Authors>beezany</Authors>
         <URL>https://forums.civfanatics.com/resources/map-trix.31950/</URL>
@@ -57,6 +57,7 @@
                     <Item>ui/bz-city-panel/panel-city-list.css</Item>
                     <Item>ui/bz-style/bz-panel-yield-banner.css</Item>
                     <Item>ui/bz-units-panel/panel-units.css</Item>
+                    <Item>icons/bz-wonder-decoration.png</Item>
                 </ImportFiles>
                 <UIScripts>
                     <Item>ui/bz-city-panel/model-city-list.js</Item>
@@ -72,6 +73,7 @@
                     <Item>ui/lenses/layer/bz-religion-layer.js</Item>
                     <Item>ui/lenses/layer/bz-route-layer.js</Item>
                     <Item>ui/lenses/layer/bz-terrain-layer.js</Item>
+                    <Item>ui/lenses/layer/bz-wonder-layer.js</Item>
                     <Item>ui/lenses/lens/bz-commander-lens.js</Item>
                     <Item>ui/lenses/lens/bz-religion-lens.js</Item>
                     <Item>ui/mini-map/bz-panel-mini-map.js</Item>

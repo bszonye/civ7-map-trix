@@ -19,6 +19,7 @@ export default [
                 Cities: "readonly",
                 Color: "readonly",
                 CombatTypes: "readonly",
+                Component: "readonly",
                 ComponentValueChangeEventName: "readonly",
                 Configuration: "readonly",
                 Constructibles: "readonly",

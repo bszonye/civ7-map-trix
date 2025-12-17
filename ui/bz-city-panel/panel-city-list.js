@@ -1,4 +1,3 @@
-// TODO: localization
 import { F as Focus } from '/core/ui/input/focus-support.chunk.js';
 import { A as AnchorType } from '/core/ui/panel-support.chunk.js';
 import TooltipManager from '/core/ui/tooltips/tooltip-manager.js';

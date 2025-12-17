@@ -136,6 +136,12 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER_TT" Language="ru_RU">
             <Text>Показывать или скрыть особенности ландшафта</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_WONDER_LAYER" Language="ru_RU">
+            <Text>Значки чудес света</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_WONDER_LAYER_TT" Language="ru_RU">
+            <Text>Показывать или скрыть значки чудес света</Text>
+        </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_BORDERS" Language="ru_RU">
             <Text>Границы</Text>
         </Replace>

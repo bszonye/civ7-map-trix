@@ -136,6 +136,12 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER_TT" Language="zh_Hant_HK">
             <Text>開啟/關閉地形特徵的可見度。</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_WONDER_LAYER" Language="zh_Hant_HK">
+            <Text>開啟/關閉奇觀圖示</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_WONDER_LAYER_TT" Language="zh_Hant_HK">
+            <Text>開啟/關閉奇觀圖示的可見度。</Text>
+        </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_BORDERS" Language="zh_Hant_HK">
             <Text>邊界</Text>
         </Replace>

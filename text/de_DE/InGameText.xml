@@ -136,6 +136,12 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER_TT" Language="de_DE">
             <Text>Sichtbarkeit der Geländemerkmale umschalten.</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_WONDER_LAYER" Language="de_DE">
+            <Text>Wundersymbole umschalten</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_WONDER_LAYER_TT" Language="de_DE">
+            <Text>Sichtbarkeit der Wundersymbole umschalten</Text>
+        </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_BORDERS" Language="de_DE">
             <Text>Grenzen</Text>
         </Replace>
