@@ -10,7 +10,7 @@ import { C as ConstructibleHasTagType } from '/base-standard/ui/utilities/utilit
 // custom & adapted icons
 const BZ_ICON_SIZE = 12;
 const BZ_ICON_DISCOVERY = "NAR_REW_DEFAULT";
-const BZ_ICON_FRAME = "url('hud_sub_circle_bk')";
+const BZ_ICON_FRAME = "url('hud_civics-icon_frame')";
 const BZ_ICON_UNIMPROVED = "CITY_UNIMPROVED";  // unimproved yield
 const BZ_ICON_RURAL = "CITY_RURAL";  // urban population/yield
 const BZ_ICON_URBAN = "CITY_URBAN";  // rural population/yield
@@ -1657,12 +1657,11 @@ class bzPlotTooltip {
     }
     renderIconDivider(info, margin=metrics.margin.px) {
         // icon divider with optional overlay
-        if (info.icon.search(/blp:tech_/) != -1) {
+        if (info.icon.search(/["'](blp:)?tech_/) != -1) {
             // tech icons need a frame
             info.size = 10;
             info.underlay = BZ_ICON_FRAME;
             info.undersize = 14;
-            info.undershift = { x: -0.25, y: 0.25 };
             info.ringsize = 12;
         }
         const layout = document.createElement("div");
