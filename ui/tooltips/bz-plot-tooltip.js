@@ -1830,15 +1830,15 @@ class bzPlotTooltip {
         const oversize = info.oversize ?? size;
         const baseSize = Math.max(size, undersize, oversize);
         const minsize = info.minsize ?? 0;
+        const ringsize = info.ringsize ?? baseSize;
         // get ring colors and thickness
         // (ring & glow collapse by default)
         const colors = info.colors;
         const collapse = (test, d) => (test || info.collapse === false ? d : 0);
-        const borderWidth = collapse(colors?.length, size/16);
+        const borderWidth = collapse(colors?.length, ringsize/16);
         const blurRadius = collapse(info.glow, 10/3*borderWidth);
         const spreadRadius = collapse(info.glow, 4/3*borderWidth);
         // calculate overall sizes
-        const ringsize = info.ringsize ?? baseSize;
         const frameSize = ringsize + 2*borderWidth;
         const glowSize = frameSize + blurRadius + 2*spreadRadius;
         const groundSize = Math.max(baseSize, glowSize, minsize);
