@@ -1463,10 +1463,7 @@ class bzPlotTooltip {
             hexName = this.city.name;
         } else if (this.district?.type) {
             // rural
-            // note: LOC_PLOT_TOOLTIP_RURAL_DISTRICT "Rural District"
-            // creates confusion between Urban and Rural tiles, because
-            // Districts are Urban tiles with at least one building.
-            hexName = "LOC_DISTRICT_RURAL_NAME";
+            hexName = "LOC_PLOT_TOOLTIP_RURAL_DISTRICT";
         } else if (this.city && this.freeConstructible) {
             // claimed but undeveloped
             hexName = "LOC_PLOT_TOOLTIP_UNIMPROVED";
