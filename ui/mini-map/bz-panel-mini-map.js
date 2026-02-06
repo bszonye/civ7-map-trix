@@ -136,7 +136,7 @@ for (const layerType of defaultLens.allowedLayers) {
 defaultLens.allowedLayers.clear();
 const discoveryLens = LensManager.lenses.get("fxs-discovery-lens");
 discoveryLens.allowedLayers.delete("fxs-yields-layer");
-delete discoveryLens.ignoreEnabledLayers;
+delete discoveryLens.skipCachingEnabledLayers;
 
 // PanelMiniMap extensions
 const BZ_ICON_CITY_BUTTON = "blp:Yield_Cities";
