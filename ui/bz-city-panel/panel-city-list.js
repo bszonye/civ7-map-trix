@@ -184,7 +184,7 @@ class bzCityPanel extends MinimapSubpanel {
             queueIcon.classList.value = "bz-city-list-queue-icon bz-icon size-full";
             Databind.bgImg(queueIcon, "entry.queueIcon");
             if (!hasCityTooltip) Databind.tooltip(queueIcon, "entry.queueTooltip");
-            qslot.appendChild(queueIcon);
+            queueBG.appendChild(queueIcon);
             queue.appendChild(qslot);
             stats.appendChild(queue);
             // town focus
@@ -199,7 +199,7 @@ class bzCityPanel extends MinimapSubpanel {
             focusIcon.classList.value = "bz-city-list-focus-icon bz-icon size-full";
             Databind.bgImg(focusIcon, "entry.focusIcon");
             Databind.tooltip(focusIcon, "entry.focusTooltip");
-            focus.appendChild(focusIcon);
+            focusBG.appendChild(focusIcon);
             stats.appendChild(focus);
             // unrest and razing
             const unrest = document.createElement("div");
@@ -210,7 +210,7 @@ class bzCityPanel extends MinimapSubpanel {
             const unrestIcon = document.createElement("div");
             unrestIcon.classList.value = "bz-city-list-unrest-icon bz-icon size-full";
             Databind.bgImg(unrestIcon, "entry.unrestIcon");
-            unrest.appendChild(unrestIcon);
+            unrestBG.appendChild(unrestIcon);
             stats.appendChild(unrest);
         }
         // finish
