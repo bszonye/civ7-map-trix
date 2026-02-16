@@ -98,7 +98,8 @@ body .army-panel__commander-portrait-container .army-panel__unit-button {
 .bz-units-entry.pressed.bz-unit-disabled {
   color: #c2c4cc;
 }
-.bz-units-entry:focus .bz-icon, .bz-units-entry:hover .bz-icon,
+.bz-units-entry:focus .bz-icon,
+.bz-units-entry:hover .bz-icon,
 .bz-units-entry.pressed .bz-icon {
   filter: drop-shadow(0 0.0555555556rem 0.1111111111rem #000c);
 }
