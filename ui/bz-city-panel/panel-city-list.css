@@ -35,7 +35,6 @@
   background-position: center;
   background-repeat: no-repeat;
   background-size: contain;
-  filter: drop-shadow(0 0.0555555556rem 0.1111111111rem #000c);
 }
 .bz-city-list-frame {
   position: absolute;
@@ -48,13 +47,6 @@
 .bz-city-list-frame .fxs-scrollbar__track--vertical {
  right: -0.6666666667rem;
 }
-.bz-city-list-entry {
-  text-shadow: 0 0.0555555556rem 0.1111111111rem black;
-}
-.bz-city-list-entry:focus, .bz-city-list-entry:hover, .bz-city-list-entry.pressed {
-  background: linear-gradient(90deg, #8c7e62 0%, #4c473d 100%);
-  color: #e5e5e5;
-}
 .bz-city-growth-turns {
   background-color: #80b34d55;
   border-radius: 1em;
@@ -63,25 +55,22 @@
   background-color: #a33d2955;
   border-radius: 1em;
 }
-.bz-city-list-entry .bz-city-list-queue-bg,
-.bz-city-list-entry .bz-city-list-focus-bg {
+.bz-city-list-entry .bz-city-list-bg {
   border-radius: 1rem;
-  filter: drop-shadow(0 0.0555555556rem 0.1111111111rem #000c);
   background-color: #333640;
 }
-.bz-city-list-entry.bz-town-has-focus .bz-city-list-focus-bg,
-.bz-city-list-entry.bz-town-is-growing .bz-city-list-focus-bg {
+.bz-city-list-entry .bz-city-list-focus .bz-city-list-bg {
   border: 0.0555555556rem solid #4c5366;
 }
-.bz-city-list-entry.bz-town-has-focus.bz-town-is-growing .bz-city-list-focus-bg {
+.bz-city-list-entry.bz-town-has-focus.bz-town-is-growing .bz-city-list-bg {
   border: 0.0555555556rem solid #8c7e62;
 }
 .bz-city-list-entry.bz-town-has-focus.bz-town-is-growing .bz-city-list-focus-icon {
   filter: sepia(1) brightness(1.2) saturate(2)
           drop-shadow(0 0.0555555556rem 0.1111111111rem #000c);
 }
-.bz-city-list-entry.bz-city-has-damage .bz-city-list-queue-bg,
-.bz-city-list-entry.bz-city-has-damage .bz-city-list-focus-bg {
+.bz-city-list-entry.bz-city-has-damage .bz-city-list-bg,
+.bz-city-list-entry.bz-town-has-focus.bz-city-has-damage .bz-city-list-bg {
   background-color: #cea92f;
   border: 0.0555555556rem solid #ffd663;
 }
@@ -89,8 +78,13 @@
 .bz-city-list-entry.bz-city-has-damage [bz-qclass=WONDER] .bz-city-list-queue-icon {
   background-size: 70%;
 }
-.bz-city-list-entry.bz-city-has-unrest .bz-city-list-queue-slot,
-.bz-city-list-entry.bz-city-is-razing .bz-city-list-queue-slot,
+.bz-city-list-entry .bz-city-list-unrest .bz-city-list-bg,
+.bz-city-list-entry.bz-town-has-focus .bz-city-list-unrest .bz-city-list-bg {
+  background-color: #660600;
+  border: 0.0555555556rem solid #990900;
+}
+.bz-city-list-entry.bz-city-has-unrest .bz-city-list-queue,
+.bz-city-list-entry.bz-city-is-razing .bz-city-list-queue,
 .bz-city-list-entry.bz-city-has-unrest .bz-city-list-focus,
 .bz-city-list-entry.bz-city-is-razing .bz-city-list-focus {
   display: none;
@@ -99,15 +93,26 @@
 .bz-city-list-entry.bz-city-is-razing .bz-city-list-unrest {
   display: flex;
 }
-.bz-city-list-entry .bz-city-list-unrest-bg {
-  border-radius: 1rem;
-  filter: drop-shadow(0 0.0555555556rem 0.1111111111rem #000c);
-  background-color: #660600;
-  border: 0.0555555556rem solid #990900;
-}
 .bz-city-list-entry.bz-city-has-unrest .bz-city-list-unrest-icon {
   background-image: url("icon_unrest");
 }
 .bz-city-list-entry.bz-city-is-razing .bz-city-list-unrest-icon {
   background-image: url("icon_razed");
+}
+.bz-city-list-entry:focus, .bz-city-list-entry:hover, .bz-city-list-entry.pressed {
+  text-shadow: 0 0.0555555556rem 0.1111111111rem black;
+  background: linear-gradient(90deg, #8c7e62 0%, #4c473d 100%);
+  color: #e5e5e5;
+}
+.bz-city-growth-turns .bz-icon,
+.bz-city-queue-turns .bz-icon,
+.bz-city-list-entry .bz-city-list-bg .bz-icon,
+.bz-city-list-entry:focus .bz-city-list-bg,
+.bz-city-list-entry:hover .bz-city-list-bg,
+.bz-city-list-entry.pressed .bz-city-list-bg,
+.bz-city-list-entry:focus .bz-icon,
+.bz-city-list-entry:hover .bz-icon,
+.bz-city-list-entry.pressed .bz-icon {
+  /* filter: drop-shadow(0 0.0555555556rem 0.1111111111rem #000c); */
+  filter: drop-shadow(0 0.0555555556rem 0.1111111111rem #000c);
 }

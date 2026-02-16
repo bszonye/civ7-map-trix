@@ -175,16 +175,16 @@ class bzCityPanel extends MinimapSubpanel {
             queueTurns.classList.add("mx-1");
             queue.appendChild(queueTurns);
             const qslot = document.createElement("div");
-            qslot.classList.value = "bz-city-list-queue-slot relative size-6 mx-1";
+            qslot.classList.value = "bz-city-list-queue relative size-6 mx-1";
             const queueBG = document.createElement("div");
-            queueBG.classList.value = "bz-city-list-queue-bg absolute size-full";
+            queueBG.classList.value = "bz-city-list-bg absolute size-full";
             Databind.classToggle(queueBG, "hidden", "!{{entry.queueIcon}}");
             qslot.appendChild(queueBG);
             const queueIcon = document.createElement("div");
             queueIcon.classList.value = "bz-city-list-queue-icon bz-icon size-full";
             Databind.bgImg(queueIcon, "entry.queueIcon");
             if (!hasCityTooltip) Databind.tooltip(queueIcon, "entry.queueTooltip");
-            qslot.appendChild(queueIcon);
+            queueBG.appendChild(queueIcon);
             queue.appendChild(qslot);
             stats.appendChild(queue);
             // town focus
@@ -192,25 +192,25 @@ class bzCityPanel extends MinimapSubpanel {
             Databind.classToggle(focus, "hidden", "!{{entry.isTown}}");
             focus.classList.value = "bz-city-list-focus relative size-6 mx-1";
             const focusBG = document.createElement("div");
-            focusBG.classList.value = "bz-city-list-focus-bg absolute size-full";
+            focusBG.classList.value = "bz-city-list-bg absolute size-full";
             Databind.classToggle(focusBG, "hidden", "!{{entry.focusIcon}}");
             focus.appendChild(focusBG);
             const focusIcon = document.createElement("div");
             focusIcon.classList.value = "bz-city-list-focus-icon bz-icon size-full";
             Databind.bgImg(focusIcon, "entry.focusIcon");
             Databind.tooltip(focusIcon, "entry.focusTooltip");
-            focus.appendChild(focusIcon);
+            focusBG.appendChild(focusIcon);
             stats.appendChild(focus);
             // unrest and razing
             const unrest = document.createElement("div");
             unrest.classList.value = "bz-city-list-unrest hidden relative size-6 mx-1";
             const unrestBG = document.createElement("div");
-            unrestBG.classList.value = "bz-city-list-unrest-bg absolute size-full";
+            unrestBG.classList.value = "bz-city-list-bg absolute size-full";
             unrest.appendChild(unrestBG);
             const unrestIcon = document.createElement("div");
             unrestIcon.classList.value = "bz-city-list-unrest-icon bz-icon size-full";
             Databind.bgImg(unrestIcon, "entry.unrestIcon");
-            unrest.appendChild(unrestIcon);
+            unrestBG.appendChild(unrestIcon);
             stats.appendChild(unrest);
         }
         // finish
