@@ -1,11 +1,11 @@
 import bzMapTrixOptions, { bzVerbosity } from '/bz-map-trix/ui/options/bz-map-trix-options.js';
 
-import TooltipManager, { PlotTooltipPriority } from '/core/ui/tooltips/tooltip-manager.js';
-import { C as ComponentID } from '/core/ui/utilities/utilities-component-id.js';
-import { L as LensManager } from '/core/ui/lenses/lens-manager.js';
+// import TooltipManager, { PlotTooltipPriority } from '/core/ui/tooltips/tooltip-manager.js';
+import { ComponentID } from '/core/ui/utilities/utilities-component-id.js';
+import LensManager from '/core/ui/lenses/lens-manager.js';
 import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
 import { g_OceanTerrain } from '/base-standard/maps/map-globals.js';
-import { C as ConstructibleHasTagType } from '/base-standard/ui/utilities/utilities-tags.js';
+import { ConstructibleHasTagType } from '/base-standard/ui/utilities/utilities-tags.js';
 
 // custom & adapted icons
 const BZ_ICON_SIZE = 12;
@@ -1982,8 +1982,11 @@ const BZ_DUMP_SIZE = 12;  // 96px at 4K
 
 // enable modified plot tooltip
 bzPlotTooltip._instance = new bzPlotTooltip();
-function installPlotTooltip(instance) {
-    TooltipManager.registerPlotType('plot', PlotTooltipPriority.LOW, instance);
+export { bzPlotTooltip as default };
+
+// disable installation of obsolete tooltip
+function installPlotTooltip(_instance) {
+    // TooltipManager.registerPlotType('plot', PlotTooltipPriority.LOW, instance);
     console.warn(`bz-plot-tooltip: registered`);
 }
 // dynamically import the vanilla plot tooltip for timing
@@ -2000,4 +2003,3 @@ import('/base-standard/ui/tooltips/plot-tooltip.js')
         console.warn(`bz-plot-tooltip: ignoring broken tooltip mod`);
         installPlotTooltip(bzPlotTooltip.instance);
     });
-export { bzPlotTooltip as default };

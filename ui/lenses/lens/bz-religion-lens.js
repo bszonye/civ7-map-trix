@@ -1,4 +1,4 @@
-import { L as LensManager } from '/core/ui/lenses/lens-manager.js';
+import LensManager from '/core/ui/lenses/lens-manager.js';
 class bzReligionLens {
     activeLayers = new Set([
         "fxs-operation-target-layer",

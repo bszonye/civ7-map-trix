@@ -1,5 +1,5 @@
 import '/bz-map-trix/ui/lenses/layer/bz-fortification-layer.js';  // force layer order
-import { L as LensManager } from '/core/ui/lenses/lens-manager.js';
+import LensManager from '/core/ui/lenses/lens-manager.js';
 // load mini-map first to configure allowed layers for default lens
 import '/bz-map-trix/ui/mini-map/bz-panel-mini-map.js';
 

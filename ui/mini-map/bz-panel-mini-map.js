@@ -1,7 +1,7 @@
 import bzMapTrixOptions, { bzCommanderLens } from '/bz-map-trix/ui/options/bz-map-trix-options.js';
-import { b as InputEngineEventName } from '/core/ui/input/input-support.js';
+import { InputEngineEventName } from '/core/ui/input/input-support.js';
 import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
-import { L as LensManager } from '/core/ui/lenses/lens-manager.js';
+import LensManager from '/core/ui/lenses/lens-manager.js';
 // guarantee import order for patching
 import '/base-standard/ui/interface-modes/interface-mode-unit-selected.js';
 import '/base-standard/ui/lenses/layer/hexgrid-layer.js';
