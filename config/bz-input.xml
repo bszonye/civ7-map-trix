@@ -11,7 +11,7 @@
         <Replace ActionId="toggle-bz-route-layer" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_TOGGLE_BZ_ROUTE_LAYER" Description="LOC_UI_KBM_MAPPING_TOGGLE_BZ_ROUTE_LAYER_TT" />
         <Replace ActionId="toggle-bz-terrain-layer" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER" Description="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER_TT" />
         <Replace ActionId="toggle-bz-wonder-layer" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_TOGGLE_BZ_WONDER_LAYER" Description="LOC_UI_KBM_MAPPING_TOGGLE_BZ_WONDER_LAYER_TT" />
-        <Replace ActionId="toggle-bz-conquest-layer" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CONQUEST_LAYER" Description="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CONQUEST_LAYER_TT" />
+        <Replace ActionId="toggle-fxs-conquest-layer" DeviceType="Keyboard" Name="LOC_UI_MINI_MAP_CONQUEST" Description="LOC_UI_MINI_MAP_CONQUEST_TOOLTIP" />
     </InputActions>
     <InputContextConstraints>
         <Replace ActionId="open-bz-city-panel" ContextId="Unit"/>
@@ -34,8 +34,8 @@
         <Replace ActionId="toggle-bz-terrain-layer" ContextId="World"/>
         <Replace ActionId="toggle-bz-wonder-layer" ContextId="Unit"/>
         <Replace ActionId="toggle-bz-wonder-layer" ContextId="World"/>
-        <Replace ActionId="toggle-bz-conquest-layer" ContextId="Unit"/>
-        <Replace ActionId="toggle-bz-conquest-layer" ContextId="World"/>
+        <Replace ActionId="toggle-fxs-conquest-layer" ContextId="Unit"/>
+        <Replace ActionId="toggle-fxs-conquest-layer" ContextId="World"/>
     </InputContextConstraints>
     <InputActionDefaultGestures>
         <Replace ActionId="open-bz-city-panel" Index="0" GestureType="KBMouse" GestureData="KEY_SHIFT+KEY_S"/>
@@ -48,6 +48,6 @@
         <Replace ActionId="toggle-bz-route-layer" Index="0" GestureType="KBMouse" GestureData="KEY_SHIFT+KEY_X"/>
         <Replace ActionId="toggle-bz-terrain-layer" Index="0" GestureType="KBMouse" GestureData="KEY_SHIFT+KEY_T"/>
         <Replace ActionId="toggle-bz-wonder-layer" Index="0" GestureType="KBMouse" GestureData="KEY_SHIFT+KEY_W"/>
-        <Replace ActionId="toggle-bz-conquest-layer" Index="0" GestureType="KBMouse" GestureData="KEY_SHIFT+KEY_Q"/>
+        <Replace ActionId="toggle-fxs-conquest-layer" Index="0" GestureType="KBMouse" GestureData="KEY_SHIFT+KEY_Q"/>
     </InputActionDefaultGestures>
 </Database>
