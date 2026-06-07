@@ -4,6 +4,7 @@ import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
 import LensManager from '/core/ui/lenses/lens-manager.js';
 // guarantee import order for patching
 import '/base-standard/ui/interface-modes/interface-mode-unit-selected.js';
+import '/base-standard/ui/lenses/layer/conquest-layer.js';
 import '/base-standard/ui/lenses/layer/hexgrid-layer.js';
 import '/base-standard/ui/lenses/lens/default-lens.js';
 import '/base-standard/ui/lenses/lens/discovery-lens.js';
@@ -33,6 +34,10 @@ const BZ_EXTRA_LAYERS = {
         "bz-fortification-layer",
     ],
 };
+
+// fix missing layer configuration
+const fxsConquestLayer = LensManager.layers.get("fxs-conquest-layer");
+fxsConquestLayer.getOptionName = () => { return "ShowMapConquest"; }
 
 // extend LensManager layer serialization
 const LMproto = Object.getPrototypeOf(LensManager);
@@ -189,6 +194,7 @@ for (const layerType of defaultLens.allowedLayers) {
 defaultLens.allowedLayers.clear();
 const discoveryLens = LensManager.lenses.get("fxs-discovery-lens");
 discoveryLens.allowedLayers.delete("fxs-yields-layer");
+discoveryLens.allowedLayers.delete("fxs-conquest-layer");
 delete discoveryLens.skipCachingEnabledLayers;
 
 // PanelMiniMap extensions
