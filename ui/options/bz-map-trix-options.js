@@ -96,7 +96,8 @@ Options.addInitCallback(() => {
         description: "LOC_OPTIONS_BZ_COMMANDER_LENS_DESCRIPTION",
         dropdownItems: commandOptions,
     });
-    Options.addOption({
+    // Options.addOption({
+    const _unusedVerbosity = {
         category: CategoryType.Mods,
         group: "bz_mods",
         type: OptionType.Dropdown,
@@ -106,7 +107,8 @@ Options.addInitCallback(() => {
         label: "LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE",
         description: "LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE_DESCRIPTION",
         dropdownItems: verbosityOptions,
-    });
+    };
+    // });
     Options.addOption({
         category: CategoryType.Mods,
         group: "bz_mods",
