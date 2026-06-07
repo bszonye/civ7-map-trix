@@ -1,5 +1,5 @@
-import { C as ComponentID } from '/core/ui/utilities/utilities-component-id.chunk.js';
-import { U as UpdateGate } from '/core/ui/utilities/utilities-update-gate.chunk.js';
+import { C as ComponentID } from '/core/ui/utilities/utilities-component-id.js';
+import { U as UpdateGate } from '/core/ui/utilities/utilities-update-gate.js';
 
 class bzCityListModel {
     onCityUpdateListener = this.onCityUpdate.bind(this);

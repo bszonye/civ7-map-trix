@@ -1,4 +1,4 @@
-import HotkeyManager from '/core/ui/input/hotkey-manager.chunk.js';
+import HotkeyManager from '/core/ui/input/hotkey-manager.js';
 
 const HM_handleInput = HotkeyManager.handleInput;
 HotkeyManager.handleInput = function(...args) {

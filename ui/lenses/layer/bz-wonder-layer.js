@@ -1,4 +1,4 @@
-import { L as LensManager } from '/core/ui/lenses/lens-manager.chunk.js';
+import { L as LensManager } from '/core/ui/lenses/lens-manager.js';
 import PlotIconsManager from '/core/ui/plot-icons/plot-icons-manager.js';
 // load mini-map first to configure allowed layers for default lens
 import '/bz-map-trix/ui/mini-map/bz-panel-mini-map.js';

@@ -1,9 +1,9 @@
-import { A as Audio } from '/core/ui/audio-base/audio-support.chunk.js';
-import { F as Focus } from '/core/ui/input/focus-support.chunk.js';
-import { A as AnchorType } from '/core/ui/panel-support.chunk.js';
-import { D as Databind } from '/core/ui/utilities/utilities-core-databinding.chunk.js';
-import { C as ComponentID } from '/core/ui/utilities/utilities-component-id.chunk.js';
-import { U as UpdateGate } from '/core/ui/utilities/utilities-update-gate.chunk.js';
+import { A as Audio } from '/core/ui/audio-base/audio-support.js';
+import { F as Focus } from '/core/ui/input/focus-support.js';
+import { A as AnchorType } from '/core/ui/panel-support.js';
+import { D as Databind } from '/core/ui/utilities/utilities-core-databinding.js';
+import { C as ComponentID } from '/core/ui/utilities/utilities-component-id.js';
+import { U as UpdateGate } from '/core/ui/utilities/utilities-update-gate.js';
 import { MinimapSubpanel } from '/base-standard/ui/mini-map/panel-mini-map.js';
 import { bzPanelMiniMap } from '/bz-map-trix/ui/mini-map/bz-panel-mini-map.js';
 import { bzUnitList } from '/bz-map-trix/ui/bz-units-panel/model-units.js';

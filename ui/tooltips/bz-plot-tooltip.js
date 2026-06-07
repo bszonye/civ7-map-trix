@@ -1,11 +1,11 @@
 import bzMapTrixOptions, { bzVerbosity } from '/bz-map-trix/ui/options/bz-map-trix-options.js';
 
 import TooltipManager, { PlotTooltipPriority } from '/core/ui/tooltips/tooltip-manager.js';
-import { C as ComponentID } from '/core/ui/utilities/utilities-component-id.chunk.js';
-import { L as LensManager } from '/core/ui/lenses/lens-manager.chunk.js';
+import { C as ComponentID } from '/core/ui/utilities/utilities-component-id.js';
+import { L as LensManager } from '/core/ui/lenses/lens-manager.js';
 import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
 import { g_OceanTerrain } from '/base-standard/maps/map-globals.js';
-import { C as ConstructibleHasTagType } from '/base-standard/ui/utilities/utilities-tags.chunk.js';
+import { C as ConstructibleHasTagType } from '/base-standard/ui/utilities/utilities-tags.js';
 
 // custom & adapted icons
 const BZ_ICON_SIZE = 12;

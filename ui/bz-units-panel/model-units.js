@@ -1,7 +1,7 @@
-import { L as LensManager } from '/core/ui/lenses/lens-manager.chunk.js';
-import { C as ComponentID } from '/core/ui/utilities/utilities-component-id.chunk.js';
-import { Icon } from '/core/ui/utilities/utilities-image.chunk.js';
-import { U as UpdateGate } from '/core/ui/utilities/utilities-update-gate.chunk.js';
+import { L as LensManager } from '/core/ui/lenses/lens-manager.js';
+import { C as ComponentID } from '/core/ui/utilities/utilities-component-id.js';
+import { Icon } from '/core/ui/utilities/utilities-image.js';
+import { U as UpdateGate } from '/core/ui/utilities/utilities-update-gate.js';
 
 const tagTypes = (tag) => GameInfo.TypeTags
     .filter(e => e.Tag == tag).map(e => Game.getHash(e.Type));

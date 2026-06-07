@@ -1,5 +1,5 @@
-import { L as LensManager, c as LensLayerDisabledEventName, b as LensLayerEnabledEventName } from '/core/ui/lenses/lens-manager.chunk.js';
-import { O as OVERLAY_PRIORITY } from '/base-standard/ui/utilities/utilities-overlay.chunk.js';
+import { L as LensManager, c as LensLayerDisabledEventName, b as LensLayerEnabledEventName } from '/core/ui/lenses/lens-manager.js';
+import { O as OVERLAY_PRIORITY } from '/base-standard/ui/utilities/utilities-overlay.js';
 // load mini-map first to configure allowed layers for default lens
 import '/bz-map-trix/ui/mini-map/bz-panel-mini-map.js';
 
