@@ -50,27 +50,12 @@ class bzFortificationLensLayer {
         const districtID = MapCities.getDistrict(loc.x, loc.y);
         if (!districtID) return;  // wilderness
         const district = Districts.get(districtID);
-        const hasDefense = (() => {
-            if (!district.cityId) return false;  // village
-            if (district.type == DistrictTypes.RURAL) return false;
-            if (district.type == DistrictTypes.CITY_CENTER) return true;
-            const cons = MapConstructibles
-                .getHiddenFilteredConstructibles(loc.x, loc.y);
-            for (const con of cons) {
-                const item = Constructibles.getByComponentID(con);
-                if (!item) continue;
-                const info = GameInfo.Constructibles.lookup(item.type);
-                if (info?.DistrictDefense) return true;
-            }
-            return false;
-        })();
-        if (hasDefense) {
-            const controller = Players.get(district.controllingPlayer);
-            const civ = GameInfo.Civilizations.lookup(controller.civilizationType);
-            const asset = this.getCivilizationIcon(civ.CivilizationType);
-            const params = { scale: SPRITE_SCALE };
-            this.bzSpriteGrid.addSprite(loc, asset, SPRITE_OFFSET, params);
-        }
+        if (!district?.isDefensible) return;
+        const controller = Players.get(district.controllingPlayer);
+        const civ = GameInfo.Civilizations.lookup(controller.civilizationType);
+        const asset = this.getCivilizationIcon(civ.CivilizationType);
+        const params = { scale: SPRITE_SCALE };
+        this.bzSpriteGrid.addSprite(loc, asset, SPRITE_OFFSET, params);
     }
     getCivilizationIcon(icon) {
         const blp = UI.getIconBLP(icon);
