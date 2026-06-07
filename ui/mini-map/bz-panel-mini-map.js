@@ -213,6 +213,7 @@ class bzPanelMiniMap {
     engineInputListener = this.onEngineInput.bind(this);
     cityHotkeyListener = this.onCityHotkey.bind(this);
     unitsHotkeyListener = this.onUnitsHotkey.bind(this);
+    layerHotkeyListener = this.onLayerHotkey.bind(this);
     toggleCooldown = 0;
     toggleQueued = false;
     constructor(component) {
@@ -258,12 +259,14 @@ class bzPanelMiniMap {
     afterAttach() {
         window.addEventListener("hotkey-open-bz-city-panel", this.cityHotkeyListener);
         window.addEventListener("hotkey-open-bz-units-panel", this.unitsHotkeyListener);
+        window.addEventListener("layer-hotkey", this.layerHotkeyListener);
         this.component.Root
             .addEventListener(InputEngineEventName, this.engineInputListener);
     }
     beforeDetach() {
         window.removeEventListener("hotkey-open-bz-city-panel", this.cityHotkeyListener);
         window.removeEventListener("hotkey-open-bz-units-panel", this.unitsHotkeyListener);
+        window.removeEventListener("layer-hotkey", this.layerHotkeyListener);
         this.component.Root
             .removeEventListener(InputEngineEventName, this.engineInputListener);
     }
@@ -317,6 +320,11 @@ class bzPanelMiniMap {
     }
     onUnitsHotkey(_event) {
         this.togglePanel(this.unitsSubpanel);
+    }
+    onLayerHotkey(hotkey) {
+        if (hotkey.detail.name == "toggle-bz-conquest-layer") {
+            LensManager.toggleLayer("fxs-conquest-layer", { serialize: true });
+        }
     }
 }
 Controls.decorate("panel-mini-map", (val) => new bzPanelMiniMap(val));
