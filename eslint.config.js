@@ -17,6 +17,7 @@ export default [
             globals: {
                 Camera: "readonly",
                 Cities: "readonly",
+                CityCommandTypes: "readonly",
                 Color: "readonly",
                 CombatTypes: "readonly",
                 Component: "readonly",
