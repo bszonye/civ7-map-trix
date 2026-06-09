@@ -342,12 +342,12 @@ class bzUnitListModel {
         const group = this._unitGroups.get(unit.armyId);
         if (group && unit.isReinforcement) {
             // select the reinforcement target group
-            UI.Player.lookAtID(group.id);
+            UI.Player.lookAtID(group.id, 0);
             UI.Player.selectUnit(group.id);
         } else if (group && !unit.isCommander) {
             // select the group first
             this.pauseSelection = true;
-            UI.Player.lookAtID(group.id);
+            UI.Player.lookAtID(group.id, 0);
             UI.Player.selectUnit(group.id);
             // and give it time to settle
             requestAnimationFrame(() => {
@@ -356,7 +356,7 @@ class bzUnitListModel {
             });
         } else if (unit.isOnMap) {
             // select the unit
-            UI.Player.lookAtID(unit.id);
+            UI.Player.lookAtID(unit.id, 0);
             UI.Player.selectUnit(unit.id);
         }
     }
