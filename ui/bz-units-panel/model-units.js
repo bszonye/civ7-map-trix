@@ -1,7 +1,7 @@
-import { L as LensManager } from '/core/ui/lenses/lens-manager.chunk.js';
-import { C as ComponentID } from '/core/ui/utilities/utilities-component-id.chunk.js';
-import { Icon } from '/core/ui/utilities/utilities-image.chunk.js';
-import { U as UpdateGate } from '/core/ui/utilities/utilities-update-gate.chunk.js';
+import LensManager from '/core/ui/lenses/lens-manager.js';
+import { ComponentID } from '/core/ui/utilities/utilities-component-id.js';
+import { Icon } from '/core/ui/utilities/utilities-image.js';
+import UpdateGate from '/core/ui/utilities/utilities-update-gate.js';
 
 const tagTypes = (tag) => GameInfo.TypeTags
     .filter(e => e.Tag == tag).map(e => Game.getHash(e.Type));
@@ -342,12 +342,12 @@ class bzUnitListModel {
         const group = this._unitGroups.get(unit.armyId);
         if (group && unit.isReinforcement) {
             // select the reinforcement target group
-            UI.Player.lookAtID(group.id);
+            UI.Player.lookAtID(group.id, 0);
             UI.Player.selectUnit(group.id);
         } else if (group && !unit.isCommander) {
             // select the group first
             this.pauseSelection = true;
-            UI.Player.lookAtID(group.id);
+            UI.Player.lookAtID(group.id, 0);
             UI.Player.selectUnit(group.id);
             // and give it time to settle
             requestAnimationFrame(() => {
@@ -356,7 +356,7 @@ class bzUnitListModel {
             });
         } else if (unit.isOnMap) {
             // select the unit
-            UI.Player.lookAtID(unit.id);
+            UI.Player.lookAtID(unit.id, 0);
             UI.Player.selectUnit(unit.id);
         }
     }

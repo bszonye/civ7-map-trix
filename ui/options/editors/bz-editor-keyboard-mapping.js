@@ -9,6 +9,7 @@ const BZ_KEYS_TO_ADD = [
     "toggle-bz-route-layer",
     "toggle-bz-terrain-layer",
     "toggle-bz-wonder-layer",
+    "toggle-fxs-conquest-layer",
 ];
 class bzEditorKeyboardMapping {
     static c_prototype;

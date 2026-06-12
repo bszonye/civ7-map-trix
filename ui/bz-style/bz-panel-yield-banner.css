@@ -1,11 +1,19 @@
-.bz-yield-banner .panel-yield__top-bar-content .text-yield-food,
-.bz-yield-banner .panel-yield__top-bar-content .text-yield-production,
-.bz-yield-banner .panel-yield__top-bar-content .text-yield-gold,
-.bz-yield-banner .panel-yield__top-bar-content .text-yield-influence,
-.bz-yield-banner .panel-yield__top-bar-content .text-yield-science,
-.bz-yield-banner .panel-yield__top-bar-content .text-yield-culture,
-.bz-yield-banner .panel-yield__top-bar-content .text-yield-happiness,
-.bz-yield-banner .panel-yield__top-bar-content .text-secondary {
+.bz-yield-banner yield-bar-entry.text-yield-food,
+.bz-yield-banner yield-bar-entry.text-yield-production,
+.bz-yield-banner yield-bar-entry.text-yield-gold,
+.bz-yield-banner yield-bar-entry.text-yield-influence,
+.bz-yield-banner yield-bar-entry.text-yield-science,
+.bz-yield-banner yield-bar-entry.text-yield-culture,
+.bz-yield-banner yield-bar-entry.text-yield-happiness,
+.bz-yield-banner yield-bar-entry.text-secondary,
+.bz-yield-banner .fullscreen-top-outside-safezone .text-yield-food,
+.bz-yield-banner .fullscreen-top-outside-safezone .text-yield-production,
+.bz-yield-banner .fullscreen-top-outside-safezone .text-yield-gold,
+.bz-yield-banner .fullscreen-top-outside-safezone .text-yield-influence,
+.bz-yield-banner .fullscreen-top-outside-safezone .text-yield-science,
+.bz-yield-banner .fullscreen-top-outside-safezone .text-yield-culture,
+.bz-yield-banner .fullscreen-top-outside-safezone .text-yield-happiness,
+.bz-yield-banner .fullscreen-top-outside-safezone .text-yield-gold ~ .text-secondary {
     color: #c2c4cc;  /* text-accent-2 */
     border-radius: 0.777rem / 50%;
     margin: 0 0.0555555556rem;
@@ -14,62 +22,86 @@
     transition: color 0.25s cubic-bezier(0.215, 0.61, 0.355, 1);
     transition: background-color 0.25s cubic-bezier(0.215, 0.61, 0.355, 1);
 }
-.bz-yield-banner .panel-yield__top-bar-content .text-yield-food:hover,
-.bz-yield-banner .panel-yield__top-bar-content .text-yield-production:hover,
-.bz-yield-banner .panel-yield__top-bar-content .text-yield-gold:hover,
-.bz-yield-banner .panel-yield__top-bar-content .text-yield-influence:hover,
-.bz-yield-banner .panel-yield__top-bar-content .text-yield-science:hover,
-.bz-yield-banner .panel-yield__top-bar-content .text-yield-culture:hover,
-.bz-yield-banner .panel-yield__top-bar-content .text-yield-happiness:hover,
-.bz-yield-banner .panel-yield__top-bar-content .text-secondary:hover {
+.bz-yield-banner yield-bar-entry.text-yield-food:hover,
+.bz-yield-banner yield-bar-entry.text-yield-production:hover,
+.bz-yield-banner yield-bar-entry.text-yield-gold:hover,
+.bz-yield-banner yield-bar-entry.text-yield-influence:hover,
+.bz-yield-banner yield-bar-entry.text-yield-science:hover,
+.bz-yield-banner yield-bar-entry.text-yield-culture:hover,
+.bz-yield-banner yield-bar-entry.text-yield-happiness:hover,
+.bz-yield-banner yield-bar-entry.text-secondary:hover,
+.bz-yield-banner .fullscreen-top-outside-safezone .text-yield-food:hover,
+.bz-yield-banner .fullscreen-top-outside-safezone .text-yield-production:hover,
+.bz-yield-banner .fullscreen-top-outside-safezone .text-yield-gold:hover,
+.bz-yield-banner .fullscreen-top-outside-safezone .text-yield-influence:hover,
+.bz-yield-banner .fullscreen-top-outside-safezone .text-yield-science:hover,
+.bz-yield-banner .fullscreen-top-outside-safezone .text-yield-culture:hover,
+.bz-yield-banner .fullscreen-top-outside-safezone .text-yield-happiness:hover,
+.bz-yield-banner .fullscreen-top-outside-safezone .text-yield-gold ~ .text-secondary:hover {
     color: #e5e5e5;  /* text-accent-1 */
 }
-.bz-yield-banner .panel-yield__top-bar-content .text-yield-food {
+.bz-yield-banner yield-bar-entry.text-yield-food,
+.bz-yield-banner .fullscreen-top-outside-safezone .text-yield-food {
     background-color: #80b34d80;
 }
-.bz-yield-banner .panel-yield__top-bar-content .text-yield-food:hover {
+.bz-yield-banner yield-bar-entry.text-yield-food:hover,
+.bz-yield-banner .fullscreen-top-outside-safezone .text-yield-food:hover {
     background-color: #80b34daa;
 }
-.bz-yield-banner .panel-yield__top-bar-content .text-yield-production {
+.bz-yield-banner yield-bar-entry.text-yield-production,
+.bz-yield-banner .fullscreen-top-outside-safezone .text-yield-production {
     background-color: #a33d2980;
 }
-.bz-yield-banner .panel-yield__top-bar-content .text-yield-production:hover {
+.bz-yield-banner yield-bar-entry.text-yield-production:hover,
+.bz-yield-banner .fullscreen-top-outside-safezone .text-yield-production:hover {
     background-color: #a33d29aa;
 }
-.bz-yield-banner .panel-yield__top-bar-content .text-yield-gold {
+.bz-yield-banner yield-bar-entry.text-yield-gold,
+.bz-yield-banner .fullscreen-top-outside-safezone .text-yield-gold {
     background-color: #f6ce5580;
 }
-.bz-yield-banner .panel-yield__top-bar-content .text-yield-gold:hover {
+.bz-yield-banner yield-bar-entry.text-yield-gold:hover,
+.bz-yield-banner .fullscreen-top-outside-safezone .text-yield-gold:hover {
     background-color: #f6ce55aa;
 }
-.bz-yield-banner .panel-yield__top-bar-content .text-yield-science {
+.bz-yield-banner yield-bar-entry.text-yield-science,
+.bz-yield-banner .fullscreen-top-outside-safezone .text-yield-science {
     background-color: #6ca6e080;
 }
-.bz-yield-banner .panel-yield__top-bar-content .text-yield-science:hover {
+.bz-yield-banner yield-bar-entry.text-yield-science:hover,
+.bz-yield-banner .fullscreen-top-outside-safezone .text-yield-science:hover {
     background-color: #6ca6e0aa;
 }
-.bz-yield-banner .panel-yield__top-bar-content .text-yield-culture {
+.bz-yield-banner yield-bar-entry.text-yield-culture,
+.bz-yield-banner .fullscreen-top-outside-safezone .text-yield-culture {
     background-color: #5c5cd680;
 }
-.bz-yield-banner .panel-yield__top-bar-content .text-yield-culture:hover {
+.bz-yield-banner yield-bar-entry.text-yield-culture:hover,
+.bz-yield-banner .fullscreen-top-outside-safezone .text-yield-culture:hover {
     background-color: #5c5cd6aa;
 }
-.bz-yield-banner .panel-yield__top-bar-content .text-yield-happiness {
+.bz-yield-banner yield-bar-entry.text-yield-happiness,
+.bz-yield-banner .fullscreen-top-outside-safezone .text-yield-happiness {
     background-color: #f5993d80;
 }
-.bz-yield-banner .panel-yield__top-bar-content .text-yield-happiness:hover {
+.bz-yield-banner yield-bar-entry.text-yield-happiness:hover,
+.bz-yield-banner .fullscreen-top-outside-safezone .text-yield-happiness:hover {
     background-color: #f5993daa;
 }
-.bz-yield-banner .panel-yield__top-bar-content .text-yield-influence {
+.bz-yield-banner yield-bar-entry.text-yield-influence,
+.bz-yield-banner .fullscreen-top-outside-safezone .text-yield-influence {
     background-color: #afb7cf80;
 }
-.bz-yield-banner .panel-yield__top-bar-content .text-yield-influence:hover {
+.bz-yield-banner yield-bar-entry.text-yield-influence:hover,
+.bz-yield-banner .fullscreen-top-outside-safezone .text-yield-influence:hover {
     background-color: #afb7cfaa;
 }
-.bz-yield-banner .panel-yield__top-bar-content .text-secondary {
+.bz-yield-banner yield-bar-entry.text-secondary,
+.bz-yield-banner .fullscreen-top-outside-safezone .text-yield-gold ~ .text-secondary {
     background-color: #e5d2ac80;
 }
-.bz-yield-banner .panel-yield__top-bar-content .text-secondary:hover {
+.bz-yield-banner yield-bar-entry.text-secondary:hover,
+.bz-yield-banner .fullscreen-top-outside-safezone .text-yield-gold ~ .text-secondary:hover {
     background-color: #e5d2acaa;
 }
 

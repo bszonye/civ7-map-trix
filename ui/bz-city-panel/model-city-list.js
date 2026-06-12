@@ -1,5 +1,5 @@
-import { C as ComponentID } from '/core/ui/utilities/utilities-component-id.chunk.js';
-import { U as UpdateGate } from '/core/ui/utilities/utilities-update-gate.chunk.js';
+import { ComponentID } from '/core/ui/utilities/utilities-component-id.js';
+import UpdateGate from '/core/ui/utilities/utilities-update-gate.js';
 
 class bzCityListModel {
     onCityUpdateListener = this.onCityUpdate.bind(this);
@@ -144,7 +144,19 @@ class bzCityListModel {
             // town focus
             entry.queueTurns = -1;  // no queue
             const focusId = isTown && city.Growth ? city.Growth.projectType : -1;
-            const focus = entry.focus = GameInfo.Projects.lookup(focusId);
+            if (focusId == -1) {
+                // check for locked focus
+                const projects = Game.CityCommands.canStart(
+                    city.id,
+                    CityCommandTypes.CHANGE_GROWTH_MODE,
+                    { Type: GrowthTypes.PROJECT },
+                    false
+                )?.Projects;
+                if (projects?.length == 1) entry.focus = GameInfo.Projects[projects[0]];
+            } else {
+                entry.focus = GameInfo.Projects.lookup(focusId);
+            }
+            const focus = entry.focus;
             if (isGrowing) {
                 entry.focusIcon = UI.getIcon("PROJECT_GROWTH");
                 const name = "LOC_UI_FOOD_CHOOSER_FOCUS_GROWTH";

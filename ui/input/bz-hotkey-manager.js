@@ -1,4 +1,4 @@
-import HotkeyManager from '/core/ui/input/hotkey-manager.chunk.js';
+import HotkeyManager from '/core/ui/input/hotkey-manager.js';
 
 const HM_handleInput = HotkeyManager.handleInput;
 HotkeyManager.handleInput = function(...args) {
@@ -19,6 +19,7 @@ HotkeyManager.handleInput = function(...args) {
             case "toggle-bz-route-layer":
             case "toggle-bz-terrain-layer":
             case "toggle-bz-wonder-layer":
+            case "toggle-fxs-conquest-layer":
                 this.sendLayerHotkeyEvent(name);
                 return false;
         }

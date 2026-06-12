@@ -1,8 +1,8 @@
 import { gatherMovementObstacles } from '/bz-map-trix/ui/tooltips/bz-plot-tooltip.js';
 import { InterfaceMode, InterfaceModeChangedEventName } from '/core/ui/interface-modes/interface-modes.js';
-import { L as LensManager } from '/core/ui/lenses/lens-manager.chunk.js';
+import LensManager from '/core/ui/lenses/lens-manager.js';
 import ChoosePlotInterfaceMode from '/base-standard/ui/interface-modes/interface-mode-choose-plot.js';
-import { O as OVERLAY_PRIORITY } from '/base-standard/ui/utilities/utilities-overlay.chunk.js';
+import { OVERLAY_PRIORITY } from '/base-standard/ui/utilities/utilities-overlay.js';
 import { UpdateOperationTargetEventName } from '/base-standard/ui/lenses/layer/operation-target-layer.js';
 // load mini-map first to configure allowed layers for default lens
 import '/bz-map-trix/ui/mini-map/bz-panel-mini-map.js';

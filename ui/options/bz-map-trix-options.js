@@ -1,5 +1,5 @@
 import '/core/ui/options/screen-options.js';  // make sure this loads first
-import { C as CategoryType, O as Options, a as OptionType } from '/core/ui/options/editors/index.chunk.js';
+import { CategoryType, Options, OptionType } from '/core/ui/options/model-options.js';
 // set up mod options tab
 import ModOptions from '/bz-map-trix/ui/options/mod-options.js';
 
@@ -96,7 +96,8 @@ Options.addInitCallback(() => {
         description: "LOC_OPTIONS_BZ_COMMANDER_LENS_DESCRIPTION",
         dropdownItems: commandOptions,
     });
-    Options.addOption({
+    // Options.addOption({
+    const _unusedVerbosity = {
         category: CategoryType.Mods,
         group: "bz_mods",
         type: OptionType.Dropdown,
@@ -106,7 +107,8 @@ Options.addInitCallback(() => {
         label: "LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE",
         description: "LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE_DESCRIPTION",
         dropdownItems: verbosityOptions,
-    });
+    };
+    // });
     Options.addOption({
         category: CategoryType.Mods,
         group: "bz_mods",

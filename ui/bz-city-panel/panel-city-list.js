@@ -1,7 +1,7 @@
-import { F as Focus } from '/core/ui/input/focus-support.chunk.js';
-import { A as AnchorType } from '/core/ui/panel-support.chunk.js';
+import { Focus } from '/core/ui/input/focus-support.js';
+import { AnchorType } from '/core/ui/panel-support.js';
 import TooltipManager from '/core/ui/tooltips/tooltip-manager.js';
-import { D as Databind } from '/core/ui/utilities/utilities-core-databinding.chunk.js';
+import Databind from '/core/ui/utilities/utilities-core-databinding.js';
 import { MinimapSubpanel } from '/base-standard/ui/mini-map/panel-mini-map.js';
 import { bzPanelMiniMap } from '/bz-map-trix/ui/mini-map/bz-panel-mini-map.js';
 import { bzCityList } from '/bz-map-trix/ui/bz-city-panel/model-city-list.js';
