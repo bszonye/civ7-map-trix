@@ -13,5 +13,6 @@ class bzCommanderLens {
         "fxs-resource-layer",
     ]);
     blendEnabledLayersOnTransition = false;
+    useUserConfig = true;
 }
 LensManager.registerLens("bz-commander-lens", new bzCommanderLens());
