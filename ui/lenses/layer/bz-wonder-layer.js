@@ -96,7 +96,7 @@ class bzWonderLensLayer {
         PlotIconsManager.removePlotIcons("bz-plot-icon-wonders");
     }
     getOptionName() {
-        return "bzShowMapDiscoveries";
+        return "bzShowMapWonders";
     }
     updateMap() {
         const width = GameplayMap.getGridWidth();
