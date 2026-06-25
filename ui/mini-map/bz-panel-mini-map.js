@@ -43,7 +43,14 @@ const FXS_USER_CONFIG_LENSES = [
     "fxs-settler-lens",
 ];
 
-// fix missing layer configuration
+// enable user configuration for vanilla lenses
+for (const lensType of FXS_USER_CONFIG_LENSES) {
+    const lens = LensManager.lenses.get(lensType)
+    lens.blendEnabledLayersOnTransition = false;
+    lens.useUserConfig = true;
+    delete lens.skipCachingEnabledLayers;
+}
+// fix missing Conquest layer configuration
 const fxsConquestLayer = LensManager.layers.get("fxs-conquest-layer");
 fxsConquestLayer.getOptionName = () => { return "ShowMapConquest"; }
 
@@ -72,11 +79,9 @@ LMproto.readTrackedLayer = function(layerType) {
     const value = Configuration.getGame().isHotsteat ?
         this.currentCatalog.getObject(LENS_CATALOG_OBJECT_NAME).read(id) :
         UI.getOption("user", "GamePlay", id);
-    console.warn(`TRIX RTL ${id} = ${value}`);
     if (value != null) return !!value;
     const lens = this.lenses.get(this.activeLens ?? "fxs-default-lens");
     const active = lens.activeLayers.has(layerType);
-    console.warn(`TRIX RTL ${layerType} = ${active}`);
     return !!active;
 }
 // patch LensManager.writeTrackedLayer
@@ -84,7 +89,6 @@ const LM_writeTrackedLayer = LMproto.writeTrackedLayer;
 LMproto.writeTrackedLayer = function(...args) {
     const [layerID, enable] = args;
     const id = this.bzLayerID(layerID);
-    console.warn(`TRIX WTL ${id} = ${enable}`);
     LM_writeTrackedLayer.apply(this, [id, enable]);
     // reconcile border layers
     if (layerID == "bz-city-borders-layer") {
@@ -205,15 +209,6 @@ for (const [lensType, lens] of LensManager.lenses.entries()) {
         active.delete("fxs-hexgrid-layer");
         allowed.add("fxs-hexgrid-layer");
     }
-}
-const discoveryLens = LensManager.lenses.get("fxs-discovery-lens");
-discoveryLens.allowedLayers.delete("fxs-yields-layer");
-discoveryLens.allowedLayers.delete("fxs-conquest-layer");
-delete discoveryLens.skipCachingEnabledLayers;
-// enable user configuration for vanilla lenses
-for (const lensType of FXS_USER_CONFIG_LENSES) {
-    const lens = LensManager.lenses.get(lensType)
-    lens.useUserConfig = true;
 }
 
 // PanelMiniMap extensions
