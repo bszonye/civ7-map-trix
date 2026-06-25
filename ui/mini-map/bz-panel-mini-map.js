@@ -65,43 +65,46 @@ LMproto.bzLayerID = function(layerID, lensType) {
 }
 // patch LensManager.getSerializedState
 LMproto.getSerializedState = function(layerType) {
-  const id = LensManager.getLayerOption(layerType);
-  if (id != layerType) {
-      return this.readTrackedLayer(layerType);
-  }
-  return void 0;
+    // TRIX: accept layerType instead of option ID
+    const id = LensManager.getLayerOption(layerType);
+    if (id != layerType) {
+        return this.readTrackedLayer(layerType);
+    }
+    return void 0;
 }
 // patch LensManager.readTrackedLayer
 LMproto.readTrackedLayer = function(layerType) {
+    // TRIX: accept layerType instead of option ID
     const layerID = this.getLayerOption(layerType);
-    const id = this.bzLayerID(layerID);
-    // const enable = LM_readTrackedLayer.apply(this, [id]);
+    const id = this.bzLayerID(layerID);  // encode lens type in ID
     const value = Configuration.getGame().isHotsteat ?
         this.currentCatalog.getObject(LENS_CATALOG_OBJECT_NAME).read(id) :
         UI.getOption("user", "GamePlay", id);
     if (value != null) return !!value;
+    // TRIX: default to lens configuration
     const lens = this.lenses.get(this.activeLens ?? "fxs-default-lens");
     const active = lens.activeLayers.has(layerType);
     return !!active;
 }
 // patch LensManager.writeTrackedLayer
 const LM_writeTrackedLayer = LMproto.writeTrackedLayer;
-LMproto.writeTrackedLayer = function(...args) {
-    const [layerID, enable] = args;
-    const id = this.bzLayerID(layerID);
-    LM_writeTrackedLayer.apply(this, [id, enable]);
-    // reconcile border layers
-    if (layerID == "bz-city-borders-layer") {
-        const id = this.bzLayerID("bz-culture-borders-layer");
-        LM_writeTrackedLayer.apply(this, [id, !enable]);
-    } else if (layerID == "bz-culture-borders-layer") {
-        const id = this.bzLayerID("bz-city-borders-layer");
-        LM_writeTrackedLayer.apply(this, [id, false]);
+LMproto.writeTrackedLayer = function(layerID, enable) {
+    // TRIX: record lens type for non-default lenses
+    const id = this.bzLayerID(layerID);  // encode lens type in ID
+    LM_writeTrackedLayer.call(this, id, enable);
+    // TRIX: reconcile border layers
+    if (layerID == "bzShowMapCityBorders") {
+        const id = this.bzLayerID("bzShowMapCultureBorders");
+        LM_writeTrackedLayer.call(this, id, !enable);
+    } else if (layerID == "bzShowMapCultureBorders") {
+        const id = this.bzLayerID("bzShowMapCityBorders");
+        LM_writeTrackedLayer.call(this, id, false);
     }
 }
 // patch LensManager.getActiveLayers
 const _LM_getActiveLayers = LMproto.getActiveLayers;
 LMproto.getActiveLayers = function(lens) {
+    // TRIX: use the readTrackedLayer method instead of UI.getOption
     const activeLayers = lens.activeLayers;
     if (lens.useUserConfig) {
         for (const layer of this.layers) {
