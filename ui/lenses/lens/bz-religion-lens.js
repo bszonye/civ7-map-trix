@@ -11,5 +11,6 @@ class bzReligionLens {
         "fxs-resource-layer",
     ]);
     blendEnabledLayersOnTransition = false;
+    useUserConfig = true;
 }
 LensManager.registerLens("bz-religion-lens", new bzReligionLens());

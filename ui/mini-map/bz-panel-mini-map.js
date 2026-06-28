@@ -9,6 +9,8 @@ import '/base-standard/ui/lenses/layer/hexgrid-layer.js';
 import '/base-standard/ui/lenses/lens/default-lens.js';
 import '/base-standard/ui/lenses/lens/discovery-lens.js';
 
+const LENS_CATALOG_OBJECT_NAME = "tracked-lens";
+
 const BZ_LENSES = {
     "fxs-discovery-lens": "LOC_DISTRICT_BZ_DISCOVERY",
     "bz-religion-lens": "LOC_UI_MINI_MAP_RELIGION",
@@ -34,62 +36,92 @@ const BZ_EXTRA_LAYERS = {
         "bz-fortification-layer",
     ],
 };
+const FXS_USER_CONFIG_LENSES = [
+    "fxs-continent-lens",
+    "fxs-discovery-lens",
+    "fxs-general-appeal-lens",
+    "fxs-settler-lens",
+];
 
-// fix missing layer configuration
+// enable user configuration for vanilla lenses
+for (const lensType of FXS_USER_CONFIG_LENSES) {
+    const lens = LensManager.lenses.get(lensType)
+    lens.blendEnabledLayersOnTransition = false;
+    lens.useUserConfig = true;
+    delete lens.skipCachingEnabledLayers;
+}
+// fix missing Conquest layer configuration
 const fxsConquestLayer = LensManager.layers.get("fxs-conquest-layer");
 fxsConquestLayer.getOptionName = () => { return "ShowMapConquest"; }
 
 // extend LensManager layer serialization
 const LMproto = Object.getPrototypeOf(LensManager);
-// patch LensManager.toggleLayer
-const LM_toggleLayer = LMproto.toggleLayer;
-LMproto.toggleLayer = function(...args) {
-    const [layerType, options] = args;
-    if (options?.serialize === true) {
-        const force = options?.force;
-        const enable = force ?? !this.enabledLayers.has(layerType);
-        this.bzSerializeLayer(layerType, enable);
-        // reconcile border layers
-        if (layerType == "bz-city-borders-layer") {
-            this.bzSerializeLayer("bz-culture-borders-layer", !enable);
-        } else if (layerType == "bz-culture-borders-layer") {
-            this.bzSerializeLayer("bz-city-borders-layer", false);
-        }
-    }
-    LM_toggleLayer.apply(this, args);
+// add LensManager.bzLayerID
+LMproto.bzLayerID = function(layerID, lensType) {
+    // returns layerID.lensType for non-default lenses
+    const lensID = lensType ?? this.activeLens;
+    if (lensID && lensID != "fxs-default-lens") return `${layerID}.${lensID}`;
+    return layerID;
 }
-// add LensManager.bzSerializeLayer
-LMproto.bzSerializeLayer = function(layerType, enable) {
+// patch LensManager.getSerializedState
+LMproto.getSerializedState = function(layerType) {
+    // TRIX: accept layerType instead of option ID
     const id = LensManager.getLayerOption(layerType);
-    if (!id || id == layerType) return;  // option name not set
-    const lensType = LensManager.getActiveLens();
-    const optionName = `bz-map-trix.${lensType}.${id}`;
-    const ovalue = UI.getOption("user", "Mod", optionName);
-    const value = enable ? 1 : 0;
-    if (value == ovalue) return;  // unchanged
-    UI.setOption("user", "Mod", optionName, value);
-    // Configuration.getUser().saveCheckpoint();
+    if (id != layerType) {
+        return this.readTrackedLayer(layerType);
+    }
+    return void 0;
 }
-// restore serialized layers just before default interface startup
-window.addEventListener("interface-mode-ready", (_event) => {
-    for (const [lensType, lens] of LensManager.lenses.entries()) {
-        for (const layerType of LensManager.layers.keys()) {
-            const layerOption = LensManager.getLayerOption(layerType);
-            if (!layerOption) continue;
-            const optionName = `bz-map-trix.${lensType}.${layerOption}`;
-            const ovalue = UI.getOption("user", "Mod", optionName);
-            if (ovalue == null) {
-                continue;  // not set
-            } else if (ovalue) {
-                lens.activeLayers.add(layerType);
-            } else {
-                lens.activeLayers.delete(layerType);
+// patch LensManager.readTrackedLayer
+LMproto.readTrackedLayer = function(layerType) {
+    // TRIX: accept layerType instead of option ID
+    const layerID = this.getLayerOption(layerType);
+    const id = this.bzLayerID(layerID);  // encode lens type in ID
+    const value = Configuration.getGame().isHotsteat ?
+        this.currentCatalog.getObject(LENS_CATALOG_OBJECT_NAME).read(id) :
+        UI.getOption("user", "GamePlay", id);
+    if (value != null) return !!value;
+    // TRIX: default to lens configuration
+    const lens = this.lenses.get(this.activeLens ?? "fxs-default-lens");
+    const active = lens.activeLayers.has(layerType);
+    return !!active;
+}
+// patch LensManager.writeTrackedLayer
+const LM_writeTrackedLayer = LMproto.writeTrackedLayer;
+LMproto.writeTrackedLayer = function(layerID, enable) {
+    // TRIX: record lens type for non-default lenses
+    const id = this.bzLayerID(layerID);  // encode lens type in ID
+    LM_writeTrackedLayer.call(this, id, enable);
+    // TRIX: reconcile border layers
+    if (layerID == "bzShowMapCityBorders") {
+        const id = this.bzLayerID("bzShowMapCultureBorders");
+        LM_writeTrackedLayer.call(this, id, !enable);
+    } else if (layerID == "bzShowMapCultureBorders") {
+        const id = this.bzLayerID("bzShowMapCityBorders");
+        LM_writeTrackedLayer.call(this, id, false);
+    }
+}
+// patch LensManager.getActiveLayers
+const _LM_getActiveLayers = LMproto.getActiveLayers;
+LMproto.getActiveLayers = function(lens) {
+    // TRIX: use the readTrackedLayer method instead of UI.getOption
+    const activeLayers = lens.activeLayers;
+    if (lens.useUserConfig) {
+        for (const layer of this.layers) {
+            const layerName = layer[0];
+            const optionID = this.getLayerOption(layerName);
+            if (optionID != layerName) {
+                const shouldEnable = this.readTrackedLayer(layerName);
+                if (shouldEnable && !activeLayers.has(layerName)) {
+                    activeLayers.add(layerName);
+                } else if (!shouldEnable && activeLayers.has(layerName)) {
+                    activeLayers.delete(layerName);
+                }
             }
-            lens.allowedLayers.delete(layerType);
-            console.warn(`LENS ${optionName}=${ovalue}`);
         }
     }
-});
+    return activeLayers;
+}
 
 
 // recon units: instead of CoreClass, use fxs-discovery-lens rules
@@ -181,21 +213,6 @@ for (const [lensType, lens] of LensManager.lenses.entries()) {
         allowed.add("fxs-hexgrid-layer");
     }
 }
-// fix Hex Grid initial visibility
-if (!LensManager.enabledLayers.has("fxs-hexgrid-layer")) {
-    const hexGrid = LensManager.layers.get("fxs-hexgrid-layer");
-    hexGrid.removeLayer();
-}
-// override vanilla layer configuration system
-const defaultLens = LensManager.lenses.get("fxs-default-lens");
-for (const layerType of defaultLens.allowedLayers) {
-    defaultLens.activeLayers.add(layerType);  // enable optional layers by default
-}
-defaultLens.allowedLayers.clear();
-const discoveryLens = LensManager.lenses.get("fxs-discovery-lens");
-discoveryLens.allowedLayers.delete("fxs-yields-layer");
-discoveryLens.allowedLayers.delete("fxs-conquest-layer");
-delete discoveryLens.skipCachingEnabledLayers;
 
 // PanelMiniMap extensions
 const BZ_ICON_CITY_BUTTON = "blp:Yield_Cities";

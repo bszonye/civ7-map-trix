@@ -6,6 +6,7 @@
 .bz-yield-banner yield-bar-entry.text-yield-culture,
 .bz-yield-banner yield-bar-entry.text-yield-happiness,
 .bz-yield-banner yield-bar-entry.text-secondary,
+.bz-yield-banner yield-bar-entry.fxs-header,
 .bz-yield-banner .fullscreen-top-outside-safezone .text-yield-food,
 .bz-yield-banner .fullscreen-top-outside-safezone .text-yield-production,
 .bz-yield-banner .fullscreen-top-outside-safezone .text-yield-gold,
@@ -13,7 +14,8 @@
 .bz-yield-banner .fullscreen-top-outside-safezone .text-yield-science,
 .bz-yield-banner .fullscreen-top-outside-safezone .text-yield-culture,
 .bz-yield-banner .fullscreen-top-outside-safezone .text-yield-happiness,
-.bz-yield-banner .fullscreen-top-outside-safezone .text-yield-gold ~ .text-secondary {
+.bz-yield-banner .fullscreen-top-outside-safezone .text-yield-gold ~ .text-secondary,
+.bz-yield-banner .fullscreen-top-outside-safezone .text-yield-gold ~ .fxs-header {
     color: #c2c4cc;  /* text-accent-2 */
     border-radius: 0.777rem / 50%;
     margin: 0 0.0555555556rem;
@@ -30,6 +32,7 @@
 .bz-yield-banner yield-bar-entry.text-yield-culture:hover,
 .bz-yield-banner yield-bar-entry.text-yield-happiness:hover,
 .bz-yield-banner yield-bar-entry.text-secondary:hover,
+.bz-yield-banner yield-bar-entry.fxs-header:hover,
 .bz-yield-banner .fullscreen-top-outside-safezone .text-yield-food:hover,
 .bz-yield-banner .fullscreen-top-outside-safezone .text-yield-production:hover,
 .bz-yield-banner .fullscreen-top-outside-safezone .text-yield-gold:hover,
@@ -37,7 +40,8 @@
 .bz-yield-banner .fullscreen-top-outside-safezone .text-yield-science:hover,
 .bz-yield-banner .fullscreen-top-outside-safezone .text-yield-culture:hover,
 .bz-yield-banner .fullscreen-top-outside-safezone .text-yield-happiness:hover,
-.bz-yield-banner .fullscreen-top-outside-safezone .text-yield-gold ~ .text-secondary:hover {
+.bz-yield-banner .fullscreen-top-outside-safezone .text-yield-gold ~ .text-secondary:hover,
+.bz-yield-banner .fullscreen-top-outside-safezone .text-yield-gold ~ .fxs-header:hover {
     color: #e5e5e5;  /* text-accent-1 */
 }
 .bz-yield-banner yield-bar-entry.text-yield-food,
@@ -104,4 +108,12 @@
 .bz-yield-banner .fullscreen-top-outside-safezone .text-yield-gold ~ .text-secondary:hover {
     background-color: #e5d2acaa;
 }
-
+.bz-yield-banner yield-bar-entry.fxs-header,
+.bz-yield-banner .fullscreen-top-outside-safezone .text-yield-gold ~ .fxs-header {
+    background-color: #e5d2ac80;
+    fxs-font-gradient-color: #0000;  /* remove gradient*/
+}
+.bz-yield-banner yield-bar-entry.fxs-header:hover,
+.bz-yield-banner .fullscreen-top-outside-safezone .text-yield-gold ~ .fxs-header:hover {
+    background-color: #e5d2acaa;
+}
