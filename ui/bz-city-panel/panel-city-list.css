@@ -62,11 +62,8 @@
 .bz-city-list-entry .bz-city-list-focus .bz-city-list-bg {
   border: 0.0555555556rem solid #4c5366;
 }
-.bz-city-list-entry.bz-town-has-focus.bz-town-is-growing .bz-city-list-bg {
-  border: 0.0555555556rem solid #8c7e62;
-}
 .bz-city-list-entry.bz-town-has-focus.bz-town-is-growing .bz-city-list-focus-icon {
-  filter: sepia(1) brightness(1.2) saturate(2)
+  filter: contrast(0.5) saturate(0.5) brightness(1.33) fxs-color-tint(#60c000)
           drop-shadow(0 0.0555555556rem 0.1111111111rem #000c);
 }
 .bz-city-list-entry.bz-city-has-damage .bz-city-list-bg,
