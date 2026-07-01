@@ -17,16 +17,15 @@ HotkeyManager.handleInput = function(...args) {
     if (status == InputActionStatuses.FINISH) {
         const name = inputEvent.detail.name;
         switch (name) {
-            case "bz-set-active-fxs-default-lens":
-            case "bz-set-active-fxs-settler-lens":
-            case "bz-set-active-fxs-continent-lens":
-            case "bz-set-active-fxs-trade-lens":
-            case "bz-set-active-fxs-general-appeal-lens":
-            case "bz-set-active-fxs-discovery-lens":
-            case "bz-set-active-bz-religion-lens":
-            case "bz-set-active-bz-commander-lens":
-            case "bz-set-active-dmt-map-tack-lens": {
-                const lens = name.substr("bz-set-active-".length);
+            case "toggle-fxs-default-lens":
+            case "toggle-fxs-settler-lens":
+            case "toggle-fxs-continent-lens":
+            case "toggle-fxs-general-appeal-lens":
+            case "toggle-fxs-discovery-lens":
+            case "toggle-bz-religion-lens":
+            case "toggle-bz-commander-lens":
+            case "toggle-dmt-map-tack-lens": {
+                const lens = name.substr("toggle-".length);
                 if (LensManager.getActiveLens() != lens) {
                     LensManager.setActiveLens(lens);
                 } else {
