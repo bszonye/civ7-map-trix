@@ -1,4 +1,13 @@
 const BZ_KEYS_TO_ADD = [
+    "bz-set-active-fxs-default-lens",
+    "bz-set-active-fxs-settler-lens",
+    "bz-set-active-fxs-continent-lens",
+    "bz-set-active-fxs-trade-lens",
+    "bz-set-active-fxs-general-appeal-lens",
+    "bz-set-active-fxs-discovery-lens",
+    "bz-set-active-bz-religion-lens",
+    "bz-set-active-bz-commander-lens",
+    "bz-set-active-dmt-map-tack-lens",
     "open-bz-city-panel",
     "open-bz-units-panel",
     "toggle-bz-culture-borders-layer",

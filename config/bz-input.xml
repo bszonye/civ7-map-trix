@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Database>
     <InputActions>
+        <Replace ActionId="bz-set-active-fxs-default-lens" DeviceType="Keyboard" Name="Default Lens" Description="Default Lens" />
+        <Replace ActionId="bz-set-active-fxs-settler-lens" DeviceType="Keyboard" Name="Settler Lens" Description="Settler Lens" />
+        <Replace ActionId="bz-set-active-fxs-continent-lens" DeviceType="Keyboard" Name="Continent Lens" Description="Continent Lens" />
+        <Replace ActionId="bz-set-active-fxs-general-appeal-lens" DeviceType="Keyboard" Name="Appeal Lens" Description="Appeal Lens" />
+        <Replace ActionId="bz-set-active-fxs-discovery-lens" DeviceType="Keyboard" Name="Discovery Lens" Description="Discovery Lens" />
+        <Replace ActionId="bz-set-active-bz-religion-lens" DeviceType="Keyboard" Name="Religion Lens" Description="Religion Lens" />
+        <Replace ActionId="bz-set-active-bz-commander-lens" DeviceType="Keyboard" Name="Commander Lens" Description="Commander Lens" />
+        <Replace ActionId="bz-set-active-dmt-map-tack-lens" DeviceType="Keyboard" Name="Map Tack Lens" Description="Map Tack Lens" />
         <Replace ActionId="open-bz-city-panel" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_OPEN_BZ_SETTLEMENTS" Description="LOC_UI_KBM_MAPPING_OPEN_BZ_SETTLEMENTS_TT" />
         <Replace ActionId="open-bz-units-panel" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS" Description="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS_TT" />
         <Replace ActionId="toggle-bz-culture-borders-layer" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS" Description="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS_TT" />
@@ -14,6 +22,22 @@
         <Replace ActionId="toggle-fxs-conquest-layer" DeviceType="Keyboard" Name="LOC_UI_MINI_MAP_CONQUEST" Description="LOC_UI_MINI_MAP_CONQUEST_TOOLTIP" />
     </InputActions>
     <InputContextConstraints>
+        <Replace ActionId="bz-set-active-fxs-default-lens" ContextId="Unit"/>
+        <Replace ActionId="bz-set-active-fxs-default-lens" ContextId="World"/>
+        <Replace ActionId="bz-set-active-fxs-settler-lens" ContextId="Unit"/>
+        <Replace ActionId="bz-set-active-fxs-settler-lens" ContextId="World"/>
+        <Replace ActionId="bz-set-active-fxs-continent-lens" ContextId="Unit"/>
+        <Replace ActionId="bz-set-active-fxs-continent-lens" ContextId="World"/>
+        <Replace ActionId="bz-set-active-fxs-general-appeal-lens" ContextId="Unit"/>
+        <Replace ActionId="bz-set-active-fxs-general-appeal-lens" ContextId="World"/>
+        <Replace ActionId="bz-set-active-fxs-discovery-lens" ContextId="Unit"/>
+        <Replace ActionId="bz-set-active-fxs-discovery-lens" ContextId="World"/>
+        <Replace ActionId="bz-set-active-bz-religion-lens" ContextId="Unit"/>
+        <Replace ActionId="bz-set-active-bz-religion-lens" ContextId="World"/>
+        <Replace ActionId="bz-set-active-bz-commander-lens" ContextId="Unit"/>
+        <Replace ActionId="bz-set-active-bz-commander-lens" ContextId="World"/>
+        <Replace ActionId="bz-set-active-dmt-map-tack-lens" ContextId="Unit"/>
+        <Replace ActionId="bz-set-active-dmt-map-tack-lens" ContextId="World"/>
         <Replace ActionId="open-bz-city-panel" ContextId="Unit"/>
         <Replace ActionId="open-bz-city-panel" ContextId="World"/>
         <Replace ActionId="open-bz-units-panel" ContextId="Unit"/>
@@ -38,6 +62,22 @@
         <Replace ActionId="toggle-fxs-conquest-layer" ContextId="World"/>
     </InputContextConstraints>
     <InputActionDefaultGestures>
+        <Replace ActionId="bz-set-active-fxs-default-lens" Index="0" GestureType="KBMouse" GestureData="KEY_0"/>
+        <Replace ActionId="bz-set-active-fxs-default-lens" Index="1" GestureType="KBMouse" GestureData="KEY_NP_0"/>
+        <Replace ActionId="bz-set-active-fxs-settler-lens" Index="0" GestureType="KBMouse" GestureData="KEY_1"/>
+        <Replace ActionId="bz-set-active-fxs-settler-lens" Index="1" GestureType="KBMouse" GestureData="KEY_NP_1"/>
+        <Replace ActionId="bz-set-active-fxs-continent-lens" Index="0" GestureType="KBMouse" GestureData="KEY_2"/>
+        <Replace ActionId="bz-set-active-fxs-continent-lens" Index="1" GestureType="KBMouse" GestureData="KEY_NP_2"/>
+        <Replace ActionId="bz-set-active-fxs-general-appeal-lens" Index="0" GestureType="KBMouse" GestureData="KEY_3"/>
+        <Replace ActionId="bz-set-active-fxs-general-appeal-lens" Index="1" GestureType="KBMouse" GestureData="KEY_NP_3"/>
+        <Replace ActionId="bz-set-active-fxs-discovery-lens" Index="0" GestureType="KBMouse" GestureData="KEY_4"/>
+        <Replace ActionId="bz-set-active-fxs-discovery-lens" Index="1" GestureType="KBMouse" GestureData="KEY_NP_4"/>
+        <Replace ActionId="bz-set-active-bz-religion-lens" Index="0" GestureType="KBMouse" GestureData="KEY_5"/>
+        <Replace ActionId="bz-set-active-bz-religion-lens" Index="1" GestureType="KBMouse" GestureData="KEY_NP_5"/>
+        <Replace ActionId="bz-set-active-bz-commander-lens" Index="0" GestureType="KBMouse" GestureData="KEY_6"/>
+        <Replace ActionId="bz-set-active-bz-commander-lens" Index="1" GestureType="KBMouse" GestureData="KEY_NP_6"/>
+        <Replace ActionId="bz-set-active-dmt-map-tack-lens" Index="0" GestureType="KBMouse" GestureData="KEY_9"/>
+        <Replace ActionId="bz-set-active-dmt-map-tack-lens" Index="1" GestureType="KBMouse" GestureData="KEY_NP_9"/>
         <Replace ActionId="open-bz-city-panel" Index="0" GestureType="KBMouse" GestureData="KEY_SHIFT+KEY_S"/>
         <Replace ActionId="open-bz-units-panel" Index="0" GestureType="KBMouse" GestureData="KEY_SHIFT+KEY_U"/>
         <Replace ActionId="toggle-bz-culture-borders-layer" Index="0" GestureType="KBMouse" GestureData="KEY_SHIFT+KEY_B"/>
