@@ -93,7 +93,7 @@ class bzCityListModel {
         this._cityList = this._settlementList.filter(c => !c.isTown);
         this._townList = this._settlementList.filter(c => c.isTown);
         // mark subhead dividers for Distant Lands cities and towns
-        const cityDL = this._cityList.find(s => !s.isCapital && s.isDistantLands);
+        const cityDL = this._cityList.find(s => s.isDistantLands && !s.isCapital);
         if (cityDL && cityDL !== this._cityList[1] && cityDL !== this._cityList.at(-1)) {
             cityDL.subhead = "LOC_PLOT_TOOLTIP_HEMISPHERE_WEST";
         }
