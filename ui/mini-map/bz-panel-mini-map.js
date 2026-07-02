@@ -340,7 +340,7 @@ class bzPanelMiniMap {
     }
     onLayerHotkey(hotkey) {
         if (hotkey.detail.name == "toggle-fxs-conquest-layer") {
-            LensManager.toggleLayer("fxs-conquest-layer", { serialize: true });
+            LensManager.toggleLayer("fxs-conquest-layer");
         }
     }
 }
