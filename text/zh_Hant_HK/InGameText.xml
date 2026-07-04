@@ -94,6 +94,30 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS_TT" Language="zh_Hant_HK">
             <Text>開啟單位面板</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_DEFAULT_BZ" Language="zh_Hant_HK">
+            <Text>Default Lens</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_SETTLER_BZ" Language="zh_Hant_HK">
+            <Text>Settler Lens</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_CONTINENT_BZ" Language="zh_Hant_HK">
+            <Text>Continent Lens</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_GENERAL_APPEAL_BZ" Language="zh_Hant_HK">
+            <Text>Appeal Lens</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_DISCOVERY_BZ" Language="zh_Hant_HK">
+            <Text>Discovery Lens</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_RELIGION_BZ" Language="zh_Hant_HK">
+            <Text>Religion Lens</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_COMMANDER_BZ" Language="zh_Hant_HK">
+            <Text>Commander Lens</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_MAP_TACKS_BZ" Language="zh_Hant_HK">
+            <Text>Map Tacks Lens</Text>
+        </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS" Language="zh_Hant_HK">
             <Text>開啟/關閉邊界的可見度</Text>
         </Replace>

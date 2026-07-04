@@ -94,29 +94,29 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS_TT">
             <Text>Open the Units panel</Text>
         </Replace>
-        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_FXS_DEFAULT_LENS">
-            <Text>Toggle Default Lens</Text>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_DEFAULT_BZ">
+            <Text>Default Lens</Text>
         </Replace>
-        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_FXS_SETTLER_LENS">
-            <Text>Toggle Settler Lens</Text>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_SETTLER_BZ">
+            <Text>Settler Lens</Text>
         </Replace>
-        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_FXS_CONTINENT_LENS">
-            <Text>Toggle Continent Lens</Text>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_CONTINENT_BZ">
+            <Text>Continent Lens</Text>
         </Replace>
-        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_FXS_GENERAL_APPEAL_LENS">
-            <Text>Toggle Appeal Lens</Text>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_GENERAL_APPEAL_BZ">
+            <Text>Appeal Lens</Text>
         </Replace>
-        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_FXS_DISCOVERY_LENS">
-            <Text>Toggle Discovery Lens</Text>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_DISCOVERY_BZ">
+            <Text>Discovery Lens</Text>
         </Replace>
-        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_RELIGION_LENS">
-            <Text>Toggle Religion Lens</Text>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_RELIGION_BZ">
+            <Text>Religion Lens</Text>
         </Replace>
-        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_COMMANDER_LENS">
-            <Text>Toggle Commander Lens</Text>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_COMMANDER_BZ">
+            <Text>Commander Lens</Text>
         </Replace>
-        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_DMT_MAP_TACK_LENS">
-            <Text>Toggle Map Tack Lens</Text>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_MAP_TACKS_BZ">
+            <Text>Map Tacks Lens</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS">
             <Text>Toggle Borders</Text>
