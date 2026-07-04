@@ -103,28 +103,28 @@
             <Text>Ouvre la fenêtre des unités.</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_DEFAULT_BZ" Language="fr_FR">
-            <Text>Default Lens</Text>
+            <Text>Filtre par défaut</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_SETTLER_BZ" Language="fr_FR">
-            <Text>Settler Lens</Text>
+            <Text>Filtre des colons</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_CONTINENT_BZ" Language="fr_FR">
-            <Text>Continent Lens</Text>
+            <Text>Filtre des continents</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_GENERAL_APPEAL_BZ" Language="fr_FR">
-            <Text>Appeal Lens</Text>
+            <Text>Filtre d'attrait</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_DISCOVERY_BZ" Language="fr_FR">
-            <Text>Discovery Lens</Text>
+            <Text>Filtre de découverte</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_RELIGION_BZ" Language="fr_FR">
-            <Text>Religion Lens</Text>
+            <Text>Filtre des religions</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_COMMANDER_BZ" Language="fr_FR">
-            <Text>Commander Lens</Text>
+            <Text>Filtre des commandants</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_MAP_TACKS_BZ" Language="fr_FR">
-            <Text>Map Tacks Lens</Text>
+            <Text>Filtre de marqueurs</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS" Language="fr_FR">
             <Text>Frontières</Text>
