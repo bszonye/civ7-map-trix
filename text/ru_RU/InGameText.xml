@@ -95,25 +95,25 @@
             <Text>Открыть панель юниты</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_DEFAULT_BZ" Language="ru_RU">
-            <Text>Lenses: None</Text>
+            <Text>Линзы: Нет</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_SETTLER_BZ" Language="ru_RU">
-            <Text>Lenses: Settler</Text>
+            <Text>Линзы: Поселенец</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_CONTINENT_BZ" Language="ru_RU">
-            <Text>Lenses: Continent</Text>
+            <Text>Линзы: Континент</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_GENERAL_APPEAL_BZ" Language="ru_RU">
-            <Text>Lenses: Appeal</Text>
+            <Text>Линзы: Престиж</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_DISCOVERY_BZ" Language="ru_RU">
-            <Text>Lenses: Discovery</Text>
+            <Text>Линзы: Открытие</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_RELIGION_BZ" Language="ru_RU">
-            <Text>Lenses: Religion</Text>
+            <Text>Линзы: Религия</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_COMMANDER_BZ" Language="ru_RU">
-            <Text>Lenses: Commander</Text>
+            <Text>Линзы: Командир</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS" Language="ru_RU">
             <Text>Границы</Text>
