@@ -115,9 +115,6 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_COMMANDER_BZ" Language="ko_KR">
             <Text>Commander Lens</Text>
         </Replace>
-        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_MAP_TACKS_BZ" Language="ko_KR">
-            <Text>Map Tacks Lens</Text>
-        </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS" Language="ko_KR">
             <Text>국경</Text>
         </Replace>

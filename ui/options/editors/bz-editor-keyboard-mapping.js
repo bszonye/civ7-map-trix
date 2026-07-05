@@ -8,7 +8,6 @@ const BZ_KEYS_TO_ADD = [
     "toggle-fxs-discovery-lens",
     "toggle-bz-religion-lens",
     "toggle-bz-commander-lens",
-    "toggle-dmt-map-tack-lens",
     "toggle-bz-culture-borders-layer",
     "toggle-bz-city-borders-layer",
     "toggle-bz-discovery-layer",

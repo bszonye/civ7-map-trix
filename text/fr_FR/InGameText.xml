@@ -123,9 +123,6 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_COMMANDER_BZ" Language="fr_FR">
             <Text>Filtre des commandants</Text>
         </Replace>
-        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_MAP_TACKS_BZ" Language="fr_FR">
-            <Text>Filtre de marqueurs</Text>
-        </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS" Language="fr_FR">
             <Text>Frontières</Text>
         </Replace>

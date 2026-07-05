@@ -115,9 +115,6 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_COMMANDER_BZ" Language="zh_Hans_CN">
             <Text>Commander Lens</Text>
         </Replace>
-        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_MAP_TACKS_BZ" Language="zh_Hans_CN">
-            <Text>Map Tacks Lens</Text>
-        </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS" Language="zh_Hans_CN">
             <Text>开关边界显示</Text>
         </Replace>

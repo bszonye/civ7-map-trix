@@ -17,14 +17,18 @@ HotkeyManager.handleInput = function(...args) {
     if (status == InputActionStatuses.FINISH) {
         const name = inputEvent.detail.name;
         switch (name) {
-            case "toggle-fxs-default-lens":
+            case "toggle-fxs-default-lens": {
+                const mode = InterfaceMode.getCurrent();
+                const lens = modes[mode] ?? "fxs-default-lens";
+                LensManager.setActiveLens(lens);
+                return false;
+            }
             case "toggle-fxs-settler-lens":
             case "toggle-fxs-continent-lens":
             case "toggle-fxs-general-appeal-lens":
             case "toggle-fxs-discovery-lens":
             case "toggle-bz-religion-lens":
-            case "toggle-bz-commander-lens":
-            case "toggle-dmt-map-tack-lens": {
+            case "toggle-bz-commander-lens": {
                 const lens = name.substr("toggle-".length);
                 if (LensManager.getActiveLens() != lens) {
                     LensManager.setActiveLens(lens);

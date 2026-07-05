@@ -115,9 +115,6 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_COMMANDER_BZ" Language="de_DE">
             <Text>Kommandantenlinse</Text>
         </Replace>
-        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_MAP_TACKS_BZ" Language="de_DE">
-            <Text>Nadel-Linse</Text>
-        </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS" Language="de_DE">
             <Text>Grenzen umschalten</Text>
         </Replace>

@@ -115,9 +115,6 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_COMMANDER_BZ" Language="ru_RU">
             <Text>Commander Lens</Text>
         </Replace>
-        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_MAP_TACKS_BZ" Language="ru_RU">
-            <Text>Map Tacks Lens</Text>
-        </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS" Language="ru_RU">
             <Text>Границы</Text>
         </Replace>
