@@ -21,6 +21,10 @@
         <Replace ActionId="toggle-fxs-conquest-layer" DeviceType="Keyboard" Name="LOC_UI_MINI_MAP_CONQUEST" Description="LOC_UI_MINI_MAP_CONQUEST_TOOLTIP" />
     </InputActions>
     <InputContextConstraints>
+        <Replace ActionId="open-bz-city-panel" ContextId="Unit"/>
+        <Replace ActionId="open-bz-city-panel" ContextId="World"/>
+        <Replace ActionId="open-bz-units-panel" ContextId="Unit"/>
+        <Replace ActionId="open-bz-units-panel" ContextId="World"/>
         <Replace ActionId="toggle-fxs-default-lens" ContextId="Unit"/>
         <Replace ActionId="toggle-fxs-default-lens" ContextId="World"/>
         <Replace ActionId="toggle-fxs-settler-lens" ContextId="Unit"/>
@@ -35,10 +39,6 @@
         <Replace ActionId="toggle-bz-religion-lens" ContextId="World"/>
         <Replace ActionId="toggle-bz-commander-lens" ContextId="Unit"/>
         <Replace ActionId="toggle-bz-commander-lens" ContextId="World"/>
-        <Replace ActionId="open-bz-city-panel" ContextId="Unit"/>
-        <Replace ActionId="open-bz-city-panel" ContextId="World"/>
-        <Replace ActionId="open-bz-units-panel" ContextId="Unit"/>
-        <Replace ActionId="open-bz-units-panel" ContextId="World"/>
         <Replace ActionId="toggle-bz-culture-borders-layer" ContextId="Unit"/>
         <Replace ActionId="toggle-bz-culture-borders-layer" ContextId="World"/>
         <Replace ActionId="toggle-bz-city-borders-layer" ContextId="Unit"/>
