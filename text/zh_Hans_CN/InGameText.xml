@@ -95,25 +95,25 @@
             <Text>打开单位面板</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_DEFAULT_BZ" Language="zh_Hans_CN">
-            <Text>Default Lens</Text>
+            <Text>Lenses: Default</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_SETTLER_BZ" Language="zh_Hans_CN">
-            <Text>Settler Lens</Text>
+            <Text>Lenses: Settler</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_CONTINENT_BZ" Language="zh_Hans_CN">
-            <Text>Continent Lens</Text>
+            <Text>Lenses: Continent</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_GENERAL_APPEAL_BZ" Language="zh_Hans_CN">
-            <Text>Appeal Lens</Text>
+            <Text>Lenses: Appeal</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_DISCOVERY_BZ" Language="zh_Hans_CN">
-            <Text>Discovery Lens</Text>
+            <Text>Lenses: Discovery</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_RELIGION_BZ" Language="zh_Hans_CN">
-            <Text>Religion Lens</Text>
+            <Text>Lenses: Religion</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_COMMANDER_BZ" Language="zh_Hans_CN">
-            <Text>Commander Lens</Text>
+            <Text>Lenses: Commander</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS" Language="zh_Hans_CN">
             <Text>开关边界显示</Text>

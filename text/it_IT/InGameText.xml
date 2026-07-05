@@ -95,25 +95,25 @@
             <Text>Apri il panello delle unità</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_DEFAULT_BZ" Language="it_IT">
-            <Text>Lente predefinita</Text>
+            <Text>Lenti: Nessuna</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_SETTLER_BZ" Language="it_IT">
-            <Text>Lente Colono</Text>
+            <Text>Lenti: Coloni</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_CONTINENT_BZ" Language="it_IT">
-            <Text>Lente Continente</Text>
+            <Text>Lenti: Continente</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_GENERAL_APPEAL_BZ" Language="it_IT">
-            <Text>Lente Appeal</Text>
+            <Text>Lenti: Appeal</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_DISCOVERY_BZ" Language="it_IT">
-            <Text>Lente Scoperta</Text>
+            <Text>Lenti: Scoperta</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_RELIGION_BZ" Language="it_IT">
-            <Text>Lente Religione</Text>
+            <Text>Lenti: Religione</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_COMMANDER_BZ" Language="it_IT">
-            <Text>Lente Comandante</Text>
+            <Text>Lenti: Comandante</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS" Language="it_IT">
             <Text>Confini</Text>

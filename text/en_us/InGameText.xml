@@ -95,25 +95,25 @@
             <Text>Open the Units panel</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_DEFAULT_BZ">
-            <Text>Default Lens</Text>
+            <Text>Lenses: None</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_SETTLER_BZ">
-            <Text>Settler Lens</Text>
+            <Text>Lenses: Settler</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_CONTINENT_BZ">
-            <Text>Continent Lens</Text>
+            <Text>Lenses: Continent</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_GENERAL_APPEAL_BZ">
-            <Text>Appeal Lens</Text>
+            <Text>Lenses: Appeal</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_DISCOVERY_BZ">
-            <Text>Discovery Lens</Text>
+            <Text>Lenses: Discovery</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_RELIGION_BZ">
-            <Text>Religion Lens</Text>
+            <Text>Lenses: Religion</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_COMMANDER_BZ">
-            <Text>Commander Lens</Text>
+            <Text>Lenses: Commander</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS">
             <Text>Toggle Borders</Text>
