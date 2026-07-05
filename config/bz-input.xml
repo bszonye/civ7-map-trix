@@ -21,40 +21,58 @@
         <Replace ActionId="toggle-fxs-conquest-layer" DeviceType="Keyboard" Name="LOC_UI_MINI_MAP_CONQUEST" Description="LOC_UI_MINI_MAP_CONQUEST_TOOLTIP" />
     </InputActions>
     <InputContextConstraints>
+        <Replace ActionId="toggle-fxs-default-lens" ContextId="Shell"/>
         <Replace ActionId="toggle-fxs-default-lens" ContextId="Unit"/>
         <Replace ActionId="toggle-fxs-default-lens" ContextId="World"/>
+        <Replace ActionId="toggle-fxs-settler-lens" ContextId="Shell"/>
         <Replace ActionId="toggle-fxs-settler-lens" ContextId="Unit"/>
         <Replace ActionId="toggle-fxs-settler-lens" ContextId="World"/>
+        <Replace ActionId="toggle-fxs-continent-lens" ContextId="Shell"/>
         <Replace ActionId="toggle-fxs-continent-lens" ContextId="Unit"/>
         <Replace ActionId="toggle-fxs-continent-lens" ContextId="World"/>
+        <Replace ActionId="toggle-fxs-general-appeal-lens" ContextId="Shell"/>
         <Replace ActionId="toggle-fxs-general-appeal-lens" ContextId="Unit"/>
         <Replace ActionId="toggle-fxs-general-appeal-lens" ContextId="World"/>
+        <Replace ActionId="toggle-fxs-discovery-lens" ContextId="Shell"/>
         <Replace ActionId="toggle-fxs-discovery-lens" ContextId="Unit"/>
         <Replace ActionId="toggle-fxs-discovery-lens" ContextId="World"/>
+        <Replace ActionId="toggle-bz-religion-lens" ContextId="Shell"/>
         <Replace ActionId="toggle-bz-religion-lens" ContextId="Unit"/>
         <Replace ActionId="toggle-bz-religion-lens" ContextId="World"/>
+        <Replace ActionId="toggle-bz-commander-lens" ContextId="Shell"/>
         <Replace ActionId="toggle-bz-commander-lens" ContextId="Unit"/>
         <Replace ActionId="toggle-bz-commander-lens" ContextId="World"/>
+        <Replace ActionId="open-bz-city-panel" ContextId="Shell"/>
         <Replace ActionId="open-bz-city-panel" ContextId="Unit"/>
         <Replace ActionId="open-bz-city-panel" ContextId="World"/>
+        <Replace ActionId="open-bz-units-panel" ContextId="Shell"/>
         <Replace ActionId="open-bz-units-panel" ContextId="Unit"/>
         <Replace ActionId="open-bz-units-panel" ContextId="World"/>
+        <Replace ActionId="toggle-bz-culture-borders-layer" ContextId="Shell"/>
         <Replace ActionId="toggle-bz-culture-borders-layer" ContextId="Unit"/>
         <Replace ActionId="toggle-bz-culture-borders-layer" ContextId="World"/>
+        <Replace ActionId="toggle-bz-city-borders-layer" ContextId="Shell"/>
         <Replace ActionId="toggle-bz-city-borders-layer" ContextId="Unit"/>
         <Replace ActionId="toggle-bz-city-borders-layer" ContextId="World"/>
+        <Replace ActionId="toggle-bz-discovery-layer" ContextId="Shell"/>
         <Replace ActionId="toggle-bz-discovery-layer" ContextId="Unit"/>
         <Replace ActionId="toggle-bz-discovery-layer" ContextId="World"/>
+        <Replace ActionId="toggle-bz-fortification-layer" ContextId="Shell"/>
         <Replace ActionId="toggle-bz-fortification-layer" ContextId="Unit"/>
         <Replace ActionId="toggle-bz-fortification-layer" ContextId="World"/>
+        <Replace ActionId="toggle-bz-religion-layer" ContextId="Shell"/>
         <Replace ActionId="toggle-bz-religion-layer" ContextId="Unit"/>
         <Replace ActionId="toggle-bz-religion-layer" ContextId="World"/>
+        <Replace ActionId="toggle-bz-route-layer" ContextId="Shell"/>
         <Replace ActionId="toggle-bz-route-layer" ContextId="Unit"/>
         <Replace ActionId="toggle-bz-route-layer" ContextId="World"/>
+        <Replace ActionId="toggle-bz-terrain-layer" ContextId="Shell"/>
         <Replace ActionId="toggle-bz-terrain-layer" ContextId="Unit"/>
         <Replace ActionId="toggle-bz-terrain-layer" ContextId="World"/>
+        <Replace ActionId="toggle-bz-wonder-layer" ContextId="Shell"/>
         <Replace ActionId="toggle-bz-wonder-layer" ContextId="Unit"/>
         <Replace ActionId="toggle-bz-wonder-layer" ContextId="World"/>
+        <Replace ActionId="toggle-fxs-conquest-layer" ContextId="Shell"/>
         <Replace ActionId="toggle-fxs-conquest-layer" ContextId="Unit"/>
         <Replace ActionId="toggle-fxs-conquest-layer" ContextId="World"/>
     </InputContextConstraints>
