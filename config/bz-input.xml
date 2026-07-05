@@ -10,7 +10,7 @@
         <Replace ActionId="toggle-fxs-discovery-lens" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_TOGGLE_LENS_DISCOVERY_BZ" Description="LOC_UI_KBM_MAPPING_TOGGLE_LENS_DISCOVERY_BZ" />
         <Replace ActionId="toggle-bz-religion-lens" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_TOGGLE_LENS_RELIGION_BZ" Description="LOC_UI_KBM_MAPPING_TOGGLE_LENS_RELIGION_BZ" />
         <Replace ActionId="toggle-bz-commander-lens" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_TOGGLE_LENS_COMMANDER_BZ" Description="LOC_UI_KBM_MAPPING_TOGGLE_LENS_COMMANDER_BZ" />
-        <Replace ActionId="toggle-bz-culture-borders-layer" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS" Description="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS_BZ" />
+        <Replace ActionId="toggle-bz-culture-borders-layer" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS" Description="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS_TT" />
         <Replace ActionId="toggle-bz-city-borders-layer" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_BORDERS" Description="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_BORDERS_TT" />
         <Replace ActionId="toggle-bz-discovery-layer" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_TOGGLE_BZ_DISCOVERY_ICONS" Description="LOC_UI_KBM_MAPPING_TOGGLE_BZ_DISCOVERY_ICONS_TT" />
         <Replace ActionId="toggle-bz-fortification-layer" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_TOGGLE_BZ_FORTIFICATION_ICONS" Description="LOC_UI_KBM_MAPPING_TOGGLE_BZ_FORTIFICATION_ICONS_TT" />
