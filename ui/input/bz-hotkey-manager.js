@@ -2,12 +2,20 @@ import HotkeyManager from '/core/ui/input/hotkey-manager.js';
 import LensManager from '/core/ui/lenses/lens-manager.js';
 import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
 
+// TODO: put these on the interface mode objects?
 const modes = {
     DMT_INTERFACEMODE_MAP_TACK_CHOOSER: "dmt-map-tack-lens",
     DMT_INTERFACEMODE_PLACE_MAP_TACKS: "dmt-map-tack-lens",
     INTERFACEMODE_ACQUIRE_TILE: "fxs-acquire-tile-lens",
-    INTERFACEMODE_BONUS_PLACEMENT: "fxs-settler-lens",
     INTERFACEMODE_PLACE_BUILDING: "fxs-building-placement-lens",
+    INTERFACEMODE_CINEMATIC: "fxs-cinematic-lens",
+    INTERFACEMODE_PEACE_DEAL: "fxs-diplomacy-lens",
+    INTERFACEMODE_DIPLOMACY_PROJECT_REACTION: "fxs-diplomacy-lens",
+    INTERFACEMODE_DIPLOMACY_DIALOG: "fxs-diplomacy-lens",
+    INTERFACEMODE_DIPLOMACY_HUB: "fxs-diplomacy-lens",
+    INTERFACEMODE_CALL_TO_ARMS: "fxs-diplomacy-lens",
+    INTERFACEMODE_HOTSEAT: "fxs-hotseat-lens",
+    INTERFACEMODE_BONUS_PLACEMENT: "fxs-settler-lens",
 }
 
 const HM_handleInput = HotkeyManager.handleInput;
