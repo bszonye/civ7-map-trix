@@ -2,8 +2,8 @@ import HotkeyManager from '/core/ui/input/hotkey-manager.js';
 import LensManager from '/core/ui/lenses/lens-manager.js';
 import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
 
-// TODO: put these on the interface mode objects?
-const modes = {
+// default lenses for interface modes that don't use fxs-default-lens
+const BZ_MODE_DEFAULTS = {
     DMT_INTERFACEMODE_MAP_TACK_CHOOSER: "dmt-map-tack-lens",
     DMT_INTERFACEMODE_PLACE_MAP_TACKS: "dmt-map-tack-lens",
     INTERFACEMODE_ACQUIRE_TILE: "fxs-acquire-tile-lens",
@@ -17,6 +17,20 @@ const modes = {
     INTERFACEMODE_HOTSEAT: "fxs-hotseat-lens",
     INTERFACEMODE_BONUS_PLACEMENT: "fxs-settler-lens",
 }
+Loading.runWhenLoaded(() => {
+    for (const [mode, lens] of Object.entries(BZ_MODE_DEFAULTS)) {
+        const handler = InterfaceMode.getInterfaceModeHandler(mode);
+        if (handler) handler.bzDefaultLens ??= lens;
+    }
+});
+
+// set the default lens for the mode, from handler.bzDefaultLens
+function setDefaultLens() {
+    const mode = InterfaceMode.getCurrent();
+    const handler = InterfaceMode.getInterfaceModeHandler(mode);
+    const lens = handler?.bzDefaultLens ?? "fxs-default-lens";
+    LensManager.setActiveLens(lens);
+}
 
 const HM_handleInput = HotkeyManager.handleInput;
 HotkeyManager.handleInput = function(...args) {
@@ -26,9 +40,7 @@ HotkeyManager.handleInput = function(...args) {
         const name = inputEvent.detail.name;
         switch (name) {
             case "toggle-fxs-default-lens": {
-                const mode = InterfaceMode.getCurrent();
-                const lens = modes[mode] ?? "fxs-default-lens";
-                LensManager.setActiveLens(lens);
+                setDefaultLens();
                 return false;
             }
             case "toggle-fxs-settler-lens":
@@ -41,9 +53,7 @@ HotkeyManager.handleInput = function(...args) {
                 if (LensManager.getActiveLens() != lens) {
                     LensManager.setActiveLens(lens);
                 } else {
-                    const mode = InterfaceMode.getCurrent();
-                    const lens = modes[mode] ?? "fxs-default-lens";
-                    LensManager.setActiveLens(lens);
+                    setDefaultLens();
                 }
                 return false;
             }
