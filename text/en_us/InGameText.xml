@@ -103,6 +103,9 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_CONTINENT_BZ">
             <Text>Lenses: Continent</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_TRADE_BZ">
+            <Text>Lenses: Trade</Text>
+        </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_GENERAL_APPEAL_BZ">
             <Text>Lenses: Appeal</Text>
         </Replace>

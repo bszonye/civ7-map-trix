@@ -103,6 +103,9 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_CONTINENT_BZ" Language="zh_Hans_CN">
             <Text>滤镜：大陆</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_TRADE_BZ" Language="zh_Hans_CN">
+            <Text>滤镜：贸易</Text>
+        </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_GENERAL_APPEAL_BZ" Language="zh_Hans_CN">
             <Text>滤镜：吸引力</Text>
         </Replace>

@@ -103,6 +103,9 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_CONTINENT_BZ" Language="de_DE">
             <Text>Linsen: Kontinent</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_TRADE_BZ" Language="de_DE">
+            <Text>Linsen: Handel</Text>
+        </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_GENERAL_APPEAL_BZ" Language="de_DE">
             <Text>Linsen: Anziehungskraft</Text>
         </Replace>

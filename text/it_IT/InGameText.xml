@@ -103,6 +103,9 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_CONTINENT_BZ" Language="it_IT">
             <Text>Lenti: Continente</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_TRADE_BZ" Language="it_IT">
+            <Text>Lenti: Commercio</Text>
+        </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_GENERAL_APPEAL_BZ" Language="it_IT">
             <Text>Lenti: Appeal</Text>
         </Replace>

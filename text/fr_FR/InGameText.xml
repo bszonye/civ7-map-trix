@@ -111,6 +111,9 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_CONTINENT_BZ" Language="fr_FR">
             <Text>Filtres: Continent</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_TRADE_BZ" Language="fr_FR">
+            <Text>Filtres: Commerce</Text>
+        </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_GENERAL_APPEAL_BZ" Language="fr_FR">
             <Text>Filtres: Attrait</Text>
         </Replace>

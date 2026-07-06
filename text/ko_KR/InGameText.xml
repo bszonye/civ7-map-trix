@@ -103,6 +103,9 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_CONTINENT_BZ" Language="ko_KR">
             <Text>렌즈: 대륙</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_TRADE_BZ" Language="ko_KR">
+            <Text>렌즈: 교역</Text>
+        </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_GENERAL_APPEAL_BZ" Language="ko_KR">
             <Text>렌즈: 매력도</Text>
         </Replace>
