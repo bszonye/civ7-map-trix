@@ -18,6 +18,8 @@ const BZ_MODE_DEFAULTS = {
     INTERFACEMODE_BONUS_PLACEMENT: "fxs-settler-lens",
 }
 Loading.runWhenLoaded(() => {
+    // after all interface modes are initialized, set the default lens
+    // for any that don't use fxs-default-lens.
     for (const [mode, lens] of Object.entries(BZ_MODE_DEFAULTS)) {
         const handler = InterfaceMode.getInterfaceModeHandler(mode);
         if (handler) handler.bzDefaultLens ??= lens;
