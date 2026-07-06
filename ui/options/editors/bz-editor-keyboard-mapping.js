@@ -1,6 +1,7 @@
 const BZ_KEYS_TO_ADD = [
     "open-bz-city-panel",
     "open-bz-units-panel",
+    "open-bz-lens-panel",
     "toggle-fxs-default-lens",
     "toggle-fxs-settler-lens",
     "toggle-fxs-continent-lens",

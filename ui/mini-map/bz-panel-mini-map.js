@@ -230,6 +230,7 @@ class bzPanelMiniMap {
     engineInputListener = this.onEngineInput.bind(this);
     cityHotkeyListener = this.onCityHotkey.bind(this);
     unitsHotkeyListener = this.onUnitsHotkey.bind(this);
+    lensesHotkeyListener = this.onLensesHotkey.bind(this);
     layerHotkeyListener = this.onLayerHotkey.bind(this);
     toggleCooldown = 0;
     toggleQueued = false;
@@ -276,6 +277,7 @@ class bzPanelMiniMap {
     afterAttach() {
         window.addEventListener("hotkey-open-bz-city-panel", this.cityHotkeyListener);
         window.addEventListener("hotkey-open-bz-units-panel", this.unitsHotkeyListener);
+        window.addEventListener("hotkey-open-bz-lens-panel", this.lensesHotkeyListener);
         window.addEventListener("layer-hotkey", this.layerHotkeyListener);
         this.component.Root
             .addEventListener(InputEngineEventName, this.engineInputListener);
@@ -283,6 +285,7 @@ class bzPanelMiniMap {
     beforeDetach() {
         window.removeEventListener("hotkey-open-bz-city-panel", this.cityHotkeyListener);
         window.removeEventListener("hotkey-open-bz-units-panel", this.unitsHotkeyListener);
+        window.removeEventListener("hotkey-open-bz-lens-panel", this.lensesHotkeyListener);
         window.removeEventListener("layer-hotkey", this.layerHotkeyListener);
         this.component.Root
             .removeEventListener(InputEngineEventName, this.engineInputListener);
@@ -337,6 +340,9 @@ class bzPanelMiniMap {
     }
     onUnitsHotkey(_event) {
         this.togglePanel(this.unitsSubpanel);
+    }
+    onLensesHotkey(_event) {
+        this.component.toggleLensPanel();
     }
     onLayerHotkey(hotkey) {
         if (hotkey.detail.name == "toggle-fxs-conquest-layer") {

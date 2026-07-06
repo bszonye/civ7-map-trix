@@ -39,6 +39,11 @@ HotkeyManager.handleInput = function(...args) {
     if (status == InputActionStatuses.FINISH) {
         const name = inputEvent.detail.name;
         switch (name) {
+            case "open-bz-city-panel":
+            case "open-bz-units-panel":
+            case "open-bz-lens-panel":
+                this.sendHotkeyEvent(name);
+                return false;
             case "toggle-fxs-default-lens": {
                 setDefaultLens();
                 return false;
@@ -57,10 +62,6 @@ HotkeyManager.handleInput = function(...args) {
                 }
                 return false;
             }
-            case "open-bz-city-panel":
-            case "open-bz-units-panel":
-                this.sendHotkeyEvent(name);
-                return false;
             case "toggle-bz-culture-borders-layer":
             case "toggle-bz-city-borders-layer":
             case "toggle-bz-discovery-layer":

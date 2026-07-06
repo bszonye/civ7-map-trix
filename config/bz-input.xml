@@ -3,6 +3,7 @@
     <InputActions>
         <Replace ActionId="open-bz-city-panel" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_OPEN_BZ_SETTLEMENTS" Description="LOC_UI_KBM_MAPPING_OPEN_BZ_SETTLEMENTS_TT" />
         <Replace ActionId="open-bz-units-panel" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS" Description="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS_TT" />
+        <Replace ActionId="open-bz-lens-panel" DeviceType="Keyboard" Name="LOC_OPEN_LENS_PANEL" Description="LOC_OPEN_LENS_PANEL_HELP" />
         <Replace ActionId="toggle-fxs-default-lens" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_TOGGLE_LENS_DEFAULT_BZ" Description="LOC_UI_KBM_MAPPING_TOGGLE_LENS_DEFAULT_BZ" />
         <Replace ActionId="toggle-fxs-settler-lens" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_TOGGLE_LENS_SETTLER_BZ" Description="LOC_UI_KBM_MAPPING_TOGGLE_LENS_SETTLER_BZ" />
         <Replace ActionId="toggle-fxs-continent-lens" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_TOGGLE_LENS_CONTINENT_BZ" Description="LOC_UI_KBM_MAPPING_TOGGLE_LENS_CONTINENT_BZ" />
@@ -21,10 +22,15 @@
         <Replace ActionId="toggle-fxs-conquest-layer" DeviceType="Keyboard" Name="LOC_UI_MINI_MAP_CONQUEST" Description="LOC_UI_MINI_MAP_CONQUEST_TOOLTIP" />
     </InputActions>
     <InputContextConstraints>
+        <Replace ActionId="open-bz-city-panel" ContextId="Shell"/>
         <Replace ActionId="open-bz-city-panel" ContextId="Unit"/>
         <Replace ActionId="open-bz-city-panel" ContextId="World"/>
+        <Replace ActionId="open-bz-units-panel" ContextId="Shell"/>
         <Replace ActionId="open-bz-units-panel" ContextId="Unit"/>
         <Replace ActionId="open-bz-units-panel" ContextId="World"/>
+        <Replace ActionId="open-bz-lens-panel" ContextId="Shell"/>
+        <Replace ActionId="open-bz-lens-panel" ContextId="Unit"/>
+        <Replace ActionId="open-bz-lens-panel" ContextId="World"/>
         <Replace ActionId="toggle-fxs-default-lens" ContextId="Unit"/>
         <Replace ActionId="toggle-fxs-default-lens" ContextId="World"/>
         <Replace ActionId="toggle-fxs-settler-lens" ContextId="Unit"/>
@@ -61,6 +67,8 @@
     <InputActionDefaultGestures>
         <Replace ActionId="open-bz-city-panel" Index="0" GestureType="KBMouse" GestureData="KEY_SHIFT+KEY_S"/>
         <Replace ActionId="open-bz-units-panel" Index="0" GestureType="KBMouse" GestureData="KEY_SHIFT+KEY_U"/>
+        <Replace ActionId="open-bz-lens-panel" Index="0" GestureType="KBMouse" GestureData="KEY_MINUS"/>
+        <Replace ActionId="open-bz-lens-panel" Index="1" GestureType="KBMouse" GestureData="KEY_NP_MINUS"/>
         <Replace ActionId="toggle-fxs-default-lens" Index="0" GestureType="KBMouse" GestureData="KEY_0"/>
         <Replace ActionId="toggle-fxs-default-lens" Index="1" GestureType="KBMouse" GestureData="KEY_NP_0"/>
         <Replace ActionId="toggle-fxs-settler-lens" Index="0" GestureType="KBMouse" GestureData="KEY_1"/>
