@@ -24,14 +24,6 @@ Loading.runWhenLoaded(() => {
     }
 });
 
-// set the default lens for the mode, from handler.bzDefaultLens
-function setDefaultLens() {
-    const mode = InterfaceMode.getCurrent();
-    const handler = InterfaceMode.getInterfaceModeHandler(mode);
-    const lens = handler?.bzDefaultLens ?? "fxs-default-lens";
-    LensManager.setActiveLens(lens);
-}
-
 const HM_handleInput = HotkeyManager.handleInput;
 HotkeyManager.handleInput = function(...args) {
     const [inputEvent] = args;
@@ -44,10 +36,6 @@ HotkeyManager.handleInput = function(...args) {
             case "open-bz-lens-panel":
                 this.sendHotkeyEvent(name);
                 return false;
-            case "toggle-fxs-default-lens": {
-                setDefaultLens();
-                return false;
-            }
             case "toggle-fxs-settler-lens":
             case "toggle-fxs-continent-lens":
             case "toggle-fxs-trade-lens":
@@ -58,9 +46,16 @@ HotkeyManager.handleInput = function(...args) {
                 const lens = name.substr("toggle-".length);
                 if (LensManager.getActiveLens() != lens) {
                     LensManager.setActiveLens(lens);
-                } else {
-                    setDefaultLens();
+                    return false;
                 }
+            }
+            // fall through
+            case "toggle-fxs-default-lens": {
+                // set the default lens for the current interface mode
+                const mode = InterfaceMode.getCurrent();
+                const handler = InterfaceMode.getInterfaceModeHandler(mode);
+                const lens = handler?.bzDefaultLens ?? "fxs-default-lens";
+                LensManager.setActiveLens(lens);
                 return false;
             }
             case "toggle-bz-culture-borders-layer":
