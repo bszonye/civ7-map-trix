@@ -8,6 +8,7 @@ import '/base-standard/ui/lenses/layer/conquest-layer.js';
 import '/base-standard/ui/lenses/layer/hexgrid-layer.js';
 import '/base-standard/ui/lenses/lens/default-lens.js';
 import '/base-standard/ui/lenses/lens/discovery-lens.js';
+import '/base-standard/ui/lenses/lens/trade-lens.js';
 
 const LENS_CATALOG_OBJECT_NAME = "tracked-lens";
 
@@ -382,10 +383,9 @@ Controls.decorate("lens-panel", (component) => new bzLensPanel(component));
 
 export { bzPanelMiniMap };
 
-// TradeRouteChooser extension
+// patch TradeRouteChooser to allow World context hotkeys
 class bzTradeRouteChooser {
     constructor(component) {
-        // enable World hotkeys while trade panel is open
         component.inputContext = InputContext.World;
     }
     beforeAttach() { }
@@ -394,3 +394,11 @@ class bzTradeRouteChooser {
     afterDetach() { }
 }
 Controls.decorate("trade-route-chooser", (component) => new bzTradeRouteChooser(component));
+
+// patch Trade layer to fix race condition when switching lenses quickly
+const fxsTradeLayer = LensManager.layers.get("fxs-trade-layer");
+const FTL_applyLayer = fxsTradeLayer.applyLayer;
+fxsTradeLayer.applyLayer = async function(...args) {
+    await FTL_applyLayer.apply(this, args);
+    if (!LensManager.isLayerEnabled("fxs-trade-layer")) this.removeLayer();
+}
