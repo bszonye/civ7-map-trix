@@ -5,6 +5,7 @@ const BZ_KEYS_TO_ADD = [
     "toggle-fxs-default-lens",
     "toggle-fxs-settler-lens",
     "toggle-fxs-continent-lens",
+    "toggle-fxs-trade-lens",
     "toggle-fxs-general-appeal-lens",
     "toggle-fxs-discovery-lens",
     "toggle-bz-religion-lens",

@@ -381,3 +381,16 @@ class bzLensPanel {
 Controls.decorate("lens-panel", (component) => new bzLensPanel(component));
 
 export { bzPanelMiniMap };
+
+// TradeRouteChooser extension
+class bzTradeRouteChooser {
+    constructor(component) {
+        // enable World hotkeys while trade panel is open
+        component.inputContext = InputContext.World;
+    }
+    beforeAttach() { }
+    afterAttach() { }
+    beforeDetach() { }
+    afterDetach() { }
+}
+Controls.decorate("trade-route-chooser", (component) => new bzTradeRouteChooser(component));

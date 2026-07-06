@@ -50,6 +50,7 @@ HotkeyManager.handleInput = function(...args) {
             }
             case "toggle-fxs-settler-lens":
             case "toggle-fxs-continent-lens":
+            case "toggle-fxs-trade-lens":
             case "toggle-fxs-general-appeal-lens":
             case "toggle-fxs-discovery-lens":
             case "toggle-bz-religion-lens":
