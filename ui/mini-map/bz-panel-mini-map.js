@@ -358,6 +358,8 @@ class bzLensPanel {
     constructor(component) {
         component.bzComponent = this;
         this.component = component;
+        // enable World hotkeys while lens panel is open
+        this.component.inputContext = InputContext.World;
     }
     beforeAttach() { }
     afterAttach() {
