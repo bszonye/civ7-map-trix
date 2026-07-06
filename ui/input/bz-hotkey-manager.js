@@ -51,7 +51,7 @@ HotkeyManager.handleInput = function(...args) {
                     LensManager.setActiveLens(lens);
                     return false;
                 }
-                // else: fall through
+                // else: fall through to toggle the lens off
             }
             case "toggle-fxs-default-lens": {
                 // set the default lens for the current interface mode
