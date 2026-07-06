@@ -45,13 +45,14 @@ HotkeyManager.handleInput = function(...args) {
             case "toggle-fxs-discovery-lens":
             case "toggle-bz-religion-lens":
             case "toggle-bz-commander-lens": {
+                // activate the lens, if it isn't already active
                 const lens = name.substr("toggle-".length);
                 if (LensManager.getActiveLens() != lens) {
                     LensManager.setActiveLens(lens);
                     return false;
                 }
+                // else: fall through
             }
-            // fall through
             case "toggle-fxs-default-lens": {
                 // set the default lens for the current interface mode
                 const mode = InterfaceMode.getCurrent();
