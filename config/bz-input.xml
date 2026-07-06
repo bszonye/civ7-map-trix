@@ -23,13 +23,10 @@
         <Replace ActionId="toggle-fxs-conquest-layer" DeviceType="Keyboard" Name="LOC_UI_MINI_MAP_CONQUEST" Description="LOC_UI_MINI_MAP_CONQUEST_TOOLTIP" />
     </InputActions>
     <InputContextConstraints>
-        <Replace ActionId="open-bz-city-panel" ContextId="Shell"/>
         <Replace ActionId="open-bz-city-panel" ContextId="Unit"/>
         <Replace ActionId="open-bz-city-panel" ContextId="World"/>
-        <Replace ActionId="open-bz-units-panel" ContextId="Shell"/>
         <Replace ActionId="open-bz-units-panel" ContextId="Unit"/>
         <Replace ActionId="open-bz-units-panel" ContextId="World"/>
-        <Replace ActionId="open-bz-lens-panel" ContextId="Shell"/>
         <Replace ActionId="open-bz-lens-panel" ContextId="Unit"/>
         <Replace ActionId="open-bz-lens-panel" ContextId="World"/>
         <Replace ActionId="toggle-fxs-default-lens" ContextId="Unit"/>
