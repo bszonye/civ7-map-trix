@@ -33,6 +33,17 @@ HotkeyManager.handleInput = function(...args) {
     if (status == InputActionStatuses.FINISH) {
         const name = inputEvent.detail.name;
         switch (name) {
+            case "bz-capital-city": {
+                const player = Players.get(GameContext.localObserverID);
+                const city = player?.Cities?.getCapital();
+                if (!city) return false;
+                if (InterfaceMode.getCurrent() == "INTERFACEMODE_CITY_PRODUCTION") {
+                    UI.Player.selectCity(city.id);
+                } else {
+                    Camera.lookAtPlot(city.location);
+                }
+                return false;
+            }
             case "open-bz-city-panel":
             case "open-bz-units-panel":
             case "open-bz-lens-panel":

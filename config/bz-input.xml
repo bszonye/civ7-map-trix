@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Database>
     <InputActions>
+        <Replace ActionId="bz-capital-city" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_CAPITAL_CITY" Description="LOC_UI_KBM_MAPPING_CAPITAL_CITY_TT" />
         <Replace ActionId="open-bz-city-panel" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_OPEN_BZ_SETTLEMENTS" Description="LOC_UI_KBM_MAPPING_OPEN_BZ_SETTLEMENTS_TT" />
         <Replace ActionId="open-bz-units-panel" DeviceType="Keyboard" Name="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS" Description="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS_TT" />
         <Replace ActionId="open-bz-lens-panel" DeviceType="Keyboard" Name="LOC_OPEN_LENS_PANEL" Description="LOC_OPEN_LENS_PANEL_HELP" />
@@ -23,6 +24,9 @@
         <Replace ActionId="toggle-fxs-conquest-layer" DeviceType="Keyboard" Name="LOC_UI_MINI_MAP_CONQUEST" Description="LOC_UI_MINI_MAP_CONQUEST_TOOLTIP" />
     </InputActions>
     <InputContextConstraints>
+        <Replace ActionId="bz-capital-city" ContextId="Dual"/>
+        <Replace ActionId="bz-capital-city" ContextId="Unit"/>
+        <Replace ActionId="bz-capital-city" ContextId="World"/>
         <Replace ActionId="open-bz-city-panel" ContextId="Unit"/>
         <Replace ActionId="open-bz-city-panel" ContextId="World"/>
         <Replace ActionId="open-bz-units-panel" ContextId="Unit"/>
@@ -65,6 +69,7 @@
         <Replace ActionId="toggle-fxs-conquest-layer" ContextId="World"/>
     </InputContextConstraints>
     <InputActionDefaultGestures>
+        <Replace ActionId="bz-capital-city" Index="0" GestureType="KBMouse" GestureData="KEY_HOME"/>
         <Replace ActionId="open-bz-city-panel" Index="0" GestureType="KBMouse" GestureData="KEY_SHIFT+KEY_S"/>
         <Replace ActionId="open-bz-units-panel" Index="0" GestureType="KBMouse" GestureData="KEY_SHIFT+KEY_U"/>
         <Replace ActionId="open-bz-lens-panel" Index="0" GestureType="KBMouse" GestureData="KEY_MINUS"/>
