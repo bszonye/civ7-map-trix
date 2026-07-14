@@ -1,5 +1,6 @@
 import HotkeyManager from '/core/ui/input/hotkey-manager.js';
 import LensManager from '/core/ui/lenses/lens-manager.js';
+import { ComponentID } from '/core/ui/utilities/utilities-component-id.js';
 import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
 
 // default lenses for interface modes that don't use fxs-default-lens
@@ -37,9 +38,19 @@ HotkeyManager.handleInput = function(...args) {
                 const player = Players.get(GameContext.localObserverID);
                 const city = player?.Cities?.getCapital();
                 if (!city) return false;
-                if (InterfaceMode.getCurrent() == "INTERFACEMODE_CITY_PRODUCTION") {
+                const center = Camera.pickPlot(0.5, 0.5);
+                const selected = UI.Player.getHeadSelectedCity();
+                if (ComponentID.isMatch(selected, city.id)) {
+                    // capital selected: deselect it
+                    UI.Player.deselectAllCities();
+                } else if (ComponentID.isValid(selected)) {
+                    // other settlement selected: switch to capital
+                    UI.Player.selectCity(city.id);
+                } else if (center.x == city.location.x && center.y == city.location.y) {
+                    // camera centered on capital: select it
                     UI.Player.selectCity(city.id);
                 } else {
+                    // otherwise: look at capital city
                     Camera.lookAtPlot(city.location);
                 }
                 return false;
