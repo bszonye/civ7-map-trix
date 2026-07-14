@@ -36,22 +36,27 @@ HotkeyManager.handleInput = function(...args) {
         switch (name) {
             case "bz-capital-city": {
                 const player = Players.get(GameContext.localObserverID);
-                const city = player?.Cities?.getCapital();
-                if (!city) return false;
-                const center = Camera.pickPlot(0.5, 0.5);
+                const capital = player?.Cities?.getCapital();
+                if (!capital) return false;
                 const selected = UI.Player.getHeadSelectedCity();
-                if (ComponentID.isMatch(selected, city.id)) {
-                    // capital selected: deselect it
-                    UI.Player.deselectAllCities();
-                } else if (ComponentID.isValid(selected)) {
-                    // other settlement selected: switch to capital
-                    UI.Player.selectCity(city.id);
-                } else if (center.x == city.location.x && center.y == city.location.y) {
-                    // camera centered on capital: select it
-                    UI.Player.selectCity(city.id);
+                if (ComponentID.isValid(selected)) {
+                    // city view: switch to capital
+                    if (ComponentID.isMatch(selected, capital.id)) {
+                        // capital already selected: close panel
+                        UI.Player.deselectAllCities();
+                        return false;
+                    }
+                    UI.Player.selectCity(capital.id);
                 } else {
-                    // otherwise: look at capital city
-                    Camera.lookAtPlot(city.location);
+                    // world view: center map on capital
+                    const center = Camera.pickPlot(0.5, 0.5);
+                    const loc = capital.location;
+                    if (center && center.x == loc.x && center.y == loc.y) {
+                        // capital already centered: select it
+                        UI.Player.selectCity(capital.id);
+                        return false;
+                    }
+                    Camera.lookAtPlot(loc);
                 }
                 return false;
             }
