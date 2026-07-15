@@ -54,10 +54,12 @@
             </Properties>
             <Actions>
                 <ImportFiles>
+                    <Item>icons/bz-wonder-decoration.png</Item>
                     <Item>ui/bz-city-panel/panel-city-list.css</Item>
                     <Item>ui/bz-style/bz-panel-yield-banner.css</Item>
                     <Item>ui/bz-units-panel/panel-units.css</Item>
-                    <Item>icons/bz-wonder-decoration.png</Item>
+                    <Item>ui-next/tooltips/plot-tooltip/components/alerts.js</Item>
+                    <Item>ui-next/tooltips/plot-tooltip/plot-tooltip.js</Item>
                 </ImportFiles>
                 <UIScripts>
                     <Item>ui/bz-city-panel/model-city-list.js</Item>
