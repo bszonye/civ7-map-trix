@@ -54,6 +54,7 @@ class bzUnitListModel {
     _unitList = [];
     constructor() {
         this.updateGate.call("constructor");
+        engine.on("LocalPlayerChanged", this.onPlayerChanged, this);
         engine.on("UnitActivityChanged", this.onUnitUpdate, this);
         engine.on("UnitAddedToArmy", this.onUnitUpdate, this);
         engine.on("UnitAddedToMap", this.onUnitUpdate, this);
@@ -359,6 +360,11 @@ class bzUnitListModel {
             UI.Player.lookAtID(unit.id, 0);
             UI.Player.selectUnit(unit.id);
         }
+    }
+    onPlayerChanged(event) {
+        const id = event?.player;
+        if (id == this.player?.id) return;
+        this.updateGate.call("onPlayerChanged");
     }
     onUnitSelection(event) {
         if (this.pauseSelection) return;
