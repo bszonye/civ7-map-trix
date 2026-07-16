@@ -59,7 +59,7 @@ class bzDiscoveryLensLayer {
             if (!item) continue;
             const info = GameInfo.Constructibles.lookup(item.type);
             if (!info || !info.Discovery && !info.Archaeology) continue;
-            const asset = UI.getIconBLP(BZ_ICON_DISCOVERY);
+            const asset = UI.getIconBLP(BZ_ICON_DISCOVERY, "FONTICON");
             const params = { scale: SPRITE_SIZE * this.upscaleMultiplier };
             this.bzSpriteGrid.addSprite(loc, asset, SPRITE_OFFSET, params);
             return;
