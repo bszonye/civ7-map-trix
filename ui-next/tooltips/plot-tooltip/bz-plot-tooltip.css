@@ -1,0 +1,145 @@
+/* vim: sw=2 et */
+.bz-plot-tooltip {
+  /* game colors */
+  --bz-color-silver: #4c5366;  /* = primary */
+  --bz-color-bronze: #e5d2ac;  /* = secondary */
+  --bz-color-primary: #4c5366;
+  --bz-color-primary-1: #8d97a6;
+  --bz-color-primary-2: #4c5366;
+  --bz-color-primary-3: #333640;
+  --bz-color-primary-4: #23252b;
+  --bz-color-primary-5: #12151f;
+  --bz-color-secondary: #e5d2ac;
+  --bz-color-secondary-1: #e5d2ac;
+  --bz-color-secondary-2: #8c7e62;
+  --bz-color-secondary-3: #4c473d;
+  --bz-color-accent: #616266;
+  --bz-color-accent-1: #e5e5e5;
+  --bz-color-accent-2: #c2c4cc;
+  --bz-color-accent-3: #9da0a6;
+  --bz-color-accent-4: #85878c;
+  --bz-color-accent-5: #616266;
+  --bz-color-accent-6: #05070d;
+  /* bronze shades */
+  --bz-color-bronze-1: #f9ecd2;
+  --bz-color-bronze-2: #e5d2ac;  /* = secondary1 */
+  --bz-color-bronze-3: #c7b28a;
+  --bz-color-bronze-4: #a99670;
+  --bz-color-bronze-5: #8c7e62;  /* = secondary 2 */
+  --bz-color-bronze-6: #4c473d;  /* = secondary 3 */
+  /* rules background */
+  --bz-color-rules: #8c7e6233;
+  /* alert colors */
+  --bz-color-black: #000000;
+  --bz-color-danger: #af1b1c99;  /* danger = militaristic 60% opacity */
+  --bz-color-caution: #cea92f;  /* caution = healthbar-medium */
+  --bz-color-note: #ff800033;  /* note = orange 20% opacity */
+  /* geographic colors */
+  --bz-color-hill: #ea995266;  /* Rough terrain = orange 40% opacity */
+  --bz-color-mountain: #aa998866;  /* Mountain terrain = warm gray 40% opacity */
+  --bz-color-aquatic: #00ffee66;  /* Aquatic = teal 40% opacity */
+  --bz-color-vegetated: #aaff0033;  /* Vegetated features = green 20% opacity */
+  --bz-color-wet: #55ffff33;  /* Wet obstacles = teal 20% opacity */
+  --bz-color-floodplain: #ff800033;  /* Floodplains = orange 20% opacity */
+  --bz-color-fresh-water: #55aaff66;  /* Fresh water = azure 60% opacity */
+  --bz-color-river: var(--bz-color-fresh-water);
+  --bz-color-road: #e5d2ac66;  /* Roads = bronze 40% opacity */
+  --bz-color-rail: #c2c4cc66;  /* Railroads = silver 40% opacity */
+  --bz-color-bridge: #d4c9c466;  /* Bridges = warm gray 40% opacity */
+  /* yield types */
+  --bz-color-food: #80b34d;        /*  90° 40 50 green */
+  --bz-color-production: #a33d29;  /*  10° 60 40 red */
+  --bz-color-gold: #f6ce55;        /*  45° 90 65 yellow */
+  --bz-color-science: #6ca6e0;     /* 210° 65 65 cyan */
+  --bz-color-culture: #5c5cd6;     /* 240° 60 60 violet */
+  --bz-color-happiness: #f5993d;   /*  30° 90 60 orange */
+  --bz-color-diplomacy: #afb7cf;   /* 225° 25 75 gray */
+  /* independent power types */
+  --bz-color-militaristic: #af1b1c;
+  --bz-color-scientific: #4d7c96;
+  --bz-color-economic: #ffd553;
+  --bz-color-cultural: #892bb3;
+  --bz-color-expansionist: #00a717;
+  --bz-color-diplomatic: #255be4;
+}
+
+.bz-plot-tooltip .bz-keyword-pill {
+  border: 1px solid #53565d;
+  background-color: #23252b;
+}
+
+.bz-plot-tooltip .text-secondary {
+  fxs-font-gradient-color: var(--bz-color-bronze-1);
+  color: var(--bz-color-bronze-2);
+}
+
+.bz-plot-tooltip .bz-alert-primary { background-color: var(--bz-color-primary); }
+.bz-plot-tooltip .bz-alert-secondary { background-color: var(--bz-color-secondary); color: var(--bz-color-black); }
+.bz-plot-tooltip .bz-alert-title { fxs-font-gradient-color: var(--bz-color-bronze-1); color: var(--bz-color-bronze-2); }
+.bz-plot-tooltip .bz-alert-black { background-color: var(--bz-color-black); }
+.bz-plot-tooltip .bz-alert-danger { background-color: var(--bz-color-danger); }
+.bz-plot-tooltip .bz-alert-enemy { background-color: var(--bz-color-danger); }
+.bz-plot-tooltip .bz-alert-caution { background-color: var(--bz-color-caution); color: var(--bz-color-black); }
+.bz-plot-tooltip .bz-alert-note { background-color: var(--bz-color-note); }
+.bz-plot-tooltip .bz-alert-DEBUG { background-color: #80808080; }
+
+.bz-plot-tooltip .bz-style-debug {
+  background-color: var(--bz-color-bronze-6);
+}
+.bz-plot-tooltip .bz-style-TERRAIN_HILL {
+  border: none;
+  background-color: var(--bz-color-hill);
+}
+.bz-plot-tooltip .bz-style-TERRAIN_MOUNTAIN {
+  border: none;
+  background-color: var(--bz-color-mountain);
+}
+.bz-plot-tooltip .bz-style-TERRAIN_OCEAN { }
+.bz-plot-tooltip .bz-style-FEATURE_CLASS_AQUATIC { }
+.bz-plot-tooltip .bz-style-FEATURE_ATOLL {
+  border: none;
+  background-color: var(--bz-color-aquatic);
+  color: var(--bz-color-accent-1);
+}
+.bz-plot-tooltip .bz-style-FEATURE_CLASS_FLOODPLAIN {
+  border: none;
+  background-color: var(--bz-color-floodplain);
+}
+.bz-plot-tooltip .bz-style-FEATURE_CLASS_VEGETATED {
+  border: none;
+  background-color: var(--bz-color-vegetated);
+}
+.bz-plot-tooltip .bz-style-FEATURE_CLASS_WET {
+  border: none;
+  background-color: var(--bz-color-wet);
+}
+.bz-plot-tooltip .bz-style-fresh-water,
+.bz-plot-tooltip .bz-style-FEATURE_OASIS,
+.bz-plot-tooltip .bz-style-FEATURE_WATERING_HOLE,
+.bz-plot-tooltip .bz-style-river,
+.bz-plot-tooltip .bz-style-RIVER_MINOR,
+.bz-plot-tooltip .bz-style-RIVER_NAVIGABLE {
+  border: none;
+  background-color: var(--bz-color-fresh-water);
+}
+.bz-plot-tooltip .bz-style-FEATURE_VOLCANO_ACTIVE {
+  border: none;
+  background-color: var(--bz-color-caution);
+  color: var(--bz-color-black);
+}
+.bz-plot-tooltip .bz-style-LOC_VOLCANO_NOT_ACTIVE {
+  border: none;
+  background-color: var(--bz-color-note);
+}
+.bz-plot-tooltip .bz-style-ROUTE_RAILROAD {
+  border: none;
+  background-color: var(--bz-color-rail);
+}
+.bz-plot-tooltip .bz-style-ROUTE_ROAD {
+  border: none;
+  background-color: var(--bz-color-road);
+}
+.bz-plot-tooltip .bz-style-ROUTE_BRIDGE {
+  border: none;
+  background-color: var(--bz-color-bridge);
+}
