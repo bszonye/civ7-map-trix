@@ -58,10 +58,6 @@
                     <Item>ui/bz-city-panel/panel-city-list.css</Item>
                     <Item>ui/bz-style/bz-panel-yield-banner.css</Item>
                     <Item>ui/bz-units-panel/panel-units.css</Item>
-                    <Item>ui-next/tooltips/plot-tooltip/components/alerts.js</Item>
-                    <Item>ui-next/tooltips/plot-tooltip/components/treasure-convoy-section.js</Item>
-                    <Item>ui-next/tooltips/plot-tooltip/components/unique-quarter-section.js</Item>
-                    <Item>ui-next/tooltips/plot-tooltip/bz-helpers.js</Item>
                     <Item>ui-next/tooltips/plot-tooltip/bz-plot-tooltip.css</Item>
                     <Item>ui-next/tooltips/plot-tooltip/plot-tooltip.js</Item>
                 </ImportFiles>
@@ -87,6 +83,17 @@
                     <Item>ui/options/bz-map-trix-options.js</Item>
                     <Item>ui/options/mod-options.js</Item>
                     <Item>ui/tooltips/bz-plot-tooltip.js</Item>
+                    <Item>ui-next/tooltips/plot-tooltip/components/bz-alerts.js</Item>
+                    <Item>ui-next/tooltips/plot-tooltip/components/bz-treasure-convoy-section.js</Item>
+                    <Item>ui-next/tooltips/plot-tooltip/components/bz-unique-quarter-section.js</Item>
+                    <Item>ui-next/tooltips/plot-tooltip/components/bz-utility.js</Item>
+                    <Item>ui-next/tooltips/plot-tooltip/components/bz-volcano-section.js</Item>
+                    <Item>ui-next/tooltips/plot-tooltip/bz-archeology-content.js</Item>
+                    <Item>ui-next/tooltips/plot-tooltip/bz-helpers.js</Item>
+                    <Item>ui-next/tooltips/plot-tooltip/bz-player-portrait.js</Item>
+                    <Item>ui-next/tooltips/plot-tooltip/bz-random-event-content.js</Item>
+                    <Item>ui-next/tooltips/plot-tooltip/bz-settlement-recommendation-content.js</Item>
+                    <Item>ui-next/tooltips/plot-tooltip/bz-unit-flag.js</Item>
                 </UIScripts>
                 <UpdateText>
                     <Item>text/en_us/InGameText.xml</Item>

@@ -1,11 +1,11 @@
 // vim: sw=2 et
-import { template, insert } from '../../../../../core/vendor/solid-js/web/dist/web.js';
-import { createComponent, Show, For, createMemo, createRenderEffect } from '../../../../../core/vendor/solid-js/dist/solid.js';
-import { Icon } from '../../../../../core/ui-next/components/icon.js';
-import { L10n } from '../../../../../core/ui-next/components/l10n.js';
-import { TooltipKeyword } from '../../../../../core/ui-next/components/tooltip-keyword.js';
-import { TooltipHorizontalPosition, TooltipVerticalPosition } from '../../../../../core/ui-next/components/tooltip.js';
-import { ProductionTooltip } from '../../production-tooltip.js';
+import { template, insert } from '/core/vendor/solid-js/web/dist/web.js';
+import { createComponent, Show, For, createMemo, createRenderEffect } from '/core/vendor/solid-js/dist/solid.js';
+import { Icon } from '/core/ui-next/components/icon.js';
+import { L10n } from '/core/ui-next/components/l10n.js';
+import { TooltipKeyword } from '/core/ui-next/components/tooltip-keyword.js';
+import { TooltipHorizontalPosition, TooltipVerticalPosition } from '/core/ui-next/components/tooltip.js';
+import { ProductionTooltip } from '/base-standard/ui-next/tooltips/production-tooltip.js';
 
 var _tmpl$ = /* @__PURE__ */ template(`<div class="w-px flex-1"></div>`), _tmpl$2 = /* @__PURE__ */ template(`<div class="flex flex-col w-full"><div class="flex flex-row items-stretch"><div class="w-12 shrink-0 flex justify-center items-start"></div><div class="w-4 shrink-0 flex flex-col items-center"></div><div class="flex flex-col flex-auto ml-1"></div></div></div>`), _tmpl$3 = /* @__PURE__ */ template(`<div class="flex w-full items-center gap-1 pr-0\\.5"></div>`), _tmpl$4 = /* @__PURE__ */ template(`<div class="flex flex-row items-center"><div class="w-12 shrink-0 flex justify-center"></div><div class="w-4 shrink-0 self-stretch flex flex-col items-center"><div class="w-px flex-1"></div><div></div><div class="w-px flex-1"></div></div><div class="flex flex-col ml-1 justify-start flex-auto"></div></div>`);
 const UniqueQuarterSection = (props) => {

@@ -1,12 +1,12 @@
 // vim: sw=2 et
-import { template, insert } from '../../../../../core/vendor/solid-js/web/dist/web.js';
-import { createRenderEffect, createComponent, Show, createMemo, For } from '../../../../../core/vendor/solid-js/dist/solid.js';
-import { Icon } from '../../../../../core/ui-next/components/icon.js';
-import { L10n } from '../../../../../core/ui-next/components/l10n.js';
-import { TooltipKeyword } from '../../../../../core/ui-next/components/tooltip-keyword.js';
-import { Tooltip } from '../../../../../core/ui-next/components/tooltip.js';
-import { getDistrictHealthInfo } from '../bz-helpers.js';
-import { TicketSection, TicketRow } from './utility.js';
+import { template, insert } from '/core/vendor/solid-js/web/dist/web.js';
+import { createRenderEffect, createComponent, Show, createMemo, For } from '/core/vendor/solid-js/dist/solid.js';
+import { Icon } from '/core/ui-next/components/icon.js';
+import { L10n } from '/core/ui-next/components/l10n.js';
+import { TooltipKeyword } from '/core/ui-next/components/tooltip-keyword.js';
+import { Tooltip } from '/core/ui-next/components/tooltip.js';
+import { getDistrictHealthInfo } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/bz-helpers.js';
+import { TicketSection, TicketRow } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/components/bz-utility.js';
 
 var _tmpl$ = /* @__PURE__ */ template(`<div class="size-6 shrink-0 bg-contain bg-center bg-no-repeat"></div>`), _tmpl$2 = /* @__PURE__ */ template(`<div class="flex flex-col items-center ml-2 shrink-0"><div class="size-6 bg-contain bg-center bg-no-repeat"></div><span class="font-body text-xs text-accent-2"></span></div>`), _tmpl$3 = /* @__PURE__ */ template(`<div class="flex items-center w-full"><div class="font-title text-sm uppercase text-secondary flex-1 flex flex-wrap items-center"></div></div>`), _tmpl$4 = /* @__PURE__ */ template(`<span class=mx-1>•</span>`), _tmpl$5 = /* @__PURE__ */ template(`<div class="flex items-center w-full"></div>`), _tmpl$6 = /* @__PURE__ */ template(`<div class="flex items-center mt-0\\.5 font-body text-sm text-accent-3"><span></span></div>`);
 const PlotAlertIcon = (props) => (() => {

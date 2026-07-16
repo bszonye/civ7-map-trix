@@ -1,12 +1,12 @@
 // vim: sw=2 et
-import { template, insert } from '../../../../../core/vendor/solid-js/web/dist/web.js';
-import { createMemo, createComponent, Show } from '../../../../../core/vendor/solid-js/dist/solid.js';
-import { Icon } from '../../../../../core/ui-next/components/icon.js';
-import { L10n } from '../../../../../core/ui-next/components/l10n.js';
-import { TooltipKeyword } from '../../../../../core/ui-next/components/tooltip-keyword.js';
-import { Tooltip } from '../../../../../core/ui-next/components/tooltip.js';
-import { TicketSection, TicketRow } from './utility.js';
-import { getTreasureConvoyInfo } from '../bz-helpers.js';
+import { template, insert } from '/core/vendor/solid-js/web/dist/web.js';
+import { createMemo, createComponent, Show } from '/core/vendor/solid-js/dist/solid.js';
+import { Icon } from '/core/ui-next/components/icon.js';
+import { L10n } from '/core/ui-next/components/l10n.js';
+import { TooltipKeyword } from '/core/ui-next/components/tooltip-keyword.js';
+import { Tooltip } from '/core/ui-next/components/tooltip.js';
+import { TicketSection, TicketRow } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/components/bz-utility.js';
+import { getTreasureConvoyInfo } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/bz-helpers.js';
 
 var _tmpl$ = /* @__PURE__ */ template(`<div class="flex flex-col items-center ml-2 shrink-0"><div class="size-6 bg-contain bg-center bg-no-repeat"></div><span class="font-body text-xs text-accent-2"></span></div>`), _tmpl$2 = /* @__PURE__ */ template(`<div class=flex></div>`);
 const TreasureConvoySection = (props) => {

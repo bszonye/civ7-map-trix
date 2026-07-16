@@ -1,32 +1,32 @@
 // vim: sw=2 et
-import { template, insert, use, spread } from '../../../../core/vendor/solid-js/web/dist/web.js';
-import { createSignal, createMemo, createComponent, Show, For, mergeProps, createRenderEffect, splitProps, useContext, createEffect, on, onCleanup, Switch, Match } from '../../../../core/vendor/solid-js/dist/solid.js';
-import LensManager from '../../../../core/ui/lenses/lens-manager.js';
-import { Icon } from '../../../../core/ui-next/components/icon.js';
-import { L10n } from '../../../../core/ui-next/components/l10n.js';
-import { TooltipKeyword } from '../../../../core/ui-next/components/tooltip-keyword.js';
-import { TooltipModel } from '../../../../core/ui-next/components/tooltip-model.js';
-import { TooltipHorizontalPosition, TooltipVerticalPosition, Tooltip, TooltipContext } from '../../../../core/ui-next/components/tooltip.js';
-import { TriggerActivationContext, TriggerActivationContextProvider, TriggerType } from '../../../../core/ui-next/components/trigger.js';
-import { ComponentRegistry } from '../../../../core/ui-next/services/component-registry.js';
-import { FocusManager } from '../../../../core/ui-next/services/focus-manager.js';
-import { isFocusable } from '../../../../core/ui-next/services/focus.js';
-import { IsMouseActive } from '../../../../core/ui-next/services/input.js';
-import { ProductionPanelCategory } from '../../../ui/production-chooser/production-chooser-helpers.js';
-// import { PillText, Pill } from '../../components/pills.js';
-import { YieldBarEntryStyle, YieldBar } from '../../components/yield-bar.js';
-import { PlotAlertSection } from './components/alerts.js';
-import { TreasureConvoySection } from './components/treasure-convoy-section.js';
-import { UniqueQuarterSection } from './components/unique-quarter-section.js';
-import { TicketRow, TicketSection, Divider, EntryDivider } from './components/utility.js';
-import { VolcanoSection } from './components/volcano-section.js';
-import { PlotTooltipPlayerPortrait } from './player-portrait.js';
-import { ProductionTooltip } from '../production-tooltip.js';
-import { hasArcheologyData, ArcheologyPlotTooltipContent } from './archeology-content.js';
-import { getSettlementName, getOwnerInfo, getResource, getSpecialistDescription, getCurrentAge, getAgelessTypes, getTerrainLabel, getBiomeLabel, getFeatureInfo, getContinentName, getRiverLabel, getConstructibleInfo, getVisiblePlotEffects, getUnitEntries, getPlotYields, getRouteData } from './bz-helpers.js';
-import { hasRandomEventData, RandomEventPlotTooltipContent } from './random-event-content.js';
-import { hasSettlementRecommendationData, SettlementRecommendationPlotTooltipContent } from './settlement-recommendation-content.js';
-import { UnitFlag } from './unit-flag.js';
+import { template, insert, use, spread } from '/core/vendor/solid-js/web/dist/web.js';
+import { createSignal, createMemo, createComponent, Show, For, mergeProps, createRenderEffect, splitProps, useContext, createEffect, on, onCleanup, Switch, Match } from '/core/vendor/solid-js/dist/solid.js';
+import LensManager from '/core/ui/lenses/lens-manager.js';
+import { Icon } from '/core/ui-next/components/icon.js';
+import { L10n } from '/core/ui-next/components/l10n.js';
+import { TooltipKeyword } from '/core/ui-next/components/tooltip-keyword.js';
+import { TooltipModel } from '/core/ui-next/components/tooltip-model.js';
+import { TooltipHorizontalPosition, TooltipVerticalPosition, Tooltip, TooltipContext } from '/core/ui-next/components/tooltip.js';
+import { TriggerActivationContext, TriggerActivationContextProvider, TriggerType } from '/core/ui-next/components/trigger.js';
+import { ComponentRegistry } from '/core/ui-next/services/component-registry.js';
+import { FocusManager } from '/core/ui-next/services/focus-manager.js';
+import { isFocusable } from '/core/ui-next/services/focus.js';
+import { IsMouseActive } from '/core/ui-next/services/input.js';
+import { ProductionPanelCategory } from '/base-standard/ui/production-chooser/production-chooser-helpers.js';
+// import { PillText, Pill } from '/core/ui-next/components/pills.js';
+import { YieldBarEntryStyle, YieldBar } from '/base-standard/ui-next/components/yield-bar.js';
+import { PlotAlertSection } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/components/bz-alerts.js';
+import { TreasureConvoySection } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/components/bz-treasure-convoy-section.js';
+import { UniqueQuarterSection } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/components/bz-unique-quarter-section.js';
+import { TicketRow, TicketSection, Divider, EntryDivider } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/components/bz-utility.js';
+import { VolcanoSection } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/components/bz-volcano-section.js';
+import { PlotTooltipPlayerPortrait } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/bz-player-portrait.js';
+import { ProductionTooltip } from '/base-standard/ui-next/tooltips/production-tooltip.js';
+import { hasArcheologyData, ArcheologyPlotTooltipContent } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/bz-archeology-content.js';
+import { getSettlementName, getOwnerInfo, getResource, getSpecialistDescription, getCurrentAge, getAgelessTypes, getTerrainLabel, getBiomeLabel, getFeatureInfo, getContinentName, getRiverLabel, getConstructibleInfo, getVisiblePlotEffects, getUnitEntries, getPlotYields, getRouteData } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/bz-helpers.js';
+import { hasRandomEventData, RandomEventPlotTooltipContent } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/bz-random-event-content.js';
+import { hasSettlementRecommendationData, SettlementRecommendationPlotTooltipContent } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/bz-settlement-recommendation-content.js';
+import { UnitFlag } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/bz-unit-flag.js';
 import { ConstructibleHasTagType } from '/base-standard/ui/utilities/utilities-tags.js';
 
 // horizontal list separator (spaced in non-ideographic locales)
@@ -83,6 +83,8 @@ const [IsPlotTooltipVisible, SetIsPlotTooltipVisible] = createSignal(true);
 const ConstructibleRow = (props) => {
   const statusEntryIcons = createMemo(() => {
     const entryIcons = [];
+    // TRIX: type icons
+    for (const icon of props.constructible.icons) entryIcons.push({ icon });
     if (props.constructible.damaged) {
       entryIcons.push({
         icon: "url(blp:fi_damaged_64)"
@@ -97,8 +99,6 @@ const ConstructibleRow = (props) => {
         }
       });
     }
-    // TRIX: type icons
-    for (const icon of props.constructible.icons) entryIcons.push({ icon });
     return entryIcons;
   });
   return createComponent(TicketRow, {

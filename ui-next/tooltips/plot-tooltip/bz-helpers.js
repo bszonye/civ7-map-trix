@@ -1,9 +1,9 @@
 // vim: sw=2 et
 // NOTE: file renamed to avoid import conflict with
 //       ui-next/screens/choosers/helpers.js
-import { ComponentID } from '../../../../core/ui/utilities/utilities-component-id.js';
-import { Icon } from '../../../../core/ui/utilities/utilities-image.js';
-import DistrictHealthManager from '../../../ui/district/district-health-manager.js';
+import { ComponentID } from '/core/ui/utilities/utilities-component-id.js';
+import { Icon } from '/core/ui/utilities/utilities-image.js';
+import DistrictHealthManager from '/base-standard/ui/district/district-health-manager.js';
 
 const BZ_TYPE_ICONS = {
   // AGELESS: "url(blp:city_ageless)",
