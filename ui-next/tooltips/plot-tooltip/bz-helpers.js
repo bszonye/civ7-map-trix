@@ -194,7 +194,8 @@ function getConstructibleInfo(constructible, plotCoordinate, currentAge, ageless
         complete: instance.complete,
         overbuildable: overbuildableConstructibleTypes.includes(info.$hash) && isBuilding,
         title: info.Name,
-        description: info.Description,
+        description: info.Tooltip,
+        // TRIX: use Tooltip (compact) instead of Description (verbose)
         icon: UI.getIconCSS(info.ConstructibleType),
         tags,
         icons,

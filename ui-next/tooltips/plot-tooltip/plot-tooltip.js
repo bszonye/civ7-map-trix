@@ -102,7 +102,7 @@ const ConstructibleRow = (props) => {
     return entryIcons;
   });
   return createComponent(TicketRow, {
-    "class": "pr-0\\.5",
+    "class": "pr-0\\.5",  // TRIX: align right edge with unit flags
     get icon() {
       return createComponent(Icon, {
         get ["class"]() {
@@ -217,6 +217,7 @@ const ConstructibleRow = (props) => {
   });
 };
 const SpecialistsRow = (props) => createComponent(TicketRow, {
+  "class": "pr-0\\.5",  // TRIX: align right edge with unit flags
   get icon() {
     return createComponent(Icon, {
       "class": "size-6",

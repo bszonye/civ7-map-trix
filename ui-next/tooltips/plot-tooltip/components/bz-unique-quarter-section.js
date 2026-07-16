@@ -42,7 +42,7 @@ const UniqueQuarterSection = (props) => {
       // TRIX: resize text
       get text() {
         return props.definition.Tooltip;
-        // TRIX: use the Tooltip instead of the verbose Description
+        // TRIX: use Tooltip (compact) instead of Description (verbose)
       }
     }), null);
     insert(_el$, createComponent(For, {
