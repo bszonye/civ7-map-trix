@@ -66,7 +66,7 @@ const bzPill = (props) => {
 };
 
 // TRIX: various styling changes
-var _tmpl$ = /* @__PURE__ */ template(`<div class="flex flex-row gap-2"></div>`),
+var _tmpl$ = /* @__PURE__ */ template(`<div class="flex flex-row gap-1"></div>`),
   _tmpl$2 = /* @__PURE__ */ template(`<div class="flex items-center"></div>`),
   _tmpl$3 = /* @__PURE__ */ template(`<div></div>`),
   _tmpl$4 = /* @__PURE__ */ template(`<div class="flex flex-row"><span class="font-body text-sm text-accent-3"></span></div>`),
@@ -121,7 +121,8 @@ const ConstructibleRow = (props) => {
           },
           get fallback() {
             return createComponent(L10n.Stylize, {
-              "class": "font-title text-sm",
+              // TRIX: expand to right-align status icons
+              "class": "font-title text-sm flex-auto",
               get text() {
                 return props.constructible.title;
               }
@@ -144,6 +145,8 @@ const ConstructibleRow = (props) => {
               allowFlip: true,
               get children() {
                 return createComponent(TooltipKeyword, {
+                  // TRIX: expand to right-align status icons
+                  "class": "flex-auto",
                   get children() {
                     return createComponent(L10n.Stylize, {
                       "class": "font-title text-sm",
