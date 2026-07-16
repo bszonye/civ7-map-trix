@@ -7,7 +7,7 @@ import { TooltipKeyword } from '../../../../../core/ui-next/components/tooltip-k
 import { TooltipHorizontalPosition, TooltipVerticalPosition } from '../../../../../core/ui-next/components/tooltip.js';
 import { ProductionTooltip } from '../../production-tooltip.js';
 
-var _tmpl$ = /* @__PURE__ */ template(`<div class="w-px flex-1"></div>`), _tmpl$2 = /* @__PURE__ */ template(`<div class="flex flex-col w-full"><div class="flex flex-row items-stretch"><div class="w-12 shrink-0 flex justify-center items-start"></div><div class="w-4 shrink-0 flex flex-col items-center"></div><div class="flex flex-col flex-auto ml-1"></div></div></div>`), _tmpl$3 = /* @__PURE__ */ template(`<div class="flex w-full items-center gap-1"></div>`), _tmpl$4 = /* @__PURE__ */ template(`<div class="flex flex-row items-center"><div class="w-12 shrink-0 flex justify-center"></div><div class="w-4 shrink-0 self-stretch flex flex-col items-center"><div class="w-px flex-1"></div><div></div><div class="w-px flex-1"></div></div><div class="flex flex-col ml-1 justify-start flex-auto"></div></div>`);
+var _tmpl$ = /* @__PURE__ */ template(`<div class="w-px flex-1"></div>`), _tmpl$2 = /* @__PURE__ */ template(`<div class="flex flex-col w-full"><div class="flex flex-row items-stretch"><div class="w-12 shrink-0 flex justify-center items-start"></div><div class="w-4 shrink-0 flex flex-col items-center"></div><div class="flex flex-col flex-auto ml-1"></div></div></div>`), _tmpl$3 = /* @__PURE__ */ template(`<div class="flex w-full items-center gap-1 pr-0\\.5"></div>`), _tmpl$4 = /* @__PURE__ */ template(`<div class="flex flex-row items-center"><div class="w-12 shrink-0 flex justify-center"></div><div class="w-4 shrink-0 self-stretch flex flex-col items-center"><div class="w-px flex-1"></div><div></div><div class="w-px flex-1"></div></div><div class="flex flex-col ml-1 justify-start flex-auto"></div></div>`);
 const UniqueQuarterSection = (props) => {
   const hasBuildings = () => props.buildings.length > 0;
   return (() => {
@@ -27,13 +27,14 @@ const UniqueQuarterSection = (props) => {
       }
     }));
     insert(_el$6, createComponent(L10n.Stylize, {
-      "class": "font-title text-sm uppercase text-accent-1",
+      "class": "font-title text-sm uppercase text-secondary",
       get text() {
         return props.definition.Name;
       }
     }), null);
     insert(_el$6, createComponent(L10n.Stylize, {
-      "class": "font-body text-xs text-secondary",
+      "class": "font-body text-2xs text-secondary",
+      // TRIX: resize text
       text: "LOC_PLOT_TOOLTIP_UNIQUE_QUARTER"
     }), null);
     insert(_el$6, createComponent(L10n.Stylize, {

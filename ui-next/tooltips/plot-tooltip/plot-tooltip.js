@@ -102,6 +102,7 @@ const ConstructibleRow = (props) => {
     return entryIcons;
   });
   return createComponent(TicketRow, {
+    "class": "pr-0\\.5",
     get icon() {
       return createComponent(Icon, {
         get ["class"]() {
