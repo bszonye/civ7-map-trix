@@ -95,6 +95,22 @@ function getPlotEffectAlert(effect) {
       turns
     };
   }
+  if (effect.plotEffectType === "PLOTEFFECT_DIGSITE") {
+    return {
+      title: effect.name,
+      icon: "url(blp:fi_unit_explorer_64)",
+      variant: "gold",
+      turns
+    };
+  }
+  if (effect.plotEffectType === "PLOTEFFECT_STONE_TRAP") {
+    return {
+      title: effect.name,
+      icon: "url(blp:fi_unit_jaguar_64)",
+      variant: "gold",
+      turns: -1
+    };
+  }
   if (effect.plotEffectType === "PLOTEFFECT_UNIT_FORTIFICATIONS") {
     return {
       title: effect.name,
