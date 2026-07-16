@@ -13,10 +13,6 @@ const PlotAlertIcon = (props) => (() => {
   var _el$ = _tmpl$();
   // eslint-disable-next-line no-constant-binary-expression -- FXS
   createRenderEffect((_$p) => (_$p = props.icon ?? "url(blp:tooltip_alert_icon)") != null ? _el$.style.setProperty("background-image", _$p) : _el$.style.removeProperty("background-image"));  // noqa
-  if (props.icon) {
-    _el$.classList.remove("size-6");
-    _el$.classList.add("size-10");
-  }
   return _el$;
 })();
 const PlotAlertTimer = (props) => createComponent(Show, {
@@ -95,14 +91,14 @@ function getPlotEffectAlert(effect) {
     return {
       title: effect.name,
       tooltipText: "LOC_PEDIA_CONCEPTS_INFECTED_TOOLTIP",
-      icon: "url(blp:yield_plague)",
+      icon: "url(blp:fi_yield_plague_64)",
       turns
     };
   }
   if (effect.plotEffectType === "PLOTEFFECT_UNIT_FORTIFICATIONS") {
     return {
       title: effect.name,
-      icon: "url(blp:Action_Fortify)",
+      icon: "url(blp:fi_action_fortify_64)",
       variant: "gold",
       turns: -1
     };

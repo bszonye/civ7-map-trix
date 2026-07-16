@@ -85,7 +85,7 @@ const ConstructibleRow = (props) => {
     const entryIcons = [];
     if (props.constructible.damaged) {
       entryIcons.push({
-        icon: "url(blp:fonticon_damaged)"
+        icon: "url(blp:fi_damaged_64)"
       });
     }
     if (props.constructible.overbuildable && props.isLocalPlayer) {
@@ -1546,6 +1546,7 @@ const PlotTooltip = ComponentRegistry.register({
   createInstance: PlotTooltipComponent,
   // TRIX: preload images
   images: [
+    "blp:fi_damaged_64",
     "blp:action_movebyroad",
     "blp:action_movebyrail",
     "blp:impicon_staat",
