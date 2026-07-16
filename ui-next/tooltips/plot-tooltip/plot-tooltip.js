@@ -27,131 +27,30 @@ import { getSettlementName, getOwnerInfo, getResource, getSpecialistDescription,
 import { hasRandomEventData, RandomEventPlotTooltipContent } from './random-event-content.js';
 import { hasSettlementRecommendationData, SettlementRecommendationPlotTooltipContent } from './settlement-recommendation-content.js';
 import { UnitFlag } from './unit-flag.js';
+import { ConstructibleHasTagType } from '/base-standard/ui/utilities/utilities-tags.js';
 
-// TRIX: prevent flicker
-Controls.preloadImage(UI.getIcon("ROUTE_ROAD"), "plot-tooltip");
-Controls.preloadImage(UI.getIcon("ROUTE_RAILROAD"), "plot-tooltip");
-
-// color palette
-const BZ_COLOR = {
-    // game colors
-    silver: "#4c5366",  // = primary
-    bronze: "#e5d2ac",  // = secondary
-    primary: "#4c5366",
-    primary1: "#8d97a6",
-    primary2: "#4c5366",
-    primary3: "#333640",
-    primary4: "#23252b",
-    primary5: "#12151f",
-    secondary: "#e5d2ac",
-    secondary1: "#e5d2ac",
-    secondary2: "#8c7e62",
-    secondary3: "#4c473d",
-    accent: "#616266",
-    accent1: "#e5e5e5",
-    accent2: "#c2c4cc",
-    accent3: "#9da0a6",
-    accent4: "#85878c",
-    accent5: "#616266",
-    accent6: "#05070d",
-    // bronze shades
-    bronze1: "#f9ecd2",
-    bronze2: "#e5d2ac",  // = secondary1
-    bronze3: "#c7b28a",
-    bronze4: "#a99670",
-    bronze5: "#8c7e62",  // = secondary 2
-    bronze6: "#4c473d",  // = secondary 3
-    // rules background
-    rules: "#8c7e6233",
-    // alert colors
-    black: "#000000",
-    danger: "#af1b1c99",  // danger = militaristic 60% opacity
-    caution: "#cea92f",  // caution = healthbar-medium
-    note: "#ff800033",  // note = orange 20% opacity
-    // geographic colors
-    hill: "#ea995266",  // Rough terrain = orange 40% opacity
-    aquatic: "#00ffee66",  // Aquaticy = teal 40% opacity
-    vegetated: "#aaff0033",  // Vegetated features = green 20% opacity
-    wet: "#55ffff33",  // Wet features = teal 20% opacity
-    floodplain: "#ff800033",  // Floodplains = orange 20% opacity
-    river: "#55aaff66",  // Rivers = azure 40% opacity
-    road: "#e5d2accc",  // Roads = bronze 80% opacity
-    rail: "#c2c4cccc",  // Railroads = silver 80% opacity
-    bridge: "#d4c9c4cc",  // Bridges = warm gray 80% opacity
-    // yield types
-    food: "#80b34d",        //  90° 40 50 green
-    production: "#a33d29",  //  10° 60 40 red
-    gold: "#f6ce55",        //  45° 90 65 yellow
-    science: "#6ca6e0",     // 210° 65 65 cyan
-    culture: "#5c5cd6",     // 240° 60 60 violet
-    happiness: "#f5993d",   //  30° 90 60 orange
-    diplomacy: "#afb7cf",   // 225° 25 75 gray
-    // independent power types
-    militaristic: "#af1b1c",
-    scientific: "#4d7c96",
-    economic: "#ffd553",
-    cultural: "#892bb3",
-    expansionist: "#00a717",
-    diplomatic: "#255be4",
-};
-const BZ_ALERT = {
-    primary: { "background-color": BZ_COLOR.primary, },
-    secondary: { "background-color": BZ_COLOR.secondary, color: BZ_COLOR.black, },
-    title: { "fxs-font-gradient-color": BZ_COLOR.bronze1, color: BZ_COLOR.bronze2, },
-    black: { "background-color": BZ_COLOR.black, },
-    danger: { "background-color": BZ_COLOR.danger, },
-    enemy: { "background-color": BZ_COLOR.danger, },
-    caution: { "background-color": BZ_COLOR.caution, color: BZ_COLOR.black, },
-    note: { "background-color": BZ_COLOR.note, },
-    DEBUG: { "background-color": "#80808080", },
-}
-const BZ_STYLE = {
-    debug: { "background-color": `${BZ_COLOR.bronze6}99`, },
-    // movement & obstacle types
-    TERRAIN_HILL: { "background-color": BZ_COLOR.hill, },
-    // TERRAIN_OCEAN: {},  // don't need to highlight this
-    FEATURE_ATOLL: { "background-color": BZ_COLOR.aquatic, color: BZ_COLOR.accent1, },
-    FEATURE_CLASS_FLOODPLAIN:  { "background-color": BZ_COLOR.floodplain, },
-    FEATURE_CLASS_VEGETATED: { "background-color": BZ_COLOR.vegetated, },
-    // FEATURE_CLASS_WET: { "background-color": BZ_COLOR.wet, },
-    FEATURE_MANGROVE: { "background-color": BZ_COLOR.wet, },
-    FEATURE_MARSH: { "background-color": BZ_COLOR.wet, },
-    FEATURE_TUNDRA_BOG: { "background-color": BZ_COLOR.wet, },
-    FEATURE_VOLCANO: BZ_ALERT.caution,
-    LOC_VOLCANO_NOT_ACTIVE: BZ_ALERT.note,
-    RIVER_MINOR: { "background-color": BZ_COLOR.river, },
-    RIVER_NAVIGABLE: { "background-color": BZ_COLOR.river, },
-    ROUTE_BRIDGE: { "background-color": BZ_COLOR.bridge, color: BZ_COLOR.black, },
-    ROUTE_RAILROAD: { "background-color": BZ_COLOR.rail, color: BZ_COLOR.black, },
-    ROUTE_ROAD: { "background-color": BZ_COLOR.road, color: BZ_COLOR.black, },
-}
+// horizontal list separator (spaced in non-ideographic locales)
+const BZ_DOT_DIVIDER = Locale.compose("LOC_PLOT_DIVIDER_DOT");
+const BZ_DOT_JOINER = Locale.getCurrentDisplayLocale().startsWith("zh_") ?
+    BZ_DOT_DIVIDER : `&nbsp;${BZ_DOT_DIVIDER} `;
 
 const bzPill = (props) => {
-  const [local, other] = splitProps(props, ["class", "color", "backgroundStyle", "children", "icon", "text"]);
-  const color = () => local.color ?? "#23252b";
-  const backgroundStyle = () => local.backgroundStyle ?? {
-    "background-color": color()
-  };
+  const [local, other] = splitProps(props, ["class", "iclass", "icon", "text"]);
   return (() => {
     var _el$ = _tmpl$();
     spread(_el$, mergeProps({
       get ["class"]() {
-        return `text-xs min-h-5 px-2 flex items-center rounded-full leading-tight ${local.class ?? ""}`;
+        return `bz-keyword-pill text-xs min-h-5 px-2 flex items-center rounded-full leading-tight ${local.class ?? ""}`;
       },
-      get style() {
-        const s = {
-          border: "1px solid #53565D",
-          ...backgroundStyle()
-        };
-        return s;
-      }
     }, other), false, true);
     insert(_el$, createComponent(Show, {
       get when() {
         return local.icon;
       },
       children: (icon) => createComponent(Icon, {
-          "class": "size-5 -ml-0\\.5 mr-0\\.5",
+          get ["class"]() {
+            return local.iclass ?? "size-4 -ml-1 mr-1";
+          },
           get name() {
             return icon();
           }
@@ -1053,6 +952,10 @@ const PlotTooltipContent = (props) => {
   const quarterKeyword = createMemo(() => district()?.isQuarter ? "LOC_PLOT_TOOLTIP_QUARTER" : void 0);
   // TRIX: define this earlier for use in keywordPills
   const route = createMemo(() => getRouteData(local.plotCoord));
+  // TRIX: bridge constructibles
+  const routeBridges = createMemo(() => {
+    return constructibles().filter(c => ConstructibleHasTagType(c.type, "BRIDGE"));
+  });
   const yields = createMemo(() => {
     if (!shouldShowOceanYields() || !shouldShowMountainYields()) {
       return [];
@@ -1068,33 +971,44 @@ const PlotTooltipContent = (props) => {
   const totalYields = createMemo(() => yields().reduce((sum, y) => sum + y.amount, 0));
   const keywordPills = createMemo(() => {
     const pills = [];
-    if (BZ_STYLE[terrainDefinition().TerrainType] != null) {
-      const style = BZ_STYLE[terrainDefinition().TerrainType];
+    if (riverLabel()) {
+      pills.push({ "class": "bz-style-river", text: riverLabel() });
+    }
+    if (terrainDefinition().TerrainType === "TERRAIN_HILL") {
+      const type = terrainDefinition().TerrainType;
+      const style = `bz-style-${type}`;
       const text = terrainDefinition().Name;
-      pills.push({ style, text });
+      pills.push({ "class": style, text });
     }
     if (feature().label && !feature().isNaturalWonder && !feature().volcano) {
-      console.warn(`TRIX ${JSON.stringify(featureDefinition())}`);
-      const style =
-        BZ_STYLE[featureDefinition().FeatureType] ??
-        BZ_STYLE[featureDefinition().FeatureClassType];
+      const type = featureDefinition().FeatureType;
+      const ctype = featureDefinition().FeatureClassType;
+      const style = `bz-style-${type} bz-style-${ctype}`;
       const label = feature().label;
       const text = Locale.compose(label).replace(/\s*\(.*\)|\s*（.*）/, "");
-      pills.push({ style, text });
+      pills.push({ "class": style, text });
     }
-    if ((featureDefinition()?.SightThroughModifier ?? 0) < 0) {
+    if ((featureDefinition()?.SightThroughModifier ?? 0) != 0) {
       // TRIX: check for nonzero instead of negative values?
-      const style = BZ_STYLE[featureDefinition().FeatureClassType] ?? BZ_ALERT.note;
+      const type = featureDefinition().FeatureType;
+      const ctype = featureDefinition().FeatureClassType;
+      const ttype = terrainDefinition().TerrainType;
+      const style = `bz-style-${type} bz-style-${ctype} bz-style-${ttype} bz-alert-note`;
       const text = "LOC_PLOT_TOOLTIP_BLOCKS_SIGHT";
-      pills.push({ style, text });
+      pills.push({ "class": style, text });
+    } else if ((terrainDefinition().SightThroughModifier ?? 0) != 0) {
+      const ttype = terrainDefinition().TerrainType;
+      const style = `bz-style-${ttype} bz-alert-note`;
+      const text = "LOC_PLOT_TOOLTIP_BLOCKS_SIGHT";
+      pills.push({ "class": style, text });
     }
-    if ((featureDefinition()?.MovementChange ?? 0) < 0) {
+    if ((featureDefinition()?.MovementChange ?? 0) != 0) {
       pills.push("LOC_PLOT_TOOLTIP_ENDS_MOVEMENT");
     }
     // TRIX: add Fresh Water pill
     if (isFreshWater()) {
       if (playerID() == -1 || district()?.type == Game.getHash("DISTRICT_CITY_CENTER")) {
-        pills.push("LOC_PLOTKEY_FRESHWATER");
+        pills.push({ "class": "bz-style-fresh-water", text: "LOC_PLOTKEY_FRESHWATER" });
       }
     }
     if (districtKeyword()) {
@@ -1105,10 +1019,23 @@ const PlotTooltipContent = (props) => {
     }
     // TRIX: move route pill into keywordPills
     if (route()) {
-      // const style = BZ_STYLE[route().type];
+      const style = `bz-style-${route().type}`;
+      const iclass = "size-4 mt-px -ml-0\\.5 mr-1";
       const icon = route().type;
       const text = route().name;
-      pills.push({ icon, text });
+      const pill = { "class": style, iclass, icon, text };
+      const bridge = routeBridges().at(0);
+      if (bridge) {
+        pill.class += " bz-style-ROUTE_BRIDGE";
+        pill.iclass = "size-4 -ml-1\\.5 mr-1";
+        pill.icon = bridge.type;
+        pill.text = Locale.compose(
+          "{1_RouteName} {LOC_PLOT_DIVIDER_DOT} {2_Ferry}",
+          bridge.title,
+          pill.text
+        );
+      }
+      pills.push(pill);
     }
     return pills;
   });
@@ -1135,10 +1062,10 @@ const PlotTooltipContent = (props) => {
   const landsLabel = createMemo(() => !isOcean() ? isDistantLands() ? "LOC_PLOT_TOOLTIP_HEMISPHERE_WEST" : "LOC_PLOT_TOOLTIP_HEMISPHERE_EAST" : "");
   const subheaderText = createMemo(() => {
     const parts = [];
-    if (riverLabel()) parts.push(riverLabel());
     if (continentName()) parts.push(continentName());
     if (landsLabel()) parts.push(landsLabel());
-    return parts.map((part) => Locale.compose(part)).join(", ");
+    return parts.map((part) => Locale.compose(part)).join(BZ_DOT_JOINER);
+    // TRIX: separate with dots, not commas
   });
   return (() => {
     var _el$15 = _tmpl$3();
@@ -1203,8 +1130,8 @@ const PlotTooltipContent = (props) => {
             return keywordPills();
           },
           children: (keyword) => createComponent(bzPill, {
-            color: keyword.color,
-            backgroundStyle: keyword.style,
+            "class": keyword.class,
+            iclass: keyword.iclass,
             icon: keyword.icon,
             text: keyword.text ?? keyword,
           })
@@ -1518,7 +1445,8 @@ const PlotTooltipComponent = (props) => {
         get children() {
           return createComponent(Tooltip.Content, {
             get ["class"]() {
-              return local.class;
+              return local.class + " bz-plot-tooltip";
+              // TRIX: add modded style rules
             },
             get children() {
               return createComponent(Show, {
@@ -1612,7 +1540,15 @@ const PlotTooltipComponent = (props) => {
 };
 const PlotTooltip = ComponentRegistry.register({
   name: "PlotTooltip",
-  createInstance: PlotTooltipComponent
+  createInstance: PlotTooltipComponent,
+  // TRIX: preload images
+  images: [
+    "blp:action_movebyroad",
+    "blp:action_movebyrail",
+    "blp:impicon_staat",
+  ],
+  // TRIX: extend styling
+  styles: ["/bz-map-trix/ui-next/tooltips/bz-plot-tooltip.css"],
 });
 
 export { IsPlotTooltipVisible, PlotTooltip, PlotTooltipContent, SetIsPlotTooltipVisible };

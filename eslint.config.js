@@ -50,6 +50,7 @@ export default [
                 MapCities: "readonly",
                 MapConstructibles: "readonly",
                 MapPlotEffects: "readonly",
+                MapStorms: "readonly",
                 MapUnits: "readonly",
                 PlayerIds: "readonly",
                 Players: "readonly",

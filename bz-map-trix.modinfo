@@ -60,6 +60,7 @@
                     <Item>ui/bz-units-panel/panel-units.css</Item>
                     <Item>ui-next/tooltips/plot-tooltip/components/alerts.js</Item>
                     <Item>ui-next/tooltips/plot-tooltip/plot-tooltip.js</Item>
+                    <Item>ui-next/tooltips/plot-tooltip/bz-plot-tooltip.css</Item>
                 </ImportFiles>
                 <UIScripts>
                     <Item>ui/bz-city-panel/model-city-list.js</Item>
