@@ -34,6 +34,38 @@ const BZ_DOT_DIVIDER = Locale.compose("LOC_PLOT_DIVIDER_DOT");
 const BZ_DOT_JOINER = Locale.getCurrentDisplayLocale().startsWith("zh_") ?
     BZ_DOT_DIVIDER : `&nbsp;${BZ_DOT_DIVIDER} `;
 
+const BZ_TYPE_ICONS = {
+  // AGELESS: "url(blp:city_ageless)",
+  MILITARY: "url(blp:fi_nar_rew_combat_64)",
+  RELIGIOUS: "url(blp:fi_nar_rew_religion_64)",
+  GREATWORK: "url(blp:fi_greatwork_64)",
+  FORTIFICATION: "url(blp:fi_action_fortify_64)",
+  CITY_STATE_UNIQUE_IMPROVEMENT: "url(blp:fi_citystate_gold_64)",
+  // UNIQUE: null,
+  // UNIQUE_IMPROVEMENT: null,
+  FOOD_WAREHOUSE: "url(blp:fi_Yield_Food_64)",
+  PRODUCTION_WAREHOUSE: "url(blp:fi_Yield_Production_64)",
+  WAREHOUSE: "url(blp:icon_building_warehouse)",
+  WATER: "url(blp:icon_building_water)",
+  // BRIDGE: null,
+  FOOD: "url(blp:fi_Yield_Food_64)",
+  PRODUCTION: "url(blp:fi_Yield_Production_64)",
+  GOLD: "url(blp:fi_Yield_Gold_64)",
+  SCIENCE: "url(blp:fi_Yield_Science_64)",
+  CULTURE: "url(blp:fi_Yield_Culture_64)",
+  HAPPINESS: "url(blp:fi_Yield_Happiness_64)",
+  DIPLOMACY: "url(blp:fi_yield_diplomacy_64)",
+}
+const BZ_TYPE_TAGS = /* @__PURE__ */ new Map();
+for (const e of GameInfo.TypeTags) {
+  let tags = BZ_TYPE_TAGS.get(e.Type) ?? new Set();
+  if (!tags.size) BZ_TYPE_TAGS.set(e.Type, tags);
+  tags.add(e.Tag);
+}
+for (const [key, value] of BZ_TYPE_TAGS.entries()) {
+  console.warn(`TRIX TYPE ${key} = ${[...value]}`);
+}
+
 const bzPill = (props) => {
   const [local, other] = splitProps(props, ["class", "iclass", "icon", "text"]);
   return (() => {
@@ -49,7 +81,7 @@ const bzPill = (props) => {
       },
       children: (icon) => createComponent(Icon, {
           get ["class"]() {
-            return local.iclass ?? "size-4 -ml-1 mr-1";
+            return local.iclass ?? "size-4 -ml-1\\.5 mr-1";
           },
           get name() {
             return icon();
@@ -96,6 +128,12 @@ const ConstructibleRow = (props) => {
           text: "LOC_PEDIA_CONCEPTS_OVERBUILDABLE_TOOLTIP"
         }
       });
+    }
+    // TRIX: type icons
+    const tags = BZ_TYPE_TAGS.get(props.constructible.type) ?? new Set();
+    console.warn(`TRIX TAGS ${[...tags]}`);
+    for (const [tag, icon] of Object.entries(BZ_TYPE_ICONS)) {
+      if (tags.has(tag)) entryIcons.push({ icon });
     }
     return entryIcons;
   });
@@ -1029,8 +1067,8 @@ const PlotTooltipContent = (props) => {
       const pill = { "class": style, iclass, icon, text };
       const bridge = routeBridges().at(0);
       if (bridge) {
+        delete pill.iclass;
         pill.class += " bz-style-ROUTE_BRIDGE";
-        pill.iclass = "size-4 -ml-1\\.5 mr-1";
         pill.icon = bridge.type;
         pill.text = Locale.compose(
           "{1_RouteName} {LOC_PLOT_DIVIDER_DOT} {2_Ferry}",
