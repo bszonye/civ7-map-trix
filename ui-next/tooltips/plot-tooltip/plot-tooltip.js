@@ -23,7 +23,7 @@ import { VolcanoSection } from './components/volcano-section.js';
 import { PlotTooltipPlayerPortrait } from './player-portrait.js';
 import { ProductionTooltip } from '../production-tooltip.js';
 import { hasArcheologyData, ArcheologyPlotTooltipContent } from './archeology-content.js';
-import { getSettlementName, getOwnerInfo, getResource, getSpecialistDescription, getCurrentAge, getAgelessTypes, getTerrainLabel, getBiomeLabel, getFeatureInfo, getContinentName, getRiverLabel, getConstructibleInfo, getVisiblePlotEffects, getUnitEntries, getPlotYields, getRouteData } from './helpers.js';
+import { getSettlementName, getOwnerInfo, getResource, getSpecialistDescription, getCurrentAge, getAgelessTypes, getTerrainLabel, getBiomeLabel, getFeatureInfo, getContinentName, getRiverLabel, getConstructibleInfo, getVisiblePlotEffects, getUnitEntries, getPlotYields, getRouteData } from './bz-helpers.js';
 import { hasRandomEventData, RandomEventPlotTooltipContent } from './random-event-content.js';
 import { hasSettlementRecommendationData, SettlementRecommendationPlotTooltipContent } from './settlement-recommendation-content.js';
 import { UnitFlag } from './unit-flag.js';

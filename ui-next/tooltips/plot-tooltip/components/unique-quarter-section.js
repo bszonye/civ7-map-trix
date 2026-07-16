@@ -113,7 +113,7 @@ const UniqueQuarterSection = (props) => {
           }), null);
           insert(_el$14, createComponent(Show, {
             get when() {
-              return true;  // building.damaged;
+              return building.damaged;
             },
             get children() {
               return createComponent(Icon, {
@@ -122,6 +122,18 @@ const UniqueQuarterSection = (props) => {
                 name: "url(blp:fi_damaged_64)"
               });
             }
+          }), null);
+          insert(_el$14, createComponent(For, {
+            get each() {
+              return building.icons;
+            },
+            children: (icon) => createComponent(Icon, {
+              "class": "size-5",
+              get name() {
+                return icon;
+              },
+              isUrl: true,
+            }),
           }), null);
           createRenderEffect((_$p) => (_$p = isLast() ? "rotate(180deg)" : "none") != null ? _el$11.style.setProperty("transform", _$p) : _el$11.style.removeProperty("transform"));
           return _el$7;
