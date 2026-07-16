@@ -172,7 +172,6 @@ function getConstructibleInfo(constructible, plotCoordinate, currentAge, ageless
     const isWonder = info.ConstructibleClass == "WONDER";
     const isImprovement = info.ConstructibleClass == "IMPROVEMENT";
     const uniqueQuarterType = instance.uniqueQuarterType;
-    console.warn(`TRIX UQ ${type} ${uniqueQuarterType}`);
     // TRIX: collect tags and matching icons
     const tagset = BZ_TYPE_TAGS.get(type) ?? new Set();
     const tags = [], icons = [];

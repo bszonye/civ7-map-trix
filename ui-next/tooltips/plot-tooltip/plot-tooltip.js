@@ -995,11 +995,11 @@ const PlotTooltipContent = (props) => {
       const label = feature().label;
       const text = Locale.compose(label).replace(/\s*\(.*\)|\s*（.*）/, "");
       pills.push({ "class": style, text });
-    }
-    if ((featureDefinition()?.SightThroughModifier ?? 0) != 0) {
-      // TRIX: check for nonzero instead of negative values?
+    } else if ((featureDefinition()?.SightThroughModifier ?? 0) != 0) {
+      // TRIX: check for nonzero instead of negative values
+      // TRIX: skip this for features that already get a pill
       const type = featureDefinition().FeatureType;
-      const ctype = featureDefinition().FeatureClassType;
+      const ctype = featureDefinition().FeatureClassType;  // may be null
       const ttype = terrainDefinition().TerrainType;
       const style = `bz-style-${type} bz-style-${ctype} bz-style-${ttype} bz-alert-note`;
       const text = "LOC_PLOT_TOOLTIP_BLOCKS_SIGHT";
