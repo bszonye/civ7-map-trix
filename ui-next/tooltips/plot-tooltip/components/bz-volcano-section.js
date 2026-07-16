@@ -4,7 +4,7 @@ import { Icon } from '/core/ui-next/components/icon.js';
 import { L10n } from '/core/ui-next/components/l10n.js';
 import { TooltipKeyword } from '/core/ui-next/components/tooltip-keyword.js';
 import { Tooltip } from '/core/ui-next/components/tooltip.js';
-import { TicketSection, TicketRow } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/components/bz-utility.js';
+import { TicketSection, TicketRow } from './bz-utility.js';
 
 const VolcanoSection = (props) => {
   return createComponent(TicketSection, {
