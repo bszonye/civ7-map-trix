@@ -34,38 +34,6 @@ const BZ_DOT_DIVIDER = Locale.compose("LOC_PLOT_DIVIDER_DOT");
 const BZ_DOT_JOINER = Locale.getCurrentDisplayLocale().startsWith("zh_") ?
     BZ_DOT_DIVIDER : `&nbsp;${BZ_DOT_DIVIDER} `;
 
-const BZ_TYPE_ICONS = {
-  // AGELESS: "url(blp:city_ageless)",
-  MILITARY: "url(blp:nar_rew_promotion)",
-  RELIGIOUS: "url(blp:fi_nar_rew_religion_64)",
-  GREATWORK: "url(blp:fi_greatwork_64)",
-  FORTIFICATION: "url(blp:fi_action_fortify_64)",
-  CITY_STATE_UNIQUE_IMPROVEMENT: "url(blp:fi_citystate_gold_64)",
-  // UNIQUE: null,
-  // UNIQUE_IMPROVEMENT: null,
-  FOOD_WAREHOUSE: "url(blp:fi_Yield_Food_64)",
-  PRODUCTION_WAREHOUSE: "url(blp:fi_Yield_Production_64)",
-  WAREHOUSE: "url(blp:icon_building_warehouse)",
-  WATER: "url(blp:icon_building_water)",
-  // BRIDGE: null,
-  FOOD: "url(blp:fi_Yield_Food_64)",
-  PRODUCTION: "url(blp:fi_Yield_Production_64)",
-  GOLD: "url(blp:fi_Yield_Gold_64)",
-  SCIENCE: "url(blp:fi_Yield_Science_64)",
-  CULTURE: "url(blp:fi_Yield_Culture_64)",
-  HAPPINESS: "url(blp:fi_Yield_Happiness_64)",
-  DIPLOMACY: "url(blp:fi_yield_diplomacy_64)",
-}
-const BZ_TYPE_TAGS = /* @__PURE__ */ new Map();
-for (const e of GameInfo.TypeTags) {
-  let tags = BZ_TYPE_TAGS.get(e.Type) ?? new Set();
-  if (!tags.size) BZ_TYPE_TAGS.set(e.Type, tags);
-  tags.add(e.Tag);
-}
-for (const [key, value] of BZ_TYPE_TAGS.entries()) {
-  console.warn(`TRIX TYPE ${key} = ${[...value]}`);
-}
-
 const bzPill = (props) => {
   const [local, other] = splitProps(props, ["class", "iclass", "icon", "text"]);
   return (() => {
@@ -101,7 +69,7 @@ const bzPill = (props) => {
 var _tmpl$ = /* @__PURE__ */ template(`<div class="flex flex-row gap-1"></div>`),
   _tmpl$2 = /* @__PURE__ */ template(`<div class="flex items-center"></div>`),
   _tmpl$3 = /* @__PURE__ */ template(`<div></div>`),
-  _tmpl$4 = /* @__PURE__ */ template(`<div class="flex flex-row"><span class="font-body text-sm text-accent-3"></span></div>`),
+  _tmpl$4 = /* @__PURE__ */ template(`<div class="flex flex-row"><div class="flex-auto"></div><div class="font-body text-sm text-accent-3"></div></div>`),
   _tmpl$5 = /* @__PURE__ */ template(`<div class="absolute top-0\\.5 right-2\\.5 size-7 flex items-center justify-center bg-contain bg-center bg-no-repeat"><div class="size-5 bg-contain bg-center bg-no-repeat"></div></div>`),
   _tmpl$6 = /* @__PURE__ */ template(`<div class="flex items-center font-body text-xs text-accent-3"></div>`),
   _tmpl$7 = /* @__PURE__ */ template(`<div class="flex flex-col justify-center grow-0 shrink"></div>`),
@@ -130,11 +98,7 @@ const ConstructibleRow = (props) => {
       });
     }
     // TRIX: type icons
-    const tags = BZ_TYPE_TAGS.get(props.constructible.type) ?? new Set();
-    console.warn(`TRIX TAGS ${[...tags]}`);
-    for (const [tag, icon] of Object.entries(BZ_TYPE_ICONS)) {
-      if (tags.has(tag)) entryIcons.push({ icon });
-    }
+    for (const icon of props.constructible.icons) entryIcons.push({ icon });
     return entryIcons;
   });
   return createComponent(TicketRow, {
@@ -262,8 +226,9 @@ const SpecialistsRow = (props) => createComponent(TicketRow, {
     });
   },
   get children() {
-    var _el$4 = _tmpl$4(), _el$5 = _el$4.firstChild;
-    insert(_el$4, createComponent(Tooltip.Text, {
+    // TRIX: right-align specialist count
+    var _el$4 = _tmpl$4(), _el$5 = _el$4.firstChild, _el$6 = _el$5.nextSibling;
+    insert(_el$5, createComponent(Tooltip.Text, {
       text: "LOC_PEDIA_CONCEPTS_SPECIALIST_TOOLTIP",
       get initialVPosition() {
         return TooltipVerticalPosition.BOTTOM;
@@ -282,8 +247,8 @@ const SpecialistsRow = (props) => createComponent(TicketRow, {
           }
         });
       }
-    }), _el$5);
-    insert(_el$5, () => `${props.current}/${props.max}`);
+    }), null);
+    insert(_el$6, () => `${props.current}/${props.max}`);
     return _el$4;
   }
 });
@@ -1067,8 +1032,8 @@ const PlotTooltipContent = (props) => {
       const pill = { "class": style, iclass, icon, text };
       const bridge = routeBridges().at(0);
       if (bridge) {
-        delete pill.iclass;
         pill.class += " bz-style-ROUTE_BRIDGE";
+        delete pill.iclass;
         pill.icon = bridge.type;
         pill.text = Locale.compose(
           "{1_RouteName} {LOC_PLOT_DIVIDER_DOT} {2_Ferry}",
