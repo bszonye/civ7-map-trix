@@ -17,7 +17,7 @@ const PlotAlertIcon = (props) => (() => {
 })();
 const PlotAlertTimer = (props) => createComponent(Show, {
   get when() {
-    return props.turns != null && 0 <= props.turns;
+    return props.turns != null;
   },
   get children() {
     var _el$2 = _tmpl$2(), _el$3 = _el$2.firstChild, _el$4 = _el$3.nextSibling;
@@ -107,16 +107,14 @@ function getPlotEffectAlert(effect) {
     return {
       title: effect.name,
       icon: "url(blp:fi_unit_jaguar_64)",
-      variant: "gold",
-      turns: -1
+      variant: "gold"
     };
   }
   if (effect.plotEffectType === "PLOTEFFECT_UNIT_FORTIFICATIONS") {
     return {
       title: effect.name,
       icon: "url(blp:fi_action_fortify_64)",
-      variant: "gold",
-      turns: -1
+      variant: "gold"
     };
   }
   return null;
@@ -240,44 +238,38 @@ const PlotAlertSection = (props) => {
       return hasAlerts();
     },
     get children() {
-      return [createComponent(Show, {
-        get when() {
-          return simpleAlerts().length > 0;
+      // TRIX: show simple alerts individually with variants & icons
+      return [createComponent(For, {
+        get each() {
+          return simpleAlerts();
         },
-        get children() {
-          return createComponent(TicketSection, {
-            name: "PlotAlertSection",
-            variant: "negative",
-            get children() {
-              return createComponent(TicketRow, {
-                get icon() {
-                  return createComponent(PlotAlertIcon, {});
-                },
-                get children() {
-                  var _el$5 = _tmpl$3(), _el$6 = _el$5.firstChild;
-                  insert(_el$6, createComponent(For, {
-                    get each() {
-                      return simpleAlerts();
-                    },
-                    children: (alert, index) => [createComponent(Show, {
-                      get when() {
-                        return index() > 0;
-                      },
-                      get children() {
-                        return _tmpl$4();
-                      }
-                    }), createComponent(PlotAlertLabel, {
-                      alert,
-                      "class": "font-title text-sm uppercase",
-                      keywordClass: "inline-flex"
-                    })]
-                  }));
-                  return _el$5;
-                }
-              });
-            }
-          });
-        }
+        children: (alert) => createComponent(TicketSection, {
+          name: "PlotAlertSection",
+          get variant() {
+            return alert.variant ?? "negative";
+          },
+          get children() {
+            return createComponent(TicketRow, {
+              get icon() {
+                return createComponent(PlotAlertIcon, {
+                  get icon() {
+                    return alert.icon;
+                  }
+                });
+              },
+              get children() {
+                var _el$8 = _tmpl$5();
+                insert(_el$8, createComponent(PlotAlertLabel, {
+                  alert,
+                  "class": "font-title text-sm uppercase flex-1",
+                  keywordClass: "flex-1"
+                }), null);
+                return _el$8;
+              }
+            });
+          }
+        })
+      }), createComponent(Show, {
       }), createComponent(For, {
         get each() {
           return timedAlerts();

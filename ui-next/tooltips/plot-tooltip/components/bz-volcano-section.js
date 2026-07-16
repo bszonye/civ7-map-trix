@@ -1,3 +1,4 @@
+// vim: sw=2 et
 import '/core/vendor/solid-js/web/dist/web.js';
 import { createComponent, Show } from '/core/vendor/solid-js/dist/solid.js';
 import { Icon } from '/core/ui-next/components/icon.js';
@@ -21,13 +22,19 @@ const VolcanoSection = (props) => {
           });
         },
         get children() {
-          return [createComponent(Show, {
+          // TRIX: use volcano name as heading, like natural wonders
+          return [createComponent(L10n.Stylize, {
+            "class": "font-title text-sm uppercase text-secondary",
+            get text() {
+              return props.volcano.name;
+            }
+          }), createComponent(Show, {
             get when() {
               return props.volcano.active;
             },
             get fallback() {
               return createComponent(L10n.Stylize, {
-                "class": "font-title text-sm uppercase text-secondary",
+                "class": "font-body text-xs",
                 text: "LOC_FEATURE_VOLCANO_NAME_INACTIVE"
               });
             },
@@ -41,18 +48,13 @@ const VolcanoSection = (props) => {
                   return createComponent(TooltipKeyword, {
                     get children() {
                       return createComponent(L10n.Stylize, {
-                        "class": "font-title text-sm uppercase",
+                        "class": "font-body text-xs",
                         text: "LOC_FEATURE_VOLCANO_NAME_ACTIVE"
                       });
                     }
                   });
                 }
               });
-            }
-          }), createComponent(L10n.Stylize, {
-            "class": "font-body text-sm",
-            get text() {
-              return props.volcano.name;
             }
           })];
         }

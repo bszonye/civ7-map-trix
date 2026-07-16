@@ -33,7 +33,7 @@ const UniqueQuarterSection = (props) => {
       }
     }), null);
     insert(_el$6, createComponent(L10n.Stylize, {
-      "class": "font-body text-2xs text-secondary",
+      "class": "font-body text-xs",
       // TRIX: resize text
       text: "LOC_PLOT_TOOLTIP_UNIQUE_QUARTER"
     }), null);
