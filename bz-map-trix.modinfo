@@ -59,6 +59,7 @@
                     <Item>ui/bz-style/bz-panel-yield-banner.css</Item>
                     <Item>ui/bz-units-panel/panel-units.css</Item>
                     <Item>ui-next/tooltips/plot-tooltip/components/alerts.js</Item>
+                    <Item>ui-next/tooltips/plot-tooltip/components/treasure-convoy-section.js</Item>
                     <Item>ui-next/tooltips/plot-tooltip/components/unique-quarter-section.js</Item>
                     <Item>ui-next/tooltips/plot-tooltip/bz-helpers.js</Item>
                     <Item>ui-next/tooltips/plot-tooltip/bz-plot-tooltip.css</Item>
