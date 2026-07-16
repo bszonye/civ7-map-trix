@@ -1,3 +1,4 @@
+// vim: sw=2 et
 import { template, insert } from '../../../../../core/vendor/solid-js/web/dist/web.js';
 import { createMemo, createComponent, Show } from '../../../../../core/vendor/solid-js/dist/solid.js';
 import { Icon } from '../../../../../core/ui-next/components/icon.js';
@@ -30,7 +31,8 @@ const TreasureConvoySection = (props) => {
             text: "LOC_PEDIA_CONCEPTS_TREASURE_CONVOY_TOOLTIP",
             get children() {
               return createComponent(TooltipKeyword, {
-                "class": "flex-auto",
+                "class": "flex-auto self-center",
+                // TRIX: center label vertically
                 get children() {
                   return createComponent(L10n.Stylize, {
                     "class": "font-title text-sm uppercase",
