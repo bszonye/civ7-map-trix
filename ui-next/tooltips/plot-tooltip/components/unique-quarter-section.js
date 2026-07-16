@@ -41,7 +41,8 @@ const UniqueQuarterSection = (props) => {
       "class": "font-body text-xs text-accent-3 mt-1",
       // TRIX: resize text
       get text() {
-        return props.definition.Description;
+        return props.definition.Tooltip;
+        // TRIX: use the Tooltip instead of the verbose Description
       }
     }), null);
     insert(_el$, createComponent(For, {
