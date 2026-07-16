@@ -7,7 +7,7 @@ import { TooltipKeyword } from '../../../../../core/ui-next/components/tooltip-k
 import { TooltipHorizontalPosition, TooltipVerticalPosition } from '../../../../../core/ui-next/components/tooltip.js';
 import { ProductionTooltip } from '../../production-tooltip.js';
 
-var _tmpl$ = /* @__PURE__ */ template(`<div class="w-px flex-1"></div>`), _tmpl$2 = /* @__PURE__ */ template(`<div class="flex flex-col w-full"><div class="flex flex-row items-stretch"><div class="w-12 shrink-0 flex justify-center items-start"></div><div class="w-4 shrink-0 flex flex-col items-center"></div><div class="flex flex-col flex-auto ml-1"></div></div></div>`), _tmpl$3 = /* @__PURE__ */ template(`<div class="flex items-center"></div>`), _tmpl$4 = /* @__PURE__ */ template(`<div class="flex flex-row items-center"><div class="w-12 shrink-0 flex justify-center"></div><div class="w-4 shrink-0 self-stretch flex flex-col items-center"><div class="w-px flex-1"></div><div></div><div class="w-px flex-1"></div></div><div class="flex flex-col flex-1 ml-1 justify-center"></div></div>`);
+var _tmpl$ = /* @__PURE__ */ template(`<div class="w-px flex-1"></div>`), _tmpl$2 = /* @__PURE__ */ template(`<div class="flex flex-col w-full"><div class="flex flex-row items-stretch"><div class="w-12 shrink-0 flex justify-center items-start"></div><div class="w-4 shrink-0 flex flex-col items-center"></div><div class="flex flex-col flex-auto ml-1"></div></div></div>`), _tmpl$3 = /* @__PURE__ */ template(`<div class="flex w-full items-center gap-1"></div>`), _tmpl$4 = /* @__PURE__ */ template(`<div class="flex flex-row items-center"><div class="w-12 shrink-0 flex justify-center"></div><div class="w-4 shrink-0 self-stretch flex flex-col items-center"><div class="w-px flex-1"></div><div></div><div class="w-px flex-1"></div></div><div class="flex flex-col ml-1 justify-start flex-auto"></div></div>`);
 const UniqueQuarterSection = (props) => {
   const hasBuildings = () => props.buildings.length > 0;
   return (() => {
@@ -66,13 +66,15 @@ const UniqueQuarterSection = (props) => {
             name: "url(blp:tooltip_uniqueIcon)"
           }));
           _el$12.style.setProperty("background-color", "#B79A64");
-          insert(_el$13, createComponent(Show, {
+          var _el$14 = _tmpl$3();
+          insert(_el$13, () => _el$14);
+          insert(_el$14, createComponent(Show, {
             get when() {
               return building.isBuilding || building.isWonder;
             },
             get fallback() {
               return createComponent(L10n.Stylize, {
-                "class": "font-title text-sm",
+                "class": "font-title text-sm flex-auto",
                 get text() {
                   return building.title;
                 }
@@ -94,6 +96,8 @@ const UniqueQuarterSection = (props) => {
                 },
                 get children() {
                   return createComponent(TooltipKeyword, {
+                    // TRIX: expand to right-align status icons
+                    "class": "flex-auto",
                     get children() {
                       return createComponent(L10n.Stylize, {
                         "class": "font-title text-sm",
@@ -107,18 +111,16 @@ const UniqueQuarterSection = (props) => {
               });
             }
           }), null);
-          insert(_el$13, createComponent(Show, {
+          insert(_el$14, createComponent(Show, {
             get when() {
-              return building.damaged;
+              return true;  // building.damaged;
             },
             get children() {
-              var _el$14 = _tmpl$3();
-              insert(_el$14, createComponent(Icon, {
+              return createComponent(Icon, {
                 "class": "size-5",
                 isUrl: true,
                 name: "url(blp:fi_damaged_64)"
-              }));
-              return _el$14;
+              });
             }
           }), null);
           createRenderEffect((_$p) => (_$p = isLast() ? "rotate(180deg)" : "none") != null ? _el$11.style.setProperty("transform", _$p) : _el$11.style.removeProperty("transform"));
