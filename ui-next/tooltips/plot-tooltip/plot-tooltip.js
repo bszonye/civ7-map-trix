@@ -36,7 +36,7 @@ const BZ_DOT_JOINER = Locale.getCurrentDisplayLocale().startsWith("zh_") ?
 
 const BZ_TYPE_ICONS = {
   // AGELESS: "url(blp:city_ageless)",
-  MILITARY: "url(blp:fi_nar_rew_combat_64)",
+  MILITARY: "url(blp:nar_rew_promotion)",
   RELIGIOUS: "url(blp:fi_nar_rew_religion_64)",
   GREATWORK: "url(blp:fi_greatwork_64)",
   FORTIFICATION: "url(blp:fi_action_fortify_64)",
