@@ -261,7 +261,7 @@ const PlotAlertSection = (props) => {
                 var _el$8 = _tmpl$5();
                 insert(_el$8, createComponent(PlotAlertLabel, {
                   alert,
-                  "class": "font-title text-sm uppercase flex-1",
+                  "class": "font-title text-sm flex-auto",
                   keywordClass: "flex-1"
                 }), null);
                 return _el$8;
@@ -292,7 +292,7 @@ const PlotAlertSection = (props) => {
                 var _el$8 = _tmpl$5();
                 insert(_el$8, createComponent(PlotAlertLabel, {
                   alert,
-                  "class": "font-title text-sm uppercase flex-1",
+                  "class": "font-title text-sm flex-auto",
                   keywordClass: "flex-1"
                 }), null);
                 insert(_el$8, createComponent(PlotAlertTimer, {
