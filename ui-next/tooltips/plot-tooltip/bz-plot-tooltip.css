@@ -1,6 +1,6 @@
 /* vim:set sw=2 et: */
 .bz-plot-tooltip .img-tooltip-border.p-4 {
-  padding: 0.6666666667rem;
+  padding: 0.6666666667rem 0.6666666667rem 0.2222222222rem;
 }
 
 .bz-plot-tooltip {
