@@ -205,13 +205,20 @@ const ConstructibleRow = (props) => {
         get when() {
           return props.constructible.isWonder && props.constructible.description;
         },
-        children: (description) => createComponent(L10n.Stylize, {
-          "class": "font-body text-xs text-accent-3",
-          // TRIX: resize text
-          get text() {
-            return description();
-          }
-        })
+        children: (description) => [
+          createComponent(L10n.Stylize, {
+            "class": "font-body text-2xs mb-1",
+            // TRIX: restyle text
+            text: "LOC_DISTRICT_WONDER_NAME"
+          }),
+          createComponent(L10n.Stylize, {
+            "class": "font-body text-xs text-accent-3",
+            // TRIX: resize text
+            get text() {
+              return description();
+            }
+          })
+        ]
       })];
     }
   });
@@ -1016,14 +1023,20 @@ const PlotTooltipContent = (props) => {
     // TRIX: add Fresh Water pill
     if (isFreshWater()) {
       if (playerID() == -1 || district()?.type == Game.getHash("DISTRICT_CITY_CENTER")) {
-        pills.push({ "class": "bz-style-fresh-water", text: "LOC_PLOTKEY_FRESHWATER" });
+        pills.push({
+          "class": "bz-style-fresh-water",
+          text: "LOC_PLOTKEY_FRESHWATER",
+        });
       }
     }
     if (districtKeyword()) {
       pills.push(districtKeyword());
     }
     if (quarterKeyword()) {
-      pills.push(quarterKeyword());
+      pills.push({
+        "class": "bz-style-quarter",
+        text: quarterKeyword()},
+      );
     }
     // TRIX: move route pill into keywordPills
     if (route()) {

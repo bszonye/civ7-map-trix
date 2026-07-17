@@ -5,25 +5,25 @@
 
 .bz-plot-tooltip {
   /* game colors */
-  --bz-color-silver: #4c5366;  /* = primary */
-  --bz-color-bronze: #e5d2ac;  /* = secondary */
-  --bz-color-primary: #4c5366;
   --bz-color-primary-1: #8d97a6;
   --bz-color-primary-2: #4c5366;
   --bz-color-primary-3: #333640;
   --bz-color-primary-4: #23252b;
   --bz-color-primary-5: #12151f;
-  --bz-color-secondary: #e5d2ac;
+  --bz-color-primary: var(--bz-color-primary-2);
+  --bz-color-silver: var(--bz-color-primary-2);
   --bz-color-secondary-1: #e5d2ac;
   --bz-color-secondary-2: #8c7e62;
   --bz-color-secondary-3: #4c473d;
-  --bz-color-accent: #616266;
+  --bz-color-secondary: var(--bz-color-secondary-2);
+  --bz-color-bronze: var(--bz-color-secondary-2);
   --bz-color-accent-1: #e5e5e5;
   --bz-color-accent-2: #c2c4cc;
   --bz-color-accent-3: #9da0a6;
   --bz-color-accent-4: #85878c;
   --bz-color-accent-5: #616266;
   --bz-color-accent-6: #05070d;
+  --bz-color-accent: var(--bz-color-accent-5);
   /* bronze shades */
   --bz-color-bronze-1: #f9ecd2;
   --bz-color-bronze-2: #e5d2ac;  /* = secondary1 */
@@ -31,6 +31,9 @@
   --bz-color-bronze-4: #a99670;
   --bz-color-bronze-5: #8c7e62;  /* = secondary 2 */
   --bz-color-bronze-6: #4c473d;  /* = secondary 3 */
+  /* pills */
+  --bz-color-pill-background: var(--bz-color-primary-4);
+  --bz-color-pill-border: #53565d;
   /* rules background */
   --bz-color-rules: #8c7e6233;
   /* alert colors */
@@ -68,8 +71,8 @@
 }
 
 .bz-plot-tooltip .bz-keyword-pill {
-  border: 1px solid #53565d;
-  background-color: #23252b;
+  border: 2px solid #53565d;  /* var color doesn't work here */
+  background-color: var(--bz-color-pill-background);
 }
 
 .bz-plot-tooltip .text-secondary {
@@ -146,4 +149,11 @@
 .bz-plot-tooltip .bz-style-ROUTE_BRIDGE {
   border: none;
   background-color: var(--bz-color-bridge);
+}
+.bz-plot-tooltip .bz-style-shiny-bronze {
+  border: none;
+  background-color: var(--bz-color-bronze-6);
+  background-image: linear-gradient(180deg, var(--bz-color-bronze-3) 0%, var(--bz-color-bronze-1) 10%, var(--bz-color-bronze-4) 30%, var(--bz-color-bronze-6) 60%, var(--bz-color-bronze-4) 100%);
+  color: var(--bz-color-bronze-1);
+  text-shadow: 0 -0.0555555556rem var(--bz-color-bronze-6);
 }
