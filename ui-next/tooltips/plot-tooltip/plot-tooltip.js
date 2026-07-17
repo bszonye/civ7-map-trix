@@ -35,7 +35,7 @@ const BZ_DOT_JOINER = Locale.getCurrentDisplayLocale().startsWith("zh_") ?
     BZ_DOT_DIVIDER : `&nbsp;${BZ_DOT_DIVIDER} `;
 
 const bzPill = (props) => {
-  const [local, other] = splitProps(props, ["class", "iclass", "icon", "text"]);
+  const [local, other] = splitProps(props, ["class", "iconClass", "icon", "text"]);
   return (() => {
     var _el$ = _tmpl$();
     spread(_el$, mergeProps({
@@ -49,7 +49,7 @@ const bzPill = (props) => {
       },
       children: (icon) => createComponent(Icon, {
           get ["class"]() {
-            return local.iclass ?? "size-4 -ml-1\\.5 mr-1";
+            return local.iconClass ?? "size-4 -ml-1\\.5 mr-1";
           },
           get name() {
             return icon();
@@ -1053,14 +1053,14 @@ const PlotTooltipContent = (props) => {
     // TRIX: move route pill into keywordPills
     if (route()) {
       const style = `bz-style-${route().type}`;
-      const iclass = "size-4 mt-px -ml-0\\.5 mr-1";
+      const iconClass = "size-4 mt-px -ml-0\\.5 mr-1";
       const icon = route().type;
       const text = route().name;
-      const pill = { "class": style, iclass, icon, text };
+      const pill = { "class": style, iconClass, icon, text };
       const bridge = routeBridges().at(0);
       if (bridge) {
         pill.class += " bz-style-ROUTE_BRIDGE";
-        delete pill.iclass;
+        delete pill.iconClass;
         pill.icon = bridge.type;
         pill.text = Locale.compose(
           "{1_RouteName} {LOC_PLOT_DIVIDER_DOT} {2_Ferry}",
@@ -1164,7 +1164,7 @@ const PlotTooltipContent = (props) => {
           },
           children: (keyword) => createComponent(bzPill, {
             "class": keyword.class,
-            iclass: keyword.iclass,
+            iconClass: keyword.iconClass,
             icon: keyword.icon,
             text: keyword.text ?? keyword,
           })
