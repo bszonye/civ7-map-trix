@@ -11,8 +11,9 @@ import { TicketSection, TicketRow } from './bz-utility.js';
 var _tmpl$ = /* @__PURE__ */ template(`<div class="size-6 shrink-0 bg-contain bg-center bg-no-repeat"></div>`), _tmpl$2 = /* @__PURE__ */ template(`<div class="flex flex-col items-center ml-2 shrink-0"><div class="size-6 bg-contain bg-center bg-no-repeat"></div><span class="font-body text-xs text-accent-2"></span></div>`), _tmpl$3 = /* @__PURE__ */ template(`<div class="flex items-center w-full"><div class="font-title text-sm uppercase text-secondary flex-1 flex flex-wrap items-center"></div></div>`), _tmpl$4 = /* @__PURE__ */ template(`<span class=mx-1>•</span>`), _tmpl$5 = /* @__PURE__ */ template(`<div class="flex items-center w-full"></div>`), _tmpl$6 = /* @__PURE__ */ template(`<div class="flex items-center mt-0\\.5 font-body text-sm text-accent-3"><span></span></div>`);
 const PlotAlertIcon = (props) => (() => {
   var _el$ = _tmpl$();
+  if (props.iconClass) _el$.classList.value = `${props.iconClass} shrink-0 bg-contain bg-center bg-no-repeat`;
   // eslint-disable-next-line no-constant-binary-expression -- FXS
-  createRenderEffect((_$p) => (_$p = props.icon ?? "url(blp:tooltip_alert_icon)") != null ? _el$.style.setProperty("background-image", _$p) : _el$.style.removeProperty("background-image"));  // noqa
+  createRenderEffect((_$p) => (_$p = props.icon ?? "url(blp:tooltip_alert_icon)") != null ? _el$.style.setProperty("background-image", _$p) : _el$.style.removeProperty("background-image"));
   return _el$;
 })();
 const PlotAlertTimer = (props) => createComponent(Show, {
@@ -74,6 +75,28 @@ function getEventClassAlertTooltip(eventClass) {
 }
 function getPlotEffectAlert(effect) {
   const turns = effect.duration > 0 ? effect.duration : void 0;
+  if (effect.plotEffectType === "PLOTEFFECT_UNIT_FORTIFICATIONS") {
+    return {
+      title: effect.name,
+      icon: "url(blp:fi_action_fortify_64)",
+      variant: "gold"
+    };
+  }
+  if (effect.plotEffectType === "PLOTEFFECT_DIGSITE") {
+    return {
+      title: effect.name,
+      iconClass: "size-9",
+      icon: "url(blp:action_excavateartifacts)",
+      variant: "gold"
+    };
+  }
+  if (effect.plotEffectType === "PLOTEFFECT_STONE_TRAP") {
+    return {
+      title: effect.name,
+      icon: "url(blp:fi_unit_jaguar_64)",
+      variant: "gold"
+    };
+  }
   if (effect.plotEffectType === "PLOTEFFECT_RADIOACTIVE_FALLOUT") {
     return {
       title: effect.name,
@@ -93,28 +116,6 @@ function getPlotEffectAlert(effect) {
       tooltipText: "LOC_PEDIA_CONCEPTS_INFECTED_TOOLTIP",
       icon: "url(blp:fi_yield_plague_64)",
       turns
-    };
-  }
-  if (effect.plotEffectType === "PLOTEFFECT_DIGSITE") {
-    return {
-      title: effect.name,
-      icon: "url(blp:fi_unit_explorer_64)",
-      variant: "gold",
-      turns
-    };
-  }
-  if (effect.plotEffectType === "PLOTEFFECT_STONE_TRAP") {
-    return {
-      title: effect.name,
-      icon: "url(blp:fi_unit_jaguar_64)",
-      variant: "gold"
-    };
-  }
-  if (effect.plotEffectType === "PLOTEFFECT_UNIT_FORTIFICATIONS") {
-    return {
-      title: effect.name,
-      icon: "url(blp:fi_action_fortify_64)",
-      variant: "gold"
     };
   }
   return null;
@@ -252,6 +253,9 @@ const PlotAlertSection = (props) => {
             return createComponent(TicketRow, {
               get icon() {
                 return createComponent(PlotAlertIcon, {
+                  get iconClass() {
+                    return alert.iconClass;
+                  },
                   get icon() {
                     return alert.icon;
                   }
@@ -283,6 +287,9 @@ const PlotAlertSection = (props) => {
             return createComponent(TicketRow, {
               get icon() {
                 return createComponent(PlotAlertIcon, {
+                  get iconClass() {
+                    return alert.iconClass;
+                  },
                   get icon() {
                     return alert.icon;
                   }
