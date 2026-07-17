@@ -1,4 +1,8 @@
-/* vim: sw=2 et */
+/* vim:set sw=2 et: */
+.bz-plot-tooltip .img-tooltip-border.p-4 {
+  padding: 0.6666666667rem;
+}
+
 .bz-plot-tooltip {
   /* game colors */
   --bz-color-silver: #4c5366;  /* = primary */

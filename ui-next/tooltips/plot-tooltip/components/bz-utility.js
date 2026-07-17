@@ -1,7 +1,7 @@
 import { template, className, insert, setAttribute } from '/core/vendor/solid-js/web/dist/web.js';
 import { createRenderEffect } from '/core/vendor/solid-js/dist/solid.js';
 
-var _tmpl$ = /* @__PURE__ */ template(`<div></div>`), _tmpl$2 = /* @__PURE__ */ template(`<div><div class="w-12 shrink-0 flex items-center justify-center py-0\\.5"></div><div class="w-px self-stretch bg-accent-2 opacity-30 mx-2"></div><div class="flex flex-col justify-start flex-auto"></div></div>`);
+var _tmpl$ = /* @__PURE__ */ template(`<div></div>`), _tmpl$2 = /* @__PURE__ */ template(`<div><div class="w-12 shrink-0 flex items-center justify-center py-0\\.5"></div><div class="w-px self-stretch bg-accent-2 opacity-30 mx-2"></div><div class="flex flex-col justify-start flex-auto my-0\\.5"></div></div>`);
 const Divider = (props) => (() => {
   var _el$ = _tmpl$();
   _el$.style.setProperty("background-image", "linear-gradient(90deg, rgba(141, 151, 166, 0) 0%, #8d97a6ff 50%, rgba(141, 151, 166, 0) 100%)");
