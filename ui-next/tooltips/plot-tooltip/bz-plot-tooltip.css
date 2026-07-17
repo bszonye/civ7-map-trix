@@ -68,6 +68,7 @@
   --bz-color-cultural: #892bb3;
   --bz-color-expansionist: #00a717;
   --bz-color-diplomatic: #255be4;
+  --bz-color-crisis: #af1b1c;
 }
 
 .bz-plot-tooltip .bz-keyword-pill {
@@ -78,6 +79,9 @@
 .bz-plot-tooltip .text-secondary {
   fxs-font-gradient-color: var(--bz-color-bronze-1);
   color: var(--bz-color-bronze-2);
+}
+.bz-plot-tooltip .bz-style-independent-CRISIS {
+  filter: fxs-color-tint(var(--bz-color-crisis));
 }
 
 .bz-plot-tooltip .bz-alert-primary { background-color: var(--bz-color-primary); }

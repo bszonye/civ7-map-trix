@@ -1,3 +1,4 @@
+// vim: sw=2 et
 import { template, insert } from '/core/vendor/solid-js/web/dist/web.js';
 import { createSignal, createEffect, createComponent, Show, createRenderEffect } from '/core/vendor/solid-js/dist/solid.js';
 import { getPlayerColorVariants, isPrimaryColorLighter } from '/core/ui/utilities/utilities-color.js';
@@ -6,6 +7,7 @@ import { Layout } from '/core/ui/utilities/utilities-layout.js';
 import { PortraitIcon } from '/core/ui-next/components/portrait-icon.js';
 import { Tooltip } from '/core/ui-next/components/tooltip.js';
 import { getSettlementIconInfo } from '/core/ui-next/utilities/settlement-utilities.js';
+import { Icon as IconComponent } from '/core/ui-next/components/icon.js';
 
 var _tmpl$ = /* @__PURE__ */ template(`<div class="-z-1 relative h-16 w-9 flex-1 flex flex-row justify-center mx-1.5 -mt-8"><div class="absolute inset-0"></div><div class="absolute inset-0"></div><div class="absolute inset-0"></div><div class="bg-contain bg-center bg-no-repeat relative self-end mb-3 size-6"></div></div>`), _tmpl$2 = /* @__PURE__ */ template(`<div class="z-0 relative flex flex-col items-center justify-center"data-name=PlotTooltipPlayerPortrait></div>`);
 const PlotTooltipPlayerPortrait = (props) => {
@@ -14,14 +16,14 @@ const PlotTooltipPlayerPortrait = (props) => {
   const [civSymbolColor, setCivSymbolColor] = createSignal("");
   const [settlementName, setSettlementName] = createSignal("");
   const [playerName, setPlayerName] = createSignal("");
+  if (props.leaderId === PlayerIds.NO_PLAYER) {
+    return;
+  }
+  const player = Players.get(props.leaderId);
+  if (!player) {
+    return;
+  }
   createEffect(() => {
-    if (props.leaderId === PlayerIds.NO_PLAYER) {
-      return;
-    }
-    const player = Players.get(props.leaderId);
-    if (!player) {
-      return;
-    }
     setPlayerName(Locale.compose(player.name));
     const variants = getPlayerColorVariants(props.leaderId);
     if (variants) {
@@ -48,6 +50,26 @@ const PlotTooltipPlayerPortrait = (props) => {
         return props.representsCityState;
       },
       get fallback() {
+        // TRIX: independents use the same icon as the diplomacy panel
+        if (player.isIndependent) {
+          const type = GameInfo.CityStateTypes.lookup(player.getCityStateCityStateType());
+          const cstype = type?.CityStateType ?? "CRISIS";
+          const icon = type?.CityStateType ?
+            UI.getIconCSS(`CITY_STATE_${type?.CityStateType}`) :
+            "url(blp:bonustype_crisis)";
+          return [
+            createComponent(IconComponent, {
+              "class": `relative size-11 bz-style-independent-${cstype}`,
+              name: icon,
+              isUrl: true,
+            }),
+            createComponent(IconComponent, {
+                "class": "absolute size-11",
+                name: "url(blp:hud_civics-icon_frame)",
+                isUrl: true,
+            })
+          ];
+        }
         return createComponent(PortraitIcon, {
           get playerId() {
             return props.leaderId;

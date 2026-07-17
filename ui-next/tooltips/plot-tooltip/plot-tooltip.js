@@ -741,7 +741,7 @@ const PlotDetailsSection = (props) => {
   });
   const hasOwnerRow = createMemo(() => {
     const info = ownerInfo();
-    return !!info && !info.isIndependent;
+    return !!info;  // && !info.isIndependent;
   });
   const hasTopContent = createMemo(() => hasOwnerRow());
   const hasContent = createMemo(() => {
@@ -761,7 +761,8 @@ const PlotDetailsSection = (props) => {
             },
             children: (info) => createComponent(Show, {
               get when() {
-                return !info().isIndependent;
+                // return !info().isIndependent;
+                return hasOwnerRow();
               },
               get children() {
                 return createComponent(PlayerOwnerRow, {
@@ -769,7 +770,12 @@ const PlotDetailsSection = (props) => {
                     return info().playerName;
                   },
                   get civName() {
-                    return info().civName;
+                    return info().isIndependent ?
+                      Locale.compose(
+                        "LOC_DIPLOMACY_INDEPENDENT_CIV_NAME",
+                        info().playerName
+                      ) :
+                      info().civName;
                   },
                   get isLocalPlayer() {
                     return props.owningPlayer === GameContext.localPlayerID;
@@ -778,7 +784,7 @@ const PlotDetailsSection = (props) => {
                     return info().suzerainId ?? props.owningPlayer;
                   },
                   get settlementName() {
-                    return settlementName();
+                    return info().isIndependent ? info().civName : settlementName();
                   },
                   get conquerorInfo() {
                     return info().conquerorInfo;
