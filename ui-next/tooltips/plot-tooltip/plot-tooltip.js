@@ -924,7 +924,7 @@ const PlotTooltipContent = (props) => {
   // TRIX: enable terrain highlighting
   const terrainDefinition = createMemo(() => GameInfo.Terrains.lookup(terrainType()));
   const featureDefinition = createMemo(() => GameInfo.Features.lookup(featureType()));
-  const districtDefinition = createMemo(() => GameInfo.Districts.lookup(district()?.type));
+  const districtDefinition = createMemo(() => GameInfo.Districts.lookup(district()?.type ?? -1));
   const isCityCenter = createMemo(() => districtDefinition()?.DistrictType === "DISTRICT_CITY_CENTER");
   const districtKeyword = createMemo(() => {
     const districtType = district() ? districtDefinition()?.DistrictType : void 0;
