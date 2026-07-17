@@ -2,7 +2,7 @@ import { template, insert } from '/core/vendor/solid-js/web/dist/web.js';
 import { createMemo, createComponent, Show } from '/core/vendor/solid-js/dist/solid.js';
 import { L10n } from '/core/ui-next/components/l10n.js';
 
-var _tmpl$ = /* @__PURE__ */ template(`<div class="flex flex-col text-accent-2 max-w-96 mt-2 mx-2"><div class="flex flex-row justify-left text-sm font-bold tooltip-title"></div></div>`);
+var _tmpl$ = /* @__PURE__ */ template(`<div class="flex flex-col text-accent-2 max-w-96 m-2"><div class="flex flex-row justify-left text-sm font-bold tooltip-title"></div></div>`);
 const ARCHEOLOGY_CONSTRUCTIBLE_TYPES = ["IMPROVEMENT_RUINS", "BUILDING_MUSEUM", "BUILDING_UNIVERSITY"];
 function getConstructibleInfo(construct) {
   const instance = Constructibles.getByComponentID(construct);
