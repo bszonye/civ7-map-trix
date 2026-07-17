@@ -3,7 +3,7 @@ import { createMemo, createComponent, Show } from '/core/vendor/solid-js/dist/so
 import { L10n } from '/core/ui-next/components/l10n.js';
 import { RandomEventsLayer } from '/base-standard/ui/lenses/layer/random-events-layer.js';
 
-var _tmpl$ = /* @__PURE__ */ template(`<div class="flex flex-row text-accent-2"><div class="flex text-sm"></div></div>`);
+var _tmpl$ = /* @__PURE__ */ template(`<div class="flex flex-row justify-center text-accent-2"><div class="flex text-sm mt-2"></div></div>`);
 function getRandomEventInfo(plotCoord) {
   const randomEvent = RandomEventsLayer.instance.getRandomEventResult(plotCoord.x, plotCoord.y);
   if (!randomEvent) return void 0;
