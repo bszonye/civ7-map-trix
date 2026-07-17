@@ -241,6 +241,7 @@ const PlayerOwnerRow = (props) => {
         get leaderId() {
           return props.playerId;
         },
+        // TRIX: support independent powers
         get isIndependent() {
           return props.isIndependent;
         },
@@ -800,7 +801,7 @@ const PlotDetailsSection = (props) => {
                   get conquerorInfo() {
                     return info().conquerorInfo;
                   },
-                  // TRIX: support independent peoples
+                  // TRIX: support independent powers
                   get isIndependent() {
                     return info().isIndependent;
                   },
