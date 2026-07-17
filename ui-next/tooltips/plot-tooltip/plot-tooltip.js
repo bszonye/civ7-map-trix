@@ -1351,6 +1351,8 @@ const PlotTooltipComponent = (props) => {
       if (!tooltipContext) {
         throw new Error("PlotTooltipTrigger must be used within a <Tooltip> root component");
       }
+      // TRIX: add shift-to-hide
+      const [isShiftDown, setIsShiftDown] = createSignal(false);
       const [isWorldDragging, setIsWorldDragging] = createSignal(false);
       const reactiveName = createMemo(() => tooltipContext.name);
       const triggerContext = new TriggerActivationContextProvider(tooltipModel, parentContext, reactiveName);
@@ -1407,6 +1409,11 @@ const PlotTooltipComponent = (props) => {
           }
         }
       };
+      // TRIX: add shift-to-hide
+      const onUpdateFrame = () => {
+        const down = Input.isShiftDown();
+        if (down != isShiftDown()) setIsShiftDown(down);
+      };
       const isRevealed = createMemo(() => {
         const currentPlotCoords = plotCoords();
         if (!currentPlotCoords) return false;
@@ -1416,8 +1423,9 @@ const PlotTooltipComponent = (props) => {
       const isWorldFocused = createMemo(() => {
         return focusManager.activeElement() === document.body;
       });
-      createEffect(on([plotCoords, IsPlotTooltipVisible, isWorldFocused, isRevealed, isWorldDragging], ([currentPlotCoords, isVisible, currentIsWorldFocused, revealed, currentIsWorldDragging], _prevValues) => {
-        if (!currentPlotCoords || !isVisible || !currentIsWorldFocused || !revealed || currentIsWorldDragging) {
+      createEffect(on([plotCoords, IsPlotTooltipVisible, isWorldFocused, isRevealed, isWorldDragging, isShiftDown], ([currentPlotCoords, isVisible, currentIsWorldFocused, revealed, currentIsWorldDragging, currentIsShiftDown], _prevValues) => {
+        if (!currentPlotCoords || !isVisible || !currentIsWorldFocused || !revealed || currentIsWorldDragging || currentIsShiftDown) {
+          // TRIX: add shift-to-hide
           hidePlotTooltip();
         } else {
           // const prevPlotCoord = prevValues?.[0];
@@ -1442,11 +1450,13 @@ const PlotTooltipComponent = (props) => {
         }
       });
       engine.on("InputAction", onInputAction);
+      engine.on("UpdateFrame", onUpdateFrame);
       onCleanup(() => {
         clearTooltipDelay();
         window.removeEventListener("cursor-updated", onCursorUpdated);
         window.removeEventListener("plot-cursor-coords-updated", onPlotCursorCoordsUpdated);
         engine.off("InputAction", onInputAction);
+        engine.off("UpdateFrame", onUpdateFrame);
       });
       return createComponent(TriggerActivationContext.Provider, {
         value: triggerContext,
@@ -1551,10 +1561,41 @@ const PlotTooltip = ComponentRegistry.register({
   createInstance: PlotTooltipComponent,
   // TRIX: preload images
   images: [
-    "blp:fi_damaged_64",
-    "blp:action_movebyroad",
+    "blp:action_civilianunits",
     "blp:action_movebyrail",
+    "blp:action_movebyroad",
+    "blp:city_ageless",
+    "blp:city_overbuildable",
+    "blp:fi_Yield_Culture_64",
+    "blp:fi_Yield_Food_64",
+    "blp:fi_Yield_Food_64",
+    "blp:fi_Yield_Gold_64",
+    "blp:fi_Yield_Happiness_64",
+    "blp:fi_Yield_Production_64",
+    "blp:fi_Yield_Production_64",
+    "blp:fi_Yield_Science_64",
+    "blp:fi_action_fortify_64",
+    "blp:fi_citystate_gold_64",
+    "blp:fi_damaged_64",
+    "blp:fi_greatwork_64",
+    "blp:fi_nar_rew_religion_64",
+    "blp:fi_unit_explorer_64",
+    "blp:fi_unit_jaguar_64",
+    "blp:fi_yield_diplomacy_64",
+    "blp:fi_yield_plague_64",
+    "blp:generic_natural_wonder",
+    "blp:hud_turn-timer",
+    "blp:icon_building_warehouse",
+    "blp:icon_building_water",
     "blp:impicon_staat",
+    "blp:nar_rew_promotion",
+    "blp:ntf_volcano_active",
+    "blp:ntf_volcano_inactive",
+    "blp:specialist_tile_pip_full",
+    "blp:tooltip_alert_icon",
+    "blp:tooltip_uniqueIcon",
+    "blp:tooltip_unitIcon",
+    "blp:tooltip_unitIconHolder",
   ],
   // TRIX: extend styling
   styles: ["/bz-map-trix/ui-next/tooltips/bz-plot-tooltip.css"],
