@@ -7,6 +7,7 @@ import DistrictHealthManager from '/base-standard/ui/district/district-health-ma
 
 const BZ_TYPE_ICONS = {
   // AGELESS: "url(blp:city_ageless)",
+  // MILITARY: "url(blp:fi_military_64)",
   MILITARY: "url(blp:nar_rew_promotion)",
   RELIGIOUS: "url(blp:fi_nar_rew_religion_64)",
   GREATWORK: "url(blp:fi_greatwork_64)",
