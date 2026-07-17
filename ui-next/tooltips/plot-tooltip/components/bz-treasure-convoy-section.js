@@ -35,7 +35,7 @@ const TreasureConvoySection = (props) => {
                 // TRIX: center label vertically
                 get children() {
                   return createComponent(L10n.Stylize, {
-                    "class": "font-title text-sm uppercase",
+                    "class": "font-title text-sm",
                     text: "LOC_PLOT_TOOLTIP_TREASURE_RESOURCE"
                   });
                 }
