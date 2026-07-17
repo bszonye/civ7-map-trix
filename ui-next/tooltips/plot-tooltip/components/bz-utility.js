@@ -1,5 +1,43 @@
-import { template, className, insert, setAttribute } from '/core/vendor/solid-js/web/dist/web.js';
-import { createRenderEffect } from '/core/vendor/solid-js/dist/solid.js';
+import { template, className, insert, setAttribute, spread } from '/core/vendor/solid-js/web/dist/web.js';
+import { createRenderEffect, createComponent, Show, mergeProps, splitProps } from '/core/vendor/solid-js/dist/solid.js';
+import { Icon } from '/core/ui-next/components/icon.js';
+import { L10n } from '/core/ui-next/components/l10n.js';
+
+// horizontal list separator (spaced in non-ideographic locales)
+const BZ_DOT_DIVIDER = Locale.compose("LOC_PLOT_DIVIDER_DOT");
+const BZ_DOT_JOINER = Locale.getCurrentDisplayLocale().startsWith("zh_") ?
+    BZ_DOT_DIVIDER : `&nbsp;${BZ_DOT_DIVIDER} `;
+
+const bzPill = (props) => {
+  const [local, other] = splitProps(props, ["class", "iconClass", "icon", "text"]);
+  return (() => {
+    var _el$ = _tmpl$();
+    spread(_el$, mergeProps({
+      get ["class"]() {
+        return `bz-keyword-pill text-xs min-h-5 px-2 flex items-center rounded-full leading-tight ${local.class ?? ""}`;
+      },
+    }, other), false, true);
+    insert(_el$, createComponent(Show, {
+      get when() {
+        return local.icon;
+      },
+      children: (icon) => createComponent(Icon, {
+          get ["class"]() {
+            return local.iconClass ?? "size-4 -ml-1\\.5 mr-1";
+          },
+          get name() {
+            return icon();
+          }
+      }),
+    }), null);
+    insert(_el$, createComponent(L10n.Stylize, {
+      get text() {
+        return local.text;
+      }
+    }), null);
+    return _el$;
+  })();
+};
 
 var _tmpl$ = /* @__PURE__ */ template(`<div></div>`), _tmpl$2 = /* @__PURE__ */ template(`<div><div class="w-12 shrink-0 flex items-center justify-center py-0\\.5"></div><div class="w-px self-stretch bg-accent-2 opacity-30 mx-2"></div><div class="flex flex-col justify-start flex-auto my-0\\.5"></div></div>`);
 const Divider = (props) => (() => {
@@ -43,4 +81,5 @@ const TicketRow = (props) => (() => {
 })();
 
 export { Divider, EntryDivider, TicketRow, TicketSection };
+export { BZ_DOT_DIVIDER, BZ_DOT_JOINER, bzPill };
 //# sourceMappingURL=utility.js.map

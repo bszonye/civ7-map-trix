@@ -29,41 +29,7 @@ import { hasSettlementRecommendationData, SettlementRecommendationPlotTooltipCon
 import { UnitFlag } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/bz-unit-flag.js';
 import { ConstructibleHasTagType } from '/base-standard/ui/utilities/utilities-tags.js';
 
-// horizontal list separator (spaced in non-ideographic locales)
-const BZ_DOT_DIVIDER = Locale.compose("LOC_PLOT_DIVIDER_DOT");
-const BZ_DOT_JOINER = Locale.getCurrentDisplayLocale().startsWith("zh_") ?
-    BZ_DOT_DIVIDER : `&nbsp;${BZ_DOT_DIVIDER} `;
-
-const bzPill = (props) => {
-  const [local, other] = splitProps(props, ["class", "iconClass", "icon", "text"]);
-  return (() => {
-    var _el$ = _tmpl$();
-    spread(_el$, mergeProps({
-      get ["class"]() {
-        return `bz-keyword-pill text-xs min-h-5 px-2 flex items-center rounded-full leading-tight ${local.class ?? ""}`;
-      },
-    }, other), false, true);
-    insert(_el$, createComponent(Show, {
-      get when() {
-        return local.icon;
-      },
-      children: (icon) => createComponent(Icon, {
-          get ["class"]() {
-            return local.iconClass ?? "size-4 -ml-1\\.5 mr-1";
-          },
-          get name() {
-            return icon();
-          }
-      }),
-    }), null);
-    insert(_el$, createComponent(L10n.Stylize, {
-      get text() {
-        return local.text;
-      }
-    }), null);
-    return _el$;
-  })();
-};
+import { BZ_DOT_JOINER, bzPill } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/components/bz-utility.js';
 
 // TRIX: various styling changes
 var _tmpl$ = /* @__PURE__ */ template(`<div class="flex flex-row gap-1"></div>`),
