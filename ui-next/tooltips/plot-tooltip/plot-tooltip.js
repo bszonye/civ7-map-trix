@@ -1215,12 +1215,12 @@ const PlotTooltipContent = (props) => {
                     return feature().label;
                   }
                 }), createComponent(L10n.Stylize, {
-                  "class": "font-body text-xs",
-                  // TRIX: resize text
+                  "class": "font-body text-2xs mb-1",
+                  // TRIX: restyle text
                   text: "LOC_PLOT_TOOLTIP_NATURAL_WONDER"
                 }), createComponent(L10n.Stylize, {
-                  "class": "font-body text-xs",
-                  // TRIX: resize text
+                  "class": "font-body text-xs text-accent-3",
+                  // TRIX: restyle text
                   get text() {
                     return feature().tooltip;
                   }
@@ -1307,8 +1307,7 @@ const PlotTooltipContent = (props) => {
     return _el$15;
   })();
 };
-const cameraPanActions = /* @__PURE__ */ new Set(["mousebutton-left", "keyboard-nav-up", "keyboard-nav-down", "keyboard-nav-left", "keyboard-nav-right", "camera-pan", "touch-pan"]);
-// TRIX: add mouse button to camera pan actions
+const cameraPanActions = /* @__PURE__ */ new Set(["keyboard-nav-up", "keyboard-nav-down", "keyboard-nav-left", "keyboard-nav-right", "camera-pan", "touch-pan"]);
 function getPlotTooltipKind(plotCoord) {
   const activeLens = LensManager.getActiveLens();
   if (activeLens === "fxs-settler-lens") {
@@ -1351,8 +1350,8 @@ const PlotTooltipComponent = (props) => {
       if (!tooltipContext) {
         throw new Error("PlotTooltipTrigger must be used within a <Tooltip> root component");
       }
-      // TRIX: add shift-to-hide
-      const [isShiftDown, setIsShiftDown] = createSignal(false);
+      // TRIX: add click-to-hide and shift-to-hide
+      const [isShiftOrClickDown, setIsShiftOrClickDown] = createSignal(false);
       const [isWorldDragging, setIsWorldDragging] = createSignal(false);
       const reactiveName = createMemo(() => tooltipContext.name);
       const triggerContext = new TriggerActivationContextProvider(tooltipModel, parentContext, reactiveName);
@@ -1409,10 +1408,10 @@ const PlotTooltipComponent = (props) => {
           }
         }
       };
-      // TRIX: add shift-to-hide
+      // TRIX: add click-to-hide and shift-to-hide
       const onUpdateFrame = () => {
-        const down = Input.isShiftDown();
-        if (down != isShiftDown()) setIsShiftDown(down);
+        const down = Input.isShiftDown() || Camera.isWorldDragging();
+        if (down != isShiftOrClickDown()) setIsShiftOrClickDown(down);
       };
       const isRevealed = createMemo(() => {
         const currentPlotCoords = plotCoords();
@@ -1423,9 +1422,9 @@ const PlotTooltipComponent = (props) => {
       const isWorldFocused = createMemo(() => {
         return focusManager.activeElement() === document.body;
       });
-      createEffect(on([plotCoords, IsPlotTooltipVisible, isWorldFocused, isRevealed, isWorldDragging, isShiftDown], ([currentPlotCoords, isVisible, currentIsWorldFocused, revealed, currentIsWorldDragging, currentIsShiftDown], _prevValues) => {
-        if (!currentPlotCoords || !isVisible || !currentIsWorldFocused || !revealed || currentIsWorldDragging || currentIsShiftDown) {
-          // TRIX: add shift-to-hide
+      createEffect(on([plotCoords, IsPlotTooltipVisible, isWorldFocused, isRevealed, isWorldDragging, isShiftOrClickDown], ([currentPlotCoords, isVisible, currentIsWorldFocused, revealed, currentIsWorldDragging, currentIsShiftOrClickDown], _prevValues) => {
+        if (!currentPlotCoords || !isVisible || !currentIsWorldFocused || !revealed || currentIsWorldDragging || currentIsShiftOrClickDown) {
+          // TRIX: add click-to-hide and shift-to-hide
           hidePlotTooltip();
         } else {
           // const prevPlotCoord = prevValues?.[0];

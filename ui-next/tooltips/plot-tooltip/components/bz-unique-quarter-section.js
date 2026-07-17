@@ -13,7 +13,7 @@ const UniqueQuarterSection = (props) => {
   return (() => {
     var _el$ = _tmpl$2(), _el$2 = _el$.firstChild, _el$3 = _el$2.firstChild, _el$4 = _el$3.nextSibling, _el$6 = _el$4.nextSibling;
     insert(_el$3, createComponent(Icon, {
-      "class": "size-6 pt-1",
+      "class": "size-6 pt-1 mt-1",
       name: "CITY_UNIQUE_QUARTER"
     }));
     insert(_el$4, createComponent(Show, {
@@ -27,18 +27,18 @@ const UniqueQuarterSection = (props) => {
       }
     }));
     insert(_el$6, createComponent(L10n.Stylize, {
-      "class": "font-title text-sm uppercase text-secondary",
+      "class": "font-title text-sm uppercase text-secondary mt-1",
       get text() {
         return props.definition.Name;
       }
     }), null);
     insert(_el$6, createComponent(L10n.Stylize, {
-      "class": "font-body text-xs",
+      "class": "font-body text-2xs mb-1",
       // TRIX: resize text
       text: "LOC_PLOT_TOOLTIP_UNIQUE_QUARTER"
     }), null);
     insert(_el$6, createComponent(L10n.Stylize, {
-      "class": "font-body text-xs text-accent-3 mt-1",
+      "class": "font-body text-xs text-accent-3 mb-2",
       // TRIX: resize text
       get text() {
         return props.definition.Tooltip;
