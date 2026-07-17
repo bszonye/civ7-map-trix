@@ -952,10 +952,15 @@ const PlotTooltipContent = (props) => {
   // TRIX: enable terrain highlighting
   const terrainDefinition = createMemo(() => GameInfo.Terrains.lookup(terrainType()));
   const featureDefinition = createMemo(() => GameInfo.Features.lookup(featureType()));
+  const districtDefinition = createMemo(() => GameInfo.Districts.lookup(district()?.type));
+  const isCityCenter = createMemo(() => districtDefinition()?.DistrictType === "DISTRICT_CITY_CENTER");
   const districtKeyword = createMemo(() => {
-    const districtType = district() ? GameInfo.Districts.lookup(district().type)?.DistrictType : void 0;
+    const districtType = district() ? districtDefinition()?.DistrictType : void 0;
     switch (districtType) {
+      case "DISTRICT_WONDER":  // TRIX
+        return "LOC_DISTRICT_WONDER_NAME";
       case "DISTRICT_CITY_CENTER":  // TRIX
+        return "LOC_DISTRICT_CITY_CENTER_NAME";
       case "DISTRICT_URBAN":
         return "LOC_PLOT_TOOLTIP_URBAN_DISTRICT";
       case "DISTRICT_RURAL":
@@ -1022,16 +1027,23 @@ const PlotTooltipContent = (props) => {
     }
     // TRIX: add Fresh Water pill
     if (isFreshWater()) {
-      if (playerID() == -1 || district()?.type == Game.getHash("DISTRICT_CITY_CENTER")) {
+      if (playerID() == -1 || isCityCenter()) {
         pills.push({
           "class": "bz-style-fresh-water",
           text: "LOC_PLOTKEY_FRESHWATER",
         });
       }
     }
+    // TRIX: add styling
     if (districtKeyword()) {
-      pills.push(districtKeyword());
+      const dtype = districtDefinition().DistrictType;
+      const style = `bz-style-district bz-style-${dtype}`;
+      pills.push({
+        "class": style,
+        text: districtKeyword(),
+      });
     }
+    // TRIX: add styling
     if (quarterKeyword()) {
       pills.push({
         "class": "bz-style-quarter",
