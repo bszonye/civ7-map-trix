@@ -19,11 +19,11 @@ const PlotTooltipPlayerPortrait = (props) => {
   if (props.leaderId === PlayerIds.NO_PLAYER) {
     return;
   }
-  const player = Players.get(props.leaderId);
-  if (!player) {
-    return;
-  }
   createEffect(() => {
+    const player = Players.get(props.leaderId);
+    if (!player) {
+      return;
+    }
     setPlayerName(Locale.compose(player.name));
     const variants = getPlayerColorVariants(props.leaderId);
     if (variants) {
@@ -50,31 +50,38 @@ const PlotTooltipPlayerPortrait = (props) => {
         return props.representsCityState;
       },
       get fallback() {
-        // TRIX: independents use the same icon as the diplomacy panel
-        if (player.isIndependent) {
-          const type = GameInfo.CityStateTypes.lookup(player.getCityStateCityStateType());
-          const cstype = type?.CityStateType ?? "CRISIS";
-          const icon = type?.CityStateType ?
-            UI.getIconCSS(`CITY_STATE_${type?.CityStateType}`) :
-            "url(blp:bonustype_crisis)";
-          return [
-            createComponent(IconComponent, {
-              "class": `relative size-11 bz-style-independent-${cstype}`,
-              name: icon,
-              isUrl: true,
-            }),
-            createComponent(IconComponent, {
+        return createComponent(Show, {
+          get when() {
+            return props.isIndependent;
+          },
+          get fallback() {
+            return createComponent(PortraitIcon, {
+              get playerId() {
+                return props.leaderId;
+              },
+              size: 12
+            });
+          },
+          get children() {
+            // TRIX: use the same icon as the diplomacy panel
+            const csinfo = props.cityStateType;
+            const style = csinfo?.CityStateType ?? "CRISIS";
+            const icon = csinfo?.CityStateType ?
+              UI.getIconCSS(`CITY_STATE_${csinfo?.CityStateType}`) :
+              "url(blp:bonustype_crisis)";
+            return [
+              createComponent(IconComponent, {
+                "class": `relative size-11 bz-style-independent-${style}`,
+                name: icon,
+                isUrl: true,
+              }),
+              createComponent(IconComponent, {
                 "class": "absolute size-11",
                 name: "url(blp:hud_civics-icon_frame)",
                 isUrl: true,
-            })
-          ];
-        }
-        return createComponent(PortraitIcon, {
-          get playerId() {
-            return props.leaderId;
-          },
-          size: 12
+              })
+            ];
+          }
         });
       },
       get children() {

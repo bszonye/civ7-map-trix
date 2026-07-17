@@ -241,6 +241,12 @@ const PlayerOwnerRow = (props) => {
         get leaderId() {
           return props.playerId;
         },
+        get isIndependent() {
+          return props.isIndependent;
+        },
+        get cityStateType() {
+          return props.cityStateType;
+        },
         size: 9
       });
     },
@@ -784,10 +790,22 @@ const PlotDetailsSection = (props) => {
                     return info().suzerainId ?? props.owningPlayer;
                   },
                   get settlementName() {
-                    return info().isIndependent ? info().civName : settlementName();
+                    if (info().isIndependent) {
+                      return info().cityStateType ?
+                        info().civName :
+                        "LOC_IMPROVEMENT_ENCAMPMENT_NAME";
+                    }
+                    return settlementName();
                   },
                   get conquerorInfo() {
                     return info().conquerorInfo;
+                  },
+                  // TRIX: support independent peoples
+                  get isIndependent() {
+                    return info().isIndependent;
+                  },
+                  get cityStateType() {  // null for crisis encampments
+                    return info().cityStateType;
                   }
                 });
               }
