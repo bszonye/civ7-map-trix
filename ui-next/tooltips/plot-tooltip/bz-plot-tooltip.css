@@ -42,6 +42,7 @@
   --bz-color-caution: #cea92f;  /* caution = healthbar-medium */
   --bz-color-note: #ff800033;  /* note = orange 20% opacity */
   --bz-color-negative: #ff6644;
+  --bz-color-hostile: #dc1e46;  /* vanilla "negative" color */
   /* geographic colors */
   --bz-color-hill: #ea995266;  /* Rough terrain = orange 40% opacity */
   --bz-color-mountain: #aa998866;  /* Mountain terrain = warm gray 40% opacity */
@@ -84,6 +85,10 @@
 .bz-plot-tooltip .text-secondary {
   fxs-font-gradient-color: var(--bz-color-bronze-1);
   color: var(--bz-color-bronze-2);
+}
+
+.bz-plot-tooltip .bz-border-hostile {
+  border-color: #dc1e46; /* var color doesn't work here */
 }
 .bz-plot-tooltip .bz-style-independent-CRISIS {
   filter: fxs-color-tint(var(--bz-color-crisis));

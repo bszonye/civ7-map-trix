@@ -29,7 +29,7 @@ const UnitFlag = (props) => (() => {
         },
         get children() {
           return createComponent(Icon, {
-            "class": "size-5 top-7 absolute rounded-full bg-black border border-victory-military",
+            "class": "size-5 top-7 absolute rounded-full bg-black border-2 bz-border-hostile",
             name: "url(blp:dip_warswordshield)",
             isUrl: true
           });
