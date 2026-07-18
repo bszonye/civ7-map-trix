@@ -94,6 +94,9 @@
   fxs-font-gradient-color: var(--bz-color-bronze-1);
   color: var(--bz-color-bronze-2);
 }
+.bz-plot-tooltip .bz-text-hostile {
+  color: var(--bz-color-hostile);
+}
 
 .bz-plot-tooltip .bz-border-hostile {
   border-color: #d93a37; /* var color doesn't work here */

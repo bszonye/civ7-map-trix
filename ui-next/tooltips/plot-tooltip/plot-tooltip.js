@@ -28,6 +28,7 @@ import { hasSettlementRecommendationData, SettlementRecommendationPlotTooltipCon
 import { UnitFlag } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/bz-unit-flag.js';
 import { ConstructibleHasTagType } from '/base-standard/ui/utilities/utilities-tags.js';
 
+import { bzGetRelationship } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/bz-helpers.js';
 import { BZ_DOT_JOINER, bzPill } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/components/bz-utility.js';
 
 // TRIX: various styling changes
@@ -270,6 +271,27 @@ const PlayerOwnerRow = (props) => {
         get args() {
           return [props.civName];
         }
+      }), createComponent(Show, {
+        get when() {
+          const color =
+            props.relationship.isEnemy ? "text-negative" : "text-accent-2";
+          const text =
+            props.isIndependent && props.relationship.isEnemy ?
+            "LOC_INDEPENDENT_RELATIONSHIP_HOSTILE" :
+            props.relationship.isEnemy ? "LOC_PLAYER_RELATIONSHIP_AT_WAR" :
+            props.relationship.isAlly ? "LOC_PLAYER_RELATIONSHIP_ALLIANCE" :
+            props.relationship.isVassal ? "LOC_BZ_RELATIONSHIP_TRIBUTARY" :
+            void 0;
+          return text ? { color, text } : void 0;
+        },
+        children: (relationship) => createComponent(L10n.Stylize, {
+          get ["class"]() {
+            return `font-body text-xs ${relationship().color}`;
+          },
+          get text() {
+            return relationship().text;
+          }
+        })
       })];
     }
   }), createComponent(Show, {
@@ -809,7 +831,11 @@ const PlotDetailsSection = (props) => {
                   },
                   get cityStateType() {  // null for crisis encampments
                     return info().cityStateType;
-                  }
+                  },
+                  // TRIX: relationship with the player
+                  get relationship() {
+                    return bzGetRelationship(props.owningPlayer);
+                  },
                 });
               }
             })
@@ -945,6 +971,7 @@ const PlotTooltipContent = (props) => {
   // TRIX: enable terrain highlighting
   const terrainDefinition = createMemo(() => GameInfo.Terrains.lookup(terrainType()));
   const featureDefinition = createMemo(() => GameInfo.Features.lookup(featureType()));
+  // TRIX: extra district info
   const districtDefinition = createMemo(() => GameInfo.Districts.lookup(district()?.type ?? -1));
   const isCityCenter = createMemo(() => districtDefinition()?.DistrictType === "DISTRICT_CITY_CENTER");
   const districtKeyword = createMemo(() => {

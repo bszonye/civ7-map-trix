@@ -33,6 +33,20 @@ for (const e of GameInfo.TypeTags) {
   if (!tags.size) BZ_TYPE_TAGS.set(e.Type, tags);
   tags.add(e.Tag);
 }
+function bzGetRelationship(targetID) {
+  const localID = GameContext.localObserverID;
+  const local = Players.get(localID);
+  const target = Players.get(targetID);
+  if (!local || !target) return void 0;
+  const suzerain = target?.Influence?.hasSuzerain ?
+    Players.get(target.Influence.getSuzerain()) : null;
+  const leader = suzerain ?? target;
+  const isAlly = leader?.Diplomacy?.hasAllied(local.id) ?? false;
+  const isEnemy = leader?.Diplomacy?.isAtWarWith(local.id) ?? false;
+  const isVassal = suzerain?.id == local.id;
+  const isYou = local.id == target.id;
+  return { isAlly, isEnemy, isVassal, isYou };
+}
 
 function getCurrentAge() {
   return GameInfo.Ages.lookup(Game.age)?.ChronologyIndex ?? 0;
@@ -453,5 +467,6 @@ function getTreasureConvoyInfo(owningCity) {
 }
 
 export { getAgelessTypes, getBiomeLabel, getConstructibleInfo, getContinentName, getCurrentAge, getDistrictHealthInfo, getFeatureInfo, getOwnerInfo, getPlotYields, getResource, getRiverLabel, getRouteData, getSettlementName, getSpecialistDescription, getTerrainLabel, getTreasureConvoyInfo, getUnitEntries, getVisiblePlotEffects };
+export { bzGetRelationship };
 //# sourceMappingURL=helpers.js.map
 // vim: sw=2 et
