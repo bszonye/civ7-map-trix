@@ -318,6 +318,9 @@ const UnitInfoSection = (props) => {
     },
     get unitIcon() {
       return props.unitIcon;
+    },
+    get relationship() {
+      return props.relationship;
     }
   });
   return createComponent(TicketSection, {
@@ -434,7 +437,7 @@ const IndependentUnitInfo = (props) => {
     }
   }), createComponent(Show, {
     get when() {
-      return props.relationship;
+      return false;  // props.relationship;
     },
     children: (relationship) => (() => {
       var _el$8 = _tmpl$6();
@@ -485,7 +488,7 @@ const PlayerUnitInfo = (props) => {
   });
   return [createComponent(Show, {
     get when() {
-      return props.relationship;
+      return false;  // props.relationship;
     },
     get children() {
       var _el$9 = _tmpl$6();
@@ -505,7 +508,7 @@ const PlayerUnitInfo = (props) => {
     }
   }), createComponent(Show, {
     get when() {
-      return !props.relationship;
+      return true;  // !props.relationship;
     },
     children: civName
   })];
@@ -1586,6 +1589,7 @@ const PlotTooltip = ComponentRegistry.register({
     "blp:bonustype_crisis",
     "blp:city_ageless",
     "blp:city_overbuildable",
+    "blp:dip_warswordshield",
     "blp:fi_Yield_Culture_64",
     "blp:fi_Yield_Food_64",
     "blp:fi_Yield_Gold_64",

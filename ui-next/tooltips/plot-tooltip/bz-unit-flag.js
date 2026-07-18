@@ -1,6 +1,8 @@
+// vim: sw=2 et
 import { template, insert, className } from '/core/vendor/solid-js/web/dist/web.js';
 import { createComponent, Show, createRenderEffect } from '/core/vendor/solid-js/dist/solid.js';
 import { Layout } from '/core/ui/utilities/utilities-layout.js';
+import { Icon } from '/core/ui-next/components/icon.js';
 
 var _tmpl$ = /* @__PURE__ */ template(`<div></div>`), _tmpl$2 = /* @__PURE__ */ template(`<div><div class="size-7 bg-center bg-contain bg-no-repeat"></div></div>`), _tmpl$3 = /* @__PURE__ */ template(`<div><div class="absolute inset-0"></div><div class="absolute inset-0"></div><div class="absolute inset-0"></div><div class="bg-contain bg-center bg-no-repeat relative size-6 self-end mb-3"></div></div>`);
 const UnitFlag = (props) => (() => {
@@ -21,6 +23,18 @@ const UnitFlag = (props) => (() => {
         e: void 0,
         t: void 0
       });
+      insert(_el$2, createComponent(Show, {
+        get when() {
+          return props.relationship?.hostile;
+        },
+        get children() {
+          return createComponent(Icon, {
+            "class": "size-5 top-7 absolute rounded-full bg-black border border-victory-military",
+            name: "url(blp:dip_warswordshield)",
+            isUrl: true
+          });
+        }
+      }));
       return _el$2;
     })()
   }), null);

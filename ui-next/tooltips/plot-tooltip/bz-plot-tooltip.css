@@ -41,6 +41,7 @@
   --bz-color-danger: #af1b1c99;  /* danger = militaristic 60% opacity */
   --bz-color-caution: #cea92f;  /* caution = healthbar-medium */
   --bz-color-note: #ff800033;  /* note = orange 20% opacity */
+  --bz-color-negative: #ff6644;
   /* geographic colors */
   --bz-color-hill: #ea995266;  /* Rough terrain = orange 40% opacity */
   --bz-color-mountain: #aa998866;  /* Mountain terrain = warm gray 40% opacity */
@@ -76,6 +77,10 @@
   background-color: var(--bz-color-pill-background);
 }
 
+.bz-plot-tooltip .text-negative,
+.bz-plot-tooltip .text-negative-light {
+  color: var(--bz-color-negative);
+}
 .bz-plot-tooltip .text-secondary {
   fxs-font-gradient-color: var(--bz-color-bronze-1);
   color: var(--bz-color-bronze-2);
