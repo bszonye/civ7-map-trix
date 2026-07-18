@@ -1,4 +1,3 @@
-// vim: sw=2 et
 import { template, insert } from '/core/vendor/solid-js/web/dist/web.js';
 import { createRenderEffect, createComponent, Show, createMemo, For } from '/core/vendor/solid-js/dist/solid.js';
 import { Icon } from '/core/ui-next/components/icon.js';
@@ -350,3 +349,4 @@ const PlotAlertSection = (props) => {
 
 export { PlotAlertSection };
 //# sourceMappingURL=alerts.js.map
+// vim: sw=2 et

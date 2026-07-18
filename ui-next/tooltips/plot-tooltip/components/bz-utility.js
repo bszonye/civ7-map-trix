@@ -83,3 +83,4 @@ const TicketRow = (props) => (() => {
 export { Divider, EntryDivider, TicketRow, TicketSection };
 export { BZ_DOT_DIVIDER, BZ_DOT_JOINER, bzPill };
 //# sourceMappingURL=utility.js.map
+// vim: sw=2 et

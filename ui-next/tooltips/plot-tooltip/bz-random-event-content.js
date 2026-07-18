@@ -49,3 +49,4 @@ const RandomEventPlotTooltipContent = (props) => {
 
 export { RandomEventPlotTooltipContent, getRandomEventInfo, hasRandomEventData };
 //# sourceMappingURL=random-event-content.js.map
+// vim: sw=2 et

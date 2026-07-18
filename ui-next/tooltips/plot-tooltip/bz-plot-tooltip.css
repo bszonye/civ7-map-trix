@@ -1,4 +1,3 @@
-/* vim:set sw=2 et: */
 .bz-plot-tooltip .img-tooltip-border.p-4 {
   padding: 0.6666666667rem 0.6666666667rem 0.2222222222rem;
 }
@@ -24,25 +23,30 @@
   --bz-color-accent-5: #616266;
   --bz-color-accent-6: #05070d;
   --bz-color-accent: var(--bz-color-accent-5);
-  /* bronze shades */
+  --bz-color-negative: #dc1e46;
+  --bz-color-negative-text: #ff6644;  /* brighter red for black backgrounds */
+  --bz-color-pill-background: var(--bz-color-primary-4);
+  --bz-color-pill-border: #53565d;
+}
+.bz-plot-tooltip {
+  /* more bronze shades */
   --bz-color-bronze-1: #f9ecd2;
   --bz-color-bronze-2: #e5d2ac;  /* = secondary1 */
   --bz-color-bronze-3: #c7b28a;
   --bz-color-bronze-4: #a99670;
   --bz-color-bronze-5: #8c7e62;  /* = secondary 2 */
   --bz-color-bronze-6: #4c473d;  /* = secondary 3 */
-  /* pills */
-  --bz-color-pill-background: var(--bz-color-primary-4);
-  --bz-color-pill-border: #53565d;
-  /* rules background */
-  --bz-color-rules: #8c7e6233;
+  --bz-color-rules: #8c7e6233;  /* broze-5 20% opacity */
+}
+.bz-plot-tooltip {
   /* alert colors */
   --bz-color-black: #000000;
   --bz-color-danger: #af1b1c99;  /* danger = militaristic 60% opacity */
   --bz-color-caution: #cea92f;  /* caution = healthbar-medium */
   --bz-color-note: #ff800033;  /* note = orange 20% opacity */
-  --bz-color-negative: #ff6644;
-  --bz-color-hostile: #dc1e46;  /* vanilla "negative" color */
+  --bz-color-hostile: #d93a37;  /* sampled from unit flags */
+}
+.bz-plot-tooltip {
   /* geographic colors */
   --bz-color-hill: #ea995266;  /* Rough terrain = orange 40% opacity */
   --bz-color-mountain: #aa998866;  /* Mountain terrain = warm gray 40% opacity */
@@ -55,6 +59,8 @@
   --bz-color-road: #e5d2ac66;  /* Roads = bronze 40% opacity */
   --bz-color-rail: #c2c4cc66;  /* Railroads = silver 40% opacity */
   --bz-color-bridge: #d4c9c466;  /* Bridges = warm gray 40% opacity */
+}
+.bz-plot-tooltip {
   /* yield types */
   --bz-color-food: #80b34d;        /*  90° 40 50 green */
   --bz-color-production: #a33d29;  /*  10° 60 40 red */
@@ -63,7 +69,9 @@
   --bz-color-culture: #5c5cd6;     /* 240° 60 60 violet */
   --bz-color-happiness: #f5993d;   /*  30° 90 60 orange */
   --bz-color-diplomacy: #afb7cf;   /* 225° 25 75 gray */
-  /* independent power types */
+}
+.bz-plot-tooltip {
+  /* city-state & independent power types */
   --bz-color-militaristic: #af1b1c;
   --bz-color-scientific: #4d7c96;
   --bz-color-economic: #ffd553;
@@ -80,7 +88,7 @@
 
 .bz-plot-tooltip .text-negative,
 .bz-plot-tooltip .text-negative-light {
-  color: var(--bz-color-negative);
+  color: var(--bz-color-negative-text);
 }
 .bz-plot-tooltip .text-secondary {
   fxs-font-gradient-color: var(--bz-color-bronze-1);
@@ -88,7 +96,7 @@
 }
 
 .bz-plot-tooltip .bz-border-hostile {
-  border-color: #dc1e46; /* var color doesn't work here */
+  border-color: #d93a37; /* var color doesn't work here */
 }
 .bz-plot-tooltip .bz-style-independent-CRISIS {
   filter: fxs-color-tint(var(--bz-color-crisis));
@@ -171,3 +179,4 @@
   color: var(--bz-color-bronze-1);
   text-shadow: 0 -0.0555555556rem var(--bz-color-bronze-6);
 }
+/* vim:set sw=2 et: */

@@ -81,3 +81,4 @@ const ArcheologyPlotTooltipContent = (props) => {
 
 export { ArcheologyPlotTooltipContent, getArcheologyData, hasArcheologyData };
 //# sourceMappingURL=archeology-content.js.map
+// vim: sw=2 et

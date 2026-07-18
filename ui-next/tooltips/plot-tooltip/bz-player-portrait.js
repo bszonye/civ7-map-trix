@@ -1,4 +1,3 @@
-// vim: sw=2 et
 import { template, insert } from '/core/vendor/solid-js/web/dist/web.js';
 import { createSignal, createEffect, createComponent, Show, createRenderEffect } from '/core/vendor/solid-js/dist/solid.js';
 import { getPlayerColorVariants, isPrimaryColorLighter } from '/core/ui/utilities/utilities-color.js';
@@ -149,3 +148,4 @@ const PlotTooltipPlayerPortrait = (props) => {
 
 export { PlotTooltipPlayerPortrait };
 //# sourceMappingURL=player-portrait.js.map
+// vim: sw=2 et

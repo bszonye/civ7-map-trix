@@ -1,4 +1,3 @@
-// vim: sw=2 et
 // NOTE: file renamed to avoid import conflict with
 //       ui-next/screens/choosers/helpers.js
 import { ComponentID } from '/core/ui/utilities/utilities-component-id.js';
@@ -455,3 +454,4 @@ function getTreasureConvoyInfo(owningCity) {
 
 export { getAgelessTypes, getBiomeLabel, getConstructibleInfo, getContinentName, getCurrentAge, getDistrictHealthInfo, getFeatureInfo, getOwnerInfo, getPlotYields, getResource, getRiverLabel, getRouteData, getSettlementName, getSpecialistDescription, getTerrainLabel, getTreasureConvoyInfo, getUnitEntries, getVisiblePlotEffects };
 //# sourceMappingURL=helpers.js.map
+// vim: sw=2 et

@@ -1,4 +1,3 @@
-// vim: sw=2 et
 import '/core/vendor/solid-js/web/dist/web.js';
 import { createComponent, Show } from '/core/vendor/solid-js/dist/solid.js';
 import { Icon } from '/core/ui-next/components/icon.js';
@@ -65,3 +64,4 @@ const VolcanoSection = (props) => {
 
 export { VolcanoSection };
 //# sourceMappingURL=volcano-section.js.map
+// vim: sw=2 et

@@ -1,4 +1,3 @@
-// vim: sw=2 et
 import { template, insert, use, spread } from '/core/vendor/solid-js/web/dist/web.js';
 import { createSignal, createMemo, createComponent, Show, For, mergeProps, createRenderEffect, splitProps, useContext, createEffect, on, onCleanup, Switch, Match } from '/core/vendor/solid-js/dist/solid.js';
 import LensManager from '/core/ui/lenses/lens-manager.js';
@@ -1636,3 +1635,4 @@ const PlotTooltip = ComponentRegistry.register({
 
 export { IsPlotTooltipVisible, PlotTooltip, PlotTooltipContent, SetIsPlotTooltipVisible };
 //# sourceMappingURL=plot-tooltip.js.map
+// vim: sw=2 et

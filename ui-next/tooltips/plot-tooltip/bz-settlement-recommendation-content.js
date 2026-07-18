@@ -55,3 +55,4 @@ const SettlementRecommendationPlotTooltipContent = (props) => {
 
 export { SettlementRecommendationPlotTooltipContent, getSettlementRecommendationData, hasSettlementRecommendationData };
 //# sourceMappingURL=settlement-recommendation-content.js.map
+// vim: sw=2 et

@@ -1,4 +1,3 @@
-// vim: sw=2 et
 import { template, insert } from '/core/vendor/solid-js/web/dist/web.js';
 import { createMemo, createComponent, Show } from '/core/vendor/solid-js/dist/solid.js';
 import { Icon } from '/core/ui-next/components/icon.js';
@@ -62,3 +61,4 @@ const TreasureConvoySection = (props) => {
 
 export { TreasureConvoySection };
 //# sourceMappingURL=treasure-convoy-section.js.map
+// vim: sw=2 et

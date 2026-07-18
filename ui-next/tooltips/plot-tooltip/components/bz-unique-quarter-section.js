@@ -1,4 +1,3 @@
-// vim: sw=2 et
 import { template, insert } from '/core/vendor/solid-js/web/dist/web.js';
 import { createComponent, Show, For, createMemo, createRenderEffect } from '/core/vendor/solid-js/dist/solid.js';
 import { Icon } from '/core/ui-next/components/icon.js';
@@ -148,3 +147,4 @@ const UniqueQuarterSection = (props) => {
 
 export { UniqueQuarterSection };
 //# sourceMappingURL=unique-quarter-section.js.map
+// vim: sw=2 et
