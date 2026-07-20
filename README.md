@@ -1,4 +1,4 @@
-# Map Trix 4.0.0
+# Map Trix 4.0.1
 better map tools for Civilization VII
 
 ## better map tooltips
@@ -7,6 +7,7 @@ many small improvements to the new map tooltips:
 - new labels for rivers, bridges, and fresh water
 - type icons for buildings and wonders
 - new alerts for Temporary Fortifications, Dig Sites, and Jaguar Traps
+- better friend-or-foe indicators
 - improved layout and consistency with more compact text
 - hotkey (Shift) to temporarily hide the tooltip
 
