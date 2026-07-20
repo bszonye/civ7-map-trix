@@ -15,10 +15,10 @@ const PlotTooltipPlayerPortrait = (props) => {
   const [civSymbolColor, setCivSymbolColor] = createSignal("");
   const [settlementName, setSettlementName] = createSignal("");
   const [playerName, setPlayerName] = createSignal("");
-  if (props.leaderId === PlayerIds.NO_PLAYER) {
-    return;
-  }
   createEffect(() => {
+    if (props.leaderId === PlayerIds.NO_PLAYER) {
+      return;
+    }
     const player = Players.get(props.leaderId);
     if (!player) {
       return;

@@ -278,6 +278,8 @@ function getOwnerInfo(location, playerID) {
   const playerName = player.name;
   const cstype = player.getCityStateCityStateType();
   const cityStateType = GameInfo.CityStateTypes.lookup(cstype);
+  const displayName = player.isMajor ? civName :
+    Locale.compose("LOC_DIPLOMACY_INDEPENDENT_CIV_NAME", playerName);
   if (player.isIndependent) {
     const relationship = GameplayMap.getOwnerHostility(location.x, location.y, localPlayerID);
     const bonusType = Game.CityStates.getBonusType(playerID);
@@ -290,7 +292,8 @@ function getOwnerInfo(location, playerID) {
       playerName,
       relationship: relationship ?? void 0,
       cityStateBonus: bonusDefinition?.Name,
-      cityStateType,  // TRIX
+      cityStateType,  // TRIX: Militaristic, Cultural, &c
+      displayName,  // TRIX: of the X people
     };
   } else {
     const districtId = MapCities.getDistrict(location.x, location.y);
@@ -317,7 +320,8 @@ function getOwnerInfo(location, playerID) {
       playerName,
       conquerorInfo,
       suzerainId,
-      cityStateType,  // TRIX
+      cityStateType,  // TRIX: Militaristic, Cultural, &c
+      displayName,  //TRIX: civ or people
     };
   }
 }

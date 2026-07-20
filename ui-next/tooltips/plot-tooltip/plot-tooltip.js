@@ -801,12 +801,7 @@ const PlotDetailsSection = (props) => {
                     return info().playerName;
                   },
                   get civName() {
-                    return !info().isMajor ?
-                      Locale.compose(
-                        "LOC_DIPLOMACY_INDEPENDENT_CIV_NAME",
-                        info().playerName
-                      ) :
-                      info().civName;
+                    return info().displayName;
                   },
                   get isLocalPlayer() {
                     return props.owningPlayer === GameContext.localPlayerID;
