@@ -185,6 +185,7 @@ function getConstructibleInfo(constructible, plotCoordinate, currentAge, ageless
     const isBuilding = info.ConstructibleClass == "BUILDING";
     const isWonder = info.ConstructibleClass == "WONDER";
     const isImprovement = info.ConstructibleClass == "IMPROVEMENT";
+    const isWall = info.ExistingDistrictOnly;
     const uniqueQuarterType = instance.uniqueQuarterType;
     // TRIX: collect tags and matching icons
     const tagset = BZ_TYPE_TAGS.get(type) ?? new Set();
@@ -202,6 +203,7 @@ function getConstructibleInfo(constructible, plotCoordinate, currentAge, ageless
         isBuilding,
         isWonder,
         isImprovement,
+        isWall,
         uniqueQuarterType,
         damaged: instance.damaged,
         complete: instance.complete,

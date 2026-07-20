@@ -861,13 +861,7 @@ const PlotDetailsSection = (props) => {
               return createComponent(ConstructibleRows, {
                 get constructibles() {
                   // TRIX: sort walls last
-                  props.constructibles.sort((a, b) => {
-                    const adef = GameInfo.Constructibles.lookup(a.type);
-                    const bdef = GameInfo.Constructibles.lookup(b.type);
-                    const awall = adef?.ExistingDistrictOnly ?? false;
-                    const bwall = bdef?.ExistingDistrictOnly ?? false;
-                    return +(awall) - +(bwall);
-                  });
+                  props.constructibles.sort((a, b) => +(a.isWall) - +(b.isWall));
                   return props.constructibles;
                 },
                 get district() {
