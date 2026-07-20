@@ -94,6 +94,30 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS_TT" Language="zh_Hans_CN">
             <Text>打开单位面板</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_DEFAULT_BZ" Language="zh_Hans_CN">
+            <Text>滤镜：无</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_SETTLER_BZ" Language="zh_Hans_CN">
+            <Text>滤镜：开拓者</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_CONTINENT_BZ" Language="zh_Hans_CN">
+            <Text>滤镜：大陆</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_TRADE_BZ" Language="zh_Hans_CN">
+            <Text>滤镜：贸易</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_GENERAL_APPEAL_BZ" Language="zh_Hans_CN">
+            <Text>滤镜：吸引力</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_DISCOVERY_BZ" Language="zh_Hans_CN">
+            <Text>滤镜：发现</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_RELIGION_BZ" Language="zh_Hans_CN">
+            <Text>滤镜：宗教</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_COMMANDER_BZ" Language="zh_Hans_CN">
+            <Text>滤镜：指挥官</Text>
+        </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS" Language="zh_Hans_CN">
             <Text>开关边界显示</Text>
         </Replace>

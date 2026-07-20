@@ -63,10 +63,11 @@ class bzReligionLensLayer {
             case DistrictTypes.RURAL:
                 religionID = city.Religion.ruralReligion;
                 break;
+            default:
+                return;
         }
-        if (religionID == -1) return;
         const info = GameInfo.Religions.lookup(religionID);
-        const asset = this.getReligionIcon(info.ReligionType);
+        const asset = this.getReligionIcon(info?.ReligionType);
         this.bzSpriteGrid.addSprite(loc, asset || SPRITE_ALT, SPRITE_OFFSET);
         if (!asset) {
             // show the IconString over the alternate icon
@@ -77,6 +78,7 @@ class bzReligionLensLayer {
         }
     }
     getReligionIcon(icon) {
+        if (!icon) return "fi_nar_rew_religion_64";
         const blp = UI.getIconBLP(icon);
         const url = UI.getIconURL(icon);
         // sprites only support built-in BLPs, for now

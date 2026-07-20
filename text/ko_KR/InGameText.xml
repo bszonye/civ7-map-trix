@@ -94,6 +94,30 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS_TT" Language="ko_KR">
             <Text>유닛 패널 엽니다.</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_DEFAULT_BZ" Language="ko_KR">
+            <Text>렌즈: 없음</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_SETTLER_BZ" Language="ko_KR">
+            <Text>렌즈: 개척자</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_CONTINENT_BZ" Language="ko_KR">
+            <Text>렌즈: 대륙</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_TRADE_BZ" Language="ko_KR">
+            <Text>렌즈: 교역</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_GENERAL_APPEAL_BZ" Language="ko_KR">
+            <Text>렌즈: 매력도</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_DISCOVERY_BZ" Language="ko_KR">
+            <Text>렌즈: 발견물</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_RELIGION_BZ" Language="ko_KR">
+            <Text>렌즈: 종교</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_COMMANDER_BZ" Language="ko_KR">
+            <Text>렌즈: 사령관</Text>
+        </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS" Language="ko_KR">
             <Text>국경</Text>
         </Replace>

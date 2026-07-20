@@ -8,6 +8,7 @@ import '/base-standard/ui/lenses/layer/conquest-layer.js';
 import '/base-standard/ui/lenses/layer/hexgrid-layer.js';
 import '/base-standard/ui/lenses/lens/default-lens.js';
 import '/base-standard/ui/lenses/lens/discovery-lens.js';
+import '/base-standard/ui/lenses/lens/trade-lens.js';
 
 const LENS_CATALOG_OBJECT_NAME = "tracked-lens";
 
@@ -230,6 +231,7 @@ class bzPanelMiniMap {
     engineInputListener = this.onEngineInput.bind(this);
     cityHotkeyListener = this.onCityHotkey.bind(this);
     unitsHotkeyListener = this.onUnitsHotkey.bind(this);
+    lensesHotkeyListener = this.onLensesHotkey.bind(this);
     layerHotkeyListener = this.onLayerHotkey.bind(this);
     toggleCooldown = 0;
     toggleQueued = false;
@@ -276,6 +278,7 @@ class bzPanelMiniMap {
     afterAttach() {
         window.addEventListener("hotkey-open-bz-city-panel", this.cityHotkeyListener);
         window.addEventListener("hotkey-open-bz-units-panel", this.unitsHotkeyListener);
+        window.addEventListener("hotkey-open-bz-lens-panel", this.lensesHotkeyListener);
         window.addEventListener("layer-hotkey", this.layerHotkeyListener);
         this.component.Root
             .addEventListener(InputEngineEventName, this.engineInputListener);
@@ -283,6 +286,7 @@ class bzPanelMiniMap {
     beforeDetach() {
         window.removeEventListener("hotkey-open-bz-city-panel", this.cityHotkeyListener);
         window.removeEventListener("hotkey-open-bz-units-panel", this.unitsHotkeyListener);
+        window.removeEventListener("hotkey-open-bz-lens-panel", this.lensesHotkeyListener);
         window.removeEventListener("layer-hotkey", this.layerHotkeyListener);
         this.component.Root
             .removeEventListener(InputEngineEventName, this.engineInputListener);
@@ -338,9 +342,12 @@ class bzPanelMiniMap {
     onUnitsHotkey(_event) {
         this.togglePanel(this.unitsSubpanel);
     }
+    onLensesHotkey(_event) {
+        this.component.toggleLensPanel();
+    }
     onLayerHotkey(hotkey) {
         if (hotkey.detail.name == "toggle-fxs-conquest-layer") {
-            LensManager.toggleLayer("fxs-conquest-layer", { serialize: true });
+            LensManager.toggleLayer("fxs-conquest-layer");
         }
     }
 }
@@ -352,6 +359,8 @@ class bzLensPanel {
     constructor(component) {
         component.bzComponent = this;
         this.component = component;
+        // enable World context hotkeys while lens panel is open
+        this.component.inputContext = InputContext.World;
     }
     beforeAttach() { }
     afterAttach() {
@@ -373,3 +382,23 @@ class bzLensPanel {
 Controls.decorate("lens-panel", (component) => new bzLensPanel(component));
 
 export { bzPanelMiniMap };
+
+// patch TradeRouteChooser to allow World context hotkeys
+class bzTradeRouteChooser {
+    constructor(component) {
+        component.inputContext = InputContext.World;
+    }
+    beforeAttach() { }
+    afterAttach() { }
+    beforeDetach() { }
+    afterDetach() { }
+}
+Controls.decorate("trade-route-chooser", (component) => new bzTradeRouteChooser(component));
+
+// patch Trade layer to fix race condition when switching lenses quickly
+const fxsTradeLayer = LensManager.layers.get("fxs-trade-layer");
+const FTL_applyLayer = fxsTradeLayer.applyLayer;
+fxsTradeLayer.applyLayer = async function(...args) {
+    await FTL_applyLayer.apply(this, args);
+    if (!LensManager.isLayerEnabled("fxs-trade-layer")) this.removeLayer();
+}

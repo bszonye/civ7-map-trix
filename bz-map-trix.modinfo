@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Mod id="bz-map-trix" version="3.10.1"
+<Mod id="bz-map-trix" version="4.0.0"
     xmlns="ModInfo">
     <Properties>
         <Name>LOC_MOD_BZ_MAP_TRIX_NAME</Name>
-        <Version>3.10.1</Version>
+        <Version>4.0.0</Version>
         <Description>LOC_MOD_BZ_MAP_TRIX_DESCRIPTION</Description>
         <Authors>beezany</Authors>
         <URL>https://forums.civfanatics.com/resources/map-trix.31950/</URL>
@@ -54,10 +54,12 @@
             </Properties>
             <Actions>
                 <ImportFiles>
+                    <Item>icons/bz-wonder-decoration.png</Item>
                     <Item>ui/bz-city-panel/panel-city-list.css</Item>
                     <Item>ui/bz-style/bz-panel-yield-banner.css</Item>
                     <Item>ui/bz-units-panel/panel-units.css</Item>
-                    <Item>icons/bz-wonder-decoration.png</Item>
+                    <Item>ui-next/tooltips/plot-tooltip/bz-plot-tooltip.css</Item>
+                    <Item>ui-next/tooltips/plot-tooltip/plot-tooltip.js</Item>
                 </ImportFiles>
                 <UIScripts>
                     <Item>ui/bz-city-panel/model-city-list.js</Item>
@@ -81,6 +83,17 @@
                     <Item>ui/options/bz-map-trix-options.js</Item>
                     <Item>ui/options/mod-options.js</Item>
                     <Item>ui/tooltips/bz-plot-tooltip.js</Item>
+                    <Item>ui-next/tooltips/plot-tooltip/components/bz-alerts.js</Item>
+                    <Item>ui-next/tooltips/plot-tooltip/components/bz-treasure-convoy-section.js</Item>
+                    <Item>ui-next/tooltips/plot-tooltip/components/bz-unique-quarter-section.js</Item>
+                    <Item>ui-next/tooltips/plot-tooltip/components/bz-utility.js</Item>
+                    <Item>ui-next/tooltips/plot-tooltip/components/bz-volcano-section.js</Item>
+                    <Item>ui-next/tooltips/plot-tooltip/bz-archeology-content.js</Item>
+                    <Item>ui-next/tooltips/plot-tooltip/bz-helpers.js</Item>
+                    <Item>ui-next/tooltips/plot-tooltip/bz-player-portrait.js</Item>
+                    <Item>ui-next/tooltips/plot-tooltip/bz-random-event-content.js</Item>
+                    <Item>ui-next/tooltips/plot-tooltip/bz-settlement-recommendation-content.js</Item>
+                    <Item>ui-next/tooltips/plot-tooltip/bz-unit-flag.js</Item>
                 </UIScripts>
                 <UpdateText>
                     <Item>text/en_us/InGameText.xml</Item>

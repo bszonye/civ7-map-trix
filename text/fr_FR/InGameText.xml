@@ -102,6 +102,30 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS_TT" Language="fr_FR">
             <Text>Ouvre la fenêtre des unités.</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_DEFAULT_BZ" Language="fr_FR">
+            <Text>Filtres: Aucun</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_SETTLER_BZ" Language="fr_FR">
+            <Text>Filtres: Colon</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_CONTINENT_BZ" Language="fr_FR">
+            <Text>Filtres: Continent</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_TRADE_BZ" Language="fr_FR">
+            <Text>Filtres: Commerce</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_GENERAL_APPEAL_BZ" Language="fr_FR">
+            <Text>Filtres: Attrait</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_DISCOVERY_BZ" Language="fr_FR">
+            <Text>Filtres: Découverte</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_RELIGION_BZ" Language="fr_FR">
+            <Text>Filtres: Religion</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_COMMANDER_BZ" Language="fr_FR">
+            <Text>Filtres: Commandant</Text>
+        </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS" Language="fr_FR">
             <Text>Frontières</Text>
         </Replace>

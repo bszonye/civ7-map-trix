@@ -93,8 +93,8 @@ class bzCityListModel {
         this._cityList = this._settlementList.filter(c => !c.isTown);
         this._townList = this._settlementList.filter(c => c.isTown);
         // mark subhead dividers for Distant Lands cities and towns
-        const cityDL = this._cityList.find(s => s.isDistantLands);
-        if (cityDL && cityDL !== this._cityList[0] && cityDL !== this._cityList.at(-1)) {
+        const cityDL = this._cityList.find(s => s.isDistantLands && !s.isCapital);
+        if (cityDL && cityDL !== this._cityList[1] && cityDL !== this._cityList.at(-1)) {
             cityDL.subhead = "LOC_PLOT_TOOLTIP_HEMISPHERE_WEST";
         }
         const townDL = this._townList.find(s => s.isDistantLands);
@@ -165,18 +165,15 @@ class bzCityListModel {
                     `[b]${Locale.compose(name)}[/b][n]${Locale.compose(desc)}`;
             }
             if (focus) {
-                if (isGrowing) {
-                    entry.focusName = Locale.compose(
+                entry.focusIcon = UI.getIcon(focus.ProjectType);
+                const name = isGrowing ?
+                    Locale.compose(
                         "LOC_BZ_PARENTHESIS",
                         focus.Name,
                         "LOC_UI_PAUSE_SUBTITLE",
-                    );
-                } else {
-                    entry.focusIcon = UI.getIcon(focus.ProjectType);
-                    entry.focusName = Locale.compose(focus.Name);
-                }
-                entry.focusDescription = Locale.compose(focus.Description);
-                const tooltip = `[b]${entry.focusName}[/b][n]${entry.focusDescription}`;
+                    ) : Locale.compose(focus.Name);
+                const desc = Locale.compose(focus.Description);
+                const tooltip = `[b]${name}[/b][n]${desc}`;
                 entry.focusTooltip =
                     isGrowing ? `${entry.focusTooltip}[n] [n]${tooltip}` : tooltip;
             }

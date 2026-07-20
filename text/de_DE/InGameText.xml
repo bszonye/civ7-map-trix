@@ -94,6 +94,30 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS_TT" Language="de_DE">
             <Text>Öffnet das Einheitenmenu</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_DEFAULT_BZ" Language="de_DE">
+            <Text>Linsen: Ohne</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_SETTLER_BZ" Language="de_DE">
+            <Text>Linsen: Siedler</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_CONTINENT_BZ" Language="de_DE">
+            <Text>Linsen: Kontinent</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_TRADE_BZ" Language="de_DE">
+            <Text>Linsen: Handel</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_GENERAL_APPEAL_BZ" Language="de_DE">
+            <Text>Linsen: Anziehungskraft</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_DISCOVERY_BZ" Language="de_DE">
+            <Text>Linsen: Entdeckung</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_RELIGION_BZ" Language="de_DE">
+            <Text>Linsen: Religion</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_COMMANDER_BZ" Language="de_DE">
+            <Text>Linsen: Kommandant</Text>
+        </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS" Language="de_DE">
             <Text>Grenzen umschalten</Text>
         </Replace>

@@ -62,7 +62,7 @@ class bzFortificationLensLayer {
         const url = UI.getIconURL(icon);
         // sprites only support built-in BLPs, for now
         if (url == `blp:${blp}` || url == `fs://game/${blp}`) return blp;
-        return "Action_Fortify";
+        return "fi_action_fortify_64";
     }
     onPlotChange(data) {
         this.updatePlot(data.location);

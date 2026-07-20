@@ -94,6 +94,30 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS_TT">
             <Text>Open the Units panel</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_DEFAULT_BZ">
+            <Text>Lenses: None</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_SETTLER_BZ">
+            <Text>Lenses: Settler</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_CONTINENT_BZ">
+            <Text>Lenses: Continent</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_TRADE_BZ">
+            <Text>Lenses: Trade</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_GENERAL_APPEAL_BZ">
+            <Text>Lenses: Appeal</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_DISCOVERY_BZ">
+            <Text>Lenses: Discovery</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_RELIGION_BZ">
+            <Text>Lenses: Religion</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_COMMANDER_BZ">
+            <Text>Lenses: Commander</Text>
+        </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS">
             <Text>Toggle Borders</Text>
         </Replace>
