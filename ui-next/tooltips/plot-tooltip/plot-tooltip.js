@@ -424,6 +424,26 @@ const UnitInfoSection = (props) => {
                 }
               });
             }
+          }), createComponent(Show, {
+            // TRIX: show unit health
+            get when() {
+              return props.unit.Health?.damage ? props.unit.Health : void 0;
+            },
+            children: (health) => (() => {
+              const tmpl = template(`<div class="flex items-center font-body text-xs text-accent-3"></div>`);
+              const max = health().maxDamage;
+              const hp = max - health().damage;
+              return (() => {
+                var el = tmpl();
+                insert(el, createComponent(Icon, {
+                  "class": "size-3 mr-1",
+                  name: "url(blp:fi_damaged_64)",
+                  isUrl: true,
+                }), null);
+                insert(el, () => `${hp}/${max}`, null);
+                return el;
+              })();
+            })()
           })];
         }
       })];
