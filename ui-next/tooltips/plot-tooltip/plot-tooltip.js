@@ -26,7 +26,6 @@ import { getSettlementName, getOwnerInfo, getResource, getSpecialistDescription,
 import { hasRandomEventData, RandomEventPlotTooltipContent } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/bz-random-event-content.js';
 import { hasSettlementRecommendationData, SettlementRecommendationPlotTooltipContent } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/bz-settlement-recommendation-content.js';
 import { UnitFlag } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/bz-unit-flag.js';
-import { ConstructibleHasTagType } from '/base-standard/ui/utilities/utilities-tags.js';
 
 import { bzGetRelationship } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/bz-helpers.js';
 import { BZ_DOT_JOINER, bzPill } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/components/bz-utility.js';
@@ -1001,9 +1000,9 @@ const PlotTooltipContent = (props) => {
   const quarterKeyword = createMemo(() => district()?.isQuarter ? "LOC_PLOT_TOOLTIP_QUARTER" : void 0);
   // TRIX: define this earlier for use in keywordPills
   const route = createMemo(() => getRouteData(local.plotCoord));
-  // TRIX: bridge constructibles
+  // TRIX: bridges
   const routeBridges = createMemo(() => {
-    return constructibles().filter(c => ConstructibleHasTagType(c.type, "BRIDGE"));
+    return constructibles().filter(c => c.tags.includes("BRIDGE"));
   });
   const yields = createMemo(() => {
     if (!shouldShowOceanYields() || !shouldShowMountainYields()) {
@@ -1088,7 +1087,7 @@ const PlotTooltipContent = (props) => {
       const pill = { "class": style, iconClass, icon, text };
       const bridge = routeBridges().at(0);
       if (bridge) {
-        pill.class += " bz-style-ROUTE_BRIDGE";
+        pill.class += " bz-style-BRIDGE";
         delete pill.iconClass;
         pill.icon = bridge.type;
         pill.text = Locale.compose(

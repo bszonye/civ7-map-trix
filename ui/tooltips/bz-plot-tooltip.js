@@ -1055,7 +1055,7 @@ class bzPlotTooltip {
             if (this.isCompact) {
                 // skip remaining notes in Compact mode
             } else if (xinfo.TraitType) {
-                notes.push("LOC_STATE_BZ_UNIQUE");
+                notes.push("LOC_TAG_UNIQUE");
             } else if (isAgeless && !isWonder) {
                 notes.push("LOC_UI_PRODUCTION_AGELESS");
             } else if (isOverbuildable) {

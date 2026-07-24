@@ -191,8 +191,10 @@ function getConstructibleInfo(constructible, plotCoordinate, currentAge, ageless
     const tagset = BZ_TYPE_TAGS.get(type) ?? new Set();
     const tags = [], icons = [];
     for (const [tag, icon] of Object.entries(BZ_TYPE_ICONS)) {
-      tags.push(tag);
-      if (tagset.has(tag)) icons.push(icon);
+      if (tagset.has(tag)) {
+        tags.push(tag);
+        icons.push(icon);
+      }
     }
     if (isBuilding || isWonder || isImprovement) {
       return {
