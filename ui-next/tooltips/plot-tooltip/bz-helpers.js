@@ -6,19 +6,20 @@ import DistrictHealthManager from '/base-standard/ui/district/district-health-ma
 
 const BZ_TYPE_ICONS = {
   // AGELESS: "url(blp:city_ageless)",
+  AGELESS: null,
   // MILITARY: "url(blp:fi_military_64)",
   MILITARY: "url(blp:nar_rew_promotion)",
   RELIGIOUS: "url(blp:fi_nar_rew_religion_64)",
   GREATWORK: "url(blp:fi_greatwork_64)",
   FORTIFICATION: "url(blp:fi_action_fortify_64)",
   CITY_STATE_UNIQUE_IMPROVEMENT: "url(blp:fi_citystate_gold_64)",
-  // UNIQUE: null,
-  // UNIQUE_IMPROVEMENT: null,
+  UNIQUE: null,
+  UNIQUE_IMPROVEMENT: null,
   FOOD_WAREHOUSE: "url(blp:fi_Yield_Food_64)",
   PRODUCTION_WAREHOUSE: "url(blp:fi_Yield_Production_64)",
   WAREHOUSE: "url(blp:icon_building_warehouse)",
   WATER: "url(blp:icon_building_water)",
-  // BRIDGE: null,
+  BRIDGE: null,
   FOOD: "url(blp:fi_Yield_Food_64)",
   PRODUCTION: "url(blp:fi_Yield_Production_64)",
   GOLD: "url(blp:fi_Yield_Gold_64)",
@@ -193,7 +194,7 @@ function getConstructibleInfo(constructible, plotCoordinate, currentAge, ageless
     for (const [tag, icon] of Object.entries(BZ_TYPE_ICONS)) {
       if (tagset.has(tag)) {
         tags.push(tag);
-        icons.push(icon);
+        if (icon) icons.push(icon);
       }
     }
     if (isBuilding || isWonder || isImprovement) {
