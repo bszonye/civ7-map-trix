@@ -59,7 +59,6 @@
   --bz-color-road: #e5d2ac66;  /* Roads = bronze 40% opacity */
   --bz-color-rail: #c2c4cc66;  /* Railroads = silver 40% opacity */
   --bz-color-bridge: #d4c9c466;  /* Bridges = warm gray 40% opacity */
-}
 .bz-plot-tooltip {
   /* yield types */
   --bz-color-food: #80b34d;        /*  90° 40 50 green */
@@ -171,7 +170,7 @@
   border: none;
   background-color: var(--bz-color-road);
 }
-.bz-plot-tooltip .bz-style-ROUTE_BRIDGE {
+.bz-plot-tooltip .bz-style-BRIDGE {
   border: none;
   background-color: var(--bz-color-bridge);
 }
