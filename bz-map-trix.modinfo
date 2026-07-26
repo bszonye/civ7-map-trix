@@ -9,6 +9,7 @@
         <URL>https://forums.civfanatics.com/resources/map-trix.31950/</URL>
         <Package>Mod</Package>
         <AffectsSavedGames>0</AffectsSavedGames>
+        <bzIcon>blp:ntf_choosenarrative_blk</bzIcon>
     </Properties>
     <References>
         <Mod id="detailed-map-tacks" title="LOC_MOD_DETAILED_MAP_TACKS_NAME" />
