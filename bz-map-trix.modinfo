@@ -10,6 +10,7 @@
         <Package>Mod</Package>
         <AffectsSavedGames>0</AffectsSavedGames>
         <bzIcon>blp:ntf_choosenarrative_blk</bzIcon>
+        <bzIconGlow>#e5d2ac</bzIconGlow>
     </Properties>
     <References>
         <Mod id="detailed-map-tacks" title="LOC_MOD_DETAILED_MAP_TACKS_NAME" />
