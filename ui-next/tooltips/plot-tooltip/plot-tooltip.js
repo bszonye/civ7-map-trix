@@ -1022,7 +1022,7 @@ const PlotTooltipContent = (props) => {
     if (riverLabel()) {
       pills.push({ "class": "bz-style-river", text: riverLabel() });
     }
-    if (terrainDefinition().TerrainType === "TERRAIN_HILL") {
+    if (terrainDefinition()?.TerrainType === "TERRAIN_HILL") {
       const type = terrainDefinition().TerrainType;
       const style = `bz-style-${type}`;
       const text = terrainDefinition().Name;
@@ -1044,7 +1044,7 @@ const PlotTooltipContent = (props) => {
       const style = `bz-style-${type} bz-style-${ctype} bz-style-${ttype} bz-alert-note`;
       const text = "LOC_PLOT_TOOLTIP_BLOCKS_SIGHT";
       pills.push({ "class": style, text });
-    } else if ((terrainDefinition().SightThroughModifier ?? 0) != 0) {
+    } else if ((terrainDefinition()?.SightThroughModifier ?? 0) != 0) {
       const ttype = terrainDefinition().TerrainType;
       const style = `bz-style-${ttype} bz-alert-note`;
       const text = "LOC_PLOT_TOOLTIP_BLOCKS_SIGHT";
