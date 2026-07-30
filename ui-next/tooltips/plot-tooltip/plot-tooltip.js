@@ -1,5 +1,5 @@
 import { template, insert, use, spread } from '/core/vendor/solid-js/web/dist/web.js';
-import { createSignal, createMemo, createComponent, Show, For, mergeProps, createRenderEffect, splitProps, useContext, createEffect, on, onCleanup, Switch, Match } from '/core/vendor/solid-js/dist/solid.js';
+import { createSignal, createMemo, createComponent, Show, For, mergeProps, createRenderEffect, splitProps, useContext, createEffect, on, onCleanup, onMount, Switch, Match } from '/core/vendor/solid-js/dist/solid.js';
 import LensManager from '/core/ui/lenses/lens-manager.js';
 import { Icon } from '/core/ui-next/components/icon.js';
 import { L10n } from '/core/ui-next/components/l10n.js';
@@ -10,7 +10,7 @@ import { TriggerActivationContext, TriggerActivationContextProvider, TriggerType
 import { ComponentRegistry } from '/core/ui-next/services/component-registry.js';
 import { FocusManager } from '/core/ui-next/services/focus-manager.js';
 import { isFocusable } from '/core/ui-next/services/focus.js';
-import { IsMouseActive } from '/core/ui-next/services/input.js';
+import { IsTouchActive, IsMouseActive } from '/core/ui-next/services/input.js';
 import { ProductionPanelCategory } from '/base-standard/ui/production-chooser/production-chooser-helpers.js';
 // import { PillText, Pill } from '/core/ui-next/components/pills.js';
 import { YieldBarEntryStyle, YieldBar } from '/base-standard/ui-next/components/yield-bar.js';
@@ -985,14 +985,13 @@ const PlotTooltipContent = (props) => {
   const districtKeyword = createMemo(() => {
     const districtType = district() ? districtDefinition()?.DistrictType : void 0;
     switch (districtType) {
-      case "DISTRICT_WONDER":  // TRIX
-        return "LOC_DISTRICT_WONDER_NAME";
-      case "DISTRICT_CITY_CENTER":  // TRIX
-        return "LOC_DISTRICT_CITY_CENTER_NAME";
+      case "DISTRICT_CITY_CENTER":
       case "DISTRICT_URBAN":
         return "LOC_PLOT_TOOLTIP_URBAN_DISTRICT";
       case "DISTRICT_RURAL":
         return "LOC_PLOT_TOOLTIP_RURAL_DISTRICT";
+      case "DISTRICT_WONDER":  // TRIX
+        return "LOC_DISTRICT_WONDER_NAME";
       default:
         return void 0;
     }
@@ -1360,7 +1359,6 @@ const PlotTooltipContent = (props) => {
     return _el$15;
   })();
 };
-const cameraPanActions = /* @__PURE__ */ new Set(["keyboard-nav-up", "keyboard-nav-down", "keyboard-nav-left", "keyboard-nav-right", "camera-pan", "touch-pan"]);
 function getPlotTooltipKind(plotCoord) {
   const activeLens = LensManager.getActiveLens();
   if (activeLens === "fxs-settler-lens") {
@@ -1405,9 +1403,10 @@ const PlotTooltipComponent = (props) => {
       }
       // TRIX: add click-to-hide and shift-to-hide
       const [isShiftOrClickDown, setIsShiftOrClickDown] = createSignal(false);
+      let isPanning = false;
+      const [showTouchPressPlotTooltip, setShowTouchPressPlotTooltip] = createSignal(false);
       const [isWorldDragging, setIsWorldDragging] = createSignal(false);
-      const reactiveName = createMemo(() => tooltipContext.name);
-      const triggerContext = new TriggerActivationContextProvider(tooltipModel, parentContext, reactiveName);
+      const triggerContext = new TriggerActivationContextProvider(tooltipModel, parentContext, () => tooltipContext.name);
       tooltipContext.setTriggerContext(triggerContext);
       let tooltipDelayHandle;
       const clearTooltipDelay = () => {
@@ -1452,12 +1451,33 @@ const PlotTooltipComponent = (props) => {
       const onPlotCursorCoordsUpdated = (event) => {
         trySetPlotCoords(event.detail.plotCoords ?? void 0);
       };
+      let cameraChangeTimeout;
+      let prevCameraState = null;
+      const onCameraChanged = (nextCameraState) => {
+        if (nextCameraState.focusPoint.x === prevCameraState?.focusPoint.x && nextCameraState.focusPoint.y === prevCameraState?.focusPoint.y) {
+          prevCameraState = nextCameraState;
+          return;
+        }
+        prevCameraState = nextCameraState;
+        setIsWorldDragging(true);
+        isPanning = true;
+        if (cameraChangeTimeout !== void 0) {
+          clearTimeout(cameraChangeTimeout);
+        }
+        cameraChangeTimeout = window.setTimeout(() => {
+          setIsWorldDragging(false);
+        }, 50);
+      };
       const onInputAction = (name, status) => {
-        if (cameraPanActions.has(name)) {
-          if (status === InputActionStatuses.START) {
-            setIsWorldDragging(true);
-          } else if (status === InputActionStatuses.FINISH) {
-            setIsWorldDragging(false);
+        if (IsTouchActive() && status == InputActionStatuses.FINISH) {
+          if (name === "touch-press") {
+            if (!isPanning) {
+              setShowTouchPressPlotTooltip(true);
+            }
+          } else if (name === "touch-tap") {
+            setShowTouchPressPlotTooltip(false);
+          } else if (name == "touch-complete") {
+            isPanning = false;
           }
         }
       };
@@ -1475,14 +1495,14 @@ const PlotTooltipComponent = (props) => {
       const isWorldFocused = createMemo(() => {
         return focusManager.activeElement() === document.body;
       });
-      createEffect(on([plotCoords, IsPlotTooltipVisible, isWorldFocused, isRevealed, isWorldDragging, isShiftOrClickDown], ([currentPlotCoords, isVisible, currentIsWorldFocused, revealed, currentIsWorldDragging, currentIsShiftOrClickDown], _prevValues) => {
-        if (!currentPlotCoords || !isVisible || !currentIsWorldFocused || !revealed || currentIsWorldDragging || currentIsShiftOrClickDown) {
+      createEffect(on([plotCoords, IsPlotTooltipVisible, isWorldFocused, isRevealed, isWorldDragging, isShiftOrClickDown, showTouchPressPlotTooltip], ([currentPlotCoords, isVisible, currentIsWorldFocused, revealed, currentIsWorldDragging, currentIsShiftOrClickDown, pressingShowTouchPlotTooltip], prevValues) => {
+        const [prevPlotCoords, _prevIsVisible, _prevIsWorldFocused, _prevRevealed, prevIsWorldDragging, _prevIsShiftOrClickDown, _prevPressingShowTouchPlotTooltip] = prevValues ?? [];
+        if (!currentPlotCoords || !isVisible || !currentIsWorldFocused || !revealed || currentIsWorldDragging || currentIsShiftOrClickDown || !pressingShowTouchPlotTooltip && IsTouchActive()) {
           // TRIX: add click-to-hide and shift-to-hide
           hidePlotTooltip();
-        } else {
-          // const prevPlotCoord = prevValues?.[0];
-          // if (currentPlotCoords.x !== prevPlotCoord?.x || currentPlotCoords.y !== prevPlotCoord?.y) {
-          //   triggerContext.trigger(TriggerType.Blur, void 0);
+        } else if (!currentIsWorldDragging && !currentIsShiftOrClickDown && !prevIsWorldDragging) {
+          // if (currentPlotCoords.x !== prevPlotCoords?.x || currentPlotCoords.y !== prevPlotCoords?.y) {
+          //   tooltipModel.triggerTooltip(tooltipContext.name, TriggerType.Blur, void 0);
           // }
           // TRIX: skip this for smooth tile transitions
           triggerWithDelay(currentPlotCoords);
@@ -1501,14 +1521,18 @@ const PlotTooltipComponent = (props) => {
           });
         }
       });
-      engine.on("InputAction", onInputAction);
-      engine.on("UpdateFrame", onUpdateFrame);
-      onCleanup(() => {
-        clearTooltipDelay();
-        window.removeEventListener("cursor-updated", onCursorUpdated);
-        window.removeEventListener("plot-cursor-coords-updated", onPlotCursorCoordsUpdated);
-        engine.off("InputAction", onInputAction);
-        engine.off("UpdateFrame", onUpdateFrame);
+      onMount(() => {
+        engine.on("CameraChanged", onCameraChanged);
+        engine.on("InputAction", onInputAction);
+        engine.on("UpdateFrame", onUpdateFrame);
+        onCleanup(() => {
+          clearTooltipDelay();
+          window.removeEventListener("cursor-updated", onCursorUpdated);
+          window.removeEventListener("plot-cursor-coords-updated", onPlotCursorCoordsUpdated);
+          engine.off("CameraChanged", onCameraChanged);
+          engine.off("InputAction", onInputAction);
+          engine.off("UpdateFrame", onUpdateFrame);
+        });
       });
       return createComponent(TriggerActivationContext.Provider, {
         value: triggerContext,
