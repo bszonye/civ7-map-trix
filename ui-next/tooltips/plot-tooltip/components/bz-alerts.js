@@ -125,7 +125,7 @@ function getPlotEffectAlert(effect) {
       title: effect.name,
       tooltipText: "LOC_PEDIA_CONCEPTS_INFECTED_TOOLTIP",
       icon: "url(blp:fi_yield_plague_64)",
-      iconSizeClass: "size-8",
+      iconSizeClass: "size-7",
       turns
     };
   }
