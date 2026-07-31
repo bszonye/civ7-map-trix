@@ -89,6 +89,7 @@
 .bz-plot-tooltip .text-negative,
 .bz-plot-tooltip .text-negative-light {
   color: var(--bz-color-negative-text);
+  text-shadow: 0 0.0555555556rem 0.1111111111rem black, 0 0 0.3333333333rem black;
 }
 .bz-plot-tooltip .text-secondary {
   fxs-font-gradient-color: var(--bz-color-bronze-1);
@@ -171,7 +172,7 @@
   border: none;
   background-color: var(--bz-color-road);
 }
-.bz-plot-tooltip .bz-style-ROUTE_BRIDGE {
+.bz-plot-tooltip .bz-style-BRIDGE {
   border: none;
   background-color: var(--bz-color-bridge);
 }

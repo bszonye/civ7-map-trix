@@ -27,7 +27,7 @@ const TreasureConvoySection = (props) => {
         get children() {
           var _el$ = _tmpl$2();
           insert(_el$, createComponent(Tooltip.Text, {
-            text: "LOC_PEDIA_CONCEPTS_TREASURE_CONVOY_TOOLTIP",
+            text: "LOC_PEDIA_CONCEPTS_TREASURE_RESOURCES_TOOLTIP",
             get children() {
               return createComponent(TooltipKeyword, {
                 "class": "flex-auto self-center",
