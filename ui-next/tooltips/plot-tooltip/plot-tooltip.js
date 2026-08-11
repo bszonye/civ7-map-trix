@@ -1496,7 +1496,7 @@ const PlotTooltipComponent = (props) => {
         return focusManager.activeElement() === document.body;
       });
       createEffect(on([plotCoords, IsPlotTooltipVisible, isWorldFocused, isRevealed, isWorldDragging, isShiftOrClickDown, showTouchPressPlotTooltip], ([currentPlotCoords, isVisible, currentIsWorldFocused, revealed, currentIsWorldDragging, currentIsShiftOrClickDown, pressingShowTouchPlotTooltip], prevValues) => {
-        const [prevPlotCoords, _prevIsVisible, _prevIsWorldFocused, _prevRevealed, prevIsWorldDragging, _prevIsShiftOrClickDown, _prevPressingShowTouchPlotTooltip] = prevValues ?? [];
+        const [_prevPlotCoords, _prevIsVisible, _prevIsWorldFocused, _prevRevealed, prevIsWorldDragging, _prevIsShiftOrClickDown, _prevPressingShowTouchPlotTooltip] = prevValues ?? [];
         if (!currentPlotCoords || !isVisible || !currentIsWorldFocused || !revealed || currentIsWorldDragging || currentIsShiftOrClickDown || !pressingShowTouchPlotTooltip && IsTouchActive()) {
           // TRIX: add click-to-hide and shift-to-hide
           hidePlotTooltip();
