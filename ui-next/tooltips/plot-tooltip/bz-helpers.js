@@ -136,18 +136,18 @@ function getRouteData(location) {
   const routeTypeHash = GameplayMap.getRouteType(location.x, location.y);
   const route = GameInfo.Routes.lookup(routeTypeHash);
   const isFerry = GameplayMap.isFerry(location.x, location.y);
-  let returnString = "";
+  let name;
   if (route) {
     if (isFerry) {
-      returnString = Locale.compose(
+      name = Locale.compose(
         "{1_RouteName} {LOC_PLOT_DIVIDER_DOT} {2_Ferry}",
         route.Name,
         "LOC_NAVIGABLE_RIVER_FERRY"
       );
     } else {
-      returnString = route.Name;
+      name = route.Name;
     }
-    return { name: returnString, type: route.RouteType };
+    return { name, type: route.RouteType };
   }
   return null;
 }

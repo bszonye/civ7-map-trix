@@ -7,11 +7,7 @@ const BZ_ICON_DISCOVERY = "NAR_REW_DEFAULT";
 const SPRITE_OFFSET = { x: 0, y: 25, z: 5 };
 const SPRITE_SCALE = 3/4;
 const SPRITE_SIZE = 64 * SPRITE_SCALE; // pixels wide
-var SpriteGroup;
-(function (SpriteGroup) {
-    SpriteGroup[SpriteGroup["bzDiscovery"] = 0] = "bzDiscovery";
-    SpriteGroup[SpriteGroup["All"] = Number.MAX_VALUE] = "All";
-})(SpriteGroup || (SpriteGroup = {}));
+
 class bzDiscoveryLensLayer {
     bzSpriteGrid = WorldUI.createSpriteGrid(
         "bzDiscoveryLayer_SpriteGroup",
