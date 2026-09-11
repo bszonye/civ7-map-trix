@@ -219,8 +219,10 @@ for (const [lensType, lens] of LensManager.lenses.entries()) {
 // PanelMiniMap extensions
 const BZ_ICON_CITY_BUTTON = "blp:Yield_Cities";
 const BZ_ICON_UNIT_BUTTON = "blp:Action_Promote";
+const BZ_ICON_WONDER_BUTTON = "blp:fonticon_wonders";
 Controls.preloadImage(BZ_ICON_CITY_BUTTON, "bz-mini-map");
 Controls.preloadImage(BZ_ICON_UNIT_BUTTON, "bz-mini-map");
+Controls.preloadImage(BZ_ICON_WONDER_BUTTON, "bz-mini-map");
 Controls.preloadImage("blp:hud_sub_circle_bk", "bz-mini-map");
 Controls.preloadImage("blp:hud_sub_circle_hov", "bz-mini-map");
 class bzPanelMiniMap {
@@ -229,6 +231,7 @@ class bzPanelMiniMap {
     static toggleCooldownTimer = 500;
     citySubpanel = null;
     unitsSubpanel = null;
+    wonderSubpanel = null;
     engineInputListener = this.onEngineInput.bind(this);
     cityHotkeyListener = this.onCityHotkey.bind(this);
     unitsHotkeyListener = this.onUnitsHotkey.bind(this);
@@ -281,12 +284,22 @@ class bzPanelMiniMap {
         );
         this.unitsSubpanel = this.component.subpanels.at(-1);
         this.unitsButton = this.component.miniMapButtonRow.lastChild;
-        this.cityButton.classList.add("bz-units-button");
+        this.unitsButton.classList.add("bz-units-button");
+        this.component.addSubpanel(
+            "bz-wonder-panel",
+            "LOC_UI_PRODUCTION_WONDERS",
+            BZ_ICON_WONDER_BUTTON,
+        );
+        this.wonderSubpanel = this.component.subpanels.at(-1);
+        this.wonderButton = this.component.miniMapButtonRow.lastChild;
+        this.wonderButton.classList.add("bz-wonder-button");
     }
-    beforeToggleSubpanel() {
+    beforeToggleSubpanel(subpanel, force) {
         // prevent infinite loop after force-closing subpanel
+        console.warn(`TRIX TOGGLE ${subpanel.tag} ${force}`);
         if (this.component.activeSubpanel &&
             !ContextManager.hasInstanceOf(this.component.activeSubpanel.tag)) {
+            console.warn(`TRIX PANEL ${this.component.activeSubpanel.tag}`);
             this.component.activeSubpanel = null;
         }
     }
