@@ -244,7 +244,7 @@ class bzPanelMiniMap {
     }
     patchPrototype(proto) {
         if (bzPanelMiniMap.c) return;  // one-time initialization
-        // patch EditorKeyboardMapping methods & properties
+        // patch PanelMiniMap methods & properties
         const c = bzPanelMiniMap.c = { proto };
         // afterInitialize
         c.onInitialize = c.proto.onInitialize;
@@ -370,7 +370,6 @@ Controls.decorate("panel-mini-map", (val) => new bzPanelMiniMap(val));
 class bzLensPanel {
     static c_prototype;
     constructor(component) {
-        component.bzComponent = this;
         this.component = component;
         // enable World context hotkeys while lens panel is open
         this.component.inputContext = InputContext.World;
