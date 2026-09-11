@@ -2,6 +2,7 @@ import bzMapTrixOptions, { bzCommanderLens } from '/bz-map-trix/ui/options/bz-ma
 import { InputEngineEventName } from '/core/ui/input/input-support.js';
 import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
 import LensManager from '/core/ui/lenses/lens-manager.js';
+import ContextManager from '/core/ui/context-manager/context-manager.js';
 // guarantee import order for patching
 import '/base-standard/ui/interface-modes/interface-mode-unit-selected.js';
 import '/base-standard/ui/lenses/layer/conquest-layer.js';
@@ -223,7 +224,7 @@ Controls.preloadImage(BZ_ICON_UNIT_BUTTON, "bz-mini-map");
 Controls.preloadImage("blp:hud_sub_circle_bk", "bz-mini-map");
 Controls.preloadImage("blp:hud_sub_circle_hov", "bz-mini-map");
 class bzPanelMiniMap {
-    static c_prototype;
+    static c = null;
     static instance;
     static toggleCooldownTimer = 500;
     citySubpanel = null;
@@ -238,21 +239,26 @@ class bzPanelMiniMap {
     constructor(component) {
         bzPanelMiniMap.instance = this;
         this.component = component;
-        component.bzComponent = this;
-        this.patchPrototypes(this.component);
+        this.component.bzMapTrix = this;
+        this.patchPrototype(Object.getPrototypeOf(component));
     }
-    patchPrototypes(component) {
-        const c_prototype = Object.getPrototypeOf(component);
-        if (bzPanelMiniMap.c_prototype == c_prototype) return;
-        // patch component methods
-        const proto = bzPanelMiniMap.c_prototype = c_prototype;
+    patchPrototype(proto) {
+        if (bzPanelMiniMap.c) return;  // one-time initialization
+        // patch EditorKeyboardMapping methods & properties
+        const c = bzPanelMiniMap.c = { proto };
         // afterInitialize
-        const afterInitialize = this.afterInitialize;
-        const onInitialize = proto.onInitialize;
-        proto.onInitialize = function(...args) {
-            const c_rv = onInitialize.apply(this, args);
-            const after_rv = afterInitialize.apply(this.bzComponent, args);
-            return after_rv ?? c_rv;
+        c.onInitialize = c.proto.onInitialize;
+        c.proto.onInitialize = function(...args) {
+            const crv = c.onInitialize.apply(this, args);
+            const arv = this.bzMapTrix.afterInitialize(...args);
+            return arv ?? crv;
+        }
+        // beforeToggleSubpanel
+        c.toggleSubpanel = c.proto.toggleSubpanel;
+        c.proto.toggleSubpanel = function(...args) {
+            const brv = this.bzMapTrix.beforeToggleSubpanel(...args);
+            const crv = c.toggleSubpanel.apply(this, args);
+            return brv ?? crv;
         }
     }
     afterInitialize() {
@@ -273,6 +279,13 @@ class bzPanelMiniMap {
         this.unitsSubpanel = this.component.subpanels.at(-1);
         this.unitsButton = this.component.miniMapButtonRow.lastChild;
         this.cityButton.classList.add("bz-units-button");
+    }
+    beforeToggleSubpanel() {
+        // prevent infinite loop after force-closing subpanel
+        if (this.component.activeSubpanel &&
+            !ContextManager.hasInstanceOf(this.component.activeSubpanel.tag)) {
+            this.component.activeSubpanel = null;
+        }
     }
     beforeAttach() { }
     afterAttach() {
