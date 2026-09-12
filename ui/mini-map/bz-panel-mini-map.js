@@ -235,6 +235,7 @@ class bzPanelMiniMap {
     engineInputListener = this.onEngineInput.bind(this);
     cityHotkeyListener = this.onCityHotkey.bind(this);
     unitsHotkeyListener = this.onUnitsHotkey.bind(this);
+    wonderHotkeyListener = this.onWonderHotkey.bind(this);
     lensesHotkeyListener = this.onLensesHotkey.bind(this);
     layerHotkeyListener = this.onLayerHotkey.bind(this);
     toggleCooldown = 0;
@@ -317,6 +318,7 @@ class bzPanelMiniMap {
     afterAttach() {
         window.addEventListener("hotkey-open-bz-city-panel", this.cityHotkeyListener);
         window.addEventListener("hotkey-open-bz-units-panel", this.unitsHotkeyListener);
+        window.addEventListener("hotkey-open-bz-wonder-panel", this.wonderHotkeyListener);
         window.addEventListener("hotkey-open-bz-lens-panel", this.lensesHotkeyListener);
         window.addEventListener("layer-hotkey", this.layerHotkeyListener);
         this.component.Root
@@ -325,6 +327,7 @@ class bzPanelMiniMap {
     beforeDetach() {
         window.removeEventListener("hotkey-open-bz-city-panel", this.cityHotkeyListener);
         window.removeEventListener("hotkey-open-bz-units-panel", this.unitsHotkeyListener);
+        window.removeEventListener("hotkey-open-bz-wonder-panel", this.wonderHotkeyListener);
         window.removeEventListener("hotkey-open-bz-lens-panel", this.lensesHotkeyListener);
         window.removeEventListener("layer-hotkey", this.layerHotkeyListener);
         this.component.Root
@@ -380,6 +383,9 @@ class bzPanelMiniMap {
     }
     onUnitsHotkey(_event) {
         this.togglePanel(this.unitsSubpanel);
+    }
+    onWonderHotkey(_event) {
+        this.togglePanel(this.wonderSubpanel);
     }
     onLensesHotkey(_event) {
         this.component.toggleLensPanel();
