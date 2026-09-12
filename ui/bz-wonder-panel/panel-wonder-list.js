@@ -17,7 +17,9 @@ class bzWonderPanel extends MinimapSubpanel {
     panel = document.createElement("fxs-vslot");
     inputContext = InputContext.World;
     activateWonderListener = this.activateWonder.bind(this);
+    modelUpdateListener = this.onModelUpdate.bind(this);
     listContainer = document.createElement("fxs-scrollable");
+    scrollArea = null;
     constructor(root) {
         super(root);
         this.animateInType = this.animateOutType = AnchorType.Fade;
@@ -50,7 +52,11 @@ class bzWonderPanel extends MinimapSubpanel {
         frame.appendChild(this.listContainer);
     }
     update() {
-        this.listContainer.innerHTML = "";
+        // TODO: verify this
+        this.scrollArea = this.scrollArea ?
+            this.listContainer.component.scrollArea :
+            this.listContainer;
+        this.scrollArea.innerHTML = "";
         this.renderList(
             "LOC_POLICIES_AVAILABLE_POLICIES",
             bzWonderList.wonderList.available,
@@ -67,7 +73,7 @@ class bzWonderPanel extends MinimapSubpanel {
             "LOC_TRIUMPH_NOT_AVAILABLE",
             bzWonderList.wonderList.skipped,
         );
-        this.listContainer.querySelector("fxs-header")?.classList
+        this.scrollArea.querySelector("fxs-header")?.classList
             .replace("mt-2", "mt-0\\.5");
     }
     renderList(headline, list) {
@@ -76,12 +82,12 @@ class bzWonderPanel extends MinimapSubpanel {
         header.setAttribute("title", headline);
         header.setAttribute("filigree-style", "h4");
         header.classList.toggle("hidden", list.length == 0);
-        this.listContainer.appendChild(header);
+        this.scrollArea.appendChild(header);
         // table rows
         for (const item of list) {
             const row = document.createElement("div");
             row.classList.value = "flex flex-col text.sm";
-            this.listContainer.appendChild(row);
+            this.scrollArea.appendChild(row);
             const subhead = document.createElement("fxs-header");
             subhead.setAttribute("filigree-style", "none");
             subhead.setAttribute("header-bg-glow", true);
@@ -206,6 +212,9 @@ class bzWonderPanel extends MinimapSubpanel {
       );
       this.disposeTooltips.push(dispose);
       return dispose;
+    }
+    onModelUpdate() {
+        this.update();
     }
 }
 Controls.define("bz-wonder-panel", {

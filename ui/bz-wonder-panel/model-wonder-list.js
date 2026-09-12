@@ -14,9 +14,19 @@ class bzWonderListModel {
     constructor() {
         this.updateGate.call("constructor");
         // TODO: events that change build times
+        engine.on("CityPopulationChanged", this.onWonderUpdateListener);
+        engine.on("CityProductionChanged", this.onWonderUpdateListener);
+        engine.on("CityProductionUpdated", this.onWonderUpdateListener);
+        engine.on("CityYieldChanged", this.onWonderUpdateListener);
+        engine.on("CityYieldGranted", this.onWonderUpdateListener);
         engine.on("ConstructibleAddedToMap", this.onWonderUpdateListener);
         engine.on("ConstructibleRemovedFromMap", this.onWonderUpdateListener);
+        engine.on("LocalPlayerChanged", this.onWonderUpdateListener);
+        engine.on("ResourceAssigned", this.onWonderUpdateListener);
+        engine.on("ResourceUnassigned", this.onWonderUpdateListener);
         engine.on("WonderCompleted", this.onWonderUpdateListener);
+        engine.on('PlayerResourceChanged', this.onWonderUpdateListener);
+        engine.on('PlayerTurnActivated', this.onWonderUpdateListener);
     }
     set updateCallback(callback) {
         this.onUpdate = callback;
@@ -154,6 +164,7 @@ class bzWonderListModel {
             list.push(wonder);
         }
         this._wonderList = { available, inProgress, complete, skipped };
+        window.dispatchEvent(new CustomEvent("bz-model-wonder-list-update"));
     }
     onWonderUpdate(_event) {
         this.updateGate.call("onWonderUpdate");

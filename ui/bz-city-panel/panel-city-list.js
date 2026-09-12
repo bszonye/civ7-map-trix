@@ -15,6 +15,7 @@ class bzCityPanel extends MinimapSubpanel {
     panel = document.createElement("fxs-vslot");
     inputContext = InputContext.World;
     activateCityListener = this.activateCity.bind(this);
+    modelUpdateListener = this.onModelUpdate.bind(this);
     listContainer = document.createElement("fxs-scrollable");
     constructor(root) {
         super(root);
@@ -242,6 +243,7 @@ class bzCityPanel extends MinimapSubpanel {
             Camera.lookAtPlot(city.location);
         }
     }
+    onModelUpdate() { }
 }
 Controls.define("bz-city-panel", {
     createInstance: bzCityPanel,
