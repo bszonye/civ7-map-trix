@@ -49,7 +49,7 @@ class bzCityPanel extends MinimapSubpanel {
         this.renderList(
             "LOC_UI_SETTLEMENT_TAB_BAR_CITIES",
             "g_bzCityListModel.cityList",
-            "mt-1",
+            "mt-0\\.5",
         );
         this.renderList(
             "LOC_UI_SETTLEMENT_TAB_BAR_TOWNS",

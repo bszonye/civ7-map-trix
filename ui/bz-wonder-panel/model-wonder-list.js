@@ -1,225 +1,162 @@
-import { ComponentID } from '/core/ui/utilities/utilities-component-id.js';
 import UpdateGate from '/core/ui/utilities/utilities-update-gate.js';
 
 class bzWonderListModel {
-    onCityUpdateListener = this.onCityUpdate.bind(this);
+    onWonderUpdateListener = this.onWonderUpdate.bind(this);
     onUpdate;
     updateGate = new UpdateGate(() => this.update());
-    _cities = new Map();
-    _settlementList = [];
-    _cityList = [];
-    _townList = [];
+    _wonders = new Map();
+    _wonderList = {
+        available: [],  // head: LOC_POLICIES_AVAILABLE_POLICIES
+        inProgress: [],  // head: LOC_PLOT_TOOLTIP_IN_PROGRESS
+        complete: [],  // head: LOC_LEGACIES_COMPLETE, subhead: age name
+        skipped: [],  // head: LOC_TRIUMPH_NOT_AVAILABLE
+    };
     constructor() {
         this.updateGate.call("constructor");
-        // from city-banner-manager
-        engine.on("AffinityLevelChanged", this.onCityUpdateListener);
-        engine.on("CityAddedToMap", this.onCityUpdateListener);
-        engine.on("CityInitialized", this.onCityUpdateListener);
-        engine.on("CityNameChanged", this.onCityUpdateListener);
-        engine.on("CapitalCityChanged", this.onCityUpdateListener);
-        engine.on("CityPopulationChanged", this.onCityUpdateListener);
-        engine.on("CityProductionChanged", this.onCityUpdateListener);
-        engine.on("CityYieldChanged", this.onCityUpdateListener);
-        engine.on("CityProductionUpdated", this.onCityUpdateListener);
-        engine.on("CityProductionQueueChanged", this.onCityUpdateListener);
-        engine.on("CityReligionChanged", this.onCityUpdateListener);
-        engine.on("DiplomacyEventStarted", this.onCityUpdateListener);
-        engine.on("DiplomacyEventEnded", this.onCityUpdateListener);
-        engine.on("DiplomacyRelationshipChanged", this.onCityUpdateListener);
-        engine.on("UrbanReligionChanged", this.onCityUpdateListener);
-        engine.on("RuralReligionChanged", this.onCityUpdateListener);
-        engine.on("CityRemovedFromMap", this.onCityUpdateListener);
-        engine.on("CitySelectionChanged", this.onCityUpdateListener);
-        engine.on("CityStateBonusChosen", this.onCityUpdateListener);
-        engine.on("CityGovernmentLevelChanged", this.onCityUpdateListener);
-        engine.on("FoodQueueChanged", this.onCityUpdateListener);
-        engine.on("CityGrowthModeChanged", this.onCityUpdateListener);
-        engine.on("CityYieldGranted", this.onCityUpdateListener);
-        engine.on("PlotVisibilityChanged", this.onCityUpdateListener);
-        engine.on("ConqueredSettlementIntegrated", this.onCityUpdateListener);
-        engine.on("DistrictAddedToMap", this.onCityUpdateListener);
-        engine.on("DistrictRemovedFromMap", this.onCityUpdateListener);
-        engine.on("NotificationAdded", this.onCityUpdateListener);
-        // from bz-flag-corps
-        engine.on('CityRazingStarted', this.onCityUpdateListener);
-        engine.on('DiplomacyEventEnded', this.onCityUpdateListener);
-        engine.on('DistrictDamageChanged', this.onCityUpdateListener);
-        engine.on('PlayerResourceChanged', this.onCityUpdateListener);
-        engine.on('PlayerTurnActivated', this.onCityUpdateListener);
+        // TODO: events that change build times
+        engine.on("ConstructibleAddedToMap", this.onWonderUpdateListener);
+        engine.on("ConstructibleRemovedFromMap", this.onWonderUpdateListener);
+        engine.on("WonderCompleted", this.onWonderUpdateListener);
     }
     set updateCallback(callback) {
         this.onUpdate = callback;
     }
-    get cities() {
-        return this._cities;
+    get wonders() {
+        return this._wonders;
     }
-    get settlementList() {
-        return this._settlementList;
-    }
-    get cityList() {
-        return this._cityList;
-    }
-    get townList() {
-        return this._townList;
+    get wonderList() {
+        return this._wonderList;
     }
     update() {
-        this._cities = new Map();
-        const player = Players.get(GameContext.localObserverID);
-        if (player?.Cities == null) return;
-        for (const id of player.Cities.getCityIds()) {
-            this.updateCity(id);
-        }
-        this.updateDisplay();
-    }
-    updateDisplay() {
-        this._settlementList = [...this._cities.values()];
-        const citySort = (a, b) => {
-            // sort capital first
-            if (a.isCapital && !b.isCapital) return -1;
-            if (b.isCapital && !a.isCapital) return +1;
-            // sort cities before towns
-            if (a.isTown && !b.isTown) return +1;
-            if (b.isTown && !a.isTown) return -1;
-            // sort homelands before distant lands
-            if (a.isDistantLands && !b.isDistantLands) return +1;
-            if (b.isDistantLands && !a.isDistantLands) return -1;
-            // group by localized name
-            const aName = Locale.compose(a.name).toUpperCase();
-            const bName = Locale.compose(b.name).toUpperCase();
-            return Locale.compare(aName, bName);
-        };
-        this._settlementList.sort(citySort);
-        // separate settlements into cities and towns
-        this._cityList = this._settlementList.filter(c => !c.isTown);
-        this._townList = this._settlementList.filter(c => c.isTown);
-        // mark subhead dividers for Distant Lands cities and towns
-        const cityDL = this._cityList.find(s => s.isDistantLands && !s.isCapital);
-        if (cityDL && cityDL !== this._cityList[1] && cityDL !== this._cityList.at(-1)) {
-            cityDL.subhead = "LOC_PLOT_TOOLTIP_HEMISPHERE_WEST";
-        }
-        const townDL = this._townList.find(s => s.isDistantLands);
-        if (townDL && townDL !== this._townList[0] && townDL !== this._townList.at(-1)) {
-            townDL.subhead = "LOC_PLOT_TOOLTIP_HEMISPHERE_WEST";
-        }
-        // send update callback and event
-        if (this.onUpdate) this.onUpdate(this);
-        window.dispatchEvent(new CustomEvent("bz-model-wonder-list-update"));
-    }
-    updateCity(id) {
-        const city = Cities.get(id);
-        if (!city) return;
-        // city details
-        const owner = city.owner;
-        const localId = city.localId;
-        const isCapital = city.isCapital;
-        const isTown = city.isTown;
-        const name = city.name;
-        const location = city.location;
-        const isDistantLands = city.isDistantLands;
-        const population = city.population;
-        const hasDamage = Boolean(city.Constructibles.getIds().find(id => {
-            const item = Constructibles.getByComponentID(id);
-            if (!item?.damaged) return false;  // not damaged
-            const info = GameInfo.Constructibles.lookup(item.type);
-            return (!info.ExistingDistrictOnly);  // not a wall
-        }));
-        const hasUnrest = Boolean(city.Happiness?.hasUnrest);
-        const isRazing = city.isBeingRazed;
-        const isGrowing = city.Growth.growthType == GrowthTypes.EXPAND;
-        const growthTurns = isGrowing ? city.Growth.turnsUntilGrowth : -1;
-        const religion = GameInfo.Religions.lookup(city.Religion?.majorityReligion ?? -1);
-        const religionIcon = religion && UI.getIconURL(religion.ReligionType);
-        // icon
-        const icon =
-            isCapital ? "res_capital" :
-            isTown ? "Yield_Towns" :
-            "Yield_Cities";
-        // compile entry
-        const entry = {
-            city, id, owner, localId, icon, name, isCapital, isTown, isDistantLands,
-            hasDamage, hasUnrest, isRazing, isGrowing,
-            location, population, growthTurns, religion, religionIcon,
-        };
-        if (isTown) {
-            // town focus
-            entry.queueTurns = -1;  // no queue
-            const focusId = isTown && city.Growth ? city.Growth.projectType : -1;
-            if (focusId == -1) {
-                // check for locked focus
-                const projects = Game.CityCommands.canStart(
-                    city.id,
-                    CityCommandTypes.CHANGE_GROWTH_MODE,
-                    { Type: GrowthTypes.PROJECT },
-                    false
-                )?.Projects;
-                if (projects?.length == 1) entry.focus = GameInfo.Projects[projects[0]];
+        // wonder lists
+        const available = [];  // head: LOC_POLICIES_AVAILABLE_POLICIES
+        const inProgress = [];  // head: LOC_PLOT_TOOLTIP_IN_PROGRESS
+        const complete = [];  // head: LOC_LEGACIES_COMPLETE, subhead: age name
+        const skipped = [];  // head: LOC_TRIUMPH_NOT_AVAILABLE
+        // current age
+        const currentAge = GameInfo.Ages.lookup(Game.age);
+        const currentAgeIndex = currentAge.ChronologyIndex;  // TODO
+        console.warn(`TRIX AGE-INDEX ${currentAgeIndex}`);
+        // all wonders
+        const wonders = [...GameInfo.Wonders].map(rules => {
+            const wonderIndex = rules.$index;
+            const hash = rules.$hash;
+            const type = rules.ConstructibleType;
+            const icon = UI.getIconURL(type);
+            // constructible info
+            const info = GameInfo.Constructibles.lookup(hash);
+            const constructibleIndex = info.$index;
+            // age info
+            const age = GameInfo.Ages.lookup(info.Age);
+            const name = info.Name;
+            const ageIndex = age.ChronologyIndex;
+            const ageName = age.Name;
+            const ageType = age.AgeType;
+            return {
+                wonderIndex, constructibleIndex,
+                hash, type, icon,
+                name,
+                ageIndex, ageName, ageType,
+                // info,
+                // age,
+            };
+        });
+        wonders.sort((a, b) => {
+            const aname = Locale.compose(a.name);
+            const bname = Locale.compose(b.name);
+            return b.ageIndex - a.ageIndex || Locale.compare(aname, bname);
+        });
+        this._wonders = new Map(wonders.map(w => [w.hash, w]));
+        // constructed wonders
+        const setConstructionInfo = (instance) => {
+            const wonder = this._wonders.get(instance?.type);
+            if (!wonder) return;
+            wonder.locations ??= [];
+            wonder.locations.push(instance.location);
+            const item = { ...wonder };
+            // ownership
+            item.owner = instance.owner;
+            const hasMet = (id) => {
+                const localID = GameContext.localPlayerID;
+                if (id == localID) return true;
+                return Players.get(localID)?.Diplomacy?.hasMet(id);
+            };
+            if (hasMet(item.owner)) {
+                const player = Players.get(item.owner);
+                const civ = GameInfo.Civilizations.lookup(player.civilizationType);
+                item.civIcon = UI.getIconURL(civ.CivilizationType);
+                item.bgColor = UI.Player.getPrimaryColorValueAsString(item.owner);
+                item.fgColor = UI.Player.getSecondaryColorValueAsString(item.owner);
+                item.sortOwner = item.owner;
             } else {
-                entry.focus = GameInfo.Projects.lookup(focusId);
+                item.civIcon = "blp:civ_sym_unknown";
+                item.bgColor = "black";
+                item.fgColor = "white";
+                item.sortOwner = 1000;
             }
-            const focus = entry.focus;
-            if (isGrowing) {
-                entry.focusIcon = UI.getIcon("PROJECT_GROWTH");
-                const name = "LOC_UI_FOOD_CHOOSER_FOCUS_GROWTH";
-                const desc = "LOC_PROJECT_TOWN_FOOD_INCREASE_DESCRIPTION";
-                entry.focusTooltip =
-                    `[b]${Locale.compose(name)}[/b][n]${Locale.compose(desc)}`;
-            }
-            if (focus) {
-                entry.focusIcon = UI.getIcon(focus.ProjectType);
-                const name = isGrowing ?
-                    Locale.compose(
-                        "LOC_BZ_PARENTHESIS",
-                        focus.Name,
-                        "LOC_UI_PAUSE_SUBTITLE",
-                    ) : Locale.compose(focus.Name);
-                const desc = Locale.compose(focus.Description);
-                const tooltip = `[b]${name}[/b][n]${desc}`;
-                entry.focusTooltip =
-                    isGrowing ? `${entry.focusTooltip}[n] [n]${tooltip}` : tooltip;
-            }
-        } else {
-            // city build queue
-            entry.queueTurns = city.BuildQueue.currentTurnsLeft;
-            const kind = city.BuildQueue.currentProductionKind;
-            const type = city.BuildQueue.currentProductionTypeHash;
-            if (kind == ProductionKind.CONSTRUCTIBLE) {
-                const info = GameInfo.Constructibles.lookup(type);
-                entry.queueKind = "CONSTRUCTIBLE";
-                entry.queueClass = info.ConstructibleClass;
-                entry.queueIcon = UI.getIcon(info.ConstructibleType);
-                entry.queueTooltip = info.Name;
-            } else if (kind == ProductionKind.UNIT) {
-                const info = GameInfo.Units.lookup(type);
-                entry.queueKind = "UNIT";
-                entry.queueIcon = UI.getIcon(info.UnitType);
-                entry.queueTooltip = info.Name;
-            } else if (kind == ProductionKind.PROJECT) {
-                const info = GameInfo.Projects.lookup(type);
-                entry.queueKind = "PROJECT";
-                entry.queueIcon = UI.getIcon(info.ProjectType);
-                entry.queueTooltip = info.Name;
+            // location
+            item.city = Cities.get(instance.cityId);
+            const list = instance.complete ? complete : inProgress;
+            const revealedState = GameplayMap.getRevealedState(
+                GameContext.localObserverID,
+                instance.location.x,
+                instance.location.y
+            );
+            item.revealedState = revealedState;
+            item.isRevealed = revealedState != RevealedStates.HIDDEN;
+            if (item.isRevealed) item.location = instance.location;
+            // finish
+            list.push(item);
+        };
+        const width = GameplayMap.getGridWidth();
+        const height = GameplayMap.getGridHeight();
+        for (let x = 0; x < width; x++) {
+            for (let y = 0; y < height; y++) {
+                for (const id of MapConstructibles.getConstructibles(x, y)) {
+                    const instance = Constructibles.getByComponentID(id);
+                    setConstructionInfo(instance);
+                }
             }
         }
-        this._cities.set(localId, entry);
+        // in-progress wonders
+        inProgress.sort((a, b) => {
+            // TODO: secondary sort by turns left
+            const aname = Locale.compose(a.name);
+            const bname = Locale.compose(b.name);
+            return Locale.compare(aname, bname);
+        });
+        // complete wonders
+        complete.sort((a, b) => {
+            // sort by age, then owner, then name
+            const aname = Locale.compose(a.name);
+            const bname = Locale.compose(b.name);
+            return b.ageIndex - a.ageIndex || a.sortOwner - b.sortOwner ||
+                Locale.compare(aname, bname);
+        });
+        for (let i = 0; i < currentAgeIndex; ++i) {
+            const sub = complete.find(w => w.ageIndex == i);
+            if (sub) sub.subhead = sub.ageName;
+        }
+        // available and skipped wonders
+        for (const wonder of wonders.values()) {
+            if (wonder.locations) continue;
+            const list = wonder.ageIndex == currentAgeIndex ? available : skipped;
+            list.push(wonder);
+        }
+        this._wonderList = { available, inProgress, complete, skipped };
     }
-    onCityUpdate(event) {
-        const id = event?.cityID;
-        if (id) {
-            // ignore events for cities we don't own
-            if (ComponentID.isInvalid(id)) return;
-            if (id.owner != GameContext.localObserverID) return;
-        }
-        this.updateGate.call("onCityUpdate");
+    onWonderUpdate(_event) {
+        this.updateGate.call("onWonderUpdate");
     }
 }
 
 const bzWonderList = new bzWonderListModel();
 engine.whenReady.then(() => {
-  const updateModel = () => {
-    engine.updateWholeModel(bzWonderList);
-  };
-  engine.createJSModel("g_bzWonderListModel", bzWonderList);
-  bzWonderList.updateCallback = updateModel;
+    const updateModel = () => {
+        engine.updateWholeModel(bzWonderList);
+    };
+    engine.createJSModel("g_bzWonderListModel", bzWonderList);
+    bzWonderList.updateCallback = updateModel;
 });
 
 export { bzWonderList };

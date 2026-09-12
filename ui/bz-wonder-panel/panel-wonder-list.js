@@ -1,12 +1,14 @@
 import { Focus } from '/core/ui/input/focus-support.js';
 import { AnchorType } from '/core/ui/panel-support.js';
-import TooltipManager from '/core/ui/tooltips/tooltip-manager.js';
 import Databind from '/core/ui/utilities/utilities-core-databinding.js';
 import { MinimapSubpanel } from '/base-standard/ui/mini-map/panel-mini-map.js';
+// production tooltip support
+import { ProductionTooltip } from '/base-standard/ui-next/tooltips/production-tooltip.js';
+import { render } from '/core/vendor/solid-js/web/dist/web.js';
+import { TooltipVerticalPosition, TooltipHorizontalPosition } from '/core/ui-next/components/tooltip.js';
+// mod imports
 import { bzPanelMiniMap } from '/bz-map-trix/ui/mini-map/bz-panel-mini-map.js';
 import { bzWonderList } from '/bz-map-trix/ui/bz-wonder-panel/model-wonder-list.js';
-
-const BZ_CITY_TOOLTIP_STYLE = "bz-city-tooltip";
 
 const styles = "fs://game/bz-map-trix/ui/bz-wonder-panel/panel-wonder-list.css";
 
@@ -14,7 +16,7 @@ class bzWonderPanel extends MinimapSubpanel {
     static savedScrollPosition = 0;
     panel = document.createElement("fxs-vslot");
     inputContext = InputContext.World;
-    activateCityListener = this.activateCity.bind(this);
+    activateWonderListener = this.activateWonder.bind(this);
     listContainer = document.createElement("fxs-scrollable");
     constructor(root) {
         super(root);
@@ -46,56 +48,60 @@ class bzWonderPanel extends MinimapSubpanel {
         this.panel.appendChild(frame);
         this.listContainer.classList.value = "bz-wonder-list-scrollable";
         frame.appendChild(this.listContainer);
+    }
+    update() {
+        this.listContainer.innerHTML = "";
         this.renderList(
-            "LOC_UI_SETTLEMENT_TAB_BAR_CITIES",
-            "g_bzWonderListModel.cityList",
-            "mt-1",
+            "LOC_POLICIES_AVAILABLE_POLICIES",
+            bzWonderList.wonderList.available,
+            "mt-0\\.5",
         );
         this.renderList(
-            "LOC_UI_SETTLEMENT_TAB_BAR_TOWNS",
-            "g_bzWonderListModel.townList",
+            "LOC_PLOT_TOOLTIP_IN_PROGRESS",
+            bzWonderList.wonderList.inProgress,
+            "mt-2",
+        );
+        this.renderList(
+            "LOC_LEGACIES_COMPLETE",
+            bzWonderList.wonderList.complete,
+            "mt-2",
+        );
+        this.renderList(
+            "LOC_TRIUMPH_NOT_AVAILABLE",
+            bzWonderList.wonderList.skipped,
             "mt-2",
         );
     }
     renderList(headline, list, ...style) {
-        const hasCityTooltip = TooltipManager.types[BZ_CITY_TOOLTIP_STYLE] != null;
         const header = document.createElement("fxs-header");
         header.classList.add("font-title-sm");
         if (style.length) header.classList.add(...style);
         header.setAttribute("title", headline);
         header.setAttribute("filigree-style", "h4");
-        Databind.classToggle(header, "hidden", `{{${list}.length}}==0`);
+        header.classList.toggle("hidden", list.length == 0);
         this.listContainer.appendChild(header);
         // table rows
-        const row = document.createElement("div");
-        row.classList.value = "flex flex-col text.sm";
-        this.listContainer.appendChild(row);
-        Databind.for(row, list, "entry");
-        {
+        for (const item of list) {
+            const row = document.createElement("div");
+            row.classList.value = "flex flex-col text.sm";
+            this.listContainer.appendChild(row);
             const subhead = document.createElement("fxs-header");
             subhead.setAttribute("filigree-style", "none");
             subhead.setAttribute("header-bg-glow", true);
             // match height of entry row (6px above, 3px below)
             subhead.classList.add("font-title-xs", "py-px", "mt-1\\.25", "mb-0\\.5");
-            Databind.classToggle(subhead, "hidden", "!{{entry.subhead}}");
-            Databind.attribute(subhead, "title", "entry.subhead");
+            subhead.classList.toggle("hidden", !item.subhead);
+            subhead.setAttribute("title", item.subhead);
             row.appendChild(subhead);
             const entry = document.createElement("fxs-activatable");
-            entry.addEventListener("action-activate", this.activateCityListener);
+            entry.addEventListener("action-activate", this.activateWonderListener);
             entry.classList.value =
                 "bz-wonder-list-entry flex justify-between items-center py-px";
             entry.setAttribute("tabindex", "-1");
-            if (hasCityTooltip) {
-                entry.setAttribute("data-tooltip-style", BZ_CITY_TOOLTIP_STYLE);
+            if (item.location) {
+                entry.setAttribute("data-wonder-location", JSON.stringify(item.location));
             }
-            Databind.attribute(entry, "data-city-owner", "entry.owner");
-            Databind.attribute(entry, "data-city-local-id", "entry.localId");
-            Databind.classToggle(entry, "bz-town-has-focus", "!!{{entry.focus}}");
-            Databind.classToggle(entry, "bz-town-is-growing", "!!{{entry.isGrowing}}");
-            Databind.classToggle(entry, "bz-wonder-has-damage", "!!{{entry.hasDamage}}");
-            Databind.classToggle(entry, "bz-wonder-has-unrest", "!!{{entry.hasUnrest}}");
-            Databind.classToggle(entry, "bz-wonder-is-razing", "!!{{entry.isRazing}}");
-            row.appendChild(entry);
+            entry.classList.toggle("text-accent-4", item.owner != null && !item.location);
             // title section (left side)
             const title = document.createElement("div");
             title.classList.value =
@@ -103,115 +109,37 @@ class bzWonderPanel extends MinimapSubpanel {
             entry.appendChild(title);
             // icon
             const icon = document.createElement("div");
-            icon.classList.value = "bz-wonder-list-icon bz-icon relative size-6";
-            const typeIcon = document.createElement("div");
-            typeIcon.classList.value = "bz-icon absolute size-full";
-            Databind.classToggle(typeIcon, "hidden", "!!{{entry.religionIcon}}");
-            Databind.bgImg(typeIcon, "entry.icon");
+            icon.classList.value = "bz-wonder-list-icon bz-icon relative size-6 mx-1";
+            const typeIcon = document.createElement("img");
+            typeIcon.classList.value = "absolute size-full";
+            typeIcon.src = item.icon;
             icon.appendChild(typeIcon);
-            const religionIcon = document.createElement("div");
-            religionIcon.classList.value = "bz-icon absolute size-full";
-            religionIcon.style.backgroundSize = "1.1111111111rem";
-            Databind.bgImg(religionIcon, "entry.religionIcon");
-            icon.appendChild(religionIcon);
             title.appendChild(icon);
             // name
             const name = document.createElement("div");
             name.classList.value =
                 "bz-wonder-list-name shrink font-fit-shrink truncate mx-1";
-            Databind.loc(name, "{{entry.name}}");
+            name.setAttribute("data-l10n-id", item.name);
             title.appendChild(name);
+            // tooltip
+            this.addProductionTooltip(row, entry, item);
             // stats section (right side)
             const stats = document.createElement("div");
             stats.classList.value =
                 "bz-wonder-list-stats flex flex-none justify-end items-center";
             entry.appendChild(stats);
-            function turnTimer(style, turns) {
-                const column = document.createElement("div");
-                column.classList.add("text-center");
-                column.style.width = "calc(1.2em + 1.6666666667rem)";  // two digits
-                const timer = document.createElement("div");
-                timer.classList.value = style;
-                timer.classList.add("flex", "items-center", "justify-center", "pl-1\\.5");
-                Databind.classToggle(column, "invisible", `{{${turns}}}==-1`);
-                const timerTurns = document.createElement("div");
-                timerTurns.classList.value = "text-right";
-                timerTurns.style.width = "calc(1.2em)";  // two digits
-                Databind.value(timerTurns, turns);
-                timer.appendChild(timerTurns);
-                const timerClock = document.createElement("div");
-                timerClock.classList.value = "bz-icon size-6";
-                timerClock.style.backgroundImage = "url('hud_turn-timer')";
-                timer.appendChild(timerClock);
-                column.appendChild(timer);
-                stats.appendChild(column);
-                return column;
+            // owner
+            if (item.owner != null) {
+                const background = document.createElement("div");
+                background.classList.value = "bz-icon relative size-6 mx-1 rounded-full";
+                background.style.backgroundColor = item.bgColor;
+                stats.appendChild(background);
+                const icon = document.createElement("img");
+                icon.classList.value = "bz-icon absolute size-full bg-center bg-contain bg-no-repeat";
+                icon.src = item.civIcon;
+                icon.style.filter = `fxs-color-tint(${item.fgColor})`;
+                background.appendChild(icon);
             }
-            // population
-            const growth = document.createElement("div");
-            growth.classList.value = "bz-wonder-growth flex items-center";
-            const population = document.createElement("div");
-            population.classList.value = "bz-wonder-list-population text-center mx-1";
-            population.style.width = "1.2em";  // two digits
-            Databind.value(population, "{{entry.population}}");
-            growth.appendChild(population);
-            const growthTurns = turnTimer(
-                "bz-wonder-growth-turns",
-                "entry.growthTurns",
-            );
-            growthTurns.classList.add("mx-1");
-            growth.appendChild(growthTurns);
-            stats.appendChild(growth);
-            // city queue
-            const queue = document.createElement("div");
-            Databind.classToggle(queue, "hidden", "{{entry.isTown}}");
-            queue.classList.value = "bz-wonder-queue flex items-center";
-            Databind.attribute(queue, "bz-qkind", "entry.queueKind");
-            Databind.attribute(queue, "bz-qclass", "entry.queueClass");
-            const queueTurns = turnTimer(
-                "bz-wonder-queue-turns",
-                "entry.queueTurns",
-            );
-            queueTurns.classList.add("mx-1");
-            queue.appendChild(queueTurns);
-            const qslot = document.createElement("div");
-            qslot.classList.value = "bz-wonder-list-queue relative size-6 mx-1";
-            const queueBG = document.createElement("div");
-            queueBG.classList.value = "bz-wonder-list-bg absolute size-full";
-            Databind.classToggle(queueBG, "hidden", "!{{entry.queueIcon}}");
-            qslot.appendChild(queueBG);
-            const queueIcon = document.createElement("div");
-            queueIcon.classList.value = "bz-wonder-list-queue-icon bz-icon size-full";
-            Databind.bgImg(queueIcon, "entry.queueIcon");
-            if (!hasCityTooltip) Databind.tooltip(queueIcon, "entry.queueTooltip");
-            queueBG.appendChild(queueIcon);
-            queue.appendChild(qslot);
-            stats.appendChild(queue);
-            // town focus
-            const focus = document.createElement("div");
-            Databind.classToggle(focus, "hidden", "!{{entry.isTown}}");
-            focus.classList.value = "bz-wonder-list-focus relative size-6 mx-1";
-            const focusBG = document.createElement("div");
-            focusBG.classList.value = "bz-wonder-list-bg absolute size-full";
-            Databind.classToggle(focusBG, "hidden", "!{{entry.focusIcon}}");
-            focus.appendChild(focusBG);
-            const focusIcon = document.createElement("div");
-            focusIcon.classList.value = "bz-wonder-list-focus-icon bz-icon size-full";
-            Databind.bgImg(focusIcon, "entry.focusIcon");
-            Databind.tooltip(focusIcon, "entry.focusTooltip");
-            focusBG.appendChild(focusIcon);
-            stats.appendChild(focus);
-            // unrest and razing
-            const unrest = document.createElement("div");
-            unrest.classList.value = "bz-wonder-list-unrest hidden relative size-6 mx-1";
-            const unrestBG = document.createElement("div");
-            unrestBG.classList.value = "bz-wonder-list-bg absolute size-full";
-            unrest.appendChild(unrestBG);
-            const unrestIcon = document.createElement("div");
-            unrestIcon.classList.value = "bz-wonder-list-unrest-icon bz-icon size-full";
-            Databind.bgImg(unrestIcon, "entry.unrestIcon");
-            unrestBG.appendChild(unrestIcon);
-            stats.appendChild(unrest);
         }
         // finish
         this.Root.appendChild(this.panel);
@@ -220,11 +148,16 @@ class bzWonderPanel extends MinimapSubpanel {
         super.onAttach();
         window.addEventListener("bz-model-wonder-list-update", this.modelUpdateListener);
         bzPanelMiniMap.toggleCooldownTimer = 250;
+        this.disposeTooltips.forEach((dispose) => dispose());
+        this.disposeTooltips = [];
+        this.update();
     }
     onDetach() {
         super.onDetach();
         window.removeEventListener("bz-model-wonder-list-update", this.modelUpdateListener);
         bzPanelMiniMap.toggleCooldownTimer = 500;
+        this.disposeTooltips.forEach((dispose) => dispose());
+        this.disposeTooltips = [];
     }
     onReceiveFocus() {
         super.onReceiveFocus();
@@ -233,14 +166,28 @@ class bzWonderPanel extends MinimapSubpanel {
     close() {
         super.close();
     }
-    activateCity(event) {
+    activateWonder(event) {
         if (event.target instanceof HTMLElement) {
-            const data = event.target.getAttribute("data-wonder-local-id");
+            const data = event.target.getAttribute("data-wonder-location");
             if (!data) return;
-            const localId = JSON.parse(data);
-            const city = bzWonderList.cities.get(localId);
-            Camera.lookAtPlot(city.location);
+            const location = JSON.parse(data);
+            Camera.lookAtPlot(location);
         }
+    }
+    disposeTooltips = [];
+    addProductionTooltip(parent, child, data) {
+      const dispose = render(
+        () => ProductionTooltip({
+          children: child,
+          name: data.name,
+          type: data.type,
+          initialHPosition: TooltipHorizontalPosition.RIGHT,
+          initialVPosition: TooltipVerticalPosition.CENTER
+        }),
+        parent
+      );
+      this.disposeTooltips.push(dispose);
+      return dispose;
     }
 }
 Controls.define("bz-wonder-panel", {
