@@ -19,7 +19,7 @@ class bzWonderPanel extends MinimapSubpanel {
     activateWonderListener = this.activateWonder.bind(this);
     modelUpdateListener = this.onModelUpdate.bind(this);
     listContainer = document.createElement("fxs-scrollable");
-    scrollArea = null;
+    scrollArea = document.createElement("div");
     constructor(root) {
         super(root);
         this.animateInType = this.animateOutType = AnchorType.Fade;
@@ -50,12 +50,10 @@ class bzWonderPanel extends MinimapSubpanel {
         this.panel.appendChild(frame);
         this.listContainer.classList.value = "bz-wonder-list-scrollable";
         frame.appendChild(this.listContainer);
+        this.scrollArea.classList.value = "bz-wonder-list-scroll-area flex-col w-full";
+        this.listContainer.appendChild(this.scrollArea);
     }
     update() {
-        // TODO: verify this
-        this.scrollArea = this.scrollArea ?
-            this.listContainer.component.scrollArea :
-            this.listContainer;
         this.scrollArea.innerHTML = "";
         this.renderList(
             "LOC_POLICIES_AVAILABLE_POLICIES",
@@ -73,8 +71,7 @@ class bzWonderPanel extends MinimapSubpanel {
             "LOC_TRIUMPH_NOT_AVAILABLE",
             bzWonderList.wonderList.skipped,
         );
-        this.scrollArea.querySelector("fxs-header")?.classList
-            .replace("mt-2", "mt-0\\.5");
+        this.scrollArea.firstChild?.classList.replace("mt-2", "mt-0\\.5");
     }
     renderList(headline, list) {
         const header = document.createElement("fxs-header");
