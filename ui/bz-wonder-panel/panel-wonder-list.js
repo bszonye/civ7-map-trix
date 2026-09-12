@@ -54,28 +54,25 @@ class bzWonderPanel extends MinimapSubpanel {
         this.renderList(
             "LOC_POLICIES_AVAILABLE_POLICIES",
             bzWonderList.wonderList.available,
-            "mt-0\\.5",
         );
         this.renderList(
             "LOC_PLOT_TOOLTIP_IN_PROGRESS",
             bzWonderList.wonderList.inProgress,
-            "mt-2",
         );
         this.renderList(
             "LOC_LEGACIES_COMPLETE",
             bzWonderList.wonderList.complete,
-            "mt-2",
         );
         this.renderList(
             "LOC_TRIUMPH_NOT_AVAILABLE",
             bzWonderList.wonderList.skipped,
-            "mt-2",
         );
+        this.listContainer.querySelector("fxs-header")?.classList
+            .replace("mt-2", "mt-0\\.5");
     }
-    renderList(headline, list, ...style) {
+    renderList(headline, list) {
         const header = document.createElement("fxs-header");
-        header.classList.add("font-title-sm");
-        if (style.length) header.classList.add(...style);
+        header.classList.add("font-title-sm", "mt-2");
         header.setAttribute("title", headline);
         header.setAttribute("filigree-style", "h4");
         header.classList.toggle("hidden", list.length == 0);
@@ -128,6 +125,26 @@ class bzWonderPanel extends MinimapSubpanel {
             stats.classList.value =
                 "bz-wonder-list-stats flex flex-none justify-end items-center";
             entry.appendChild(stats);
+            // build turns
+            if (item.buildTurns) {
+                const column = document.createElement("div");
+                column.classList.value = "text-center mx-0\\.5";
+                column.style.minWidth = "calc(1.2em + 1.6666666667rem)";  // two digits
+                stats.appendChild(column);
+                const timer = document.createElement("div");
+                timer.classList.value =
+                    "bz-wonder-build-turns flex items-center justify-center pl-1\\.5";
+                const timerTurns = document.createElement("div");
+                timerTurns.classList.value = "text-right";
+                timerTurns.style.minWidth = "calc(1.2em)";  // two digits
+                timerTurns.textContent = item.buildTurns;
+                timer.appendChild(timerTurns);
+                const timerClock = document.createElement("img");
+                timerClock.classList.value = "bz-icon size-6";
+                timerClock.src = "blp:hud_turn-timer";
+                timer.appendChild(timerClock);
+                column.appendChild(timer);
+            }
             // owner
             if (item.owner != null) {
                 const background = document.createElement("div");
@@ -135,7 +152,7 @@ class bzWonderPanel extends MinimapSubpanel {
                 background.style.backgroundColor = item.bgColor;
                 stats.appendChild(background);
                 const icon = document.createElement("img");
-                icon.classList.value = "bz-icon absolute size-full bg-center bg-contain bg-no-repeat";
+                icon.classList.value = "bz-icon absolute size-6";
                 icon.src = item.civIcon;
                 icon.style.filter = `fxs-color-tint(${item.fgColor})`;
                 background.appendChild(icon);

@@ -35,7 +35,7 @@ class bzWonderListModel {
         const skipped = [];  // head: LOC_TRIUMPH_NOT_AVAILABLE
         // current age
         const currentAge = GameInfo.Ages.lookup(Game.age);
-        const currentAgeIndex = currentAge.ChronologyIndex;  // TODO
+        const currentAgeIndex = currentAge.ChronologyIndex;
         console.warn(`TRIX AGE-INDEX ${currentAgeIndex}`);
         // all wonders
         const wonders = [...GameInfo.Wonders].map(rules => {
@@ -74,6 +74,22 @@ class bzWonderListModel {
             wonder.locations ??= [];
             wonder.locations.push(instance.location);
             const item = { ...wonder };
+            // location
+            item.city = Cities.get(instance.cityId);
+            const list = instance.complete ? complete : inProgress;
+            const revealedState = GameplayMap.getRevealedState(
+                GameContext.localObserverID,
+                instance.location.x,
+                instance.location.y
+            );
+            item.revealedState = revealedState;
+            item.isRevealed = revealedState != RevealedStates.HIDDEN;
+            if (item.isRevealed) item.location = instance.location;
+            // build turns
+            if (!instance.complete) {
+                const buildQueue = item.city.BuildQueue;
+                item.buildTurns = buildQueue.getTurnsLeft(item.hash);
+            }
             // ownership
             item.owner = instance.owner;
             const hasMet = (id) => {
@@ -94,17 +110,6 @@ class bzWonderListModel {
                 item.fgColor = "white";
                 item.sortOwner = 1000;
             }
-            // location
-            item.city = Cities.get(instance.cityId);
-            const list = instance.complete ? complete : inProgress;
-            const revealedState = GameplayMap.getRevealedState(
-                GameContext.localObserverID,
-                instance.location.x,
-                instance.location.y
-            );
-            item.revealedState = revealedState;
-            item.isRevealed = revealedState != RevealedStates.HIDDEN;
-            if (item.isRevealed) item.location = instance.location;
             // finish
             list.push(item);
         };
@@ -120,10 +125,10 @@ class bzWonderListModel {
         }
         // in-progress wonders
         inProgress.sort((a, b) => {
-            // TODO: secondary sort by turns left
             const aname = Locale.compose(a.name);
             const bname = Locale.compose(b.name);
-            return Locale.compare(aname, bname);
+            return Locale.compare(aname, bname) ||
+                a.buildTurns - b.buildTurns || a.sortOwner - b.sortOwner;
         });
         // complete wonders
         complete.sort((a, b) => {
