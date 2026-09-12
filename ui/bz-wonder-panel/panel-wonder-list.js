@@ -98,11 +98,12 @@ class bzWonderPanel extends MinimapSubpanel {
             if (item.location) {
                 entry.setAttribute("data-wonder-location", JSON.stringify(item.location));
             }
-            entry.classList.toggle("text-accent-4", item.owner != null && !item.location);
+            entry.classList.toggle("text-accent-4", item.isRevealed === false);
             // title section (left side)
             const title = document.createElement("div");
             title.classList.value =
                 "bz-wonder-list-title flex shrink justify-start items-center";
+            title.classList.toggle("invisible", item.isRacing === true);
             entry.appendChild(title);
             // icon
             const icon = document.createElement("div");

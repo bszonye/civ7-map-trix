@@ -130,6 +130,11 @@ class bzWonderListModel {
             return Locale.compare(aname, bname) ||
                 a.buildTurns - b.buildTurns || a.sortOwner - b.sortOwner;
         });
+        let lastType = null;
+        for (const item of inProgress) {
+            item.isRacing = item.type == lastType;
+            lastType = item.type;
+        }
         // complete wonders
         complete.sort((a, b) => {
             // sort by age, then owner, then name
