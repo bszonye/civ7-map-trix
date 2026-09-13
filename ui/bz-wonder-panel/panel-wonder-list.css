@@ -67,8 +67,3 @@
 .bz-wonder-list-entry.pressed .bz-icon {
   filter: drop-shadow(0 0.0555555556rem 0.1111111111rem #000c);
 }
-.bz-wonder-list-entry:focus .bz-icon-bg,
-.bz-wonder-list-entry:hover .bz-icon-bg,
-.bz-wonder-list-entry.pressed .bz-icon-bg {
-    opacity: 0.8;
-}

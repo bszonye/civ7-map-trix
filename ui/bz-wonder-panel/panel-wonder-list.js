@@ -107,7 +107,7 @@ class bzWonderPanel extends MinimapSubpanel {
             // title section (left side)
             const title = document.createElement("div");
             title.classList.value =
-                "bz-wonder-list-title flex flex-auto justify-start items-center my-px";
+                "bz-wonder-list-title flex flex-auto justify-start items-center py-px";
             title.classList.toggle("invisible", item.isRacing === true);
             // entry.appendChild(title);
             this.addProductionTooltip(entry, title, item);
@@ -149,12 +149,9 @@ class bzWonderPanel extends MinimapSubpanel {
             if (item.owner != null) {
                 const owner = document.createElement("div");
                 owner.classList.value =
-                    "bz-wonder-list-bg relative flex-col justify-center h-full mx-1";
+                    "bz-wonder-list-bg flex-col justify-center size-6 mx-1 rounded-full";
+                owner.style.backgroundColor = item.bgColor;
                 entry.appendChild(owner);
-                const bg = document.createElement("div");
-                bg.classList.value = "bz-icon-bg absolute size-full";
-                bg.style.backgroundColor = item.bgColor;
-                owner.appendChild(bg);
                 const icon = document.createElement("div");
                 icon.classList.value = "bz-icon flex-auto size-6";
                 icon.style.backgroundImage = `url(${item.civIcon})`;
