@@ -15,7 +15,7 @@ const styles = "fs://game/bz-map-trix/ui/bz-wonder-panel/panel-wonder-list.css";
 class bzWonderPanel extends MinimapSubpanel {
     static savedScrollPosition = 0;
     panel = document.createElement("fxs-vslot");
-    inputContext = InputContext.World;
+    inputContext = InputContext.Unit;
     activateWonderListener = this.activateWonder.bind(this);
     modelUpdateListener = this.onModelUpdate.bind(this);
     listContainer = document.createElement("fxs-scrollable");

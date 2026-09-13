@@ -13,7 +13,7 @@ const styles = "fs://game/bz-map-trix/ui/bz-city-panel/panel-city-list.css";
 class bzCityPanel extends MinimapSubpanel {
     static savedScrollPosition = 0;
     panel = document.createElement("fxs-vslot");
-    inputContext = InputContext.World;
+    inputContext = InputContext.Unit;
     activateCityListener = this.activateCity.bind(this);
     modelUpdateListener = this.onModelUpdate.bind(this);
     listContainer = document.createElement("fxs-scrollable");
