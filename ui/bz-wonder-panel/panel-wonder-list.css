@@ -70,5 +70,5 @@
 .bz-wonder-list-entry:focus .bz-icon-bg,
 .bz-wonder-list-entry:hover .bz-icon-bg,
 .bz-wonder-list-entry.pressed .bz-icon-bg {
-    opacity: 0.667;
+    opacity: 0.8;
 }
