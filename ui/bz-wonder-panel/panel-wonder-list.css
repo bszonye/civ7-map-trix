@@ -53,17 +53,23 @@
   background-color: #a33d2966;
   border-radius: 1em;
 }
+.bz-wonder-owner {
+  opacity: 0.85;
+}
 .bz-wonder-list-entry:focus, .bz-wonder-list-entry:hover, .bz-wonder-list-entry.pressed {
   text-shadow: 0 0.0555555556rem 0.1111111111rem black;
   background: linear-gradient(90deg, #8c7e62 0%, #4c473d 100%);
   color: #e5e5e5;
 }
-.bz-wonder-list-entry:focus .bz-wonder-list-bg,
-.bz-wonder-list-entry:hover .bz-wonder-list-bg,
-.bz-wonder-list-entry.pressed .bz-wonder-list-bg,
 .bz-wonder-list-entry:focus .bz-icon,
 .bz-wonder-list-entry:hover .bz-icon,
 .bz-wonder-list-entry.pressed .bz-icon {
+  filter: drop-shadow(0 0.0555555556rem 0.1111111111rem #000c);
+}
+.bz-wonder-list-entry:focus .bz-wonder-owner,
+.bz-wonder-list-entry:hover .bz-wonder-owner,
+.bz-wonder-list-entry.pressed .bz-wonder-owner {
+  opacity: 1;
   filter: drop-shadow(0 0.0555555556rem 0.1111111111rem #000c);
 }
 .bz-wonder-list-entry:focus .bz-wonder-build-turns,
@@ -71,3 +77,4 @@
 .bz-wonder-list-entry.pressed .bz-wonder-build-turns {
   filter: drop-shadow(0 0.0555555556rem 0.0555555556rem black);
 }
+/* vim: set sw=2 et : */

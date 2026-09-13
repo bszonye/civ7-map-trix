@@ -145,7 +145,7 @@ class bzWonderPanel extends MinimapSubpanel {
             if (item.owner != null) {
                 const owner = document.createElement("div");
                 owner.classList.value =
-                    "bz-wonder-list-bg flex-col justify-center size-6 mx-1 rounded-full";
+                    "bz-wonder-owner flex-col justify-center size-6 mx-1 rounded-full";
                 owner.style.backgroundColor = item.bgColor;
                 owner.setAttribute("data-tooltip-content", item.ownerTooltip);
                 entry.appendChild(owner);
