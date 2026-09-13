@@ -13,20 +13,24 @@ class bzWonderListModel {
     };
     constructor() {
         this.updateGate.call("constructor");
-        // TODO: events that change build times
+        // events that can change build queues or production rate
         engine.on("CityPopulationChanged", this.onWonderUpdateListener);
         engine.on("CityProductionChanged", this.onWonderUpdateListener);
+        engine.on("CityProductionQueueChanged", this.cityProductionWonderUpdateListener);
         engine.on("CityProductionUpdated", this.onWonderUpdateListener);
         engine.on("CityYieldChanged", this.onWonderUpdateListener);
         engine.on("CityYieldGranted", this.onWonderUpdateListener);
         engine.on("ConstructibleAddedToMap", this.onWonderUpdateListener);
         engine.on("ConstructibleRemovedFromMap", this.onWonderUpdateListener);
+        engine.on("DiplomacyEventEnded", this.onWonderUpdateListener);
+        engine.on("DiplomacyEventStarted", this.onWonderUpdateListener);
+        engine.on("DiplomacyRelationshipChanged", this.onWonderUpdateListener);
         engine.on("LocalPlayerChanged", this.onWonderUpdateListener);
+        engine.on("PlayerResourceChanged", this.onWonderUpdateListener);
+        engine.on("PlayerTurnActivated", this.onWonderUpdateListener);
         engine.on("ResourceAssigned", this.onWonderUpdateListener);
         engine.on("ResourceUnassigned", this.onWonderUpdateListener);
         engine.on("WonderCompleted", this.onWonderUpdateListener);
-        engine.on('PlayerResourceChanged', this.onWonderUpdateListener);
-        engine.on('PlayerTurnActivated', this.onWonderUpdateListener);
     }
     set updateCallback(callback) {
         this.onUpdate = callback;

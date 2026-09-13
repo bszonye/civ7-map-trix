@@ -96,7 +96,7 @@ class bzWonderPanel extends MinimapSubpanel {
             const entry = document.createElement("fxs-activatable");
             entry.addEventListener("action-activate", this.activateWonderListener);
             entry.classList.value =
-                "bz-wonder-list-entry flex justify-between items-center py-px";
+                "bz-wonder-list-entry flex justify-between items-center";
             entry.setAttribute("tabindex", "-1");
             if (item.location) {
                 entry.setAttribute("data-wonder-location", JSON.stringify(item.location));
@@ -105,7 +105,7 @@ class bzWonderPanel extends MinimapSubpanel {
             // title section (left side)
             const title = document.createElement("div");
             title.classList.value =
-                "bz-wonder-list-title flex shrink justify-start items-center";
+                "bz-wonder-list-title flex shrink justify-start items-center my-px";
             title.classList.toggle("invisible", item.isRacing === true);
             entry.appendChild(title);
             // icon
@@ -127,7 +127,7 @@ class bzWonderPanel extends MinimapSubpanel {
             // stats section (right side)
             const stats = document.createElement("div");
             stats.classList.value =
-                "bz-wonder-list-stats flex flex-none justify-end items-center";
+                "bz-wonder-list-stats flex flex-none justify-end items-center h-full";
             entry.appendChild(stats);
             // build turns
             if (item.buildTurns) {
@@ -151,15 +151,19 @@ class bzWonderPanel extends MinimapSubpanel {
             }
             // owner
             if (item.owner != null) {
-                const background = document.createElement("div");
-                background.classList.value = "bz-icon relative size-6 mx-1 rounded-full";
-                background.style.backgroundColor = item.bgColor;
-                stats.appendChild(background);
-                const icon = document.createElement("img");
-                icon.classList.value = "bz-icon absolute size-6";
-                icon.src = item.civIcon;
+                const owner = document.createElement("div");
+                owner.classList.value =
+                    "bz-wonder-list-bg relative flex-col justify-center h-full mx-1";
+                stats.appendChild(owner);
+                const bg = document.createElement("div");
+                bg.classList.value = "bz-icon-bg absolute size-full";
+                bg.style.backgroundColor = item.bgColor;
+                owner.appendChild(bg);
+                const icon = document.createElement("div");
+                icon.classList.value = "bz-icon flex-auto size-6";
+                icon.style.backgroundImage = `url(${item.civIcon})`;
                 icon.style.filter = `fxs-color-tint(${item.fgColor})`;
-                background.appendChild(icon);
+                owner.appendChild(icon);
             }
         }
         // finish
