@@ -50,7 +50,6 @@ class bzWonderListModel {
         // current age
         const currentAge = GameInfo.Ages.lookup(Game.age);
         const currentAgeIndex = currentAge.ChronologyIndex;
-        console.warn(`TRIX AGE-INDEX ${currentAgeIndex}`);
         // all wonders
         const wonders = [...GameInfo.Wonders].map(rules => {
             const wonderIndex = rules.$index;
@@ -114,11 +113,17 @@ class bzWonderListModel {
             if (hasMet(item.owner)) {
                 const player = Players.get(item.owner);
                 const civ = GameInfo.Civilizations.lookup(player.civilizationType);
+                item.ownerTooltip = [
+                    `[style:text-secondary]${Locale.compose(item.city.name)}[/style]`,
+                    Locale.compose(player.civilizationFullName),
+                    Locale.compose(player.name),
+                ].join("[n]");
                 item.civIcon = UI.getIconURL(civ.CivilizationType);
                 item.bgColor = UI.Player.getPrimaryColorValueAsString(item.owner);
                 item.fgColor = UI.Player.getSecondaryColorValueAsString(item.owner);
                 item.sortOwner = item.owner;
             } else {
+                item.ownerTooltip = "LOC_UI_UNMET_PLAYER_NAME";
                 item.civIcon = "blp:civ_sym_unknown";
                 item.bgColor = "black";
                 item.fgColor = "white";
