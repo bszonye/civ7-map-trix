@@ -104,13 +104,13 @@ class bzWonderPanel extends MinimapSubpanel {
             entry.classList.toggle("text-accent-4", item.isRevealed === false);
             // tooltip
             row.appendChild(entry);
-            // title section (left side)
-            const title = document.createElement("div");
-            title.classList.value =
+            // wonder description section (left side)
+            const wonder = document.createElement("div");
+            wonder.classList.value =
                 "bz-wonder-list-title flex flex-auto justify-start items-center py-px";
-            title.classList.toggle("invisible", item.isRacing === true);
-            // entry.appendChild(title);
-            this.addProductionTooltip(entry, title, item);
+            wonder.classList.toggle("invisible", item.isRacing === true);
+            // entry.appendChild(wonder);
+            this.addProductionTooltip(entry, wonder, item);
             // icon
             const icon = document.createElement("div");
             icon.classList.value = "bz-wonder-list-icon bz-icon relative size-6 mx-1";
@@ -118,22 +118,18 @@ class bzWonderPanel extends MinimapSubpanel {
             typeIcon.classList.value = "absolute size-full";
             typeIcon.src = item.icon;
             icon.appendChild(typeIcon);
-            title.appendChild(icon);
+            wonder.appendChild(icon);
             // name
             const name = document.createElement("div");
             name.classList.value =
                 "bz-wonder-list-name flex-auto font-fit-shrink truncate mx-1";
             name.setAttribute("data-l10n-id", item.name);
-            title.appendChild(name);
+            wonder.appendChild(name);
             // build turns
             if (item.buildTurns) {
-                const column = document.createElement("div");
-                column.classList.value = "text-center mx-0\\.5";
-                column.style.minWidth = "calc(1.2em + 1.6666666667rem)";  // two digits
-                title.appendChild(column);
                 const timer = document.createElement("div");
                 timer.classList.value =
-                    "bz-wonder-build-turns flex items-center justify-center pl-1\\.5";
+                    "bz-wonder-build-turns flex items-center justify-center pl-1\\.5 mx-0\\.5";
                 const timerTurns = document.createElement("div");
                 timerTurns.classList.value = "text-right";
                 timerTurns.style.minWidth = "calc(1.2em)";  // two digits
@@ -143,7 +139,7 @@ class bzWonderPanel extends MinimapSubpanel {
                 timerClock.classList.value = "bz-icon size-6";
                 timerClock.src = "blp:hud_turn-timer";
                 timer.appendChild(timerClock);
-                column.appendChild(timer);
+                wonder.appendChild(timer);
             }
             // owner
             if (item.owner != null) {
