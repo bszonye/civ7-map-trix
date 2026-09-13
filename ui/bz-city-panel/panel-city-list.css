@@ -118,6 +118,5 @@
 .bz-city-list-entry:focus .bz-city-queue-turns,
 .bz-city-list-entry:hover .bz-city-queue-turns,
 .bz-city-list-entry.pressed .bz-city-queue-turns {
-  filter: drop-shadow(0 0.0555555556rem 0.1111111111rem #000c)
-          drop-shadow(0 0.0555555556rem 0.1111111111rem #000c);
+  filter: drop-shadow(0 0.0555555556rem 0.0555555556rem black);
 }
