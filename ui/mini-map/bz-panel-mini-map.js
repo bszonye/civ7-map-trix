@@ -295,12 +295,10 @@ class bzPanelMiniMap {
         this.wonderButton = this.component.miniMapButtonRow.lastChild;
         this.wonderButton.classList.add("bz-wonder-button");
     }
-    beforeToggleSubpanel(subpanel, force) {
+    beforeToggleSubpanel(_subpanel, _force) {
         // prevent infinite loop after force-closing subpanel
-        console.warn(`TRIX TOGGLE ${subpanel.tag} ${force}`);
         if (this.component.activeSubpanel &&
             !ContextManager.hasInstanceOf(this.component.activeSubpanel.tag)) {
-            console.warn(`TRIX PANEL ${this.component.activeSubpanel.tag}`);
             this.component.activeSubpanel = null;
         }
     }
