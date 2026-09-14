@@ -108,12 +108,12 @@ class bzWonderPanel extends MinimapSubpanel {
             const wonder = document.createElement("div");
             wonder.classList.value =
                 "bz-wonder-list-title flex flex-auto justify-start items-center py-px";
-            wonder.classList.toggle("invisible", item.isRacing === true);
             // entry.appendChild(wonder);
             this.addProductionTooltip(entry, wonder, item);
             // icon
             const icon = document.createElement("div");
             icon.classList.value = "bz-wonder-list-icon bz-icon relative size-6 mx-1";
+            icon.classList.toggle("invisible", item.isRacing === true);
             const typeIcon = document.createElement("img");
             typeIcon.classList.value = "absolute size-full";
             typeIcon.src = item.icon;
@@ -123,6 +123,7 @@ class bzWonderPanel extends MinimapSubpanel {
             const name = document.createElement("div");
             name.classList.value =
                 "bz-wonder-list-name flex-auto font-fit-shrink truncate mx-1";
+            name.classList.toggle("invisible", item.isRacing === true);
             name.setAttribute("data-l10n-id", item.name);
             wonder.appendChild(name);
             // build turns
