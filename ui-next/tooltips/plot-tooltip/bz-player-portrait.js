@@ -8,7 +8,7 @@ import { Tooltip } from '/core/ui-next/components/tooltip.js';
 import { getSettlementIconInfo } from '/core/ui-next/utilities/settlement-utilities.js';
 import { Icon as IconComponent } from '/core/ui-next/components/icon.js';
 
-var _tmpl$ = /* @__PURE__ */ template(`<div class="-z-1 relative h-16 w-9 flex-1 flex flex-row justify-center mx-1.5 -mt-8"><div class="absolute inset-0"></div><div class="absolute inset-0"></div><div class="absolute inset-0"></div><div class="bg-contain bg-center bg-no-repeat relative self-end mb-3 size-6"></div></div>`), _tmpl$2 = /* @__PURE__ */ template(`<div class="z-0 relative flex flex-col items-center justify-center"data-name=PlotTooltipPlayerPortrait></div>`);
+var _tmpl$ = /* @__PURE__ */ template(`<div class="-z-1 relative h-16 w-9 flex-1 flex flex-row justify-center mx-1.5 -mt-8"><div class="absolute inset-0"></div><div class="absolute inset-0"></div><div class="absolute inset-0"></div><div class="bg-contain bg-center bg-no-repeat relative self-end mb-3 size-6"></div></div>`), _tmpl$2 = /* @__PURE__ */ template(`<div class="z-0 relative flex flex-col items-center justify-center"data-name="PlotTooltipPlayerPortrait"></div>`);
 const PlotTooltipPlayerPortrait = (props) => {
   const [bannerColor, setBannerColor] = createSignal("");
   const [civSymbol, setCivSymbol] = createSignal("");
