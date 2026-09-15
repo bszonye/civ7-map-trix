@@ -7,8 +7,12 @@ import ContextManager from '/core/ui/context-manager/context-manager.js';
 import '/base-standard/ui/interface-modes/interface-mode-unit-selected.js';
 import '/base-standard/ui/lenses/layer/conquest-layer.js';
 import '/base-standard/ui/lenses/layer/hexgrid-layer.js';
+import '/base-standard/ui/lenses/layer/trade-layer.js';
 import '/base-standard/ui/lenses/lens/default-lens.js';
+import '/base-standard/ui/lenses/lens/continent-lens.js';
 import '/base-standard/ui/lenses/lens/discovery-lens.js';
+import '/base-standard/ui/lenses/lens/general-appeal-lens.js';
+import '/base-standard/ui/lenses/lens/settler-lens.js';
 import '/base-standard/ui/lenses/lens/trade-lens.js';
 
 const LENS_CATALOG_OBJECT_NAME = "tracked-lens";
