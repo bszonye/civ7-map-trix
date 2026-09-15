@@ -87,15 +87,25 @@ function getBiomeLabel(location, showDebug) {
   return "";
 }
 function getAppealLabel(location, _showDebug) {
+  const showValue = Configuration.getUser().getValue("ShowAppealValues");
   const appeal = GameplayMap.getAppeal(location.x, location.y);
+  const info = { appeal };
   if (appeal >= getGlobalParamNumber("APPEAL_FOR_DOUBLE_HAPPINESS_TILE_YIELD")) {
-    return `{LOC_UI_BREATHTAKING_APPEAL_SHORT} (${appeal})`;
+    info.name = "LOC_UI_BREATHTAKING_APPEAL_SHORT";
+    info["class"] = "bz-style-breathtaking-appeal";
   } else if (appeal >= getGlobalParamNumber("APPEAL_FOR_HAPPINESS_TILE_YIELD")) {
-    return `{LOC_UI_CHARMING_APPEAL_SHORT} (${appeal})`;
+    info.name = "LOC_UI_CHARMING_APPEAL_SHORT";
+    info["class"] = "bz-style-charming-appeal";
   } else if (!GameplayMap.isWater(location.x, location.y)) {
-    return `{LOC_UI_AVERAGE_APPEAL_SHORT} (${appeal})`;
+    if (!showValue) return null;  // don't show Average everywhere
+    info.name = "LOC_UI_AVERAGE_APPEAL_SHORT";
+    info["class"] = "bz-style-average-appeal";
+  } else {
+    return null;
   }
-  return "";
+  info.text = showValue ?
+    `{${info.name}} [style:bz-appeal-number font-title-2xs]${appeal}[/style]` : info.name;
+  return info;
 }
 function getFeatureInfo(location, plotIndex) {
   let label = "";
