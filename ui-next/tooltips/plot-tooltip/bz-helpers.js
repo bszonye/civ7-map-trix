@@ -1,6 +1,7 @@
 // NOTE: file renamed to avoid import conflict with
 //       ui-next/screens/choosers/helpers.js
 import { ComponentID } from '/core/ui/utilities/utilities-component-id.js';
+import { getGlobalParamNumber } from '/core/ui/utilities/utilities-data.js';
 import { Icon } from '/core/ui/utilities/utilities-image.js';
 import DistrictHealthManager from '/base-standard/ui/district/district-health-manager.js';
 
@@ -82,6 +83,17 @@ function getBiomeLabel(location, showDebug) {
     } else {
       return biome.Name;
     }
+  }
+  return "";
+}
+function getAppealLabel(location, _showDebug) {
+  const appeal = GameplayMap.getAppeal(location.x, location.y);
+  if (appeal >= getGlobalParamNumber("APPEAL_FOR_DOUBLE_HAPPINESS_TILE_YIELD")) {
+    return `{LOC_UI_BREATHTAKING_APPEAL_SHORT} (${appeal})`;
+  } else if (appeal >= getGlobalParamNumber("APPEAL_FOR_HAPPINESS_TILE_YIELD")) {
+    return `{LOC_UI_CHARMING_APPEAL_SHORT} (${appeal})`;
+  } else if (!GameplayMap.isWater(location.x, location.y)) {
+    return `{LOC_UI_AVERAGE_APPEAL_SHORT} (${appeal})`;
   }
   return "";
 }
@@ -475,7 +487,7 @@ function getTreasureConvoyInfo(owningCity) {
   return { turnsRemaining: owningCity.Resources.getTurnsUntilTreasureGenerated() };
 }
 
-export { getAgelessTypes, getBiomeLabel, getConstructibleInfo, getContinentName, getCurrentAge, getDistrictHealthInfo, getFeatureInfo, getOwnerInfo, getPlotYields, getResource, getRiverLabel, getRouteData, getSettlementName, getSpecialistDescription, getTerrainLabel, getTreasureConvoyInfo, getUnitEntries, getVisiblePlotEffects };
+export { buildUnitInfoProps, getAgelessTypes, getAppealLabel, getBiomeLabel, getConstructibleInfo, getContinentName, getCurrentAge, getDistrictHealthInfo, getFeatureInfo, getOwnerInfo, getPlotYields, getResource, getRiverLabel, getRouteData, getSettlementName, getSpecialistDescription, getTerrainLabel, getTreasureConvoyInfo, getUnitEntries, getVisiblePlotEffects };
 export { bzGetRelationship };
 //# sourceMappingURL=helpers.js.map
 // vim: sw=2 et
