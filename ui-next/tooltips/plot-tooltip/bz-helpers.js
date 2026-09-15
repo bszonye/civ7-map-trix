@@ -1,6 +1,7 @@
 // NOTE: file renamed to avoid import conflict with
 //       ui-next/screens/choosers/helpers.js
 import { ComponentID } from '/core/ui/utilities/utilities-component-id.js';
+import { getGlobalParamNumber } from '/core/ui/utilities/utilities-data.js';
 import { Icon } from '/core/ui/utilities/utilities-image.js';
 import DistrictHealthManager from '/base-standard/ui/district/district-health-manager.js';
 
@@ -85,6 +86,27 @@ function getBiomeLabel(location, showDebug) {
   }
   return "";
 }
+function getAppealLabel(location, _showDebug) {
+  const showValue = Configuration.getUser().getValue("ShowAppealValues");
+  const appeal = GameplayMap.getAppeal(location.x, location.y);
+  const info = { appeal };
+  if (appeal >= getGlobalParamNumber("APPEAL_FOR_DOUBLE_HAPPINESS_TILE_YIELD")) {
+    info.name = "LOC_UI_BREATHTAKING_APPEAL_SHORT";
+    info["class"] = "bz-style-breathtaking-appeal";
+  } else if (appeal >= getGlobalParamNumber("APPEAL_FOR_HAPPINESS_TILE_YIELD")) {
+    info.name = "LOC_UI_CHARMING_APPEAL_SHORT";
+    info["class"] = "bz-style-charming-appeal";
+  } else if (!GameplayMap.isWater(location.x, location.y)) {
+    if (!showValue) return null;  // don't show Average everywhere
+    info.name = "LOC_UI_AVERAGE_APPEAL_SHORT";
+    info["class"] = "bz-style-average-appeal";
+  } else {
+    return null;
+  }
+  info.text = showValue ?
+    `{${info.name}} [style:bz-appeal-value font-title-2xs]${appeal}[/style]` : info.name;
+  return info;
+}
 function getFeatureInfo(location, plotIndex) {
   let label = "";
   let tooltip = "";
@@ -136,18 +158,18 @@ function getRouteData(location) {
   const routeTypeHash = GameplayMap.getRouteType(location.x, location.y);
   const route = GameInfo.Routes.lookup(routeTypeHash);
   const isFerry = GameplayMap.isFerry(location.x, location.y);
-  let returnString = "";
+  let name;
   if (route) {
     if (isFerry) {
-      returnString = Locale.compose(
+      name = Locale.compose(
         "{1_RouteName} {LOC_PLOT_DIVIDER_DOT} {2_Ferry}",
         route.Name,
         "LOC_NAVIGABLE_RIVER_FERRY"
       );
     } else {
-      returnString = route.Name;
+      name = route.Name;
     }
-    return { name: returnString, type: route.RouteType };
+    return { name, type: route.RouteType };
   }
   return null;
 }
@@ -475,7 +497,7 @@ function getTreasureConvoyInfo(owningCity) {
   return { turnsRemaining: owningCity.Resources.getTurnsUntilTreasureGenerated() };
 }
 
-export { getAgelessTypes, getBiomeLabel, getConstructibleInfo, getContinentName, getCurrentAge, getDistrictHealthInfo, getFeatureInfo, getOwnerInfo, getPlotYields, getResource, getRiverLabel, getRouteData, getSettlementName, getSpecialistDescription, getTerrainLabel, getTreasureConvoyInfo, getUnitEntries, getVisiblePlotEffects };
+export { buildUnitInfoProps, getAgelessTypes, getAppealLabel, getBiomeLabel, getConstructibleInfo, getContinentName, getCurrentAge, getDistrictHealthInfo, getFeatureInfo, getOwnerInfo, getPlotYields, getResource, getRiverLabel, getRouteData, getSettlementName, getSpecialistDescription, getTerrainLabel, getTreasureConvoyInfo, getUnitEntries, getVisiblePlotEffects };
 export { bzGetRelationship };
 //# sourceMappingURL=helpers.js.map
 // vim: sw=2 et

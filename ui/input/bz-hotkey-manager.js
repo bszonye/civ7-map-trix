@@ -62,6 +62,7 @@ HotkeyManager.handleInput = function(...args) {
             }
             case "open-bz-city-panel":
             case "open-bz-units-panel":
+            case "open-bz-wonder-panel":
             case "open-bz-lens-panel":
                 this.sendHotkeyEvent(name);
                 return false;

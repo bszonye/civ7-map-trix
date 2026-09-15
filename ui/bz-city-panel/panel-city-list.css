@@ -48,11 +48,11 @@
  right: -0.6666666667rem;
 }
 .bz-city-growth-turns {
-  background-color: #80b34d55;
+  background-color: #80b34d66;
   border-radius: 1em;
 }
 .bz-city-queue-turns {
-  background-color: #a33d2955;
+  background-color: #a33d2966;
   border-radius: 1em;
 }
 .bz-city-list-entry .bz-city-list-bg {
@@ -110,6 +110,13 @@
 .bz-city-list-entry:focus .bz-icon,
 .bz-city-list-entry:hover .bz-icon,
 .bz-city-list-entry.pressed .bz-icon {
-  /* filter: drop-shadow(0 0.0555555556rem 0.1111111111rem #000c); */
   filter: drop-shadow(0 0.0555555556rem 0.1111111111rem #000c);
+}
+.bz-city-list-entry:focus .bz-city-growth-turns,
+.bz-city-list-entry:hover .bz-city-growth-turns,
+.bz-city-list-entry.pressed .bz-city-growth-turns,
+.bz-city-list-entry:focus .bz-city-queue-turns,
+.bz-city-list-entry:hover .bz-city-queue-turns,
+.bz-city-list-entry.pressed .bz-city-queue-turns {
+  filter: drop-shadow(0 0.0555555556rem 0.0555555556rem black);
 }

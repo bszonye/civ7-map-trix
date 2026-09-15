@@ -13,8 +13,9 @@ const styles = "fs://game/bz-map-trix/ui/bz-city-panel/panel-city-list.css";
 class bzCityPanel extends MinimapSubpanel {
     static savedScrollPosition = 0;
     panel = document.createElement("fxs-vslot");
-    inputContext = InputContext.World;
+    inputContext = InputContext.Unit;
     activateCityListener = this.activateCity.bind(this);
+    modelUpdateListener = this.onModelUpdate.bind(this);
     listContainer = document.createElement("fxs-scrollable");
     constructor(root) {
         super(root);
@@ -49,7 +50,7 @@ class bzCityPanel extends MinimapSubpanel {
         this.renderList(
             "LOC_UI_SETTLEMENT_TAB_BAR_CITIES",
             "g_bzCityListModel.cityList",
-            "mt-1",
+            "mt-0\\.5",
         );
         this.renderList(
             "LOC_UI_SETTLEMENT_TAB_BAR_TOWNS",
@@ -242,6 +243,7 @@ class bzCityPanel extends MinimapSubpanel {
             Camera.lookAtPlot(city.location);
         }
     }
+    onModelUpdate() { }
 }
 Controls.define("bz-city-panel", {
     createInstance: bzCityPanel,
