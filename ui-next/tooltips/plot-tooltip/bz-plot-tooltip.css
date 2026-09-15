@@ -188,8 +188,9 @@
   border-color: #2010fd;
 }
 .bz-plot-tooltip .bz-style-breathtaking-appeal {
-  background-color: #002000e6;
-  border-color: #90b717;
+  /* background-color: #002000ee; */
+  background-color: #003000;
+  border-color: #90b71733;
   color: #90b717;
 }
 .bz-plot-tooltip .bz-style-charming-appeal {
@@ -201,7 +202,7 @@
   background-color: #9b8181b3;
   border-color: #9b8181;
 }
-.bz-plot-tooltip .bz-appeal-number {
+.bz-plot-tooltip .bz-appeal-value {
   color: white;
   background-color: #000a;
   border-radius: 0.2222222222rem;

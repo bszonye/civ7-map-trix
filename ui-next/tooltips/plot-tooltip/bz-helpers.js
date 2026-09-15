@@ -104,7 +104,7 @@ function getAppealLabel(location, _showDebug) {
     return null;
   }
   info.text = showValue ?
-    `{${info.name}} [style:bz-appeal-number font-title-2xs]${appeal}[/style]` : info.name;
+    `{${info.name}} [style:bz-appeal-value font-title-2xs]${appeal}[/style]` : info.name;
   return info;
 }
 function getFeatureInfo(location, plotIndex) {
