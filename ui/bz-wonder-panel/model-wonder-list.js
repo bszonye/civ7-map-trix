@@ -114,9 +114,9 @@ class bzWonderListModel {
                 const player = Players.get(item.owner);
                 const civ = GameInfo.Civilizations.lookup(player.civilizationType);
                 item.ownerTooltip = [
-                    `[style:text-secondary]${Locale.compose(item.city.name)}[/style]`,
-                    Locale.compose(player.civilizationFullName),
-                    Locale.compose(player.name),
+                    `[style:text-secondary]{${item.city.name}}[/style]`,
+                    `{${player.civilizationFullName}}`,
+                    `{${player.name}}`,
                 ].join("[n]");
                 item.civIcon = UI.getIconURL(civ.CivilizationType);
                 item.bgColor = UI.Player.getPrimaryColorValueAsString(item.owner);
