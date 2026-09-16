@@ -4,6 +4,10 @@
 .bz-plot-tooltip .img-tooltip-border--wide {
   padding: 0.8888888889rem;
 }
+/* tighten margin below inspect/hide controls */
+.bz-plot-tooltip .img-tooltip-border > .flex.items-center.justify-center:last-child {
+  margin-bottom: -0.3333333333rem;
+}
 
 .bz-plot-tooltip {
   /* game colors */

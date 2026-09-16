@@ -32,7 +32,8 @@ import { bzGetRelationship } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/bz
 import { BZ_DOT_JOINER, bzPill } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/components/bz-utility.js';
 
 // TRIX: various styling changes
-var _tmpl$ = /* @__PURE__ */ template(`<div class="flex flex-row gap-1"></div>`),
+var
+  _tmpl$ = /* @__PURE__ */ template(`<div class="flex flex-row gap-1"></div>`),
   _tmpl$2 = /* @__PURE__ */ template(`<div class="flex items-center"></div>`),
   _tmpl$3 = /* @__PURE__ */ template(`<div></div>`),
   _tmpl$4 = /* @__PURE__ */ template(`<div class="flex flex-row"><div class="flex-auto"></div><div class="font-body text-sm text-accent-3"></div></div>`),
