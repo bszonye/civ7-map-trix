@@ -1,5 +1,11 @@
-.bz-plot-tooltip .img-tooltip-border.p-4 {
+.bz-plot-tooltip .img-tooltip-border {
   padding: 0.6666666667rem 0.6666666667rem 0.2222222222rem;
+}
+.bz-plot-tooltip .img-tooltip-border--wide {
+  padding: 0.6666666667rem;
+}
+.bz-plot-tooltip .bz-tooltip-border--random-event {
+  padding: 0.6666666667rem 1.3333333333rem;
 }
 
 .bz-plot-tooltip {
