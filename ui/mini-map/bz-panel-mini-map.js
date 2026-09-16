@@ -2,7 +2,7 @@ import bzMapTrixOptions, { bzCommanderLens } from '/bz-map-trix/ui/options/bz-ma
 import { InputEngineEventName } from '/core/ui/input/input-support.js';
 import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
 import LensManager from '/core/ui/lenses/lens-manager.js';
-import ContextManager from '/core/ui/context-manager/context-manager.js';
+import { ContextManager } from '/core/ui/context-manager/context-manager.js';
 // guarantee import order for patching
 import '/base-standard/ui/interface-modes/interface-mode-unit-selected.js';
 import '/base-standard/ui/lenses/layer/conquest-layer.js';
