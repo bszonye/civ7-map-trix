@@ -1,4 +1,5 @@
 import HotkeyManager from '/core/ui/input/hotkey-manager.js';
+import { InputHandlerState } from '/core/ui/input/input-support.js';
 import LensManager from '/core/ui/lenses/lens-manager.js';
 import { ComponentID } from '/core/ui/utilities/utilities-component-id.js';
 import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
@@ -37,14 +38,14 @@ HotkeyManager.handleInput = function(...args) {
             case "bz-capital-city": {
                 const player = Players.get(GameContext.localObserverID);
                 const capital = player?.Cities?.getCapital();
-                if (!capital) return false;
+                if (!capital) return InputHandlerState.Handled;
                 const selected = UI.Player.getHeadSelectedCity();
                 if (ComponentID.isValid(selected)) {
                     // city view: switch to capital
                     if (ComponentID.isMatch(selected, capital.id)) {
                         // capital already selected: close panel
                         UI.Player.deselectAllCities();
-                        return false;
+                        return InputHandlerState.Handled;
                     }
                     UI.Player.selectCity(capital.id);
                 } else {
@@ -54,18 +55,18 @@ HotkeyManager.handleInput = function(...args) {
                     if (center && center.x == loc.x && center.y == loc.y) {
                         // capital already centered: select it
                         UI.Player.selectCity(capital.id);
-                        return false;
+                        return InputHandlerState.Handled;
                     }
                     Camera.lookAtPlot(loc);
                 }
-                return false;
+                return InputHandlerState.Handled;
             }
             case "open-bz-city-panel":
             case "open-bz-units-panel":
             case "open-bz-wonder-panel":
             case "open-bz-lens-panel":
                 this.sendHotkeyEvent(name);
-                return false;
+                return InputHandlerState.Handled;
             case "toggle-fxs-settler-lens":
             case "toggle-fxs-continent-lens":
             case "toggle-fxs-trade-lens":
@@ -77,7 +78,7 @@ HotkeyManager.handleInput = function(...args) {
                 const lens = name.substr("toggle-".length);
                 if (LensManager.getActiveLens() != lens) {
                     LensManager.setActiveLens(lens);
-                    return false;
+                    return InputHandlerState.Handled;
                 }
                 // else: fall through to toggle the lens off
             }
@@ -87,7 +88,7 @@ HotkeyManager.handleInput = function(...args) {
                 const handler = InterfaceMode.getInterfaceModeHandler(mode);
                 const lens = handler?.bzDefaultLens ?? "fxs-default-lens";
                 LensManager.setActiveLens(lens);
-                return false;
+                return InputHandlerState.Handled;
             }
             case "toggle-bz-culture-borders-layer":
             case "toggle-bz-city-borders-layer":
@@ -99,7 +100,7 @@ HotkeyManager.handleInput = function(...args) {
             case "toggle-bz-wonder-layer":
             case "toggle-fxs-conquest-layer":
                 this.sendLayerHotkeyEvent(name);
-                return false;
+                return InputHandlerState.Handled;
         }
     }
     // default handler
