@@ -1582,16 +1582,7 @@ const PlotTooltipComponent = (props) => {
                   const tooltipKind = createMemo(() => getPlotTooltipKind(currentPlotCoords()));
                   return createComponent(Tooltip.Frame, {
                     get ["class"]() {
-                      // TRIX: customize tooltip frame
-                      const value = "relative flex flex-col";
-                      switch (tooltipKind()) {
-                        case "settlement-recommendation":
-                          return `${value} img-tooltip-border--wide`;
-                        case "random-event":
-                          return `${value} bz-tooltip-border--random-event`;
-                        default:
-                          return value;
-                      }
+                      return `relative flex flex-col ${tooltipKind() === "settlement-recommendation" ? "img-tooltip-border--wide" : ""}`;
                     },
                     get children() {
                       return createComponent(Switch, {
