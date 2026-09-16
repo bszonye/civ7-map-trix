@@ -94,6 +94,12 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS_TT" Language="ko_KR">
             <Text>유닛 패널 엽니다.</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_WONDERS" Language="ko_KR">
+            <Text>불가사의 열기</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_WONDERS_TT" Language="ko_KR">
+            <Text>불가사의 패널 엽니다.</Text>
+        </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_DEFAULT_BZ" Language="ko_KR">
             <Text>렌즈: 없음</Text>
         </Replace>

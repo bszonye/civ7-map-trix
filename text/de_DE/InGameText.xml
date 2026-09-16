@@ -86,13 +86,19 @@
             <Text>Siedlungen öffnen</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_SETTLEMENTS_TT" Language="de_DE">
-            <Text>Öffnet das Siedlungenmenu</Text>
+            <Text>Öffnet das Siedlungenmenü</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS" Language="de_DE">
             <Text>Einheiten öffnen</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS_TT" Language="de_DE">
-            <Text>Öffnet das Einheitenmenu</Text>
+            <Text>Öffnet das Einheitenmenü</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_WONDERS" Language="de_DE">
+            <Text>Wunder öffnen</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_WONDERS_TT" Language="de_DE">
+            <Text>Öffnet das Wundermenü</Text>
         </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_DEFAULT_BZ" Language="de_DE">
             <Text>Linsen: Ohne</Text>

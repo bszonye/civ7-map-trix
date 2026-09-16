@@ -94,6 +94,12 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS_TT" Language="zh_Hant_HK">
             <Text>開啟單位面板</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_WONDERS" Language="zh_Hant_HK">
+            <Text>開啟奇觀</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_WONDERS_TT" Language="zh_Hant_HK">
+            <Text>開啟奇觀面板</Text>
+        </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_DEFAULT_BZ" Language="zh_Hant_HK">
             <Text>視圖：無</Text>
         </Replace>

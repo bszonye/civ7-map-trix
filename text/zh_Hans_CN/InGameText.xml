@@ -94,6 +94,12 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS_TT" Language="zh_Hans_CN">
             <Text>打开单位面板</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_WONDERS" Language="zh_Hans_CN">
+            <Text>打开奇观</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_WONDERS_TT" Language="zh_Hans_CN">
+            <Text>打开奇观面板</Text>
+        </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_DEFAULT_BZ" Language="zh_Hans_CN">
             <Text>滤镜：无</Text>
         </Replace>
