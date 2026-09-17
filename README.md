@@ -55,6 +55,7 @@ every map menu, lens, and decoration layer has a hotkey:
 - `7` Commander lens
 - `Shift+S` Settlements panel
 - `Shift+U` Units panel
+- `Shift+W` Wonders panel
 - `Shift+B` Borders
 - `Shift+C` City Limits
 - `Shift+D` Discoveries
@@ -62,7 +63,7 @@ every map menu, lens, and decoration layer has a hotkey:
 - `Shift+R` Religion
 - `Shift+X` Roads
 - `Shift+T` Terrain
-- `Shift+W` Wonders
+- `Shift+N` Wonders
 - `Shift+Q` Conquest
 
 ## localization
