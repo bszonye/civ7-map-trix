@@ -11,9 +11,10 @@ many small improvements to the new map tooltips:
 - improved layout and consistency with more compact text
 - hotkey (Shift) to temporarily hide the tooltip
 
-## settlement and unit lists
-two new panels list every settlement in your empire and every unit on
-the map.  click the list to visit a settlement or select a unit.
+## settlement, unit, and wonder lists
+three new panels list every settlement and unit in your empire plus
+every wonder on the map.  click the list to select a unit or zoom the
+map.
 
 ## better yield banner
 the system bar adds new backgrounds to the empire yield banner, with
