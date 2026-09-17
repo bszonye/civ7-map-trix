@@ -69,7 +69,10 @@ const ConstructibleRow = (props) => {
     return entryIcons;
   });
   return createComponent(TicketRow, {
-    "class": "pr-0\\.5",  // TRIX: align right edge with unit flags
+    get ["class"]() {  // TRIX: reduced opacity for incomplete items
+      const complete = props.constructible.complete ? "opacity-100" : "opacity-65";
+      return `${complete} pr-0\\.5`;  // align right edge with unit flags
+    },
     get icon() {
       return createComponent(Icon, {
         get ["class"]() {
