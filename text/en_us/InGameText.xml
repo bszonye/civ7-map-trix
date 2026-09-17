@@ -94,6 +94,12 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS_TT">
             <Text>Open the Units panel</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_WONDERS">
+            <Text>Open Wonders</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_WONDERS_TT">
+            <Text>Open the Wonders panel</Text>
+        </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_DEFAULT_BZ">
             <Text>Lenses: None</Text>
         </Replace>

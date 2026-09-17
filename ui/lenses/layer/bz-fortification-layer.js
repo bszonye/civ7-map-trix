@@ -4,11 +4,7 @@ import '/bz-map-trix/ui/mini-map/bz-panel-mini-map.js';
 
 const SPRITE_OFFSET = { x: 0, y: 0, z: 5 };
 const SPRITE_SCALE = 2;
-var SpriteGroup;
-(function (SpriteGroup) {
-    SpriteGroup[SpriteGroup["bzFortification"] = 0] = "bzFortification";
-    SpriteGroup[SpriteGroup["All"] = Number.MAX_VALUE] = "All";
-})(SpriteGroup || (SpriteGroup = {}));
+
 class bzFortificationLensLayer {
     bzSpriteGrid = WorldUI.createSpriteGrid(
         "bzFortificationLayer_SpriteGroup",

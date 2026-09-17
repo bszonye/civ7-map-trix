@@ -1,3 +1,4 @@
+import CommanderInteract from '/base-standard/ui/commander-interact/model-commander-interact.js';
 import LensManager from '/core/ui/lenses/lens-manager.js';
 import { ComponentID } from '/core/ui/utilities/utilities-component-id.js';
 import { Icon } from '/core/ui/utilities/utilities-image.js';
@@ -45,7 +46,6 @@ class bzUnitListModel {
     player = Players.get(GameContext.localObserverID);
     onUpdate;
     updateGate = new UpdateGate(() => this.update());
-    pauseSelection = false;
     _selectedUnit = null;
     _types = new Map();
     _typeList = [];
@@ -346,15 +346,10 @@ class bzUnitListModel {
             UI.Player.lookAtID(group.id, 0);
             UI.Player.selectUnit(group.id);
         } else if (group && !unit.isCommander) {
-            // select the group first
-            this.pauseSelection = true;
+            // select the unit within its command group
+            CommanderInteract.setArmyCommander(group.id);
             UI.Player.lookAtID(group.id, 0);
-            UI.Player.selectUnit(group.id);
-            // and give it time to settle
-            requestAnimationFrame(() => {
-                this.pauseSelection = false;
-                UI.Player.selectUnit(unit.id);
-            });
+            UI.Player.selectUnit(unit.id);
         } else if (unit.isOnMap) {
             // select the unit
             UI.Player.lookAtID(unit.id, 0);
@@ -367,7 +362,6 @@ class bzUnitListModel {
         this.updateGate.call("onPlayerChanged");
     }
     onUnitSelection(event) {
-        if (this.pauseSelection) return;
         const id = event?.unit;
         if (!id || ComponentID.isInvalid(id)) return;
         this.updateUnit(id);

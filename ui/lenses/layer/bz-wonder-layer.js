@@ -29,24 +29,22 @@ Controls.define("bz-plot-icon-wonders", {
 
 // bugfix for plot-icons-root
 class bzPlotIconsRoot {
-    static c_prototype;
-    static c_on_removeIcon;
+    static c;
     constructor(component) {
         this.component = component;
-        component.bzComponent = this;
-        this.patchPrototypes(this.component);
-    }
-    patchPrototypes(component) {
-        const c_prototype = Object.getPrototypeOf(component);
-        if (bzPlotIconsRoot.c_prototype == c_prototype) return;
-        // patch component methods
-        const proto = bzPlotIconsRoot.c_prototype = c_prototype;
-        // replace onRemoveIcon
-        bzPlotIconsRoot.c_onRemoveIcon = proto.onRemoveIcon;
-        proto.onRemoveIcon = function(event) {
-            return this.bzComponent.onRemoveIcon(event);
-        }
+        this.component.bzMapTrix = this;
+        this.patchPrototype(Object.getPrototypeOf(component));
         component.removeIconListener = component.onRemoveIcon.bind(component);
+    }
+    patchPrototype(proto) {
+        if (bzPlotIconsRoot.c) return;  // one-time initialization
+        // patch PlotIconsRoot methods & properties
+        const c = bzPlotIconsRoot.c = { proto };
+        // replace onRemoveIcon
+        c.onRemoveIcon = c.proto.onRemoveIcon;
+        c.proto.onRemoveIcon = function(event) {
+            return this.bzMapTrix.onRemoveIcon(event);
+        }
     }
     beforeAttach() { }
     afterAttach() { }

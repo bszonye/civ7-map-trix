@@ -7,7 +7,7 @@ import { Tooltip } from '/core/ui-next/components/tooltip.js';
 import { TicketSection, TicketRow } from './bz-utility.js';
 import { getTreasureConvoyInfo } from '../bz-helpers.js';
 
-var _tmpl$ = /* @__PURE__ */ template(`<div class="flex flex-col items-center ml-2 shrink-0"><div class="size-6 bg-contain bg-center bg-no-repeat"></div><span class="font-body text-xs text-accent-2"></span></div>`), _tmpl$2 = /* @__PURE__ */ template(`<div class=flex></div>`);
+var _tmpl$ = /* @__PURE__ */ template(`<div class="flex flex-col items-center ml-2 shrink-0"><div class="size-6 bg-contain bg-center bg-no-repeat"></div><span class="font-body text-xs text-accent-2"></span></div>`), _tmpl$2 = /* @__PURE__ */ template(`<div class="flex"></div>`);
 const TreasureConvoySection = (props) => {
   const convoy = createMemo(() => getTreasureConvoyInfo(props.owningCity));
   return createComponent(TicketSection, {

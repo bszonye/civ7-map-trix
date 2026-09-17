@@ -11,6 +11,7 @@ import { ComponentRegistry } from '/core/ui-next/services/component-registry.js'
 import { FocusManager } from '/core/ui-next/services/focus-manager.js';
 import { isFocusable } from '/core/ui-next/services/focus.js';
 import { IsTouchActive, IsMouseActive } from '/core/ui-next/services/input.js';
+import { createSignalFromDebugWidget } from '/core/ui-next/utilities/debug-widgets.js';
 import { ProductionPanelCategory } from '/base-standard/ui/production-chooser/production-chooser-helpers.js';
 // import { PillText, Pill } from '/core/ui-next/components/pills.js';
 import { YieldBarEntryStyle, YieldBar } from '/base-standard/ui-next/components/yield-bar.js';
@@ -22,7 +23,7 @@ import { VolcanoSection } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/compo
 import { PlotTooltipPlayerPortrait } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/bz-player-portrait.js';
 import { ProductionTooltip } from '/base-standard/ui-next/tooltips/production-tooltip.js';
 import { hasArcheologyData, ArcheologyPlotTooltipContent } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/bz-archeology-content.js';
-import { getSettlementName, getOwnerInfo, getResource, getSpecialistDescription, getCurrentAge, getAgelessTypes, getTerrainLabel, getBiomeLabel, getFeatureInfo, getContinentName, getRiverLabel, getConstructibleInfo, getVisiblePlotEffects, getUnitEntries, getPlotYields, getRouteData } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/bz-helpers.js';
+import { getSettlementName, getOwnerInfo, getResource, getSpecialistDescription, getCurrentAge, getAgelessTypes, getTerrainLabel, getAppealLabel, getBiomeLabel, getFeatureInfo, getContinentName, getRiverLabel, getConstructibleInfo, getVisiblePlotEffects, getUnitEntries, getPlotYields, getRouteData } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/bz-helpers.js';
 import { hasRandomEventData, RandomEventPlotTooltipContent } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/bz-random-event-content.js';
 import { hasSettlementRecommendationData, SettlementRecommendationPlotTooltipContent } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/bz-settlement-recommendation-content.js';
 import { UnitFlag } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/bz-unit-flag.js';
@@ -31,7 +32,8 @@ import { bzGetRelationship } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/bz
 import { BZ_DOT_JOINER, bzPill } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/components/bz-utility.js';
 
 // TRIX: various styling changes
-var _tmpl$ = /* @__PURE__ */ template(`<div class="flex flex-row gap-1"></div>`),
+var
+  _tmpl$ = /* @__PURE__ */ template(`<div class="flex flex-row gap-1"></div>`),
   _tmpl$2 = /* @__PURE__ */ template(`<div class="flex items-center"></div>`),
   _tmpl$3 = /* @__PURE__ */ template(`<div></div>`),
   _tmpl$4 = /* @__PURE__ */ template(`<div class="flex flex-row"><div class="flex-auto"></div><div class="font-body text-sm text-accent-3"></div></div>`),
@@ -41,7 +43,7 @@ var _tmpl$ = /* @__PURE__ */ template(`<div class="flex flex-row gap-1"></div>`)
   _tmpl$8 = /* @__PURE__ */ template(`<div class="flex flex-row font-title text-sm text-negative"></div>`),
   _tmpl$9 = /* @__PURE__ */ template(`<div class="flex flex-row font-body text-xs text-accent-3"></div>`),
   _tmpl$10 = /* @__PURE__ */ template(`<div class="flex flex-col font-title text-sm text-accent-3"></div>`),
-  _tmpl$11 = /* @__PURE__ */ template(`<div class=relative></div>`),
+  _tmpl$11 = /* @__PURE__ */ template(`<div class="relative"></div>`),
   _tmpl$12 = /* @__PURE__ */ template(`<div class="flex flex-row flex-wrap justify-center mt-1 mb-0\\.5 gap-1\\.5"></div>`);
 const _PROTECTED_IMPORTS = [isFocusable];
 const [IsPlotTooltipVisible, SetIsPlotTooltipVisible] = createSignal(true);
@@ -177,7 +179,7 @@ const ConstructibleRow = (props) => {
             text: "LOC_DISTRICT_WONDER_NAME"
           }),
           createComponent(L10n.Stylize, {
-            "class": "font-body text-xs text-accent-3",
+            "class": "font-body text-xs text-accent-3 break-words",
             // TRIX: resize text
             get text() {
               return description();
@@ -356,6 +358,7 @@ const UnitInfoSection = (props) => {
         get icon() {
           return unitIcon();
         },
+        "class": "mr-8",
         get children() {
           return [createComponent(ProductionTooltip, {
             get category() {
@@ -487,7 +490,7 @@ const IndependentUnitInfo = (props) => {
         },
         get children() {
           return createComponent(Icon, {
-            "class": "size-5 mr-1",
+            "class": "size-6 mr-1",
             name: "WAR"
           });
         }
@@ -534,11 +537,11 @@ const PlayerUnitInfo = (props) => {
       var _el$9 = _tmpl$6();
       insert(_el$9, createComponent(Show, {
         get when() {
-          return props.relationship?.hostile;
+          return props.isAtWarWithOwner;
         },
         get children() {
           return createComponent(Icon, {
-            "class": "size-5 mr-1",
+            "class": "size-6 mr-1",
             name: "WAR"
           });
         }
@@ -929,6 +932,7 @@ const PlotTooltipContent = (props) => {
   const agelessTypes = createMemo(() => getAgelessTypes());
   const plotIndex = createMemo(() => GameplayMap.getIndexFromLocation(local.plotCoord));
   const terrainLabel = createMemo(() => getTerrainLabel(local.plotCoord, isShowingDebug()));
+  const appealLabel = createMemo(() => getAppealLabel(local.plotCoord, isShowingDebug()));
   const biomeLabel = createMemo(() => getBiomeLabel(local.plotCoord, isShowingDebug()));
   const feature = createMemo(() => getFeatureInfo(local.plotCoord, plotIndex()));
   const continentName = createMemo(() => getContinentName(local.plotCoord));
@@ -1052,6 +1056,9 @@ const PlotTooltipContent = (props) => {
     if ((featureDefinition()?.MovementChange ?? 0) != 0) {
       pills.push("LOC_PLOT_TOOLTIP_ENDS_MOVEMENT");
     }
+    if (appealLabel()) {
+      pills.push(appealLabel());
+    }
     // TRIX: add Fresh Water pill
     if (isFreshWater()) {
       if (playerID() == -1 || isCityCenter()) {
@@ -1120,9 +1127,15 @@ const PlotTooltipContent = (props) => {
     return [];
   });
   const landsLabel = createMemo(() => !isOcean() ? isDistantLands() ? "LOC_PLOT_TOOLTIP_HEMISPHERE_WEST" : "LOC_PLOT_TOOLTIP_HEMISPHERE_EAST" : "");
+  const islandLabel = createMemo(() => {
+    if (GameplayMap.isWater(local.plotCoord.x, local.plotCoord.y)) return "";
+    const isIsland = GameplayMap.isIsland(local.plotCoord.x, local.plotCoord.y);
+    return isIsland ? "LOC_PLOT_TOOLTIP_ISLAND" : "";
+  });
   const subheaderText = createMemo(() => {
     const parts = [];
     if (continentName()) parts.push(continentName());
+    if (islandLabel()) parts.push(islandLabel());
     if (landsLabel()) parts.push(landsLabel());
     return parts.map((part) => Locale.compose(part)).join(BZ_DOT_JOINER);
     // TRIX: separate with dots, not commas
@@ -1131,7 +1144,8 @@ const PlotTooltipContent = (props) => {
     var _el$15 = _tmpl$3();
     spread(_el$15, mergeProps({
       get ["class"]() {
-        return `w-auto min-w-62 max-w-84 self-start text-sm ${local.class ?? ""}`;
+        return `w-full min-w-62 max-w-84 text-sm ${local.class ?? ""}`;
+        // TRIX: keep previous width limit
       }
     }, other), false, true);
     insert(_el$15, createComponent(Show, {
@@ -1406,6 +1420,14 @@ const PlotTooltipComponent = (props) => {
       let isPanning = false;
       const [showTouchPressPlotTooltip, setShowTouchPressPlotTooltip] = createSignal(false);
       const [isWorldDragging, setIsWorldDragging] = createSignal(false);
+      const [isGlobalRuleVisible, setIsGlobalRuleVisible] = createSignal(true);
+      const isDebugDisabled = createSignalFromDebugWidget({
+        id: "disablePlotTooltips",
+        category: "Systems",
+        caption: "Disable Plot Tooltips",
+        domainType: "bool",
+        value: false
+      });
       const triggerContext = new TriggerActivationContextProvider(tooltipModel, parentContext, () => tooltipContext.name);
       tooltipContext.setTriggerContext(triggerContext);
       let tooltipDelayHandle;
@@ -1451,6 +1473,12 @@ const PlotTooltipComponent = (props) => {
       const onPlotCursorCoordsUpdated = (event) => {
         trySetPlotCoords(event.detail.plotCoords ?? void 0);
       };
+      const onGlobalPlotTooltipHide = () => {
+        setIsGlobalRuleVisible(false);
+      };
+      const onGlobalPlotTooltipShow = () => {
+        setIsGlobalRuleVisible(true);
+      };
       let cameraChangeTimeout;
       let prevCameraState = null;
       const onCameraChanged = (nextCameraState) => {
@@ -1495,15 +1523,15 @@ const PlotTooltipComponent = (props) => {
       const isWorldFocused = createMemo(() => {
         return focusManager.activeElement() === document.body;
       });
-      createEffect(on([plotCoords, IsPlotTooltipVisible, isWorldFocused, isRevealed, isWorldDragging, isShiftOrClickDown, showTouchPressPlotTooltip], ([currentPlotCoords, isVisible, currentIsWorldFocused, revealed, currentIsWorldDragging, currentIsShiftOrClickDown, pressingShowTouchPlotTooltip], prevValues) => {
-        const [prevPlotCoords, _prevIsVisible, _prevIsWorldFocused, _prevRevealed, prevIsWorldDragging, _prevIsShiftOrClickDown, _prevPressingShowTouchPlotTooltip] = prevValues ?? [];
-        if (!currentPlotCoords || !isVisible || !currentIsWorldFocused || !revealed || currentIsWorldDragging || currentIsShiftOrClickDown || !pressingShowTouchPlotTooltip && IsTouchActive()) {
+      createEffect(on([plotCoords, IsPlotTooltipVisible, isGlobalRuleVisible, isWorldFocused, isRevealed, isWorldDragging, showTouchPressPlotTooltip, isDebugDisabled, isShiftOrClickDown], ([currentPlotCoords, isVisible, currentGlobalRuleVisible, currentIsWorldFocused, revealed, currentIsWorldDragging, pressingShowTouchPlotTooltip, debugDisabled, currentIsShiftOrClickDown], prevValues) => {
+        const [prevPlotCoords, _prevIsVisible, _prevGlobalRuleVisible, _prevIsWorldFocused, _prevRevealed, prevIsWorldDragging, _prevPressingShowTouchPlotTooltip, _prevDebugDisabled, _prevIsShiftOrClickDown] = prevValues ?? [];
+        if (!currentPlotCoords || !isVisible || !currentGlobalRuleVisible || !currentIsWorldFocused || !revealed || currentIsWorldDragging || debugDisabled || !pressingShowTouchPlotTooltip && IsTouchActive() || currentIsShiftOrClickDown) {
           // TRIX: add click-to-hide and shift-to-hide
           hidePlotTooltip();
         } else if (!currentIsWorldDragging && !currentIsShiftOrClickDown && !prevIsWorldDragging) {
-          // if (currentPlotCoords.x !== prevPlotCoords?.x || currentPlotCoords.y !== prevPlotCoords?.y) {
-          //   tooltipModel.triggerTooltip(tooltipContext.name, TriggerType.Blur, void 0);
-          // }
+          if (currentPlotCoords.x !== prevPlotCoords?.x || currentPlotCoords.y !== prevPlotCoords?.y) {
+            // tooltipModel.triggerTooltip(tooltipContext.name, TriggerType.Blur, void 0);
+          }
           // TRIX: skip this for smooth tile transitions
           triggerWithDelay(currentPlotCoords);
         }
@@ -1525,10 +1553,14 @@ const PlotTooltipComponent = (props) => {
         engine.on("CameraChanged", onCameraChanged);
         engine.on("InputAction", onInputAction);
         engine.on("UpdateFrame", onUpdateFrame);
+        window.addEventListener("ui-hide-plot-tooltips", onGlobalPlotTooltipHide);
+        window.addEventListener("ui-show-plot-tooltips", onGlobalPlotTooltipShow);
         onCleanup(() => {
           clearTooltipDelay();
           window.removeEventListener("cursor-updated", onCursorUpdated);
           window.removeEventListener("plot-cursor-coords-updated", onPlotCursorCoordsUpdated);
+          window.removeEventListener("ui-hide-plot-tooltips", onGlobalPlotTooltipHide);
+          window.removeEventListener("ui-show-plot-tooltips", onGlobalPlotTooltipShow);
           engine.off("CameraChanged", onCameraChanged);
           engine.off("InputAction", onInputAction);
           engine.off("UpdateFrame", onUpdateFrame);
@@ -1550,7 +1582,9 @@ const PlotTooltipComponent = (props) => {
                 children: (currentPlotCoords) => {
                   const tooltipKind = createMemo(() => getPlotTooltipKind(currentPlotCoords()));
                   return createComponent(Tooltip.Frame, {
-                    "class": "relative flex flex-col",
+                    get ["class"]() {
+                      return `relative flex flex-col ${tooltipKind() === "settlement-recommendation" ? "img-tooltip-border--wide" : ""}`;
+                    },
                     get children() {
                       return createComponent(Switch, {
                         get fallback() {
@@ -1603,7 +1637,7 @@ const PlotTooltipComponent = (props) => {
                             }
                           }), createComponent(Match, {
                             get when() {
-                              return tooltipKind() === "archeology";
+                              return createMemo(() => !!(GameInfo.Ages.lookup(Game.age)?.AgeType != "AGE_ANTIQUITY" && GameInfo.Ages.lookup(Game.age)?.AgeType != "AGE_EXPLORATION"))() && tooltipKind() === "archeology";
                             },
                             get children() {
                               return createComponent(ArcheologyPlotTooltipContent, {
@@ -1692,6 +1726,6 @@ const PlotTooltip = ComponentRegistry.register({
   styles: ["/bz-map-trix/ui-next/tooltips/bz-plot-tooltip.css"],
 });
 
-export { IsPlotTooltipVisible, PlotTooltip, PlotTooltipContent, SetIsPlotTooltipVisible };
+export { IsPlotTooltipVisible, PlotTooltip, PlotTooltipContent, SetIsPlotTooltipVisible, UnitInfoSection };
 //# sourceMappingURL=plot-tooltip.js.map
 // vim: sw=2 et

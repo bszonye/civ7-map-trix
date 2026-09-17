@@ -102,6 +102,12 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS_TT" Language="fr_FR">
             <Text>Ouvre la fenêtre des unités.</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_WONDERS" Language="fr_FR">
+            <Text>Ouvrir Merveilles</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_WONDERS_TT" Language="fr_FR">
+            <Text>Ouvre la fenêtre des merveilles.</Text>
+        </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_DEFAULT_BZ" Language="fr_FR">
             <Text>Filtres: Aucun</Text>
         </Replace>

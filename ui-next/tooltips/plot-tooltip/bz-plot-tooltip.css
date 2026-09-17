@@ -1,5 +1,12 @@
-.bz-plot-tooltip .img-tooltip-border.p-4 {
-  padding: 0.6666666667rem 0.6666666667rem 0.2222222222rem;
+.bz-plot-tooltip .img-tooltip-border {
+  padding: 0.6666666667rem;
+}
+.bz-plot-tooltip .img-tooltip-border--wide {
+  padding: 0.8888888889rem;
+}
+/* tighten margin below inspect/hide controls */
+.bz-plot-tooltip .img-tooltip-border > .flex.items-center.justify-center:last-child {
+  margin-bottom: -0.2222222222rem;
 }
 
 .bz-plot-tooltip {
@@ -182,5 +189,30 @@
   background-image: linear-gradient(180deg, var(--bz-color-bronze-3) 0%, var(--bz-color-bronze-1) 10%, var(--bz-color-bronze-4) 30%, var(--bz-color-bronze-6) 60%, var(--bz-color-bronze-4) 100%);
   color: var(--bz-color-bronze-1);
   text-shadow: 0 -0.0555555556rem var(--bz-color-bronze-6);
+}
+.bz-plot-tooltip .bz-style-natural-wonder-appeal {
+  background-color: #2010fdcc;
+  border-color: #2010fd;
+}
+.bz-plot-tooltip .bz-style-breathtaking-appeal {
+  /* background-color: #002000ee; */
+  background-color: #90b717e6;
+  border-color: #90b717;
+  color: #002000;
+}
+.bz-plot-tooltip .bz-style-charming-appeal {
+  background-color: #90b717e6;
+  border-color: #90b717;
+  color: #002000;
+}
+.bz-plot-tooltip .bz-style-average-appeal {
+  background-color: #9b8181b3;
+  border-color: #9b8181;
+}
+.bz-plot-tooltip .bz-appeal-value {
+  color: white;
+  background-color: #000a;
+  border-radius: 0.2222222222rem;
+  padding: 0 0.2222222222rem;
 }
 /* vim:set sw=2 et: */

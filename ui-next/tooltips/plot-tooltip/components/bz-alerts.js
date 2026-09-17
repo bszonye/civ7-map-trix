@@ -7,7 +7,7 @@ import { Tooltip } from '/core/ui-next/components/tooltip.js';
 import { getDistrictHealthInfo } from '../bz-helpers.js';
 import { TicketSection, TicketRow } from './bz-utility.js';
 
-var _tmpl$ = /* @__PURE__ */ template(`<div></div>`), _tmpl$2 = /* @__PURE__ */ template(`<div class="flex flex-col items-center ml-2 shrink-0"><div class="size-6 bg-contain bg-center bg-no-repeat"></div><span class="font-body text-xs text-accent-2"></span></div>`), _tmpl$3 = /* @__PURE__ */ template(`<div class="flex items-center w-full"><div class="font-title text-sm uppercase text-secondary flex-1 flex flex-wrap items-center"></div></div>`), _tmpl$4 = /* @__PURE__ */ template(`<span class=mx-1>•</span>`), _tmpl$5 = /* @__PURE__ */ template(`<div class="flex items-center w-full"></div>`), _tmpl$6 = /* @__PURE__ */ template(`<div class="flex items-center mt-0\\.5 font-body text-sm text-accent-3"><span></span></div>`);
+var _tmpl$ = /* @__PURE__ */ template(`<div></div>`), _tmpl$2 = /* @__PURE__ */ template(`<div class="flex flex-col items-center ml-2 shrink-0"><div class="size-6 bg-contain bg-center bg-no-repeat"></div><span class="font-body text-xs text-accent-2"></span></div>`), _tmpl$3 = /* @__PURE__ */ template(`<div class="flex items-center w-full"><div class="font-title text-sm uppercase text-secondary flex-1 flex flex-wrap items-center"></div></div>`), _tmpl$4 = /* @__PURE__ */ template(`<span class="mx-1">•</span>`), _tmpl$5 = /* @__PURE__ */ template(`<div class="flex items-center w-full"></div>`), _tmpl$6 = /* @__PURE__ */ template(`<div class="flex items-center mt-0\\.5 font-body text-sm text-accent-3"><span></span></div>`);
 const PlotAlertIcon = (props) => {
   const mergedProps = mergeProps({
     iconSizeClass: "size-6"
@@ -150,6 +150,10 @@ function getVolcanoRandomEvent(featureType, eruptionInfo) {
 const PlotAlertSection = (props) => {
   const districtHealth = createMemo(() => getDistrictHealthInfo(props.plotCoord));
   const isOccupiedByEnemy = createMemo(() => props.unitEntries.some((unitEntry) => unitEntry.unit.owner !== GameContext.localObserverID && !unitEntry.isCivilian && unitEntry.relationship?.hostile));
+  const isOwnedByPlayer = createMemo(() => {
+    const owner = GameplayMap.getOwner(props.plotCoord.x, props.plotCoord.y);
+    return owner == GameContext.localObserverID;
+  });
   const hasPillagedConstructible = createMemo(() => props.constructibles.some((entry) => entry.damaged));
   const activeStorm = createMemo(() => {
     const stormID = MapStorms.getActiveStormIDAtPlot(props.plotIndex);
@@ -217,7 +221,7 @@ const PlotAlertSection = (props) => {
         title: "LOC_RESOURCE_PILLAGED"
       });
     }
-    if (isOccupiedByEnemy()) {
+    if (isOccupiedByEnemy() && isOwnedByPlayer() && Districts.getAtLocation(props.plotCoord) != void 0) {
       pushUniqueAlert(alerts, {
         title: "LOC_PLOT_TOOLTIP_ALERT_OCCUPIED"
       });

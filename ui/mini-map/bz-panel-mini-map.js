@@ -2,12 +2,17 @@ import bzMapTrixOptions, { bzCommanderLens } from '/bz-map-trix/ui/options/bz-ma
 import { InputEngineEventName } from '/core/ui/input/input-support.js';
 import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
 import LensManager from '/core/ui/lenses/lens-manager.js';
+import { ContextManager } from '/core/ui/context-manager/context-manager.js';
 // guarantee import order for patching
 import '/base-standard/ui/interface-modes/interface-mode-unit-selected.js';
 import '/base-standard/ui/lenses/layer/conquest-layer.js';
 import '/base-standard/ui/lenses/layer/hexgrid-layer.js';
+import '/base-standard/ui/lenses/layer/trade-layer.js';
 import '/base-standard/ui/lenses/lens/default-lens.js';
+import '/base-standard/ui/lenses/lens/continent-lens.js';
 import '/base-standard/ui/lenses/lens/discovery-lens.js';
+import '/base-standard/ui/lenses/lens/general-appeal-lens.js';
+import '/base-standard/ui/lenses/lens/settler-lens.js';
 import '/base-standard/ui/lenses/lens/trade-lens.js';
 
 const LENS_CATALOG_OBJECT_NAME = "tracked-lens";
@@ -218,19 +223,23 @@ for (const [lensType, lens] of LensManager.lenses.entries()) {
 // PanelMiniMap extensions
 const BZ_ICON_CITY_BUTTON = "blp:Yield_Cities";
 const BZ_ICON_UNIT_BUTTON = "blp:Action_Promote";
+const BZ_ICON_WONDER_BUTTON = "blp:fonticon_wonders";
 Controls.preloadImage(BZ_ICON_CITY_BUTTON, "bz-mini-map");
 Controls.preloadImage(BZ_ICON_UNIT_BUTTON, "bz-mini-map");
+Controls.preloadImage(BZ_ICON_WONDER_BUTTON, "bz-mini-map");
 Controls.preloadImage("blp:hud_sub_circle_bk", "bz-mini-map");
 Controls.preloadImage("blp:hud_sub_circle_hov", "bz-mini-map");
 class bzPanelMiniMap {
-    static c_prototype;
+    static c = null;
     static instance;
     static toggleCooldownTimer = 500;
     citySubpanel = null;
     unitsSubpanel = null;
+    wonderSubpanel = null;
     engineInputListener = this.onEngineInput.bind(this);
     cityHotkeyListener = this.onCityHotkey.bind(this);
     unitsHotkeyListener = this.onUnitsHotkey.bind(this);
+    wonderHotkeyListener = this.onWonderHotkey.bind(this);
     lensesHotkeyListener = this.onLensesHotkey.bind(this);
     layerHotkeyListener = this.onLayerHotkey.bind(this);
     toggleCooldown = 0;
@@ -238,22 +247,30 @@ class bzPanelMiniMap {
     constructor(component) {
         bzPanelMiniMap.instance = this;
         this.component = component;
-        component.bzComponent = this;
-        this.patchPrototypes(this.component);
+        this.component.bzMapTrix = this;
+        this.patchPrototype(Object.getPrototypeOf(component));
     }
-    patchPrototypes(component) {
-        const c_prototype = Object.getPrototypeOf(component);
-        if (bzPanelMiniMap.c_prototype == c_prototype) return;
-        // patch component methods
-        const proto = bzPanelMiniMap.c_prototype = c_prototype;
+    patchPrototype(proto) {
+        if (bzPanelMiniMap.c) return;  // one-time initialization
+        // patch PanelMiniMap methods & properties
+        const c = bzPanelMiniMap.c = { proto };
         // afterInitialize
-        const afterInitialize = this.afterInitialize;
-        const onInitialize = proto.onInitialize;
-        proto.onInitialize = function(...args) {
-            const c_rv = onInitialize.apply(this, args);
-            const after_rv = afterInitialize.apply(this.bzComponent, args);
-            return after_rv ?? c_rv;
+        c.onInitialize = c.proto.onInitialize;
+        c.proto.onInitialize = function(...args) {
+            const crv = c.onInitialize.apply(this, args);
+            const arv = this.bzMapTrix.afterInitialize(...args);
+            return arv ?? crv;
         }
+        // beforeToggleSubpanel
+        c.toggleSubpanel = c.proto.toggleSubpanel;
+        c.proto.toggleSubpanel = function(...args) {
+            const brv = this.bzMapTrix.beforeToggleSubpanel(...args);
+            const crv = c.toggleSubpanel.apply(this, args);
+            return brv ?? crv;
+        }
+        // replace onContextChange
+        c.onContextChange = c.proto.onContextChange;
+        c.proto.onContextChange = this.onContextChange;
     }
     afterInitialize() {
         this.component.Root.classList.add("bz-mini-map");
@@ -272,12 +289,38 @@ class bzPanelMiniMap {
         );
         this.unitsSubpanel = this.component.subpanels.at(-1);
         this.unitsButton = this.component.miniMapButtonRow.lastChild;
-        this.cityButton.classList.add("bz-units-button");
+        this.unitsButton.classList.add("bz-units-button");
+        this.component.addSubpanel(
+            "bz-wonder-panel",
+            "LOC_UI_PRODUCTION_WONDERS",
+            BZ_ICON_WONDER_BUTTON,
+        );
+        this.wonderSubpanel = this.component.subpanels.at(-1);
+        this.wonderButton = this.component.miniMapButtonRow.lastChild;
+        this.wonderButton.classList.add("bz-wonder-button");
+    }
+    beforeToggleSubpanel(_subpanel, _force) {
+        // prevent infinite loop after force-closing subpanel
+        if (this.component.activeSubpanel &&
+            !ContextManager.hasInstanceOf(this.component.activeSubpanel.tag)) {
+            this.component.activeSubpanel = null;
+        }
+    }
+    onContextChange(_event) {
+        const deactivatedElement = _event.detail.deactivatedElement;
+        if (deactivatedElement?.typeName === "lens-panel") {
+            if (this.lensPanelState) this.toggleLensPanel();
+        } else if (deactivatedElement?.typeName === "screen-mp-chat") {
+            if (this.chatPanelState) this.toggleChatPanel();
+        } else {
+            this.updateChatNavHelp();
+        }
     }
     beforeAttach() { }
     afterAttach() {
         window.addEventListener("hotkey-open-bz-city-panel", this.cityHotkeyListener);
         window.addEventListener("hotkey-open-bz-units-panel", this.unitsHotkeyListener);
+        window.addEventListener("hotkey-open-bz-wonder-panel", this.wonderHotkeyListener);
         window.addEventListener("hotkey-open-bz-lens-panel", this.lensesHotkeyListener);
         window.addEventListener("layer-hotkey", this.layerHotkeyListener);
         this.component.Root
@@ -286,6 +329,7 @@ class bzPanelMiniMap {
     beforeDetach() {
         window.removeEventListener("hotkey-open-bz-city-panel", this.cityHotkeyListener);
         window.removeEventListener("hotkey-open-bz-units-panel", this.unitsHotkeyListener);
+        window.removeEventListener("hotkey-open-bz-wonder-panel", this.wonderHotkeyListener);
         window.removeEventListener("hotkey-open-bz-lens-panel", this.lensesHotkeyListener);
         window.removeEventListener("layer-hotkey", this.layerHotkeyListener);
         this.component.Root
@@ -342,6 +386,9 @@ class bzPanelMiniMap {
     onUnitsHotkey(_event) {
         this.togglePanel(this.unitsSubpanel);
     }
+    onWonderHotkey(_event) {
+        this.togglePanel(this.wonderSubpanel);
+    }
     onLensesHotkey(_event) {
         this.component.toggleLensPanel();
     }
@@ -357,7 +404,6 @@ Controls.decorate("panel-mini-map", (val) => new bzPanelMiniMap(val));
 class bzLensPanel {
     static c_prototype;
     constructor(component) {
-        component.bzComponent = this;
         this.component = component;
         // enable World context hotkeys while lens panel is open
         this.component.inputContext = InputContext.World;

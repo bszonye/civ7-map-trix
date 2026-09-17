@@ -94,6 +94,12 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS_TT" Language="ru_RU">
             <Text>Открыть панель юниты</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_WONDERS" Language="ru_RU">
+            <Text>Открыть чудеса света</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_WONDERS_TT" Language="ru_RU">
+            <Text>Открыть панель чудеса света</Text>
+        </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_DEFAULT_BZ" Language="ru_RU">
             <Text>Линзы: Нет</Text>
         </Replace>

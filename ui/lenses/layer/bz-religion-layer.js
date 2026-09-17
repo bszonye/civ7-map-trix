@@ -5,11 +5,7 @@ import '/bz-map-trix/ui/mini-map/bz-panel-mini-map.js';
 
 const SPRITE_OFFSET = { x: 0, y: -18, z: 5 };
 const SPRITE_ALT = "buildicon_open";
-var SpriteGroup;
-(function (SpriteGroup) {
-    SpriteGroup[SpriteGroup["bzReligion"] = 0] = "bzReligion";
-    SpriteGroup[SpriteGroup["All"] = Number.MAX_VALUE] = "All";
-})(SpriteGroup || (SpriteGroup = {}));
+
 class bzReligionLensLayer {
     bzSpriteGrid = WorldUI.createSpriteGrid(
         "bzReligionLayer_SpriteGroup",
@@ -54,7 +50,7 @@ class bzReligionLensLayer {
         if (!district.cityId) return;  // village
         const city = Cities.get(district.cityId);
         if (!city.Religion) return;
-        let religionID = -1;
+        let religionID;
         switch (district.type) {
             case DistrictTypes.CITY_CENTER:
             case DistrictTypes.URBAN:
