@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Database>
+    <LocalizedText>
+        <Replace Tag="LOC_BZ_PARENTHESIS" Language="pl_PL">
+            <Text>{1_text} ({2_parenthesis})</Text>
+        </Replace>
+        <Replace Tag="LOC_BZ_PEOPLE_NAME" Language="pl_PL">
+            <Text>Lud {1_name}</Text>
+        </Replace>
+        <Replace Tag="LOC_BZ_RELATIONSHIP_TRIBUTARY" Language="pl_PL">
+            <Text>Trybutariusz</Text>
+        </Replace>
+        <Replace Tag="LOC_BZ_SETTLEMENT_CITY_STATE" Language="pl_PL">
+            <Text>Miasto-państwo</Text>
+        </Replace>
+        <Replace Tag="LOC_BZ_WAS_PREVIOUSLY" Language="pl_PL">
+            <Text>(Wcześniej {1_name})</Text>
+        </Replace>
+        <Replace Tag="LOC_BZ_IMPROVEMENT_FOR_TILE" Language="pl_PL">
+            <Text>Wspiera {1_icon} {2_name}</Text>
+        </Replace>
+        <Replace Tag="LOC_BZ_IMPROVEMENT_FOR_RESOURCE" Language="pl_PL">
+            <Text>Wymaga {1_icon} {2_name}</Text>
+        </Replace>
+        <Replace Tag="LOC_DISTRICT_BZ_DISCOVERY" Language="pl_PL">
+            <Text>Odkrycie</Text>
+        </Replace>
+        <Replace Tag="LOC_DISTRICT_BZ_INDEPENDENT" Language="pl_PL">
+            <Text>Niezależne</Text>
+        </Replace>
+        <Replace Tag="LOC_DISTRICT_BZ_TOWN_CENTER" Language="pl_PL">
+            <Text>Centrum miasta</Text>
+        </Replace>
+        <Replace Tag="LOC_DISTRICT_BZ_URBAN_VACANT" Language="pl_PL">
+            <Text>Pusty dystrykt</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_COMLENS_NONE" Language="pl_PL">
+            <Text>Brak</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_COMLENS_COMMANDERS" Language="pl_PL">
+            <Text>Dowódcy</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_COMLENS_MILITARY" Language="pl_PL">
+            <Text>Wszystkie jednostki wojskowe</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_COMLENS_RECON" Language="pl_PL">
+            <Text>Jednostki wojskowe i zwiadowcze</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_COMMANDER_LENS" Language="pl_PL">
+            <Text>Map Trix • aktywacja filtra dowódcy</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_COMMANDER_LENS_DESCRIPTION" Language="pl_PL">
+            <Text>Które jednostki aktywują filtr dowódcy.</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE" Language="pl_PL">
+            <Text>Map Trix • poziom szczegółowości</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_MAP_TRIX_VERBOSE_DESCRIPTION" Language="pl_PL">
+            <Text>Ile szczegółów pokazywać w dymkach na mapie.[N] [N][B]Skróty klawiszowe[/B][N]Zwięzłe • Ctrl[N]Szczegółowe • Shift[N]Ukryte • Ctrl+Shift</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER" Language="pl_PL">
+            <Text>Map Trix • przestylizuj baner dochodów</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_RESTYLE_YIELD_BANNER_DESCRIPTION" Language="pl_PL">
+            <Text>Zmienia wygląd górnego paska, dopasowując go do zaokrąglonych, kolorowych akcentów w modach trixie.</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_VERBOSITY_HIDDEN" Language="pl_PL">
+            <Text>Ukryte</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_VERBOSITY_COMPACT" Language="pl_PL">
+            <Text>Zwięzłe</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_VERBOSITY_STANDARD" Language="pl_PL">
+            <Text>Standardowe</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_BZ_VERBOSITY_VERBOSE" Language="pl_PL">
+            <Text>Szczegółowe</Text>
+        </Replace>
+        <Replace Tag="LOC_OPTIONS_GROUP_BZ_MODS" Language="pl_PL">
+            <Text>mody trixie</Text>
+        </Replace>
+        <Replace Tag="LOC_STATE_BZ_UNIQUE" Language="pl_PL">
+            <Text>Unikalne</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_SETTLEMENTS" Language="pl_PL">
+            <Text>Otwórz osiedla</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_SETTLEMENTS_TT" Language="pl_PL">
+            <Text>Otwiera panel osiedli</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS" Language="pl_PL">
+            <Text>Otwórz jednostki</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_UNITS_TT" Language="pl_PL">
+            <Text>Otwiera panel jednostek</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_WONDERS" Language="pl_PL">
+            <Text>Otwórz cuda</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_OPEN_BZ_WONDERS_TT" Language="pl_PL">
+            <Text>Otwiera panel cudów</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_DEFAULT_BZ" Language="pl_PL">
+            <Text>Filtry: Brak</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_SETTLER_BZ" Language="pl_PL">
+            <Text>Filtry: Osadnik</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_CONTINENT_BZ" Language="pl_PL">
+            <Text>Filtry: Kontynent</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_TRADE_BZ" Language="pl_PL">
+            <Text>Filtry: Handel</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_GENERAL_APPEAL_BZ" Language="pl_PL">
+            <Text>Filtry: Atrakcyjność</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_DISCOVERY_BZ" Language="pl_PL">
+            <Text>Filtry: Odkrycia</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_RELIGION_BZ" Language="pl_PL">
+            <Text>Filtry: Religia</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_LENS_COMMANDER_BZ" Language="pl_PL">
+            <Text>Filtry: Dowódca</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS" Language="pl_PL">
+            <Text>Przełącz granice</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_BORDERS_TT" Language="pl_PL">
+            <Text>Przełącza widoczność granic</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_BORDERS" Language="pl_PL">
+            <Text>Przełącz granice miast</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_CITY_BORDERS_TT" Language="pl_PL">
+            <Text>Przełącza między granicami miast a granicami imperium</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_DISCOVERY_ICONS" Language="pl_PL">
+            <Text>Przełącz ikony odkryć</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_DISCOVERY_ICONS_TT" Language="pl_PL">
+            <Text>Przełącza widoczność ikon odkryć</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_FORTIFICATION_ICONS" Language="pl_PL">
+            <Text>Przełącz ikony fortyfikacji</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_FORTIFICATION_ICONS_TT" Language="pl_PL">
+            <Text>Przełącza widoczność ikon fortyfikacji</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_RELIGION_ICONS" Language="pl_PL">
+            <Text>Przełącz ikony religii</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_RELIGION_ICONS_TT" Language="pl_PL">
+            <Text>Przełącza widoczność ikon religii</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_ROUTE_LAYER" Language="pl_PL">
+            <Text>Przełącz mapę dróg</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_ROUTE_LAYER_TT" Language="pl_PL">
+            <Text>Przełącza widoczność mapy dróg</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER" Language="pl_PL">
+            <Text>Przełącz cechy terenu</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_TERRAIN_LAYER_TT" Language="pl_PL">
+            <Text>Przełącza widoczność cech terenu</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_WONDER_LAYER" Language="pl_PL">
+            <Text>Przełącz ikony cudów</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_WONDER_LAYER_TT" Language="pl_PL">
+            <Text>Przełącza widoczność ikon cudów</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_MINI_MAP_BZ_BORDERS" Language="pl_PL">
+            <Text>Granice</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_MINI_MAP_BZ_CITY_BORDERS" Language="pl_PL">
+            <Text>Granice miast</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_MINI_MAP_BZ_DISCOVERY" Language="pl_PL">
+            <Text>Odkrycia</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_MINI_MAP_BZ_FORTIFICATION" Language="pl_PL">
+            <Text>Fortyfikacje</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_MINI_MAP_BZ_ROUTE" Language="pl_PL">
+            <Text>Drogi</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_MINI_MAP_BZ_TERRAIN" Language="pl_PL">
+            <Text>Teren</Text>
+        </Replace>
+        <Replace Tag="LOC_YIELD_BZ_TOTAL" Language="pl_PL">
+            <Text>Całkowity dochód</Text>
+        </Replace>
+    </LocalizedText>
+</Database>
