@@ -10,9 +10,6 @@
         <Replace Tag="LOC_BZ_RELATIONSHIP_TRIBUTARY" Language="pl_PL">
             <Text>Trybutariusz</Text>
         </Replace>
-        <Replace Tag="LOC_BZ_SETTLEMENT_CITY_STATE" Language="pl_PL">
-            <Text>Miasto-państwo</Text>
-        </Replace>
         <Replace Tag="LOC_BZ_WAS_PREVIOUSLY" Language="pl_PL">
             <Text>(Wcześniej {1_name})</Text>
         </Replace>

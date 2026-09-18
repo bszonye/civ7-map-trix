@@ -999,7 +999,7 @@ class bzPlotTooltip {
         } else if (!this.city) {
             // not a settlement
         } else if (this.owner.isMinor) {
-            this.settlementType = "LOC_BZ_SETTLEMENT_CITY_STATE";
+            this.settlementType = "LOC_CIVILIZATION_CITY_STATE_NAME";
         } else if (this.city.isTown) {
             const focus = getTownFocus(this.city);
             this.townFocus = focus;
