@@ -15,9 +15,6 @@
     <References>
         <Mod id="detailed-map-tacks" title="LOC_MOD_DETAILED_MAP_TACKS_NAME" />
         <Mod id="discovery-lens" title="LOC_MOD_DISCOVERY_LENS_NAME" />
-        <Mod id="finwickle-border-boggles" title="LOC_MOD_BORDER_TOGGLES_NAME" />
-        <Mod id="fortified-district-lens" title="LOC_FORTIFIED_DISTRICT_LENS_TITLE" />
-        <Mod id="tcs-ui-improved-plot-tooltip" title="LOC_MOD_TCS_IMPROVED_PLOT_TOOLTIP_NAME" />
     </References>
     <ActionCriteria>
         <Criteria id="always">
@@ -88,7 +85,6 @@
                     <Item>ui/options/editors/bz-editor-keyboard-mapping.js</Item>
                     <Item>ui/options/bz-map-trix-options.js</Item>
                     <Item>ui/options/mod-options.js</Item>
-                    <Item>ui/tooltips/bz-plot-tooltip.js</Item>
                     <Item>ui-next/tooltips/plot-tooltip/components/bz-alerts.js</Item>
                     <Item>ui-next/tooltips/plot-tooltip/components/bz-treasure-convoy-section.js</Item>
                     <Item>ui-next/tooltips/plot-tooltip/components/bz-unique-quarter-section.js</Item>

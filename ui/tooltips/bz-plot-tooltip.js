@@ -1,3 +1,6 @@
+// FOR REFERENCE ONLY
+// REMOVED FROM UISCRIPTS
+
 import bzMapTrixOptions, { bzVerbosity } from '/bz-map-trix/ui/options/bz-map-trix-options.js';
 
 // import TooltipManager, { PlotTooltipPriority } from '/core/ui/tooltips/tooltip-manager.js';
