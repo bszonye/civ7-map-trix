@@ -115,6 +115,7 @@ class bzCityListModel {
         const isTown = city.isTown;
         const name = city.name;
         const location = city.location;
+        const loc = JSON.stringify(location);
         const isDistantLands = city.isDistantLands;
         const population = city.population;
         const hasDamage = Boolean(city.Constructibles.getIds().find(id => {
@@ -138,7 +139,7 @@ class bzCityListModel {
         const entry = {
             city, id, owner, localId, icon, name, isCapital, isTown, isDistantLands,
             hasDamage, hasUnrest, isRazing, isGrowing,
-            location, population, growthTurns, religion, religionIcon,
+            location, loc, population, growthTurns, religion, religionIcon,
         };
         if (isTown) {
             // town focus

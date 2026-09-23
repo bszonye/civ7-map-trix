@@ -89,6 +89,7 @@ class bzCityPanel extends MinimapSubpanel {
             if (hasCityTooltip) {
                 entry.setAttribute("data-tooltip-style", BZ_CITY_TOOLTIP_STYLE);
             }
+            Databind.attribute(entry, "data-city-location", "entry.loc");
             Databind.attribute(entry, "data-city-owner", "entry.owner");
             Databind.attribute(entry, "data-city-local-id", "entry.localId");
             Databind.classToggle(entry, "bz-town-has-focus", "!!{{entry.focus}}");
@@ -198,6 +199,7 @@ class bzCityPanel extends MinimapSubpanel {
             focus.appendChild(focusBG);
             const focusIcon = document.createElement("div");
             focusIcon.classList.value = "bz-city-list-focus-icon bz-icon size-full";
+            focusIcon.style.backgroundSize = "125%";
             Databind.bgImg(focusIcon, "entry.focusIcon");
             Databind.tooltip(focusIcon, "entry.focusTooltip");
             focusBG.appendChild(focusIcon);
