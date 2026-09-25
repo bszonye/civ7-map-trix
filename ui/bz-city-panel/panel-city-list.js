@@ -89,7 +89,6 @@ class bzCityPanel extends MinimapSubpanel {
             if (hasCityTooltip) {
                 entry.setAttribute("data-tooltip-style", BZ_CITY_TOOLTIP_STYLE);
             }
-            Databind.attribute(entry, "data-city-location", "entry.loc");
             Databind.attribute(entry, "data-city-owner", "entry.owner");
             Databind.attribute(entry, "data-city-local-id", "entry.localId");
             Databind.classToggle(entry, "bz-town-has-focus", "!!{{entry.focus}}");
