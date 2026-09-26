@@ -170,7 +170,7 @@ class bzCityListModel {
                     Locale.compose(
                         "LOC_BZ_PARENTHESIS",
                         focus.Name,
-                        "LOC_UI_PAUSE_SUBTITLE",
+                        "LOC_VOLCANO_NOT_ACTIVE",
                     ) : Locale.compose(focus.Name);
                 const desc = Locale.compose(focus.Description);
                 const tooltip = `[b]${name}[/b][n]${desc}`;

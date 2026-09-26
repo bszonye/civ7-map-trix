@@ -35,12 +35,6 @@ const BZ_LAYERS = {
 const BZ_EXTRA_LAYERS = {
     "fxs-settler-lens": [ "bz-city-borders-layer", ],
     "fxs-trade-lens": [ "bz-city-borders-layer", ],
-    "mod-fortified-district-lens": [
-        "fxs-resource-layer",
-        "fxs-operation-target-layer",
-        "bz-discovery-layer",
-        "bz-fortification-layer",
-    ],
 };
 const FXS_USER_CONFIG_LENSES = [
     "fxs-continent-lens",

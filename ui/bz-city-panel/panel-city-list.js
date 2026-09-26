@@ -198,6 +198,7 @@ class bzCityPanel extends MinimapSubpanel {
             focus.appendChild(focusBG);
             const focusIcon = document.createElement("div");
             focusIcon.classList.value = "bz-city-list-focus-icon bz-icon size-full";
+            focusIcon.style.backgroundSize = "125%";
             Databind.bgImg(focusIcon, "entry.focusIcon");
             Databind.tooltip(focusIcon, "entry.focusTooltip");
             focusBG.appendChild(focusIcon);

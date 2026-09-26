@@ -56,12 +56,12 @@ class bzWonderPanel extends MinimapSubpanel {
     update() {
         this.scrollArea.innerHTML = "";
         this.renderList(
-            "LOC_POLICIES_AVAILABLE_POLICIES",
-            bzWonderList.wonderList.available,
-        );
-        this.renderList(
             "LOC_PLOT_TOOLTIP_IN_PROGRESS",
             bzWonderList.wonderList.inProgress,
+        );
+        this.renderList(
+            "LOC_POLICIES_AVAILABLE_POLICIES",
+            bzWonderList.wonderList.available,
         );
         this.renderList(
             "LOC_LEGACIES_COMPLETE",

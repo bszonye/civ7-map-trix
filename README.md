@@ -1,4 +1,4 @@
-# Map Trix 4.1.0
+# Map Trix 4.1.1
 better map tools for Civilization VII
 
 ## better map tooltips
@@ -55,6 +55,7 @@ every map menu, lens, and decoration layer has a hotkey:
 - `7` Commander lens
 - `Shift+S` Settlements panel
 - `Shift+U` Units panel
+- `Shift+W` Wonders panel
 - `Shift+B` Borders
 - `Shift+C` City Limits
 - `Shift+D` Discoveries
@@ -62,7 +63,7 @@ every map menu, lens, and decoration layer has a hotkey:
 - `Shift+R` Religion
 - `Shift+X` Roads
 - `Shift+T` Terrain
-- `Shift+W` Wonders
+- `Shift+N` Wonders
 - `Shift+Q` Conquest
 
 ## localization
@@ -72,6 +73,7 @@ supported languages:
 - German (translated by Chr1Z93)
 - Italian (translated by leonardfactory)
 - Korean (translated by Hotsolidinfill)
+- Polish (translated by Najane)
 - Russian (translated by Webrok)
 - Simplified Chinese (translated by v480615)
 - Traditional Chinese (translated by v480615)
