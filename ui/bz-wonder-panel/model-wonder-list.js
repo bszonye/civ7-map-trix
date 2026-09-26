@@ -6,8 +6,8 @@ class bzWonderListModel {
     updateGate = new UpdateGate(() => this.update());
     _wonders = new Map();
     _wonderList = {
-        available: [],  // head: LOC_POLICIES_AVAILABLE_POLICIES
         inProgress: [],  // head: LOC_PLOT_TOOLTIP_IN_PROGRESS
+        available: [],  // head: LOC_POLICIES_AVAILABLE_POLICIES
         complete: [],  // head: LOC_LEGACIES_COMPLETE, subhead: age name
         skipped: [],  // head: LOC_TRIUMPH_NOT_AVAILABLE
     };
@@ -43,8 +43,8 @@ class bzWonderListModel {
     }
     update() {
         // wonder lists
-        const available = [];  // head: LOC_POLICIES_AVAILABLE_POLICIES
         const inProgress = [];  // head: LOC_PLOT_TOOLTIP_IN_PROGRESS
+        const available = [];  // head: LOC_POLICIES_AVAILABLE_POLICIES
         const complete = [];  // head: LOC_LEGACIES_COMPLETE, subhead: age name
         const skipped = [];  // head: LOC_TRIUMPH_NOT_AVAILABLE
         // current age
@@ -172,7 +172,7 @@ class bzWonderListModel {
             const list = wonder.ageIndex == currentAgeIndex ? available : skipped;
             list.push(wonder);
         }
-        this._wonderList = { available, inProgress, complete, skipped };
+        this._wonderList = { inProgress, available, complete, skipped };
         window.dispatchEvent(new CustomEvent("bz-model-wonder-list-update"));
     }
     onWonderUpdate(_event) {
