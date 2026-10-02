@@ -10,9 +10,6 @@
         <Replace Tag="LOC_BZ_RELATIONSHIP_TRIBUTARY" Language="zh_Hans_CN">
             <Text>朝贡国</Text>
         </Replace>
-        <Replace Tag="LOC_BZ_SETTLEMENT_CITY_STATE" Language="zh_Hans_CN">
-            <Text>城邦</Text>
-        </Replace>
         <Replace Tag="LOC_BZ_WAS_PREVIOUSLY" Language="zh_Hans_CN">
             <Text>(原为 {1_name})</Text>
         </Replace>

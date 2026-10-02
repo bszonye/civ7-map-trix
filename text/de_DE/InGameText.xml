@@ -10,9 +10,6 @@
         <Replace Tag="LOC_BZ_RELATIONSHIP_TRIBUTARY" Language="de_DE">
             <Text>Abhängig</Text>
         </Replace>
-        <Replace Tag="LOC_BZ_SETTLEMENT_CITY_STATE" Language="de_DE">
-            <Text>Stadtstaat</Text>
-        </Replace>
         <Replace Tag="LOC_BZ_WAS_PREVIOUSLY" Language="de_DE">
             <Text>(War {1_name})</Text>
         </Replace>

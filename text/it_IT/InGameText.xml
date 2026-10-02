@@ -10,9 +10,6 @@
         <Replace Tag="LOC_BZ_RELATIONSHIP_TRIBUTARY" Language="it_IT">
             <Text>Tributario</Text>
         </Replace>
-        <Replace Tag="LOC_BZ_SETTLEMENT_CITY_STATE" Language="it_IT">
-            <Text>Città-Stato</Text>
-        </Replace>
         <Replace Tag="LOC_BZ_WAS_PREVIOUSLY" Language="it_IT">
             <Text>(Era {1_name})</Text>
         </Replace>

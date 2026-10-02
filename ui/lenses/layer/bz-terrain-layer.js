@@ -1,4 +1,3 @@
-import { gatherMovementObstacles } from '/bz-map-trix/ui/tooltips/bz-plot-tooltip.js';
 import { InterfaceMode, InterfaceModeChangedEventName } from '/core/ui/interface-modes/interface-modes.js';
 import LensManager from '/core/ui/lenses/lens-manager.js';
 import ChoosePlotInterfaceMode from '/base-standard/ui/interface-modes/interface-mode-choose-plot.js';
@@ -7,7 +6,28 @@ import { UpdateOperationTargetEventName } from '/base-standard/ui/lenses/layer/o
 // load mini-map first to configure allowed layers for default lens
 import '/bz-map-trix/ui/mini-map/bz-panel-mini-map.js';
 
-// adapted from ui/tooltips/bz-plot-tooltip.js
+// get the set of obstacles that end movement for a movement class
+const BZ_OBSTACLES = {};  // cache
+function gatherMovementObstacles(mclass) {
+    if (!mclass) {
+        // get the movement class for the selected unit
+        const unitID = UI.Player.getHeadSelectedUnit();
+        const unit = unitID && Units.get(unitID);
+        const unitType = unit && GameInfo.Units.lookup(unit.type);
+        mclass = unitType?.UnitMovementClass ?? "UNIT_MOVEMENT_CLASS_FOOT";
+    }
+    if (mclass in BZ_OBSTACLES) return BZ_OBSTACLES[mclass];
+    const obstacles = new Set();
+    for (const o of GameInfo.UnitMovementClassObstacles) {
+        if (!o.EndsTurn || o.UnitMovementClass != mclass) continue;
+        if (o.FeatureType) obstacles.add(o.FeatureType);
+        if (o.RiverType) obstacles.add(o.RiverType);
+        if (o.TerrainType) obstacles.add(o.TerrainType);
+    }
+    // set the cache and return it
+    return BZ_OBSTACLES[mclass] = obstacles;
+}
+// adapted from plot-tooltip styling
 const BZ_OVERLAY = {
     // #c07e45  oklch(0.65 0.11 60)   #633e1d  oklch(0.40 0.07 60)
     TERRAIN_HILL: { fillColor: 0xaa457ec0, edgeColor: 0xff1d3e63, },

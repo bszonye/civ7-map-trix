@@ -10,9 +10,6 @@
         <Replace Tag="LOC_BZ_RELATIONSHIP_TRIBUTARY" Language="zh_Hant_HK">
             <Text>朝貢國</Text>
         </Replace>
-        <Replace Tag="LOC_BZ_SETTLEMENT_CITY_STATE" Language="zh_Hant_HK">
-            <Text>城邦</Text>
-        </Replace>
         <Replace Tag="LOC_BZ_WAS_PREVIOUSLY" Language="zh_Hant_HK">
             <Text>(原為 {1_name})</Text>
         </Replace>

@@ -10,9 +10,6 @@
         <Replace Tag="LOC_BZ_RELATIONSHIP_TRIBUTARY">
             <Text>Tributary</Text>
         </Replace>
-        <Replace Tag="LOC_BZ_SETTLEMENT_CITY_STATE">
-            <Text>City-State</Text>
-        </Replace>
         <Replace Tag="LOC_BZ_WAS_PREVIOUSLY">
             <Text>(Was {1_name})</Text>
         </Replace>

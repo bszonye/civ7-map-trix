@@ -10,9 +10,6 @@
         <Replace Tag="LOC_BZ_RELATIONSHIP_TRIBUTARY" Language="ko_KR">
             <Text>종속국</Text>
         </Replace>
-        <Replace Tag="LOC_BZ_SETTLEMENT_CITY_STATE" Language="ko_KR">
-            <Text>도시 국가</Text>
-        </Replace>
         <Replace Tag="LOC_BZ_WAS_PREVIOUSLY" Language="ko_KR">
             <Text>(이전에 {1_name})</Text>
         </Replace>

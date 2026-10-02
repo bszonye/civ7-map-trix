@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Mod id="bz-map-trix" version="4.1.0"
+<Mod id="bz-map-trix" version="4.1.1"
     xmlns="ModInfo">
     <Properties>
         <Name>LOC_MOD_BZ_MAP_TRIX_NAME</Name>
-        <Version>4.1.0</Version>
+        <Version>4.1.1</Version>
         <Description>LOC_MOD_BZ_MAP_TRIX_DESCRIPTION</Description>
         <Authors>beezany</Authors>
         <URL>https://forums.civfanatics.com/resources/map-trix.31950/</URL>
@@ -15,9 +15,6 @@
     <References>
         <Mod id="detailed-map-tacks" title="LOC_MOD_DETAILED_MAP_TACKS_NAME" />
         <Mod id="discovery-lens" title="LOC_MOD_DISCOVERY_LENS_NAME" />
-        <Mod id="finwickle-border-boggles" title="LOC_MOD_BORDER_TOGGLES_NAME" />
-        <Mod id="fortified-district-lens" title="LOC_FORTIFIED_DISTRICT_LENS_TITLE" />
-        <Mod id="tcs-ui-improved-plot-tooltip" title="LOC_MOD_TCS_IMPROVED_PLOT_TOOLTIP_NAME" />
     </References>
     <ActionCriteria>
         <Criteria id="always">
@@ -44,6 +41,7 @@
                     <Item locale="fr_FR">text/fr_FR/InGameText.xml</Item>
                     <Item locale="it_IT">text/it_IT/InGameText.xml</Item>
                     <Item locale="ko_KR">text/ko_KR/InGameText.xml</Item>
+                    <Item locale="pl_PL">text/pl_PL/InGameText.xml</Item>
                     <Item locale="ru_RU">text/ru_RU/InGameText.xml</Item>
                     <Item locale="zh_Hans_CN">text/zh_Hans_CN/InGameText.xml</Item>
                     <Item locale="zh_Hant_HK">text/zh_Hant_HK/InGameText.xml</Item>
@@ -87,7 +85,6 @@
                     <Item>ui/options/editors/bz-editor-keyboard-mapping.js</Item>
                     <Item>ui/options/bz-map-trix-options.js</Item>
                     <Item>ui/options/mod-options.js</Item>
-                    <Item>ui/tooltips/bz-plot-tooltip.js</Item>
                     <Item>ui-next/tooltips/plot-tooltip/components/bz-alerts.js</Item>
                     <Item>ui-next/tooltips/plot-tooltip/components/bz-treasure-convoy-section.js</Item>
                     <Item>ui-next/tooltips/plot-tooltip/components/bz-unique-quarter-section.js</Item>
@@ -106,6 +103,7 @@
                     <Item locale="fr_FR">text/fr_FR/InGameText.xml</Item>
                     <Item locale="it_IT">text/it_IT/InGameText.xml</Item>
                     <Item locale="ko_KR">text/ko_KR/InGameText.xml</Item>
+                    <Item locale="pl_PL">text/pl_PL/InGameText.xml</Item>
                     <Item locale="ru_RU">text/ru_RU/InGameText.xml</Item>
                     <Item locale="zh_Hans_CN">text/zh_Hans_CN/InGameText.xml</Item>
                     <Item locale="zh_Hant_HK">text/zh_Hant_HK/InGameText.xml</Item>
@@ -119,6 +117,7 @@
         <File>text/fr_FR/ModInfoText.xml</File>
         <File>text/it_IT/ModInfoText.xml</File>
         <File>text/ko_KR/ModInfoText.xml</File>
+        <File>text/pl_PL/ModInfoText.xml</File>
         <File>text/zh_Hans_CN/ModInfoText.xml</File>
         <File>text/zh_Hant_HK/ModInfoText.xml</File>
     </LocalizedText>
