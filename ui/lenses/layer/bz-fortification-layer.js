@@ -142,17 +142,14 @@ class bzFortificationLensLayer {
         const observer = GameContext.localObserverID;
         const revealed = GameplayMap.getRevealedState(observer, loc.x, loc.y);
         if (revealed == RevealedStates.HIDDEN) return;
-        const { defense, district, hasFortification, _modifiers } = plotDefense(loc);
-        if (defense) {
+        const { defense, district, modifiers } = plotDefense(loc);
+        if (defense || modifiers.length) {
             const plot = GameplayMap.getIndexFromLocation(loc);
             const isBonus = 0 <= defense;
             const back = isBonus ? this.bonusBack : this.penaltyBack;
             const value = isBonus ? `+${defense}` : defense.toString();
             this.bzSpriteGrid.addSprite(plot, back, this.backOffset, this.backOptions);
             this.bzSpriteGrid.addText(plot, value, this.textOffset, this.textOptions);
-        }
-        if (hasFortification) {
-            // TODO
         }
         if (!district?.isDefensible) return;
         const controller = Players.get(district.controllingPlayer);
