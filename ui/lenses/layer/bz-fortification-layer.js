@@ -148,9 +148,9 @@ class bzFortificationLensLayer {
             const plot = GameplayMap.getIndexFromLocation(loc);
             const isBonus = 0 <= defense;
             const back = isBonus ? this.bonusBack : this.penaltyBack;
-            const value = isBonus ? `+${defense}` : defense.toString();
+            const text = isBonus ? `+${defense}` : defense.toString();
             this.bzSpriteGrid.addSprite(plot, back, this.backOffset, this.backOptions);
-            this.bzSpriteGrid.addText(plot, value, this.textOffset, this.textOptions);
+            this.bzSpriteGrid.addText(plot, text, this.textOffset, this.textOptions);
         }
         if (!district?.isDefensible) return;
         const controller = Players.get(district.controllingPlayer);
