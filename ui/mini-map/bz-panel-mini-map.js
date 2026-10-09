@@ -33,6 +33,7 @@ const BZ_LAYERS = {
     "bz-wonder-layer": "LOC_UI_PRODUCTION_WONDERS",
 };
 const BZ_EXTRA_LAYERS = {
+    "fxs-discovery-lens": [ "bz-fortification-layer", "bz-route-layer", ],
     "fxs-settler-lens": [ "bz-city-borders-layer", ],
     "fxs-trade-lens": [ "bz-city-borders-layer", ],
 };
