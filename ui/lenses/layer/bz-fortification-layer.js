@@ -79,6 +79,9 @@ function plotDefense(loc) {
         }
     }
     // plot effects (temporary fortification)
+    // omitted from "fortifications" list, which the plot tooltip uses
+    // to construct a keyword tag.  the tooltip displays this effect as
+    // an alert instead.
     const effects = MapPlotEffects.getPlotEffects(plotIndex);
     for (const effect of effects) {
         if (!effect.onlyVisibleToOwner || effect.owner == GameContext.localPlayerID) {
