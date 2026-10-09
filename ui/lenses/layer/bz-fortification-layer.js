@@ -10,29 +10,29 @@ function plotDefense(loc) {
     const plotIndex = GameplayMap.getIndexFromLocation(loc);
     const modifiers = [];
     // fortifications
-    const districtID = MapCities.getDistrict(loc.x, loc.y);
-    const district = districtID && Districts.get(districtID);
-    // TODO: fortification improvements
     const fortifications = MapConstructibles
         .getHiddenFilteredConstructibles(loc.x, loc.y)
         .map(id => {
             const item = Constructibles.getByComponentID(id);
+            if (!item.complete || item.damaged) return null;
             const info = item && GameInfo.Constructibles.lookup(item.type);
             const type = info?.ConstructibleType;
             if (!type || !ConstructibleHasTagType(type, "FORTIFICATION")) return null;
-            return { item, info };
+            return { ...item, info };
         }).filter(e => e);
     for (const fort of fortifications) {
-        const defense = fort.info.DistrictDefense ? 0 :
-            parseInt(GlobalParameters.COMBAT_UNIT_FORTIFICATION_BONUS);
-        const label = "LOC_COMBAT_PREVIEW_DEFENSIVE_IMPROVEMENT_BONUS_DESC";
+        if (fort.info.DistrictDefense) continue;  // no defense bonus
+        const defense = parseInt(GlobalParameters.COMBAT_UNIT_FORTIFICATION_BONUS);
+        const label = "LOC_COMBAT_PREVIEW_FORTIFIED_DEFENSE_DESC";
         const name = Locale.compose(label, defense);
         modifiers.push({ defense, name });
     }
-    const hasFortification = !!modifiers.find(m => m.hasFortification);
-    // districts with health ignore terrain bonuses
-    if (district?.isDefensible && district.getDamage < district.getMaxDamage) {
-        return { district, hasFortification, modifiers };
+    // districts with intact defenses ignore terrain bonuses
+    const districtID = MapCities.getDistrict(loc.x, loc.y);
+    const district = districtID && Districts.get(districtID);
+    if (district?.isDefensible && fortifications.find(f => f.info?.DistrictDefense)) {
+        const defense = modifiers.reduce((sum, m) => sum + m.defense, 0);
+        return { defense, district, fortifications, modifiers };
     }
     // feature types
     const fid = GameplayMap.getFeatureType(loc.x, loc.y);
@@ -93,15 +93,16 @@ function plotDefense(loc) {
     }
     // gather results
     const defense = modifiers.reduce((sum, m) => sum + m.defense, 0);
-    return { district, defense, hasFortification, modifiers };
+    return { district, defense, fortifications, modifiers };
 }
 
 class bzFortificationLensLayer {
-    backingOffset = { x: 0, y: -19, z: 0 };
+    backOffset = { x: 0, y: -19, z: 0 };
     textOffset = { x: -0.5, y: -18, z: 0 };
-    bonusBacking = "unit_combat-shadow";
-    penaltyBacking = "unit_combat-shadow_red";
-    modifierFont = { fonts: ["TitleFont"], fontSize: 6, faceCamera: true };
+    bonusBack = "unit_combat-shadow";
+    penaltyBack = "unit_combat-shadow_red";
+    backOptions = { scale: 1, alpha: 0.66 };
+    textOptions = { fonts: ["TitleFont"], fontSize: 6, faceCamera: true };
     bzSpriteGrid = WorldUI.createSpriteGrid(
         "bzFortificationLayer_SpriteGroup",
         SpriteMode.Default
@@ -141,17 +142,14 @@ class bzFortificationLensLayer {
         const observer = GameContext.localObserverID;
         const revealed = GameplayMap.getRevealedState(observer, loc.x, loc.y);
         if (revealed == RevealedStates.HIDDEN) return;
-        const { district, defense, hasFortification, modifiers } = plotDefense(loc);
+        const { defense, district, hasFortification, _modifiers } = plotDefense(loc);
         if (defense) {
-            const plotIndex = GameplayMap.getIndexFromLocation(loc);
-            if (0 <= defense) {
-                this.bzSpriteGrid.addSprite(plotIndex, this.bonusBacking, this.backingOffset, { scale: 1, alpha: 0.66 });
-                this.bzSpriteGrid.addText(plotIndex, `+${defense}`, this.textOffset, this.modifierFont);
-            } else {
-                this.bzSpriteGrid.addSprite(plotIndex, this.penaltyBacking, this.backingOffset, { scale: 1, alpha: 0.66 });
-                this.bzSpriteGrid.addText(plotIndex, defense.toString(), this.textOffset, this.modifierFont);
-            }
-            console.warn(`TRIX MODS ${JSON.stringify(modifiers)}`);
+            const plot = GameplayMap.getIndexFromLocation(loc);
+            const isBonus = 0 <= defense;
+            const back = isBonus ? this.bonusBack : this.penaltyBack;
+            const value = isBonus ? `+${defense}` : defense.toString();
+            this.bzSpriteGrid.addSprite(plot, back, this.backOffset, this.backOptions);
+            this.bzSpriteGrid.addText(plot, value, this.textOffset, this.textOptions);
         }
         if (hasFortification) {
             // TODO
@@ -180,3 +178,5 @@ class bzFortificationLensLayer {
     }
 }
 LensManager.registerLensLayer("bz-fortification-layer", new bzFortificationLensLayer());
+
+export { plotDefense };

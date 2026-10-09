@@ -30,6 +30,7 @@ import { UnitFlag } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/bz-unit-fla
 
 import { bzGetRelationship } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/bz-helpers.js';
 import { BZ_DOT_JOINER, bzPill } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/components/bz-utility.js';
+import { plotDefense } from '/bz-map-trix/ui/lenses/layer/bz-fortification-layer.js';
 
 // TRIX: various styling changes
 var
@@ -1023,6 +1024,7 @@ const PlotTooltipContent = (props) => {
     iconContext: "YIELD"
   })));
   const totalYields = createMemo(() => yields().reduce((sum, y) => sum + y.amount, 0));
+  const defense = createMemo(() => plotDefense(local.plotCoord));
   const keywordPills = createMemo(() => {
     const pills = [];
     if (riverLabel()) {
@@ -1086,6 +1088,13 @@ const PlotTooltipContent = (props) => {
         "class": "bz-style-quarter",
         text: quarterKeyword()},
       );
+    }
+    // TRIX: add Fortification pill
+    if (defense()?.fortifications?.length) {
+      pills.push({
+        "class": "bz-style-fortification",
+        text: "LOC_TAG_FORTIFICATION",
+      });
     }
     // TRIX: move route pill into keywordPills
     if (route()) {
