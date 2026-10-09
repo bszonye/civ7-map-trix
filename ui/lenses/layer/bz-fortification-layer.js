@@ -83,17 +83,15 @@ function plotDefense(loc) {
     // to construct a keyword tag.  the tooltip displays this effect as
     // an alert instead.
     const effects = MapPlotEffects.getPlotEffects(plotIndex);
-    for (const effect of effects) {
-        if (!effect.onlyVisibleToOwner || effect.owner == GameContext.localPlayerID) {
-            const info = GameInfo.PlotEffects.lookup(effect.effectType);
-            const defense = parseInt(info?.Defense);
-            if (defense && !Number.isNaN(defense)) {
-                const label = "LOC_COMBAT_PREVIEW_FORTIFIED_DEFENSE_DESC";
-                const name = Locale.compose(label, defense);
-                modifiers.push({ defense, name });
-            }
+    effects?.forEach(effect => {
+        const info = GameInfo.PlotEffects.lookup(effect.effectType);
+        const defense = parseInt(info?.Defense);
+        if (defense && !Number.isNaN(defense)) {
+            const label = "LOC_COMBAT_PREVIEW_FORTIFIED_DEFENSE_DESC";
+            const name = Locale.compose(label, defense);
+            modifiers.push({ defense, name });
         }
-    }
+    });
     // gather results
     const defense = modifiers.reduce((sum, m) => sum + m.defense, 0);
     return { district, defense, fortifications, modifiers };
