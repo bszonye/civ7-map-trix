@@ -94,7 +94,7 @@ function plotDefense(loc) {
     });
     // gather results
     const defense = modifiers.reduce((sum, m) => sum + m.defense, 0);
-    return { district, defense, fortifications, modifiers };
+    return { defense, district, fortifications, modifiers };
 }
 
 class bzFortificationLensLayer {
