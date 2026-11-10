@@ -266,30 +266,30 @@ class bzPanelMiniMap {
     }
     afterInitialize() {
         this.component.Root.classList.add("bz-mini-map");
+        const subpanels = this.component.subpanels;
+        this.searchSubpanel = subpanels.find((s) => s.tag === "map-search");
+        this.unitsSubpanel = subpanels.find((s) => s.tag === "panel-unit-list");
         this.component.addSubpanel(
             "bz-city-panel",
             "LOC_UI_RESOURCE_ALLOCATION_SETTLEMENTS",
             BZ_ICON_CITY_BUTTON,
         );
-        this.citySubpanel = this.component.subpanels.at(-1);
-        this.cityButton = this.component.miniMapButtonRow.lastChild;
-        this.cityButton.classList.add("bz-city-button");
-        this.component.addSubpanel(
-            "bz-units-panel",
-            "LOC_UI_PRODUCTION_UNITS",
-            BZ_ICON_UNIT_BUTTON,
-        );
-        this.unitsSubpanel = this.component.subpanels.at(-1);
-        this.unitsButton = this.component.miniMapButtonRow.lastChild;
-        this.unitsButton.classList.add("bz-units-button");
+        this.citySubpanel = subpanels.find((s) => s.tag === "bz-city-panel");
+        this.citySubpanel.button.classList.add("bz-city-button");
+        // this.component.addSubpanel(
+        //     "bz-units-panel",
+        //     "LOC_UI_PRODUCTION_UNITS",
+        //     BZ_ICON_UNIT_BUTTON,
+        // );
+        this.unitsButton = this.unitsSubpanel.button;
+        this.component.miniMapButtonRow.appendChild(this.unitsButton);  // move to end
         this.component.addSubpanel(
             "bz-wonder-panel",
             "LOC_UI_PRODUCTION_WONDERS",
             BZ_ICON_WONDER_BUTTON,
         );
-        this.wonderSubpanel = this.component.subpanels.at(-1);
-        this.wonderButton = this.component.miniMapButtonRow.lastChild;
-        this.wonderButton.classList.add("bz-wonder-button");
+        this.wonderSubpanel = subpanels.find((s) => s.tag === "bz-wonder-panel");
+        this.wonderSubpanel.button.classList.add("bz-wonder-button");
     }
     beforeToggleSubpanel(_subpanel, _force) {
         // prevent infinite loop after force-closing subpanel
