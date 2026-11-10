@@ -232,10 +232,11 @@ class bzPanelMiniMap {
     unitsSubpanel = null;
     wonderSubpanel = null;
     engineInputListener = this.onEngineInput.bind(this);
+    lensesHotkeyListener = this.onLensesHotkey.bind(this);
+    searchHotkeyListener = this.onSearchHotkey.bind(this);
     cityHotkeyListener = this.onCityHotkey.bind(this);
     unitsHotkeyListener = this.onUnitsHotkey.bind(this);
     wonderHotkeyListener = this.onWonderHotkey.bind(this);
-    lensesHotkeyListener = this.onLensesHotkey.bind(this);
     layerHotkeyListener = this.onLayerHotkey.bind(this);
     toggleCooldown = 0;
     toggleQueued = false;
@@ -300,19 +301,21 @@ class bzPanelMiniMap {
     }
     beforeAttach() { }
     afterAttach() {
+        window.addEventListener("hotkey-open-bz-lens-panel", this.lensesHotkeyListener);
+        window.addEventListener("hotkey-open-bz-map-search", this.searchHotkeyListener);
         window.addEventListener("hotkey-open-bz-city-panel", this.cityHotkeyListener);
         window.addEventListener("hotkey-open-bz-units-panel", this.unitsHotkeyListener);
         window.addEventListener("hotkey-open-bz-wonder-panel", this.wonderHotkeyListener);
-        window.addEventListener("hotkey-open-bz-lens-panel", this.lensesHotkeyListener);
         window.addEventListener("layer-hotkey", this.layerHotkeyListener);
         this.component.Root
             .addEventListener(InputEngineEventName, this.engineInputListener);
     }
     beforeDetach() {
+        window.removeEventListener("hotkey-open-bz-lens-panel", this.lensesHotkeyListener);
+        window.removeEventListener("hotkey-open-bz-map-search", this.searchHotkeyListener);
         window.removeEventListener("hotkey-open-bz-city-panel", this.cityHotkeyListener);
         window.removeEventListener("hotkey-open-bz-units-panel", this.unitsHotkeyListener);
         window.removeEventListener("hotkey-open-bz-wonder-panel", this.wonderHotkeyListener);
-        window.removeEventListener("hotkey-open-bz-lens-panel", this.lensesHotkeyListener);
         window.removeEventListener("layer-hotkey", this.layerHotkeyListener);
         this.component.Root
             .removeEventListener(InputEngineEventName, this.engineInputListener);
@@ -362,6 +365,12 @@ class bzPanelMiniMap {
                 break;
         }
     }
+    onLensesHotkey(_event) {
+        this.component.toggleLensPanel();
+    }
+    onSearchHotkey(_event) {
+        this.togglePanel(this.searchSubpanel);
+    }
     onCityHotkey(_event) {
         this.togglePanel(this.citySubpanel);
     }
@@ -370,9 +379,6 @@ class bzPanelMiniMap {
     }
     onWonderHotkey(_event) {
         this.togglePanel(this.wonderSubpanel);
-    }
-    onLensesHotkey(_event) {
-        this.component.toggleLensPanel();
     }
     onLayerHotkey(hotkey) {
         if (hotkey.detail.name == "toggle-fxs-conquest-layer") {
