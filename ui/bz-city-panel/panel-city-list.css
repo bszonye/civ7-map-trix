@@ -1,7 +1,6 @@
 .bz-mini-map .mini-map__map-tacks-button,
 .bz-mini-map .mini-map__lens-button {
-    margin-left: 0.1111111111rem;
-    margin-right: 0.1111111111rem;
+  margin: 0 0.0555555556rem;
 }
 .bz-mini-map .mini-map__lens-button__bg,
 .bz-mini-map .mini-map__map-tacks-button__bg {
