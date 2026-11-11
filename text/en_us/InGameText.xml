@@ -136,6 +136,9 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_DISCOVERY_ICONS">
             <Text>Toggle Discovery Icons</Text>
         </Replace>
+        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_EXPLORATION_ICONS">
+            <Text>Toggle Exploration Icons</Text>
+        </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_DISCOVERY_ICONS_TT">
             <Text>Toggles visibility of discovery icons</Text>
         </Replace>

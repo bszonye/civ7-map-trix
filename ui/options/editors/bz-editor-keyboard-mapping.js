@@ -16,6 +16,7 @@ const BZ_KEYS_TO_ADD = [
     "toggle-bz-culture-borders-layer",
     "toggle-bz-city-borders-layer",
     "toggle-bz-discovery-layer",
+    "toggle-bz-exploration-layer",
     "toggle-bz-fortification-layer",
     "toggle-bz-religion-layer",
     "toggle-bz-route-layer",

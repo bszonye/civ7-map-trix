@@ -29,7 +29,7 @@ class bzReligionLensLayer {
     }
     showInMinimap = {
         labelKey: "LOC_UI_MINI_MAP_RELIGION",
-        sortOrder: 160
+        sortOrder: 150
     };
     getOptionName() {
         return "bzShowMapReligion";

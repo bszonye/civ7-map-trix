@@ -61,7 +61,7 @@ class bzRouteLensLayer {
     }
     showInMinimap = {
         labelKey: "LOC_UI_MINI_MAP_BZ_ROUTE",
-        sortOrder: 150
+        sortOrder: 160
     };
     getOptionName() {
         return "bzShowMapRoads";
