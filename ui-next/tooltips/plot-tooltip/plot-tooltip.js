@@ -42,7 +42,7 @@ var
   _tmpl$2 = /* @__PURE__ */ template(`<div class="flex items-center"></div>`),
   _tmpl$3 = /* @__PURE__ */ template(`<div></div>`),
   _tmpl$4 = /* @__PURE__ */ template(`<div class="flex flex-row items-center"><div class="flex-auto"></div><div class="font-body text-sm text-accent-3"></div></div>`),
-  _tmpl$5 = /* @__PURE__ */ template(`<div class="flex flex-row items-center"></div>`),
+  _tmpl$5 = /* @__PURE__ */ template(`<div class="flex flex-row items-center"><div class="flex-auto"></div><div class="flex flex-col items-end"><div class="font-body text-sm text-accent-3"></div></div></div>`),
   _tmpl$6 = /* @__PURE__ */ template(`<div class="absolute top-0\\.5 right-2\\.5 size-7 flex items-center justify-center bg-contain bg-center bg-no-repeat"><div class="size-5 bg-contain bg-center bg-no-repeat"></div></div>`),
   _tmpl$7 = /* @__PURE__ */ template(`<div class="flex items-center font-body text-xs text-accent-3"></div>`),
   _tmpl$8 = /* @__PURE__ */ template(`<div class="flex flex-col justify-center grow-0 shrink"></div>`),
@@ -245,19 +245,20 @@ const DistrictHealthRow = (props) => createComponent(TicketRow, {
     });
   },
   get children() {
-    var _el$6 = _tmpl$5();
+    var elWrap = _tmpl$5(), _el$6 = elWrap.firstChild, elRight = _el$6.nextSibling, elHP = elRight.firstChild;
     insert(_el$6, createComponent(L10n.Stylize, {
       "class": "font-title text-sm mr-1",
       text: "LOC_PLOT_TOOLTIP_DISTRICT_HEALTH_TITLE"
     }), null);
-    insert(_el$6, createComponent(L10n.Stylize, {
+    insert(elHP, createComponent(L10n.Stylize, {
       text: "LOC_PLOT_TOOLTIP_DISTRICT_HEALTH",
       get args() {
         return props.current != props.max ? [`${props.current}/${props.max}`] : [props.max];
       },
-      "class": "font-body text-xs text-accent-3"
+      // TRIX: defined in template
+      // "class": "font-body text-xs text-accent-3"
     }), null);
-    insert(_el$6, createComponent(Show, {
+    insert(elRight, createComponent(Show, {
       get when() {
         return props.constructibles.some((row) => {
           return getTypeHasTag(row.type, "FORTIFICATION");
@@ -266,7 +267,7 @@ const DistrictHealthRow = (props) => createComponent(TicketRow, {
       get children() {
         return [createComponent(L10n.Stylize, {
           "class": "font-title text-sm ml-1",
-          text: "("
+          text: ""  // "("
         }), createComponent(Tooltip.Text, {
           text: "LOC_PEDIA_CONCEPTS_FORTIFIED_DISTRICTS_TOOLTIP",
           get initialVPosition() {
@@ -280,19 +281,21 @@ const DistrictHealthRow = (props) => createComponent(TicketRow, {
             return createComponent(TooltipKeyword, {
               get children() {
                 return createComponent(L10n.Stylize, {
-                  "class": "font-title text-sm",
-                  text: "[icon:CITY_FORTIFIED] {LOC_PLOT_TOOLTIP_DISTRICT_FORTIFIED}"
+                  // "class": "font-title text-sm",
+                  "class": "font-title text-xs",  // TIX
+                  // text: "[icon:CITY_FORTIFIED] {LOC_PLOT_TOOLTIP_DISTRICT_FORTIFIED}"
+                  text: "LOC_PLOT_TOOLTIP_DISTRICT_FORTIFIED"
                 });
               }
             });
           }
         }), createComponent(L10n.Stylize, {
           "class": "font-title text-sm",
-          text: ")"
+          text: ""  // ")"
         })];
       }
     }), null);
-    return _el$6;
+    return elWrap;
   }
 });
 const PlayerOwnerRow = (props) => {
@@ -1636,20 +1639,22 @@ const PlotTooltipComponent = (props) => {
         return focusManager.activeElement() === document.body;
       });
       createEffect(on([plotCoords, IsPlotTooltipVisible, isGlobalRuleVisible, isWorldFocused, isRevealed, isWorldDragging, showTouchPressPlotTooltip, isDebugDisabled, selectedPlot, isShiftOrClickDown], ([currentPlotCoords, isVisible, currentGlobalRuleVisible, currentIsWorldFocused, revealed, currentIsWorldDragging, pressingShowTouchPlotTooltip, debugDisabled, currentSelectedPlot, currentIsShiftOrClickDown], prevValues) => {
+        console.warn(`TRIX SELECT ${JSON.stringify(currentSelectedPlot)}`);
+        console.warn(`TRIX CURRENT ${JSON.stringify(currentPlotCoords)}`);
         if (currentSelectedPlot) {
           clearTooltipDelay();
           tooltipModel.triggerTooltip(tooltipContext.id, TriggerType.Focus, currentSelectedPlot);
           return;
         }
-        const [prevPlotCoords, _prevIsVisible, _prevGlobalRuleVisible, _prevIsWorldFocused, _prevRevealed, prevIsWorldDragging, _prevPressingShowTouchPlotTooltip, _prevDebugDisabled, _prevIsShiftOrClickDown] = prevValues ?? [];
+        const [prevPlotCoords, _prevIsVisible, _prevGlobalRuleVisible, _prevIsWorldFocused, _prevRevealed, prevIsWorldDragging, _prevPressingShowTouchPlotTooltip, _prevDebugDisabled, _prevSelectedPlot, _prevIsShiftOrClickDown] = prevValues ?? [];
         if (!currentPlotCoords || !isVisible || !currentGlobalRuleVisible || !currentIsWorldFocused || !revealed || currentIsWorldDragging || debugDisabled || !pressingShowTouchPlotTooltip && IsTouchActive() || currentIsShiftOrClickDown) {
           // TRIX: add click-to-hide and shift-to-hide
           hidePlotTooltip();
         } else if (!currentIsWorldDragging && !currentIsShiftOrClickDown && !prevIsWorldDragging) {
           if (currentPlotCoords.x !== prevPlotCoords?.x || currentPlotCoords.y !== prevPlotCoords?.y) {
             // tooltipModel.triggerTooltip(tooltipContext.id, TriggerType.Blur, void 0);
+            // TRIX: skip this for smooth tile transitions
           }
-          // TRIX: skip this for smooth tile transitions
           triggerWithDelay(currentPlotCoords);
         }
       }));
