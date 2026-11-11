@@ -34,6 +34,19 @@ const FXS_USER_CONFIG_LENSES = [
     "fxs-settler-lens",
 ];
 
+// fix Appeal lens input context
+import { createComponent } from '/core/vendor/solid-js/dist/solid.js';
+import { defineLegacyComponent } from '/core/ui-next/components/fxs-solid-component.js';
+import { IsControllerActive } from '/core/ui-next/services/input.js';
+import { GeneralAppealPanel } from '/base-standard/ui-next/screens/lenses/general-appeal-lens/general-appeal-lens-panel.js';
+defineLegacyComponent("panel-general-appeal-legend", {
+    classNames: ["panel-general-appeal-legend", "fullscreen"],
+    tabIndex: 0,
+    inputContext: () => IsControllerActive() ? InputContext.Dual : InputContext.World
+}, (_attrs, _element) => {
+    return createComponent(GeneralAppealPanel, {});
+});
+
 // enable user configuration for vanilla lenses
 for (const lensType of FXS_USER_CONFIG_LENSES) {
     const lens = LensManager.lenses.get(lensType)
