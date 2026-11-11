@@ -11,8 +11,10 @@ import { ComponentRegistry } from '/core/ui-next/services/component-registry.js'
 import { FocusManager } from '/core/ui-next/services/focus-manager.js';
 import { isFocusable } from '/core/ui-next/services/focus.js';
 import { IsTouchActive, IsMouseActive } from '/core/ui-next/services/input.js';
+import { MapSearchModel } from '/core/ui-next/services/map-search-model.js';
 import { createSignalFromDebugWidget } from '/core/ui-next/utilities/debug-widgets.js';
 import { ProductionPanelCategory } from '/base-standard/ui/production-chooser/production-chooser-helpers.js';
+import { getTypeHasTag } from '/base-standard/ui/utilities/utilities-tags.js';
 // import { PillText, Pill } from '/core/ui-next/components/pills.js';
 import { YieldBarEntryStyle, YieldBar } from '/base-standard/ui-next/components/yield-bar.js';
 import { PlotAlertSection } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/components/bz-alerts.js';
@@ -28,6 +30,8 @@ import { hasRandomEventData, RandomEventPlotTooltipContent } from '/bz-map-trix/
 import { hasSettlementRecommendationData, SettlementRecommendationPlotTooltipContent } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/bz-settlement-recommendation-content.js';
 import { UnitFlag } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/bz-unit-flag.js';
 
+// var _tmpl$ = /* @__PURE__ */ template(`<div class="flex flex-row gap-2"></div>`), _tmpl$2 = /* @__PURE__ */ template(`<div class="flex items-center"></div>`), _tmpl$3 = /* @__PURE__ */ template(`<div></div>`), _tmpl$4 = /* @__PURE__ */ template(`<div class="flex flex-row items-center"><span class="font-body text-xs text-accent-3"></span></div>`), _tmpl$5 = /* @__PURE__ */ template(`<div class="flex flex-row items-center"></div>`), _tmpl$6 = /* @__PURE__ */ template(`<div class="absolute top-0\\.5 right-2\\.5 size-7 flex items-center justify-center bg-contain bg-center bg-no-repeat"><div class="size-5 bg-contain bg-center bg-no-repeat"></div></div>`), _tmpl$7 = /* @__PURE__ */ template(`<div class="flex items-center font-body text-sm text-accent-3"></div>`), _tmpl$8 = /* @__PURE__ */ template(`<div class="flex flex-col justify-center grow-0 shrink"></div>`), _tmpl$9 = /* @__PURE__ */ template(`<div class="flex flex-row font-title text-sm text-negative"></div>`), _tmpl$10 = /* @__PURE__ */ template(`<div class="flex flex-row font-body text-sm text-accent-3"></div>`), _tmpl$11 = /* @__PURE__ */ template(`<div class="flex flex-col font-body text-sm"></div>`), _tmpl$12 = /* @__PURE__ */ template(`<div class="relative"></div>`), _tmpl$13 = /* @__PURE__ */ template(`<div class="flex flex-row flex-wrap justify-center mt-1 gap-2"></div>`);
+
 import { bzGetRelationship } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/bz-helpers.js';
 import { BZ_DOT_JOINER, bzPill } from '/bz-map-trix/ui-next/tooltips/plot-tooltip/components/bz-utility.js';
 import { plotDefense } from '/bz-map-trix/ui/lenses/layer/bz-fortification-layer.js';
@@ -37,15 +41,16 @@ var
   _tmpl$ = /* @__PURE__ */ template(`<div class="flex flex-row gap-1"></div>`),
   _tmpl$2 = /* @__PURE__ */ template(`<div class="flex items-center"></div>`),
   _tmpl$3 = /* @__PURE__ */ template(`<div></div>`),
-  _tmpl$4 = /* @__PURE__ */ template(`<div class="flex flex-row"><div class="flex-auto"></div><div class="font-body text-sm text-accent-3"></div></div>`),
-  _tmpl$5 = /* @__PURE__ */ template(`<div class="absolute top-0\\.5 right-2\\.5 size-7 flex items-center justify-center bg-contain bg-center bg-no-repeat"><div class="size-5 bg-contain bg-center bg-no-repeat"></div></div>`),
-  _tmpl$6 = /* @__PURE__ */ template(`<div class="flex items-center font-body text-xs text-accent-3"></div>`),
-  _tmpl$7 = /* @__PURE__ */ template(`<div class="flex flex-col justify-center grow-0 shrink"></div>`),
-  _tmpl$8 = /* @__PURE__ */ template(`<div class="flex flex-row font-title text-sm text-negative"></div>`),
-  _tmpl$9 = /* @__PURE__ */ template(`<div class="flex flex-row font-body text-xs text-accent-3"></div>`),
-  _tmpl$10 = /* @__PURE__ */ template(`<div class="flex flex-col font-title text-sm text-accent-3"></div>`),
-  _tmpl$11 = /* @__PURE__ */ template(`<div class="relative"></div>`),
-  _tmpl$12 = /* @__PURE__ */ template(`<div class="flex flex-row flex-wrap justify-center mt-1 mb-0\\.5 gap-1\\.5"></div>`);
+  _tmpl$4 = /* @__PURE__ */ template(`<div class="flex flex-row items-center"><div class="flex-auto"></div><div class="font-body text-sm text-accent-3"></div></div>`),
+  _tmpl$5 = /* @__PURE__ */ template(`<div class="flex flex-row items-center"></div>`),
+  _tmpl$6 = /* @__PURE__ */ template(`<div class="absolute top-0\\.5 right-2\\.5 size-7 flex items-center justify-center bg-contain bg-center bg-no-repeat"><div class="size-5 bg-contain bg-center bg-no-repeat"></div></div>`),
+  _tmpl$7 = /* @__PURE__ */ template(`<div class="flex items-center font-body text-xs text-accent-3"></div>`),
+  _tmpl$8 = /* @__PURE__ */ template(`<div class="flex flex-col justify-center grow-0 shrink"></div>`),
+  _tmpl$9 = /* @__PURE__ */ template(`<div class="flex flex-row font-title text-sm text-negative"></div>`),
+  _tmpl$10 = /* @__PURE__ */ template(`<div class="flex flex-row font-body text-xs text-accent-3"></div>`),
+  _tmpl$11 = /* @__PURE__ */ template(`<div class="flex flex-col font-title text-sm text-accent-3"></div>`),
+  _tmpl$12 = /* @__PURE__ */ template(`<div class="relative"></div>`),
+  _tmpl$13 = /* @__PURE__ */ template(`<div class="flex flex-row flex-wrap justify-center mt-1 mb-0\\.5 gap-1\\.5"></div>`);
 const _PROTECTED_IMPORTS = [isFocusable];
 const [IsPlotTooltipVisible, SetIsPlotTooltipVisible] = createSignal(true);
 const ConstructibleRow = (props) => {
@@ -207,8 +212,8 @@ const SpecialistsRow = (props) => createComponent(TicketRow, {
   },
   get children() {
     // TRIX: right-align specialist count
-    var _el$4 = _tmpl$4(), _el$5 = _el$4.firstChild, _el$6 = _el$5.nextSibling;
-    insert(_el$5, createComponent(Tooltip.Text, {
+    var elWrap = _tmpl$4(), _el$4 = elWrap.firstChild, _el$5 = _el$4.nextSibling;
+    insert(_el$4, createComponent(Tooltip.Text, {
       text: "LOC_PEDIA_CONCEPTS_SPECIALIST_TOOLTIP",
       get initialVPosition() {
         return TooltipVerticalPosition.BOTTOM;
@@ -228,8 +233,66 @@ const SpecialistsRow = (props) => createComponent(TicketRow, {
         });
       }
     }), null);
-    insert(_el$6, () => `${props.current}/${props.max}`);
-    return _el$4;
+    insert(_el$5, () => `${props.current}/${props.max}`);
+    return elWrap;
+  }
+});
+const DistrictHealthRow = (props) => createComponent(TicketRow, {
+  get icon() {
+    return createComponent(Icon, {
+      "class": "size-6",
+      name: "Action_Heal"
+    });
+  },
+  get children() {
+    var _el$6 = _tmpl$5();
+    insert(_el$6, createComponent(L10n.Stylize, {
+      "class": "font-title text-sm mr-1",
+      text: "LOC_PLOT_TOOLTIP_DISTRICT_HEALTH_TITLE"
+    }), null);
+    insert(_el$6, createComponent(L10n.Stylize, {
+      text: "LOC_PLOT_TOOLTIP_DISTRICT_HEALTH",
+      get args() {
+        return props.current != props.max ? [`${props.current}/${props.max}`] : [props.max];
+      },
+      "class": "font-body text-xs text-accent-3"
+    }), null);
+    insert(_el$6, createComponent(Show, {
+      get when() {
+        return props.constructibles.some((row) => {
+          return getTypeHasTag(row.type, "FORTIFICATION");
+        });
+      },
+      get children() {
+        return [createComponent(L10n.Stylize, {
+          "class": "font-title text-sm ml-1",
+          text: "("
+        }), createComponent(Tooltip.Text, {
+          text: "LOC_PEDIA_CONCEPTS_FORTIFIED_DISTRICTS_TOOLTIP",
+          get initialVPosition() {
+            return TooltipVerticalPosition.BOTTOM;
+          },
+          get initialHPosition() {
+            return TooltipHorizontalPosition.RIGHT;
+          },
+          allowFlip: true,
+          get children() {
+            return createComponent(TooltipKeyword, {
+              get children() {
+                return createComponent(L10n.Stylize, {
+                  "class": "font-title text-sm",
+                  text: "[icon:CITY_FORTIFIED] {LOC_PLOT_TOOLTIP_DISTRICT_FORTIFIED}"
+                });
+              }
+            });
+          }
+        }), createComponent(L10n.Stylize, {
+          "class": "font-title text-sm",
+          text: ")"
+        })];
+      }
+    }), null);
+    return _el$6;
   }
 });
 const PlayerOwnerRow = (props) => {
@@ -354,10 +417,10 @@ const UnitInfoSection = (props) => {
     "class": "relative",
     get children() {
       return [(() => {
-        var _el$6 = _tmpl$5(), _el$7 = _el$6.firstChild;
-        _el$6.style.setProperty("background-image", "url(blp:tooltip_unitIconHolder)");
-        createRenderEffect((_$p) => (_$p = props.isCivilian ? "url(blp:action_civilianunits)" : "url(blp:tooltip_unitIcon)") != null ? _el$7.style.setProperty("background-image", _$p) : _el$7.style.removeProperty("background-image"));
-        return _el$6;
+        var _el$7 = _tmpl$6(), _el$8 = _el$7.firstChild;
+        _el$7.style.setProperty("background-image", "url(blp:tooltip_unitIconHolder)");
+        createRenderEffect((_$p) => (_$p = props.isCivilian ? "url(blp:action_civilianunits)" : "url(blp:tooltip_unitIcon)") != null ? _el$8.style.setProperty("background-image", _$p) : _el$8.style.removeProperty("background-image"));
+        return _el$7;
       })(), createComponent(TicketRow, {
         get icon() {
           return unitIcon();
@@ -487,8 +550,8 @@ const IndependentUnitInfo = (props) => {
       return false;  // props.relationship;
     },
     children: (relationship) => (() => {
-      var _el$8 = _tmpl$6();
-      insert(_el$8, createComponent(Show, {
+      var _el$9 = _tmpl$7();
+      insert(_el$9, createComponent(Show, {
         get when() {
           return relationship().hostile;
         },
@@ -499,12 +562,12 @@ const IndependentUnitInfo = (props) => {
           });
         }
       }), null);
-      insert(_el$8, createComponent(L10n.Compose, {
+      insert(_el$9, createComponent(L10n.Compose, {
         get text() {
           return relationship().name;
         }
       }), null);
-      return _el$8;
+      return _el$9;
     })()
   })];
 };
@@ -538,8 +601,8 @@ const PlayerUnitInfo = (props) => {
       return false;  // props.relationship;
     },
     get children() {
-      var _el$9 = _tmpl$6();
-      insert(_el$9, createComponent(Show, {
+      var _el$10 = _tmpl$7();
+      insert(_el$10, createComponent(Show, {
         get when() {
           return props.isAtWarWithOwner;
         },
@@ -550,8 +613,8 @@ const PlayerUnitInfo = (props) => {
           });
         }
       }), null);
-      insert(_el$9, civName, null);
-      return _el$9;
+      insert(_el$10, civName, null);
+      return _el$10;
     }
   }), createComponent(Show, {
     get when() {
@@ -582,22 +645,22 @@ const ResourceInfoRow = (props) => {
       });
     },
     get children() {
-      var _el$10 = _tmpl$7();
-      insert(_el$10, createComponent(L10n.Stylize, {
+      var _el$11 = _tmpl$8();
+      insert(_el$11, createComponent(L10n.Stylize, {
         "class": "font-title text-sm uppercase text-secondary",
         // TRIX: add color
         get text() {
           return props.resource.Name;
         }
       }), null);
-      insert(_el$10, createComponent(L10n.Stylize, {
+      insert(_el$11, createComponent(L10n.Stylize, {
         // TRIX: add font styling
         "class": "font-body text-xs text-accent-3",
         get text() {
           return props.resource.Tooltip;
         }
       }), null);
-      return _el$10;
+      return _el$11;
     }
   })];
 };
@@ -609,11 +672,11 @@ const DebugInfoSection = (props) => {
       return createComponent(TicketRow, {
         get children() {
           return [(() => {
-            var _el$11 = _tmpl$8();
-            insert(_el$11, createComponent(L10n.Compose, {
+            var _el$12 = _tmpl$9();
+            insert(_el$12, createComponent(L10n.Compose, {
               text: "LOC_PLOT_TOOLTIP_DEBUG_TITLE"
             }), null);
-            insert(_el$11, createComponent(Show, {
+            insert(_el$12, createComponent(Show, {
               get when() {
                 return hasHealth();
               },
@@ -622,21 +685,21 @@ const DebugInfoSection = (props) => {
                 return `: ${props.currentHealth} / ${props.maxHealth}`;
               }
             }), null);
-            return _el$11;
-          })(), (() => {
-            var _el$12 = _tmpl$9();
-            insert(_el$12, createComponent(L10n.Compose, {
-              text: "LOC_PLOT_TOOLTIP_PLOT"
-            }), null);
-            insert(_el$12, () => `: (${props.plotCoord.x},${props.plotCoord.y})`, null);
             return _el$12;
           })(), (() => {
-            var _el$13 = _tmpl$9();
+            var _el$13 = _tmpl$10();
             insert(_el$13, createComponent(L10n.Compose, {
+              text: "LOC_PLOT_TOOLTIP_PLOT"
+            }), null);
+            insert(_el$13, () => `: (${props.plotCoord.x},${props.plotCoord.y})`, null);
+            return _el$13;
+          })(), (() => {
+            var _el$14 = _tmpl$10();
+            insert(_el$14, createComponent(L10n.Compose, {
               text: "LOC_PLOT_TOOLTIP_INDEX"
             }), null);
-            insert(_el$13, () => `: ${props.plotIndex}`, null);
-            return _el$13;
+            insert(_el$14, () => `: ${props.plotIndex}`, null);
+            return _el$14;
           })()];
         }
       });
@@ -731,8 +794,8 @@ const ConstructibleRows = (props) => {
           },
           get children() {
             // TRIX: show warehouse bonuses for unique improvements
-            var _el$14 = _tmpl$10();
-            insert(_el$14, createComponent(L10n.Stylize, {
+            var _el$15 = _tmpl$11();
+            insert(_el$15, createComponent(L10n.Stylize, {
               "class": "font-body text-2xs text-accent-2",
               get text() {
                 return props.constructibles.length ?
@@ -740,12 +803,12 @@ const ConstructibleRows = (props) => {
                   "LOC_PLOT_TOOLTIP_GROWTH_IMPROVEMENT_PREFIX_ONLY";
               }
             }), null);
-            insert(_el$14, createComponent(L10n.Compose, {
+            insert(_el$15, createComponent(L10n.Compose, {
               get text() {
                 return freeInfo().name;
               }
             }), null);
-            return _el$14;
+            return _el$15;
           }
         })]
       })];
@@ -783,6 +846,11 @@ const PlotDetailsSection = (props) => {
   });
   const hasConstructiblesContent = createMemo(() => {
     return props.constructibles.length > 0 || freeImprovement() != null;
+  });
+  const hasDistrictHealth = createMemo(() => {
+    return props.district?.type == DistrictTypes.CITY_CENTER || [DistrictTypes.URBAN, DistrictTypes.WONDER].includes(props.district?.type ?? DistrictTypes.INVALID) && props.constructibles.some((row) => {
+      return getTypeHasTag(row.type, "FORTIFICATION");
+    });
   });
   const specialistDesc = createMemo(() => getSpecialistDescription(props.plotCoord, props.owningCity));
   const specialistsAssigned = createMemo(() => {
@@ -884,7 +952,7 @@ const PlotDetailsSection = (props) => {
               return hasConstructiblesContent();
             },
             get children() {
-              return createComponent(ConstructibleRows, {
+              return [createComponent(ConstructibleRows, {
                 get constructibles() {
                   // TRIX: sort walls last
                   props.constructibles.sort((a, b) => +(a.isWall) - +(b.isWall));
@@ -902,7 +970,24 @@ const PlotDetailsSection = (props) => {
                 get isLocalPlayer() {
                   return props.owningPlayer === GameContext.localPlayerID;
                 }
-              });
+              }), createComponent(Show, {
+                get when() {
+                  return hasDistrictHealth() && (props.districtHealth.max ?? 0 > 0);
+                },
+                get children() {
+                  return [createComponent(EntryDivider, {}), createComponent(DistrictHealthRow, {
+                    get constructibles() {
+                      return props.constructibles;
+                    },
+                    get current() {
+                      return props.districtHealth.current ?? 0;
+                    },
+                    get max() {
+                      return props.districtHealth.max ?? 0;
+                    }
+                  })];
+                }
+              })];
             }
           }), createComponent(Show, {
             get when() {
@@ -945,6 +1030,14 @@ const PlotTooltipContent = (props) => {
   const localPlayer = Players.get(GameContext.localObserverID);
   const isDistantLands = createMemo(() => localPlayer.isDistantLands(local.plotCoord) ?? false);
   const district = createMemo(() => Districts.getAtLocation(props.plotCoord));
+  const districtHealth = createMemo(() => {
+    const ph = Players.Districts.get(playerID())?.getDistrictHealth(local.plotCoord);
+    const mh = Players.Districts.get(playerID())?.getDistrictMaxHealth(local.plotCoord);
+    return {
+      current: ph,
+      max: mh
+    };
+  });
   const overbuildableConstructibles = createMemo(() => district()?.getOverbuildableConstructibleTypes() ?? []);
   const constructibles = createMemo(() => {
     const plotConstructibles = MapConstructibles.getHiddenFilteredConstructibles(local.plotCoord.x, local.plotCoord.y);
@@ -1153,14 +1246,14 @@ const PlotTooltipContent = (props) => {
     // TRIX: separate with dots, not commas
   });
   return (() => {
-    var _el$15 = _tmpl$3();
-    spread(_el$15, mergeProps({
+    var _el$16 = _tmpl$3();
+    spread(_el$16, mergeProps({
       get ["class"]() {
         return `w-full min-w-62 max-w-84 text-sm ${local.class ?? ""}`;
         // TRIX: keep previous width limit
       }
     }, other), false, true);
-    insert(_el$15, createComponent(Show, {
+    insert(_el$16, createComponent(Show, {
       get when() {
         return biomeLabel();
       },
@@ -1184,13 +1277,13 @@ const PlotTooltipContent = (props) => {
         });
       }
     }), null);
-    insert(_el$15, createComponent(Show, {
+    insert(_el$16, createComponent(Show, {
       get when() {
         return subheaderText();
       },
       get children() {
-        var _el$16 = _tmpl$11();
-        insert(_el$16, createComponent(L10n.Stylize, {
+        var _el$17 = _tmpl$12();
+        insert(_el$17, createComponent(L10n.Stylize, {
           "class": "text-2xs text-center",
           // TRIX: resize text
           style: {
@@ -1201,17 +1294,17 @@ const PlotTooltipContent = (props) => {
             return subheaderText();
           }
         }));
-        return _el$16;
+        return _el$17;
       }
     }), null);
-    insert(_el$15, createComponent(Show, {
+    insert(_el$16, createComponent(Show, {
       get when() {
         return keywordPills().length;
         // TRIX: move route pill into keywordPills
       },
       get children() {
-        var _el$17 = _tmpl$12();
-        insert(_el$17, createComponent(For, {
+        var _el$18 = _tmpl$13();
+        insert(_el$18, createComponent(For, {
           get each() {
             return keywordPills();
           },
@@ -1222,10 +1315,10 @@ const PlotTooltipContent = (props) => {
             text: keyword.text ?? keyword,
           })
         }), null);
-        return _el$17;
+        return _el$18;
       }
     }), null);
-    insert(_el$15, createComponent(PlotAlertSection, {
+    insert(_el$16, createComponent(PlotAlertSection, {
       get plotCoord() {
         return local.plotCoord;
       },
@@ -1245,7 +1338,7 @@ const PlotTooltipContent = (props) => {
         return unitEntries();
       }
     }), null);
-    insert(_el$15, createComponent(Show, {
+    insert(_el$16, createComponent(Show, {
       get when() {
         return createMemo(() => !!(hexTreasureResource()?.ResourceClassType === "RESOURCECLASS_TREASURE" && local.owningCity != null))() && isDistantLands();
       },
@@ -1260,7 +1353,7 @@ const PlotTooltipContent = (props) => {
         });
       }
     }), null);
-    insert(_el$15, createComponent(Show, {
+    insert(_el$16, createComponent(Show, {
       get when() {
         return feature().volcano;
       },
@@ -1270,7 +1363,7 @@ const PlotTooltipContent = (props) => {
         }
       })
     }), null);
-    insert(_el$15, createComponent(Show, {
+    insert(_el$16, createComponent(Show, {
       get when() {
         return feature().isNaturalWonder;
       },
@@ -1309,7 +1402,7 @@ const PlotTooltipContent = (props) => {
         });
       }
     }), null);
-    insert(_el$15, createComponent(PlotDetailsSection, {
+    insert(_el$16, createComponent(PlotDetailsSection, {
       get plotCoord() {
         return local.plotCoord;
       },
@@ -1324,15 +1417,18 @@ const PlotTooltipContent = (props) => {
       },
       get district() {
         return district();
+      },
+      get districtHealth() {
+        return districtHealth();
       }
     }), null);
-    insert(_el$15, createComponent(For, {
+    insert(_el$16, createComponent(For, {
       get each() {
         return unitEntries();
       },
       children: (info) => createComponent(UnitInfoSection, info)
     }), null);
-    insert(_el$15, createComponent(Show, {
+    insert(_el$16, createComponent(Show, {
       get when() {
         return yieldBarData().length > 0;
       },
@@ -1361,7 +1457,7 @@ const PlotTooltipContent = (props) => {
         })];
       }
     }), null);
-    insert(_el$15, createComponent(Show, {
+    insert(_el$16, createComponent(Show, {
       get when() {
         return isShowingDebug();
       },
@@ -1382,7 +1478,7 @@ const PlotTooltipContent = (props) => {
         });
       }
     }), null);
-    return _el$15;
+    return _el$16;
   })();
 };
 function getPlotTooltipKind(plotCoord) {
@@ -1402,7 +1498,11 @@ function getPlotTooltipKind(plotCoord) {
 }
 const PlotTooltipComponent = (props) => {
   const [local, other] = splitProps(props, ["showDebug", "class"]);
-  const [plotCoords, setPlotCoords] = createSignal();
+  const {
+    selectedPlot
+  } = MapSearchModel.get();
+  const [cursorPlotCoords, setCursorPlotCoords] = createSignal();
+  const plotCoords = createMemo(() => selectedPlot() ?? cursorPlotCoords());
   const owningCity = createMemo(() => {
     const coord = plotCoords();
     if (!coord) return null;
@@ -1440,7 +1540,7 @@ const PlotTooltipComponent = (props) => {
         domainType: "bool",
         value: false
       });
-      const triggerContext = new TriggerActivationContextProvider(tooltipModel, parentContext, () => tooltipContext.name);
+      const triggerContext = new TriggerActivationContextProvider(tooltipModel, parentContext, () => tooltipContext.id);
       tooltipContext.setTriggerContext(triggerContext);
       let tooltipDelayHandle;
       const clearTooltipDelay = () => {
@@ -1450,34 +1550,34 @@ const PlotTooltipComponent = (props) => {
         }
       };
       const hidePlotTooltip = () => {
-        if (tooltipModel.isLocked(tooltipContext.name)) {
+        if (tooltipModel.isLocked(tooltipContext.id)) {
           return;
         }
         clearTooltipDelay();
-        tooltipModel.triggerTooltip(tooltipContext.name, TriggerType.Blur, void 0);
+        tooltipModel.triggerTooltip(tooltipContext.id, TriggerType.Blur, void 0);
       };
       const triggerWithDelay = (plotCoords2) => {
         clearTooltipDelay();
         const activeTooltips = tooltipModel.active();
         const delay = activeTooltips.length === 0 ? Configuration.getUser().plotTooltipDelay : 0;
         if (delay <= 0) {
-          tooltipModel.triggerTooltip(tooltipContext.name, TriggerType.Focus, plotCoords2);
+          tooltipModel.triggerTooltip(tooltipContext.id, TriggerType.Focus, plotCoords2);
           return;
         }
         tooltipDelayHandle = window.setTimeout(() => {
           tooltipDelayHandle = void 0;
-          tooltipModel.triggerTooltip(tooltipContext.name, TriggerType.Focus, plotCoords2);
+          tooltipModel.triggerTooltip(tooltipContext.id, TriggerType.Focus, plotCoords2);
         }, delay);
       };
       const trySetPlotCoords = (incomingPlotCoords) => {
-        const currentPlotCoord = plotCoords();
+        const currentPlotCoord = cursorPlotCoords();
         if (incomingPlotCoords?.x === currentPlotCoord?.x && incomingPlotCoords?.y === currentPlotCoord?.y) {
           return;
         }
-        if (tooltipModel.isLocked(tooltipContext.name)) {
+        if (tooltipModel.isLocked(tooltipContext.id)) {
           return;
         }
-        setPlotCoords(incomingPlotCoords);
+        setCursorPlotCoords(incomingPlotCoords);
       };
       const onCursorUpdated = (event) => {
         trySetPlotCoords(event.detail.plot ?? void 0);
@@ -1535,14 +1635,19 @@ const PlotTooltipComponent = (props) => {
       const isWorldFocused = createMemo(() => {
         return focusManager.activeElement() === document.body;
       });
-      createEffect(on([plotCoords, IsPlotTooltipVisible, isGlobalRuleVisible, isWorldFocused, isRevealed, isWorldDragging, showTouchPressPlotTooltip, isDebugDisabled, isShiftOrClickDown], ([currentPlotCoords, isVisible, currentGlobalRuleVisible, currentIsWorldFocused, revealed, currentIsWorldDragging, pressingShowTouchPlotTooltip, debugDisabled, currentIsShiftOrClickDown], prevValues) => {
+      createEffect(on([plotCoords, IsPlotTooltipVisible, isGlobalRuleVisible, isWorldFocused, isRevealed, isWorldDragging, showTouchPressPlotTooltip, isDebugDisabled, selectedPlot, isShiftOrClickDown], ([currentPlotCoords, isVisible, currentGlobalRuleVisible, currentIsWorldFocused, revealed, currentIsWorldDragging, pressingShowTouchPlotTooltip, debugDisabled, currentSelectedPlot, currentIsShiftOrClickDown], prevValues) => {
+        if (currentSelectedPlot) {
+          clearTooltipDelay();
+          tooltipModel.triggerTooltip(tooltipContext.id, TriggerType.Focus, currentSelectedPlot);
+          return;
+        }
         const [prevPlotCoords, _prevIsVisible, _prevGlobalRuleVisible, _prevIsWorldFocused, _prevRevealed, prevIsWorldDragging, _prevPressingShowTouchPlotTooltip, _prevDebugDisabled, _prevIsShiftOrClickDown] = prevValues ?? [];
         if (!currentPlotCoords || !isVisible || !currentGlobalRuleVisible || !currentIsWorldFocused || !revealed || currentIsWorldDragging || debugDisabled || !pressingShowTouchPlotTooltip && IsTouchActive() || currentIsShiftOrClickDown) {
           // TRIX: add click-to-hide and shift-to-hide
           hidePlotTooltip();
         } else if (!currentIsWorldDragging && !currentIsShiftOrClickDown && !prevIsWorldDragging) {
           if (currentPlotCoords.x !== prevPlotCoords?.x || currentPlotCoords.y !== prevPlotCoords?.y) {
-            // tooltipModel.triggerTooltip(tooltipContext.name, TriggerType.Blur, void 0);
+            // tooltipModel.triggerTooltip(tooltipContext.id, TriggerType.Blur, void 0);
           }
           // TRIX: skip this for smooth tile transitions
           triggerWithDelay(currentPlotCoords);
