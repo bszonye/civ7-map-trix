@@ -93,6 +93,10 @@ class bzWonderLensLayer {
         this.visible = false;
         PlotIconsManager.removePlotIcons("bz-plot-icon-wonders");
     }
+    showInMinimap = {
+        labelKey: "LOC_UI_PRODUCTION_WONDERS",
+        sortOrder: 180
+    };
     getOptionName() {
         return "bzShowMapWonders";
     }

@@ -126,6 +126,10 @@ class bzFortificationLensLayer {
     removeLayer() {
         this.bzSpriteGrid.setVisible(false);
     }
+    showInMinimap = {
+        labelKey: "LOC_UI_MINI_MAP_BZ_FORTIFICATION",
+        sortOrder: 130
+    };
     getOptionName() {
         return "bzShowMapFortifications";
     }

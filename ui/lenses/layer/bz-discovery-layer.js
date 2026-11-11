@@ -32,6 +32,10 @@ class bzDiscoveryLensLayer {
     removeLayer() {
         this.bzSpriteGrid.setVisible(false);
     }
+    showInMinimap = {
+        labelKey: "LOC_UI_MINI_MAP_BZ_DISCOVERY",
+        sortOrder: 110
+    };
     getOptionName() {
         return "bzShowMapDiscoveries";
     }

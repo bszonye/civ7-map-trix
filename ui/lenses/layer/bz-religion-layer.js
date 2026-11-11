@@ -27,6 +27,10 @@ class bzReligionLensLayer {
     removeLayer() {
         this.bzSpriteGrid.setVisible(false);
     }
+    showInMinimap = {
+        labelKey: "LOC_UI_MINI_MAP_RELIGION",
+        sortOrder: 160
+    };
     getOptionName() {
         return "bzShowMapReligion";
     }

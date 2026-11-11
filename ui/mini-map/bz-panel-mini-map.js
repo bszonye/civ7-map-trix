@@ -22,16 +22,6 @@ const BZ_LENSES = {
     "bz-religion-lens": "LOC_UI_MINI_MAP_RELIGION",
     "bz-commander-lens": "LOC_UI_MINI_MAP_COMMANDER",
 };
-const BZ_LAYERS = {
-    "bz-discovery-layer": "LOC_UI_MINI_MAP_BZ_DISCOVERY",
-    "bz-culture-borders-layer": "LOC_UI_MINI_MAP_BZ_BORDERS",
-    "bz-fortification-layer": "LOC_UI_MINI_MAP_BZ_FORTIFICATION",
-    "bz-city-borders-layer": "LOC_UI_MINI_MAP_BZ_CITY_BORDERS",
-    "bz-route-layer": "LOC_UI_MINI_MAP_BZ_ROUTE",
-    "bz-religion-layer": "LOC_UI_MINI_MAP_RELIGION",
-    "bz-terrain-layer": "LOC_UI_MINI_MAP_BZ_TERRAIN",
-    "bz-wonder-layer": "LOC_UI_PRODUCTION_WONDERS",
-};
 const BZ_EXTRA_LAYERS = {
     "fxs-discovery-lens": [ "bz-fortification-layer", "bz-route-layer", ],
     "fxs-settler-lens": [ "bz-city-borders-layer", ],
@@ -401,9 +391,6 @@ class bzLensPanel {
         for (const [lens, name] of Object.entries(BZ_LENSES)) {
             this.component.createLensButton(name, lens, "lens-group");
         }
-        for (const [layer, name] of Object.entries(BZ_LAYERS)) {
-            this.component.createLayerCheckbox(name, layer);
-        }
         // hide checkboxes for fxs borders (added by Border Toggles)
         for (const layer of ["fxs-city-borders-layer", "fxs-culture-borders-layer"]) {
             const checkbox = this.component.layerElementMap[layer];
@@ -428,11 +415,3 @@ class bzTradeRouteChooser {
     afterDetach() { }
 }
 Controls.decorate("trade-route-chooser", (component) => new bzTradeRouteChooser(component));
-
-// patch Trade layer to fix race condition when switching lenses quickly
-const fxsTradeLayer = LensManager.layers.get("fxs-trade-layer");
-const FTL_applyLayer = fxsTradeLayer.applyLayer;
-fxsTradeLayer.applyLayer = async function(...args) {
-    await FTL_applyLayer.apply(this, args);
-    if (!LensManager.isLayerEnabled("fxs-trade-layer")) this.removeLayer();
-}

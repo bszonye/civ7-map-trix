@@ -110,6 +110,10 @@ class bzCityBordersLayer {
     removeLayer() {
         this.cityOverlayGroup.setVisible(false);
     }
+    showInMinimap = {
+        labelKey: "LOC_UI_MINI_MAP_BZ_CITY_BORDERS",
+        sortOrder: 140
+    };
     getOptionName() {
         return "bzShowMapCityBorders";
     }

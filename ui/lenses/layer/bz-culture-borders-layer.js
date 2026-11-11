@@ -143,6 +143,10 @@ class bzCultureBordersLayer {
     removeLayer() {
         this.cultureOverlayGroup.setVisible(false);
     }
+    showInMinimap = {
+        labelKey: "LOC_UI_MINI_MAP_BZ_BORDERS",
+        sortOrder: 120
+    };
     getOptionName() {
         return "bzShowMapCultureBorders";
     }
