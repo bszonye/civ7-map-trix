@@ -1639,8 +1639,6 @@ const PlotTooltipComponent = (props) => {
         return focusManager.activeElement() === document.body;
       });
       createEffect(on([plotCoords, IsPlotTooltipVisible, isGlobalRuleVisible, isWorldFocused, isRevealed, isWorldDragging, showTouchPressPlotTooltip, isDebugDisabled, selectedPlot, isShiftOrClickDown], ([currentPlotCoords, isVisible, currentGlobalRuleVisible, currentIsWorldFocused, revealed, currentIsWorldDragging, pressingShowTouchPlotTooltip, debugDisabled, currentSelectedPlot, currentIsShiftOrClickDown], prevValues) => {
-        console.warn(`TRIX SELECT ${JSON.stringify(currentSelectedPlot)}`);
-        console.warn(`TRIX CURRENT ${JSON.stringify(currentPlotCoords)}`);
         if (currentSelectedPlot) {
           clearTooltipDelay();
           tooltipModel.triggerTooltip(tooltipContext.id, TriggerType.Focus, currentSelectedPlot);
