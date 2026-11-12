@@ -8,9 +8,9 @@ const SPRITE_OFFSET = { x: 0, y: 25, z: 5 };
 const SPRITE_SCALE = 3/4;
 const SPRITE_SIZE = 64 * SPRITE_SCALE; // pixels wide
 
-class bzExplorationLensLayer {
+class bzDiscoveryLensLayer {
     bzSpriteGrid = WorldUI.createSpriteGrid(
-        "bzExplorationLayer_SpriteGroup",
+        "bzDiscoveryLayer_SpriteGroup",
         SpriteMode.FixedBillboard
     );
     upscaleMultiplier = 1;
@@ -33,7 +33,7 @@ class bzExplorationLensLayer {
         this.bzSpriteGrid.setVisible(false);
     }
     showInMinimap = {
-        labelKey: "LOC_AGE_EXPLORATION_NAME",
+        labelKey: "LOC_UI_MINI_MAP_DISCOVERY",
         tooltipKey: "LOC_UI_MINI_MAP_DISCOVERY_TOOLTIP",
         sortOrder: 110
     };
@@ -71,10 +71,8 @@ class bzExplorationLensLayer {
     }
     onLayerHotkey(hotkey) {
         if (hotkey.detail.name == "toggle-bz-discovery-layer") {
-            LensManager.toggleLayer("fxs-discovery-layer");
-        } else if (hotkey.detail.name == "toggle-bz-exploration-layer") {
-            LensManager.toggleLayer("bz-exploration-layer");
+            LensManager.toggleLayer("bz-discovery-layer");
         }
     }
 }
-LensManager.registerLensLayer("bz-exploration-layer", new bzExplorationLensLayer());
+LensManager.registerLensLayer("bz-discovery-layer", new bzDiscoveryLensLayer());

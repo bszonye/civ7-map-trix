@@ -94,7 +94,6 @@ HotkeyManager.handleInput = function(...args) {
             case "toggle-bz-culture-borders-layer":
             case "toggle-bz-city-borders-layer":
             case "toggle-bz-discovery-layer":
-            case "toggle-bz-exploration-layer":
             case "toggle-bz-fortification-layer":
             case "toggle-bz-religion-layer":
             case "toggle-bz-route-layer":

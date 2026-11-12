@@ -136,9 +136,6 @@
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_DISCOVERY_ICONS">
             <Text>Toggle Discovery Icons</Text>
         </Replace>
-        <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_EXPLORATION_ICONS">
-            <Text>Toggle Exploration Icons</Text>
-        </Replace>
         <Replace Tag="LOC_UI_KBM_MAPPING_TOGGLE_BZ_DISCOVERY_ICONS_TT">
             <Text>Toggles visibility of discovery icons</Text>
         </Replace>
@@ -177,9 +174,6 @@
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_CITY_BORDERS">
             <Text>City Limits</Text>
-        </Replace>
-        <Replace Tag="LOC_UI_MINI_MAP_BZ_DISCOVERY">
-            <Text>Discoveries</Text>
         </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_FORTIFICATION">
             <Text>Fortifications</Text>

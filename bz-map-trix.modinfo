@@ -74,7 +74,7 @@
                     <Item>ui/interface-modes/bz-interface-modes.js</Item>
                     <Item>ui/lenses/layer/bz-city-borders-layer.js</Item>
                     <Item>ui/lenses/layer/bz-culture-borders-layer.js</Item>
-                    <Item>ui/lenses/layer/bz-exploration-layer.js</Item>
+                    <Item>ui/lenses/layer/bz-discovery-layer.js</Item>
                     <Item>ui/lenses/layer/bz-fortification-layer.js</Item>
                     <Item>ui/lenses/layer/bz-religion-layer.js</Item>
                     <Item>ui/lenses/layer/bz-route-layer.js</Item>

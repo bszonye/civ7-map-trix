@@ -207,9 +207,9 @@ for (const [lensType, lens] of LensManager.lenses.entries()) {
     }
     active.delete("fxs-city-borders-layer");
     active.delete("fxs-culture-borders-layer");
-    // add exploration layer to every lens that allows Resources
+    // add discovery layer to every lens that allows Resources
     if (active.has("fxs-resource-layer") || allowed.has("fxs-resource-layer")) {
-        active.add("bz-exploration-layer");
+        active.add("bz-discovery-layer");
     }
     // fix Hex Grid configurability (use "allowed" instead of "active")
     if (active.has("fxs-hexgrid-layer")) {
