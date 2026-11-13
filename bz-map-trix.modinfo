@@ -59,9 +59,6 @@
                     <Item>ui/bz-style/bz-panel-yield-banner.css</Item>
                     <Item>ui/bz-units-panel/panel-units.css</Item>
                     <Item>ui/bz-wonder-panel/panel-wonder-list.css</Item>
-                    <Item>ui-next/screens/unit-list/unit-list.js</Item>
-                    <Item>ui-next/tooltips/plot-tooltip/bz-plot-tooltip.css</Item>
-                    <Item>ui-next/tooltips/plot-tooltip/plot-tooltip.js</Item>
                 </ImportFiles>
                 <UIScripts>
                     <Item>ui/bz-city-panel/model-city-list.js</Item>
