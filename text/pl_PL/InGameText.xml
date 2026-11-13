@@ -175,9 +175,6 @@
         <Replace Tag="LOC_UI_MINI_MAP_BZ_CITY_BORDERS" Language="pl_PL">
             <Text>Granice miast</Text>
         </Replace>
-        <Replace Tag="LOC_UI_MINI_MAP_BZ_DISCOVERY" Language="pl_PL">
-            <Text>Odkrycia</Text>
-        </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_FORTIFICATION" Language="pl_PL">
             <Text>Fortyfikacje</Text>
         </Replace>
