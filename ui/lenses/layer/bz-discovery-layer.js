@@ -95,9 +95,11 @@ class bzDiscoveryLensLayer {
         const observer = GameContext.localObserverID;
         const revealed = GameplayMap.getRevealedState(observer, loc.x, loc.y);
         if (revealed == RevealedStates.HIDDEN) return;
-        const cons = MapConstructibles.getHiddenFilteredConstructibles(loc.x, loc.y);
-        for (const con of cons) {
-            const item = Constructibles.getByComponentID(con);
+        const district = Districts.getAtLocation(plot);
+        if (!district || district.type != DistrictTypes.WILDERNESS && district.type != DistrictTypes.RURAL) return;
+        const cids = MapConstructibles.getHiddenFilteredConstructibles(loc.x, loc.y);
+        for (const cid of cids) {
+            const item = Constructibles.getByComponentID(cid);
             if (!item) continue;
             const info = GameInfo.Constructibles.lookup(item.type);
             if (!info || !info.Discovery && !info.Archaeology) continue;
