@@ -154,7 +154,7 @@ function selectReligionLens(unit) {
     if (info.SpreadCharges) return "bz-religion-lens";
   return void 0;
 }
-registerUnitLensSelector(selectCommanderLens);
+registerUnitLensSelector(selectCommanderLens, 10);
 registerUnitLensSelector(selectReligionLens);
 
 // patch new layers into other lenses (activeLayers)
