@@ -1096,7 +1096,7 @@ class bzPlotTooltip {
             if (info.Discovery || info.Archaeology) {
                 // use the narrative reward icon for discoveries
                 this.improvement.icon = BZ_ICON_DISCOVERY;
-                this.improvement.districtName = "LOC_DISTRICT_BZ_DISCOVERY";
+                this.improvement.districtName = "LOC_SEARCH_TERM_DISCOVERY";
             } else {
                 this.improvement.icon = this.improvement.type;
                 if (info.Age == null && info.Population == 0) {

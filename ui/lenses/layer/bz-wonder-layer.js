@@ -95,7 +95,7 @@ class bzWonderLensLayer {
     }
     showInMinimap = {
         labelKey: "LOC_UI_PRODUCTION_WONDERS",
-        sortOrder: 180
+        sortOrder: 47
     };
     getOptionName() {
         return "bzShowMapWonders";

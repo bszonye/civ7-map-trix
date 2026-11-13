@@ -18,7 +18,7 @@ import '/base-standard/ui/lenses/lens/trade-lens.js';
 const LENS_CATALOG_OBJECT_NAME = "tracked-lens";
 
 const BZ_LENSES = {
-    "fxs-discovery-lens": "LOC_DISTRICT_BZ_DISCOVERY",
+    "fxs-discovery-lens": "LOC_SEARCH_TERM_DISCOVERY",
     "bz-religion-lens": "LOC_UI_MINI_MAP_RELIGION",
     "bz-commander-lens": "LOC_UI_MINI_MAP_COMMANDER",
 };
@@ -204,9 +204,12 @@ for (const [lensType, lens] of LensManager.lenses.entries()) {
         active.add("bz-city-borders-layer");
     } else if (active.has("fxs-culture-borders-layer")) {
         active.add("bz-culture-borders-layer");
+    } else if (active.has("fxs-discovery-layer")) {
+        active.add("bz-discovery-layer");
     }
     active.delete("fxs-city-borders-layer");
     active.delete("fxs-culture-borders-layer");
+    active.delete("fxs-discovery-layer");
     // add discovery layer to every lens that allows Resources
     if (active.has("fxs-resource-layer") || allowed.has("fxs-resource-layer")) {
         active.add("bz-discovery-layer");
@@ -400,16 +403,7 @@ class bzLensPanel {
         this.component.inputContext = InputContext.World;
     }
     beforeAttach() { }
-    afterAttach() {
-        for (const [lens, name] of Object.entries(BZ_LENSES)) {
-            this.component.createLensButton(name, lens, "lens-group");
-        }
-        // hide checkboxes for fxs borders (added by Border Toggles)
-        for (const layer of ["fxs-city-borders-layer", "fxs-culture-borders-layer"]) {
-            const checkbox = this.component.layerElementMap[layer];
-            if (checkbox) checkbox.parentElement.style.display = "none";
-        }
-    }
+    afterAttach() { }
     beforeDetach() { }
     afterDetach() { }
 }

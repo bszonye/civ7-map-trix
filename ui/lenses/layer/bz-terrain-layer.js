@@ -89,7 +89,7 @@ class bzTerrainLensLayer {
     }
     showInMinimap = {
         labelKey: "LOC_UI_MINI_MAP_BZ_TERRAIN",
-        sortOrder: 170
+        sortOrder: 46
     };
     getOptionName() {
         return "bzShowMapTerrain";

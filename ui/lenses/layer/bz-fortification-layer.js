@@ -128,7 +128,7 @@ class bzFortificationLensLayer {
     }
     showInMinimap = {
         labelKey: "LOC_UI_MINI_MAP_BZ_FORTIFICATION",
-        sortOrder: 130
+        sortOrder: 43
     };
     getOptionName() {
         return "bzShowMapFortifications";

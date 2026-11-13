@@ -112,7 +112,7 @@ class bzCityBordersLayer {
     }
     showInMinimap = {
         labelKey: "LOC_UI_MINI_MAP_BZ_CITY_BORDERS",
-        sortOrder: 140
+        sortOrder: 42
     };
     getOptionName() {
         return "bzShowMapCityBorders";

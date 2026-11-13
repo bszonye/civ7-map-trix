@@ -145,7 +145,7 @@ class bzCultureBordersLayer {
     }
     showInMinimap = {
         labelKey: "LOC_UI_MINI_MAP_BZ_BORDERS",
-        sortOrder: 120
+        sortOrder: 41
     };
     getOptionName() {
         return "bzShowMapCultureBorders";

@@ -2,6 +2,21 @@ import LensManager from '/core/ui/lenses/lens-manager.js';
 // load mini-map first to configure allowed layers for default lens
 import '/bz-map-trix/ui/mini-map/bz-panel-mini-map.js';
 
+// add vanilla lens checkbox
+import '/base-standard/ui/lenses/lens/discovery-lens.js';
+const fxsDiscoveryLens = LensManager.lenses.get("fxs-discovery-lens");
+if (fxsDiscoveryLens) {
+    fxsDiscoveryLens.showInMinimap = {
+        labelKey: "LOC_SEARCH_TERM_DISCOVERY",
+        sortOrder: 50
+    };
+}
+
+// disable vanilla layer checkbox
+import '/base-standard/ui/lenses/layer/discovery-layer.js';
+const fxsDiscoveryLayer = LensManager.layers.get("fxs-discovery-layer");
+delete fxsDiscoveryLayer?.showInMinimap;
+
 const UPSCALE_START = 1080;
 const BZ_ICON_DISCOVERY = "NAR_REW_DEFAULT";
 const SPRITE_OFFSET = { x: 0, y: 25, z: 5 };
@@ -35,7 +50,7 @@ class bzDiscoveryLensLayer {
     showInMinimap = {
         labelKey: "LOC_UI_MINI_MAP_DISCOVERY",
         tooltipKey: "LOC_UI_MINI_MAP_DISCOVERY_TOOLTIP",
-        sortOrder: 110
+        sortOrder: 35
     };
     getOptionName() {
         return "bzShowMapDiscoveries";

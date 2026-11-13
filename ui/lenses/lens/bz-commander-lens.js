@@ -14,5 +14,9 @@ class bzCommanderLens {
     ]);
     blendEnabledLayersOnTransition = false;
     useUserConfig = true;
+    showInMinimap = {
+        labelKey: "LOC_UI_MINI_MAP_COMMANDER",
+        sortOrder: 70
+    };
 }
 LensManager.registerLens("bz-commander-lens", new bzCommanderLens());
