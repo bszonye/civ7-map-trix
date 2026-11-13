@@ -1,7 +1,6 @@
 import bzMapTrixOptions, { bzCommanderLens } from '/bz-map-trix/ui/options/bz-map-trix-options.js';
 import { InputEngineEventName } from '/core/ui/input/input-support.js';
-import { InterfaceMode } from '/core/ui/interface-modes/interface-modes.js';
-import LensManager from '/core/ui/lenses/lens-manager.js';
+import LensManager, { registerUnitLensSelector } from '/core/ui/lenses/lens-manager.js';
 import { ContextManager } from '/core/ui/context-manager/context-manager.js';
 // guarantee import order for patching
 import '/base-standard/ui/interface-modes/interface-mode-unit-selected.js';
@@ -133,58 +132,31 @@ if (GameInfo.Ages.lookup(Game.age).AgeType == "AGE_EXPLORATION") {
         if (row.FormationClass == "FORMATION_CLASS_NAVAL") reconUnits.add(row.UnitType);
     });
 }
-// extend UnitSelectedInterfaceMode.setUnitLens(unitID)
-function bzSetUnitLens(unitID) {
-    const unit = Units.get(unitID);
-    if (!unit) return true;  // hand off errors to original method
+// extend unit lens selector
+function selectCommanderLens(unit) {
+  const info = GameInfo.Units.lookup(unit.type);
+  const isRecon = reconUnits.has(info.UnitType);
+  const isMilitary = info.CoreClass == "CORE_CLASS_MILITARY" && !isRecon;
+  switch (bzMapTrixOptions.commanders) {
+      case bzCommanderLens.RECON:
+          if (isRecon) return "bz-commander-lens";
+          // falls through
+      case bzCommanderLens.MILITARY:
+          if (isMilitary) return "bz-commander-lens";
+          // falls through
+      case bzCommanderLens.COMMANDERS:
+          if (unit.isCommanderUnit) return "bz-commander-lens";
+  }
+  return void 0;
+}
+function selectReligionLens(unit) {
     const info = GameInfo.Units.lookup(unit.type);
-    const isRecon = reconUnits.has(info.UnitType);
-    const isMilitary = info.CoreClass == "CORE_CLASS_MILITARY" && !isRecon;
-    const skips = getLensSkips();
-    let lens;
-    if (info.FoundCity || info.MakeTradeRoute || info.ExtractsArtifacts) {
-        // don't interfere with fxs lenses
-    } else if (skips.has(info.UnitType) || skips.has(info.UnitMovementClass)) {
-        // don't interfere with other mods
-    } else if (info.SpreadCharges) {
-        lens = "bz-religion-lens";
-    } else switch (bzMapTrixOptions.commanders) {
-        case bzCommanderLens.RECON:
-            if (isRecon) lens = "bz-commander-lens";
-            // falls through
-        case bzCommanderLens.MILITARY:
-            if (isMilitary) lens = "bz-commander-lens";
-            // falls through
-        case bzCommanderLens.COMMANDERS:
-            if (unit.isCommanderUnit) lens = "bz-commander-lens";
-    }
-    if (!lens) return true;  // hand off to original method
-    LensManager.setActiveLens(lens);
+    if (info.SpreadCharges) return "bz-religion-lens";
+  return void 0;
 }
-// skip lens activation for units handled by other lens mods
-const BZ_MOD_SKIPS = {
-    "mod-discovery-lens": ["UNIT_MOVEMENT_CLASS_RECON", "UNIT_MOVEMENT_CLASS_NAVAL"],
-    "mod-fortified-district-lens": ["UNIT_ARMY_COMMANDER", "UNIT_AERODROME_COMMANDER"],
-};
-const BZ_SKIPS = new Set();  // cache
-function getLensSkips() {
-    if (BZ_SKIPS.size) return BZ_SKIPS;
-    BZ_SKIPS.add("UNIT_SETTLER");  // ensure a non-empty set
-    for (const [mod, skips] of Object.entries(BZ_MOD_SKIPS)) {
-        if (LensManager.lenses.has(mod)) skips.forEach(skip => BZ_SKIPS.add(skip));
-    }
-    return BZ_SKIPS;
-}
-// patch UnitSelectedInterfaceMode.setUnitLens (calling it as a fallback)
-engine.whenReady.then(() => {
-    const USIM = InterfaceMode.getInterfaceModeHandler("INTERFACEMODE_UNIT_SELECTED");
-    const prototype = Object.getPrototypeOf(USIM);
-    const original = prototype.setUnitLens;
-    prototype.setUnitLens = function(...args) {
-        const rv = bzSetUnitLens.apply(this, args);
-        if (rv) return original.apply(this, args);
-    }
-});
+registerUnitLensSelector(selectCommanderLens);
+registerUnitLensSelector(selectReligionLens);
+
 // patch new layers into other lenses (activeLayers)
 for (const [lensType, lens] of LensManager.lenses.entries()) {
     const active = lens.activeLayers;
