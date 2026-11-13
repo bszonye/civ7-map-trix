@@ -17,11 +17,6 @@ import '/base-standard/ui/lenses/lens/trade-lens.js';
 
 const LENS_CATALOG_OBJECT_NAME = "tracked-lens";
 
-const BZ_LENSES = {
-    "fxs-discovery-lens": "LOC_SEARCH_TERM_DISCOVERY",
-    "bz-religion-lens": "LOC_UI_MINI_MAP_RELIGION",
-    "bz-commander-lens": "LOC_UI_MINI_MAP_COMMANDER",
-};
 const BZ_EXTRA_LAYERS = {
     "fxs-discovery-lens": [ "bz-fortification-layer", "bz-route-layer", ],
     "fxs-settler-lens": [ "bz-city-borders-layer", ],
