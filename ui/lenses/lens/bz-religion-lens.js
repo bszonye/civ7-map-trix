@@ -12,5 +12,9 @@ class bzReligionLens {
     ]);
     blendEnabledLayersOnTransition = false;
     useUserConfig = true;
+    showInMinimap = {
+        labelKey: "LOC_UI_MINI_MAP_RELIGION",
+        sortOrder: 60
+    };
 }
 LensManager.registerLens("bz-religion-lens", new bzReligionLens());

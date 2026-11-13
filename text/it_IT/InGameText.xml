@@ -175,9 +175,6 @@
         <Replace Tag="LOC_UI_MINI_MAP_BZ_CITY_BORDERS" Language="it_IT">
             <Text>Città</Text>
         </Replace>
-        <Replace Tag="LOC_UI_MINI_MAP_BZ_DISCOVERY" Language="it_IT">
-            <Text>Scoperte</Text>
-        </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_FORTIFICATION" Language="it_IT">
             <Text>Fortificazioni</Text>
         </Replace>

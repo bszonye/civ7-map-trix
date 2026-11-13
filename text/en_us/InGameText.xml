@@ -175,9 +175,6 @@
         <Replace Tag="LOC_UI_MINI_MAP_BZ_CITY_BORDERS">
             <Text>City Limits</Text>
         </Replace>
-        <Replace Tag="LOC_UI_MINI_MAP_BZ_DISCOVERY">
-            <Text>Discoveries</Text>
-        </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_FORTIFICATION">
             <Text>Fortifications</Text>
         </Replace>

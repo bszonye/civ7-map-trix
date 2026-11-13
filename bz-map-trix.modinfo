@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Mod id="bz-map-trix" version="4.2.0"
+<Mod id="bz-map-trix" version="40300"
     xmlns="ModInfo">
     <Properties>
         <Name>LOC_MOD_BZ_MAP_TRIX_NAME</Name>
-        <Version>4.2.0</Version>
+        <Version>4.3.0</Version>
         <Description>LOC_MOD_BZ_MAP_TRIX_DESCRIPTION</Description>
         <Authors>beezany</Authors>
         <URL>https://forums.civfanatics.com/resources/map-trix.31950/</URL>
@@ -57,7 +57,6 @@
                     <Item>icons/bz-wonder-decoration.png</Item>
                     <Item>ui/bz-city-panel/panel-city-list.css</Item>
                     <Item>ui/bz-style/bz-panel-yield-banner.css</Item>
-                    <Item>ui/bz-units-panel/panel-units.css</Item>
                     <Item>ui/bz-wonder-panel/panel-wonder-list.css</Item>
                     <Item>ui-next/tooltips/plot-tooltip/bz-plot-tooltip.css</Item>
                     <Item>ui-next/tooltips/plot-tooltip/plot-tooltip.js</Item>
@@ -65,8 +64,6 @@
                 <UIScripts>
                     <Item>ui/bz-city-panel/model-city-list.js</Item>
                     <Item>ui/bz-city-panel/panel-city-list.js</Item>
-                    <Item>ui/bz-units-panel/model-units.js</Item>
-                    <Item>ui/bz-units-panel/panel-units.js</Item>
                     <Item>ui/bz-wonder-panel/model-wonder-list.js</Item>
                     <Item>ui/bz-wonder-panel/panel-wonder-list.js</Item>
                     <Item>ui/input/bz-hotkey-manager.js</Item>

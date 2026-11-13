@@ -175,9 +175,6 @@
         <Replace Tag="LOC_UI_MINI_MAP_BZ_CITY_BORDERS" Language="ru_RU">
             <Text>Поселения</Text>
         </Replace>
-        <Replace Tag="LOC_UI_MINI_MAP_BZ_DISCOVERY" Language="ru_RU">
-            <Text>Открытия</Text>
-        </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_FORTIFICATION" Language="ru_RU">
             <Text>Укрепления</Text>
         </Replace>

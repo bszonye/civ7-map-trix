@@ -2,7 +2,7 @@ import { Focus } from '/core/ui/input/focus-support.js';
 import { AnchorType } from '/core/ui/panel-support.js';
 import TooltipManager from '/core/ui/tooltips/tooltip-manager.js';
 import Databind from '/core/ui/utilities/utilities-core-databinding.js';
-import { MinimapSubpanel } from '/base-standard/ui/mini-map/panel-mini-map.js';
+import { MinimapSubpanel } from '/base-standard/ui/mini-map/minimap-support.js';
 import { bzPanelMiniMap } from '/bz-map-trix/ui/mini-map/bz-panel-mini-map.js';
 import { bzCityList } from '/bz-map-trix/ui/bz-city-panel/model-city-list.js';
 

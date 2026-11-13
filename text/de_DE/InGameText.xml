@@ -175,9 +175,6 @@
         <Replace Tag="LOC_UI_MINI_MAP_BZ_CITY_BORDERS" Language="de_DE">
             <Text>Stadtgrenzen</Text>
         </Replace>
-        <Replace Tag="LOC_UI_MINI_MAP_BZ_DISCOVERY" Language="de_DE">
-            <Text>Entdeckungen</Text>
-        </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_FORTIFICATION" Language="de_DE">
             <Text>Befestigungen</Text>
         </Replace>

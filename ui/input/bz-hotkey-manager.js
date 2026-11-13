@@ -61,10 +61,11 @@ HotkeyManager.handleInput = function(...args) {
                 }
                 return InputHandlerState.Handled;
             }
+            case "open-bz-lens-panel":
+            case "open-bz-map-search":
             case "open-bz-city-panel":
             case "open-bz-units-panel":
             case "open-bz-wonder-panel":
-            case "open-bz-lens-panel":
                 this.sendHotkeyEvent(name);
                 return InputHandlerState.Handled;
             case "toggle-fxs-settler-lens":

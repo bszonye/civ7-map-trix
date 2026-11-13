@@ -4,7 +4,7 @@ import { AnchorType } from '/core/ui/panel-support.js';
 import Databind from '/core/ui/utilities/utilities-core-databinding.js';
 import { ComponentID } from '/core/ui/utilities/utilities-component-id.js';
 import UpdateGate from '/core/ui/utilities/utilities-update-gate.js';
-import { MinimapSubpanel } from '/base-standard/ui/mini-map/panel-mini-map.js';
+import { MinimapSubpanel } from '/base-standard/ui/mini-map/minimap-support.js';
 import { bzPanelMiniMap } from '/bz-map-trix/ui/mini-map/bz-panel-mini-map.js';
 import { bzUnitList } from '/bz-map-trix/ui/bz-units-panel/model-units.js';
 

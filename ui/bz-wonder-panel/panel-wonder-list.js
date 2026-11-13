@@ -1,7 +1,7 @@
 import { Focus } from '/core/ui/input/focus-support.js';
 import { AnchorType } from '/core/ui/panel-support.js';
 import Databind from '/core/ui/utilities/utilities-core-databinding.js';
-import { MinimapSubpanel } from '/base-standard/ui/mini-map/panel-mini-map.js';
+import { MinimapSubpanel } from '/base-standard/ui/mini-map/minimap-support.js';
 // production tooltip support
 import { ProductionTooltip } from '/base-standard/ui-next/tooltips/production-tooltip.js';
 import { render } from '/core/vendor/solid-js/web/dist/web.js';

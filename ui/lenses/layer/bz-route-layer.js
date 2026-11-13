@@ -59,6 +59,10 @@ class bzRouteLensLayer {
         this.visible = null;
         this.routeSpriteGrid.setVisible(false);
     }
+    showInMinimap = {
+        labelKey: "LOC_UI_MINI_MAP_BZ_ROUTE",
+        sortOrder: 45
+    };
     getOptionName() {
         return "bzShowMapRoads";
     }

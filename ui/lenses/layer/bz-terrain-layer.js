@@ -87,6 +87,10 @@ class bzTerrainLensLayer {
         window.removeEventListener(InterfaceModeChangedEventName, this.onInterfaceModeChanged);
         this.terrainOverlayGroup.setVisible(false);
     }
+    showInMinimap = {
+        labelKey: "LOC_UI_MINI_MAP_BZ_TERRAIN",
+        sortOrder: 46
+    };
     getOptionName() {
         return "bzShowMapTerrain";
     }

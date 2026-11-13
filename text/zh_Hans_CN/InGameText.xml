@@ -175,9 +175,6 @@
         <Replace Tag="LOC_UI_MINI_MAP_BZ_CITY_BORDERS" Language="zh_Hans_CN">
             <Text>定居点</Text>
         </Replace>
-        <Replace Tag="LOC_UI_MINI_MAP_BZ_DISCOVERY" Language="zh_Hans_CN">
-            <Text>发现</Text>
-        </Replace>
         <Replace Tag="LOC_UI_MINI_MAP_BZ_FORTIFICATION" Language="zh_Hans_CN">
             <Text>防御工事</Text>
         </Replace>
