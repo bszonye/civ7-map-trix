@@ -56,6 +56,7 @@
                 <ImportFiles>
                     <Item>icons/bz-wonder-decoration.png</Item>
                     <Item>ui/bz-city-panel/panel-city-list.css</Item>
+                    <Item>ui/mini-map/bz-panel-mini-map.css</Item>
                     <Item>ui/bz-style/bz-panel-yield-banner.css</Item>
                     <Item>ui/bz-wonder-panel/panel-wonder-list.css</Item>
                     <Item>ui-next/tooltips/plot-tooltip/bz-plot-tooltip.css</Item>

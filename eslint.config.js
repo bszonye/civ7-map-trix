@@ -74,6 +74,7 @@ export default [
                 clearInterval: "readonly",
                 clearTimeout: "readonly",
                 console: "readonly",
+                delayByFrame: "readonly",
                 document: "readonly",
                 engine: "readonly",
                 localStorage: "readonly",
@@ -81,6 +82,7 @@ export default [
                 requestAnimationFrame: "readonly",
                 setInterval: "readonly",
                 setTimeout: "readonly",
+                waitForLayout: "readonly",
                 window: "readonly",
             }
         }

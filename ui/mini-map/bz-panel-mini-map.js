@@ -14,6 +14,8 @@ import '/base-standard/ui/lenses/lens/general-appeal-lens.js';
 import '/base-standard/ui/lenses/lens/settler-lens.js';
 import '/base-standard/ui/lenses/lens/trade-lens.js';
 
+Controls.loadStyle("fs://game/bz-map-trix/ui/mini-map/bz-panel-mini-map.css");
+
 const LENS_CATALOG_OBJECT_NAME = "tracked-lens";
 
 const BZ_EXTRA_LAYERS = {
@@ -217,6 +219,9 @@ class bzPanelMiniMap {
         bzPanelMiniMap.instance = this;
         this.component = component;
         this.component.bzMapTrix = this;
+        this.component.MAX_ASPECT_RATIO = 2.2;  // TODO
+        // this.component.MAX_ASPECT_RATIO = 1;  // TODO
+        this.component.MIN_ASPECT_RATIO = 1;  // TODO
         this.patchPrototype(Object.getPrototypeOf(component));
     }
     patchPrototype(proto) {
@@ -238,17 +243,30 @@ class bzPanelMiniMap {
             return brv ?? crv;
         }
     }
+    addSubpanel(targetClassName, tooltipKey, iconPath) {
+        const slots = document.querySelector("[name='minimap-sidepanel']");
+        if (slots) {
+            // CREATE CONTEXT SLOT
+            const id = "target-slot-" + targetClassName;
+            const slot = document.createElement("div");
+            slot.setAttribute("name", id);
+            slot.setAttribute("id", id);
+            slot.className = "fxs-slot-target " + id;
+            slots.appendChild(slot);
+        }
+        this.component.addSubpanel(targetClassName, tooltipKey, iconPath, true);
+        return this.component.subpanels.find((s) => s.tag === targetClassName);
+    }
     afterInitialize() {
         this.component.Root.classList.add("bz-mini-map");
         const subpanels = this.component.subpanels;
         this.searchSubpanel = subpanels.find((s) => s.tag === "map-search");
         this.unitsSubpanel = subpanels.find((s) => s.tag === "panel-unit-list");
-        this.component.addSubpanel(
+        this.citySubpanel = this.addSubpanel(
             "bz-city-panel",
             "LOC_UI_RESOURCE_ALLOCATION_SETTLEMENTS",
-            BZ_ICON_CITY_BUTTON,
+            BZ_ICON_CITY_BUTTON
         );
-        this.citySubpanel = subpanels.find((s) => s.tag === "bz-city-panel");
         this.citySubpanel.button.classList.add("bz-city-button");
         // this.component.addSubpanel(
         //     "bz-units-panel",
@@ -257,12 +275,11 @@ class bzPanelMiniMap {
         // );
         this.unitsButton = this.unitsSubpanel.button;
         this.component.miniMapButtonRow.appendChild(this.unitsButton);  // move to end
-        this.component.addSubpanel(
+        this.wonderSubpanel = this.addSubpanel(
             "bz-wonder-panel",
             "LOC_UI_PRODUCTION_WONDERS",
-            BZ_ICON_WONDER_BUTTON,
+            BZ_ICON_WONDER_BUTTON
         );
-        this.wonderSubpanel = subpanels.find((s) => s.tag === "bz-wonder-panel");
         this.wonderSubpanel.button.classList.add("bz-wonder-button");
     }
     beforeToggleSubpanel(_subpanel, _force) {

@@ -1,33 +1,12 @@
-.bz-mini-map .mini-map__map-tacks-button,
-.bz-mini-map .mini-map__lens-button {
-  margin: 0 0.0555555556rem;
-}
-.bz-mini-map .mini-map__lens-button__bg,
-.bz-mini-map .mini-map__map-tacks-button__bg {
-  top: 0;
-  left: 0;
-  right: 0.0555555556rem;
-  bottom: 0;
-  background-image: url("blp:hud_sub_circle_bk");
-}
 .bz-city-button .mini-map__lens-button__icon {
   top: 0.3333333333rem;
 }
 
-.mini-map__city-panel {
-  height: calc(100vh - 14rem);
-  pointer-events: auto;
-  width: 19.7777777778rem;
-  border-top-left-radius: 0.3333333333rem;
-  border-top-right-radius: 0.3333333333rem;
-  background: linear-gradient(to bottom, rgba(35, 37, 43, 0.9), rgba(18, 21, 31, 0.8));
+.bz-city-list-container {
+  padding-left: 0.7222222222rem;
 }
-
-.mini-map__city-panel-container {
-  transition-property: transform;
-  transition-timing-function: cubic-bezier(0.645, 0.045, 0.355, 1);
+.bz-city-list-panel {
   transform-origin: bottom;
-  transition-duration: 0.25s;
 }
 
 .bz-city-list-entry .bz-icon {
@@ -119,3 +98,4 @@
 .bz-city-list-entry.pressed .bz-city-queue-turns {
   filter: drop-shadow(0 0.0555555556rem 0.0555555556rem black);
 }
+/* vim: set sw=2 et : */
