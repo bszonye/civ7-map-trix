@@ -1,7 +1,10 @@
+import { IsControllerActive } from '/core/ui-next/services/input.js';
 import { Focus } from '/core/ui/input/focus-support.js';
 import { AnchorType } from '/core/ui/panel-support.js';
 import Databind from '/core/ui/utilities/utilities-core-databinding.js';
-import { MinimapSubpanel } from '/base-standard/ui/mini-map/minimap-support.js';
+import { Layout } from '/core/ui/utilities/utilities-layout.js';
+import { MinimapSubpanel, SubpanelCloseEventName } from '/base-standard/ui/mini-map/minimap-support.js';
+import { NarrativePopupManager } from '/base-standard/ui/narrative-event/narrative-popup-manager.js';
 // production tooltip support
 import { ProductionTooltip } from '/base-standard/ui-next/tooltips/production-tooltip.js';
 import { render } from '/core/vendor/solid-js/web/dist/web.js';
@@ -14,10 +17,15 @@ const styles = "fs://game/bz-map-trix/ui/bz-wonder-panel/panel-wonder-list.css";
 
 class bzWonderPanel extends MinimapSubpanel {
     static savedScrollPosition = 0;
+    container = document.createElement("div");
     panel = document.createElement("fxs-vslot");
-    inputContext = InputContext.Unit;
+    inputContext = () => {
+      console.log("Input context requested");
+      return IsControllerActive() ? InputContext.Shell : InputContext.World;
+    };
     activateWonderListener = this.activateWonder.bind(this);
     modelUpdateListener = this.onModelUpdate.bind(this);
+    subpanelCloseListener = this.onSubpanelClose.bind(this);
     listContainer = document.createElement("fxs-scrollable");
     scrollArea = document.createElement("div");
     constructor(root) {
@@ -27,11 +35,15 @@ class bzWonderPanel extends MinimapSubpanel {
     }
     onInitialize() {
         super.onInitialize();
+        this.container.className = "bz-wonder-list-container h-full flex flex-col justify-end items-left max-h-full pt-11 pointer-events-none transition-all relative";
+        this.container.style.paddingBottom = Layout.pixels(239);
         this.panel.setAttribute("data-navrule-up", "stop");
         this.panel.setAttribute("data-navrule-down", "stop");
         this.panel.setAttribute("data-navrule-right", "stop");
         this.panel.setAttribute("data-navrule-left", "stop");
-        this.panel.classList.add("mini-map__wonder-panel", "left-3", "px-2", "py-3");
+        // this.panel.className = "bz-wonder-list_panel left-3 px-2 py-3";
+        this.panel.className = "mini-map__lens-panel bz-wonder-list-panel grow pointer-events-auto px-2 py-3 flex flex-col justify-start items-center relative";
+        NarrativePopupManager.addIgnoredPanelClass("bz-wonder-panel");
         const closeNavHelp = document.createElement("fxs-nav-help");
         closeNavHelp.setAttribute("action-key", "inline-cancel");
         closeNavHelp.classList.add("absolute", "-right-4", "-top-3", "z-1");
@@ -158,10 +170,12 @@ class bzWonderPanel extends MinimapSubpanel {
             }
         }
         // finish
-        this.Root.appendChild(this.panel);
+        this.container.appendChild(this.panel);
+        this.Root.appendChild(this.container);
     }
     onAttach() {
         super.onAttach();
+        window.addEventListener(SubpanelCloseEventName, this.subpanelCloseListener);
         window.addEventListener("bz-model-wonder-list-update", this.modelUpdateListener);
         bzPanelMiniMap.toggleCooldownTimer = 250;
         this.disposeTooltips.forEach((dispose) => dispose());
@@ -170,6 +184,7 @@ class bzWonderPanel extends MinimapSubpanel {
     }
     onDetach() {
         super.onDetach();
+        window.removeEventListener(SubpanelCloseEventName, this.subpanelCloseListener);
         window.removeEventListener("bz-model-wonder-list-update", this.modelUpdateListener);
         bzPanelMiniMap.toggleCooldownTimer = 500;
         this.disposeTooltips.forEach((dispose) => dispose());
@@ -178,6 +193,9 @@ class bzWonderPanel extends MinimapSubpanel {
     onReceiveFocus() {
         super.onReceiveFocus();
         Focus.setContextAwareFocus(this.panel, this.Root);
+    }
+    onSubpanelClose(event) {
+        if (event.detail.tag == "bz-wonder-panel") this.close();
     }
     close() {
         super.close();
@@ -212,7 +230,7 @@ class bzWonderPanel extends MinimapSubpanel {
 Controls.define("bz-wonder-panel", {
     createInstance: bzWonderPanel,
     description: "Wonder Panel",
-    classNames: ["bz-wonder-panel"],
+    classNames: ["bz-wonder-panel", "relative"],
     styles: [styles],
     tabIndex: -1
 });

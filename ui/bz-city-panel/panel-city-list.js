@@ -1,8 +1,11 @@
+import { IsControllerActive } from '/core/ui-next/services/input.js';
 import { Focus } from '/core/ui/input/focus-support.js';
 import { AnchorType } from '/core/ui/panel-support.js';
 import TooltipManager from '/core/ui/tooltips/tooltip-manager.js';
 import Databind from '/core/ui/utilities/utilities-core-databinding.js';
-import { MinimapSubpanel } from '/base-standard/ui/mini-map/minimap-support.js';
+import { Layout } from '/core/ui/utilities/utilities-layout.js';
+import { MinimapSubpanel, SubpanelCloseEventName } from '/base-standard/ui/mini-map/minimap-support.js';
+import { NarrativePopupManager } from '/base-standard/ui/narrative-event/narrative-popup-manager.js';
 import { bzPanelMiniMap } from '/bz-map-trix/ui/mini-map/bz-panel-mini-map.js';
 import { bzCityList } from '/bz-map-trix/ui/bz-city-panel/model-city-list.js';
 
@@ -12,10 +15,15 @@ const styles = "fs://game/bz-map-trix/ui/bz-city-panel/panel-city-list.css";
 
 class bzCityPanel extends MinimapSubpanel {
     static savedScrollPosition = 0;
+    container = document.createElement("div");
     panel = document.createElement("fxs-vslot");
-    inputContext = InputContext.Unit;
+    inputContext = () => {
+      console.log("Input context requested");
+      return IsControllerActive() ? InputContext.Shell : InputContext.World;
+    };
     activateCityListener = this.activateCity.bind(this);
     modelUpdateListener = this.onModelUpdate.bind(this);
+    subpanelCloseListener = this.onSubpanelClose.bind(this);
     listContainer = document.createElement("fxs-scrollable");
     constructor(root) {
         super(root);
@@ -24,11 +32,15 @@ class bzCityPanel extends MinimapSubpanel {
     }
     onInitialize() {
         super.onInitialize();
+        this.container.className = "bz-city-list-container h-full flex flex-col justify-end items-left max-h-full pt-11 pointer-events-none transition-all relative";
+        this.container.style.paddingBottom = Layout.pixels(239);
         this.panel.setAttribute("data-navrule-up", "stop");
         this.panel.setAttribute("data-navrule-down", "stop");
         this.panel.setAttribute("data-navrule-right", "stop");
         this.panel.setAttribute("data-navrule-left", "stop");
-        this.panel.classList.add("mini-map__city-panel", "left-3", "px-2", "py-3");
+        // this.panel.classList.add("bz-city-list_panel", "left-3", "px-2", "py-3");
+        this.panel.className = "mini-map__lens-panel bz-city-list-panel grow pointer-events-auto px-2 py-3 flex flex-col justify-start items-center relative";
+        NarrativePopupManager.addIgnoredPanelClass("bz-city-panel");
         const closeNavHelp = document.createElement("fxs-nav-help");
         closeNavHelp.setAttribute("action-key", "inline-cancel");
         closeNavHelp.classList.add("absolute", "-right-4", "-top-3", "z-1");
@@ -216,21 +228,27 @@ class bzCityPanel extends MinimapSubpanel {
             stats.appendChild(unrest);
         }
         // finish
-        this.Root.appendChild(this.panel);
+        this.container.appendChild(this.panel);
+        this.Root.appendChild(this.container);
     }
     onAttach() {
         super.onAttach();
+        window.addEventListener(SubpanelCloseEventName, this.subpanelCloseListener);
         window.addEventListener("bz-model-city-list-update", this.modelUpdateListener);
         bzPanelMiniMap.toggleCooldownTimer = 250;
     }
     onDetach() {
-        super.onDetach();
+        window.removeEventListener(SubpanelCloseEventName, this.subpanelCloseListener);
         window.removeEventListener("bz-model-city-list-update", this.modelUpdateListener);
         bzPanelMiniMap.toggleCooldownTimer = 500;
+        super.onDetach();
     }
     onReceiveFocus() {
         super.onReceiveFocus();
         Focus.setContextAwareFocus(this.panel, this.Root);
+    }
+    onSubpanelClose(event) {
+        if (event.detail.tag == "bz-city-panel") this.close();
     }
     close() {
         super.close();
@@ -249,7 +267,7 @@ class bzCityPanel extends MinimapSubpanel {
 Controls.define("bz-city-panel", {
     createInstance: bzCityPanel,
     description: "City Panel",
-    classNames: ["bz-city-panel"],
+    classNames: ["bz-city-panel", "relative"],
     styles: [styles],
     tabIndex: -1
 });

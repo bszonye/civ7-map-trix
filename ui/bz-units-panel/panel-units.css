@@ -1,17 +1,10 @@
-.mini-map__units-panel {
+.bz-mini-map__units-panel {
   height: calc(100vh - 14rem);
   pointer-events: auto;
   width: 19.7777777778rem;
   border-top-left-radius: 0.3333333333rem;
   border-top-right-radius: 0.3333333333rem;
   background: linear-gradient(to bottom, rgba(35, 37, 43, 0.9), rgba(18, 21, 31, 0.8));
-}
-
-.mini-map__units-panel-container {
-  transition-property: transform;
-  transition-timing-function: cubic-bezier(0.645, 0.045, 0.355, 1);
-  transform-origin: bottom;
-  transition-duration: 0.25s;
 }
 
 .bz-unit-types .bz-icon,

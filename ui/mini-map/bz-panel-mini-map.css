@@ -1,0 +1,18 @@
+.bz-mini-map .mini-map__map-tacks-button,
+.bz-mini-map .mini-map__lens-button {
+  margin: 0 -0.2222222222rem;
+}
+.bz-mini-map .mini-map__lens-button:hover,
+.bz-mini-map .mini-map__lens-button.pressed,
+.bz-mini-map .mini-map__lens-button.mini-map__button--selected {
+  z-index: 1;
+}
+.bz-mini-map .mini-map__lens-button__bg,
+.bz-mini-map .mini-map__map-tacks-button__bg {
+  top: 0;
+  left: 0;
+  right: 0.0555555556rem;
+  bottom: 0;
+  background-image: url("blp:hud_sub_circle_bk");
+}
+
