@@ -1,4 +1,5 @@
-.bz-city-button .mini-map__lens-button__icon {
+.bz-mini-map .bz-city-button .mini-map__lens-button__icon {
+  background-position: center top;
   top: 0.3333333333rem;
 }
 

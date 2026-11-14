@@ -219,9 +219,8 @@ class bzPanelMiniMap {
         bzPanelMiniMap.instance = this;
         this.component = component;
         this.component.bzMapTrix = this;
-        this.component.MAX_ASPECT_RATIO = 2.2;  // TODO
-        // this.component.MAX_ASPECT_RATIO = 1;  // TODO
-        this.component.MIN_ASPECT_RATIO = 1;  // TODO
+        // this.component.MAX_ASPECT_RATIO = 2.2;
+        // this.component.MIN_ASPECT_RATIO = 1;
         this.patchPrototype(Object.getPrototypeOf(component));
     }
     patchPrototype(proto) {
@@ -281,6 +280,8 @@ class bzPanelMiniMap {
             BZ_ICON_WONDER_BUTTON
         );
         this.wonderSubpanel.button.classList.add("bz-wonder-button");
+        // limit button row width
+        this.component.miniMapButtonRow.maxWidth = this.component.width;
     }
     beforeToggleSubpanel(_subpanel, _force) {
         // prevent infinite loop after force-closing subpanel

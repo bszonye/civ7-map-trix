@@ -1,6 +1,8 @@
 .bz-mini-map .mini-map__map-tacks-button,
 .bz-mini-map .mini-map__lens-button {
-  margin: 0 -0.2222222222rem;
+  margin: 0;
+  flex: 1 1 auto;
+  max-width: 3rem;
 }
 .bz-mini-map .mini-map__lens-button:hover,
 .bz-mini-map .mini-map__lens-button.pressed,
@@ -9,10 +11,20 @@
 }
 .bz-mini-map .mini-map__lens-button__bg,
 .bz-mini-map .mini-map__map-tacks-button__bg {
-  top: 0;
-  left: 0;
-  right: 0.0555555556rem;
-  bottom: 0;
+  background-size: 2.6666666667rem;
   background-image: url("blp:hud_sub_circle_bk");
 }
-
+.bz-mini-map .mini-map__lens-button__icon,
+.bz-mini-map .mini-map__map-tacks-button__icon {
+  background-size: 1.8888888889rem;
+}
+.bz-mini-map .mini-map__lens-button__bg,
+.bz-mini-map .mini-map__map-tacks-button__bg,
+.bz-mini-map .mini-map__lens-button__icon,
+.bz-mini-map .mini-map__map-tacks-button__icon {
+  background-position: center;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
