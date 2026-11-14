@@ -32,13 +32,13 @@ class bzCityPanel extends MinimapSubpanel {
     }
     onInitialize() {
         super.onInitialize();
-        this.container.className = "bz-city-list-container h-full flex flex-col justify-end items-left max-h-full pt-11 pointer-events-none transition-all relative";
-        this.container.style.paddingBottom = Layout.pixels(239);
+        this.container.className = "bz-city-list-container flex flex-col justify-end items-left max-h-full pt-11 pointer-events-none transition-all relative";
+        this.container.style.height =
+            Layout.pixels(window.innerHeight * 100 / Layout.currentScale() - 239);
         this.panel.setAttribute("data-navrule-up", "stop");
         this.panel.setAttribute("data-navrule-down", "stop");
         this.panel.setAttribute("data-navrule-right", "stop");
         this.panel.setAttribute("data-navrule-left", "stop");
-        // this.panel.classList.add("bz-city-list_panel", "left-3", "px-2", "py-3");
         this.panel.className = "mini-map__lens-panel bz-city-list-panel grow pointer-events-auto px-2 py-3 flex flex-col justify-start items-center relative";
         NarrativePopupManager.addIgnoredPanelClass("bz-city-panel");
         const closeNavHelp = document.createElement("fxs-nav-help");
@@ -48,10 +48,8 @@ class bzCityPanel extends MinimapSubpanel {
         this.panel.appendChild(closeNavHelp);
         // header
         const header = document.createElement("fxs-header");
-        header.classList.add("mb-2", "font-title-base", "text-secondary");
         header.setAttribute("title", "LOC_UI_RESOURCE_ALLOCATION_SETTLEMENTS");
         header.setAttribute("filigree-style", "h4");
-        header.setAttribute("header-bg-glow", true);
         this.panel.appendChild(header);
         // city list
         const frame = document.createElement("div");
@@ -62,7 +60,7 @@ class bzCityPanel extends MinimapSubpanel {
         this.renderList(
             "LOC_UI_SETTLEMENT_TAB_BAR_CITIES",
             "g_bzCityListModel.cityList",
-            "mt-0\\.5",
+            "mt-px",
         );
         this.renderList(
             "LOC_UI_SETTLEMENT_TAB_BAR_TOWNS",
@@ -73,25 +71,23 @@ class bzCityPanel extends MinimapSubpanel {
     renderList(headline, list, ...style) {
         const hasCityTooltip = TooltipManager.types[BZ_CITY_TOOLTIP_STYLE] != null;
         const header = document.createElement("fxs-header");
-        header.classList.add("font-title-sm");
         if (style.length) header.classList.add(...style);
+        header.setAttribute("text-class", "font-title-sm bz-header");
+        header.setAttribute("filigree-style", "none");
         header.setAttribute("title", headline);
-        header.setAttribute("filigree-style", "h4");
         Databind.classToggle(header, "hidden", `{{${list}.length}}==0`);
         this.listContainer.appendChild(header);
         // table rows
         const row = document.createElement("div");
-        row.classList.value = "flex flex-col text.sm";
+        row.classList.value = "flex flex-col text-sm";
         this.listContainer.appendChild(row);
         Databind.for(row, list, "entry");
         {
             const subhead = document.createElement("fxs-header");
-            subhead.setAttribute("filigree-style", "none");
-            subhead.setAttribute("header-bg-glow", true);
-            // match height of entry row (6px above, 3px below)
-            subhead.classList.add("font-title-xs", "py-px", "mt-1\\.25", "mb-0\\.5");
-            Databind.classToggle(subhead, "hidden", "!{{entry.subhead}}");
             Databind.attribute(subhead, "title", "entry.subhead");
+            subhead.setAttribute("text-class", "font-title-xs bz-subhead");
+            subhead.setAttribute("filigree-style", "none");
+            Databind.classToggle(subhead, "hidden", "!{{entry.subhead}}");
             row.appendChild(subhead);
             const entry = document.createElement("fxs-activatable");
             entry.addEventListener("action-activate", this.activateCityListener);

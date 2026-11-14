@@ -254,7 +254,7 @@ class bzPanelMiniMap {
             slot.className = "fxs-slot-target " + id;
             slots.appendChild(slot);
         }
-        this.component.addSubpanel(targetClassName, tooltipKey, iconPath, true);
+        this.component.addSubpanel(targetClassName, tooltipKey, iconPath);
         return this.component.subpanels.find((s) => s.tag === targetClassName);
     }
     afterInitialize() {

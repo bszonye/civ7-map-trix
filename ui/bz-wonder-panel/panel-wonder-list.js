@@ -95,7 +95,7 @@ class bzWonderPanel extends MinimapSubpanel {
         // table rows
         for (const item of list) {
             const row = document.createElement("div");
-            row.classList.value = "flex flex-col text.sm";
+            row.classList.value = "flex flex-col text-sm";
             this.scrollArea.appendChild(row);
             const subhead = document.createElement("fxs-header");
             subhead.setAttribute("filigree-style", "none");
