@@ -35,13 +35,13 @@ class bzWonderPanel extends MinimapSubpanel {
     }
     onInitialize() {
         super.onInitialize();
-        this.container.className = "bz-wonder-list-container h-full flex flex-col justify-end items-left max-h-full pt-11 pointer-events-none transition-all relative";
-        this.container.style.paddingBottom = Layout.pixels(239);
+        this.container.className = "bz-wonder-list-container flex flex-col justify-end items-left max-h-full pt-11 pointer-events-none transition-all relative";
+        this.container.style.height =
+            Layout.pixels(window.innerHeight * 100 / Layout.currentScale() - 239);
         this.panel.setAttribute("data-navrule-up", "stop");
         this.panel.setAttribute("data-navrule-down", "stop");
         this.panel.setAttribute("data-navrule-right", "stop");
         this.panel.setAttribute("data-navrule-left", "stop");
-        // this.panel.className = "bz-wonder-list_panel left-3 px-2 py-3";
         this.panel.className = "mini-map__lens-panel bz-wonder-list-panel grow pointer-events-auto px-2 py-3 flex flex-col justify-start items-center relative";
         NarrativePopupManager.addIgnoredPanelClass("bz-wonder-panel");
         const closeNavHelp = document.createElement("fxs-nav-help");
@@ -51,10 +51,8 @@ class bzWonderPanel extends MinimapSubpanel {
         this.panel.appendChild(closeNavHelp);
         // header
         const header = document.createElement("fxs-header");
-        header.classList.add("mb-2", "font-title-base", "text-secondary");
         header.setAttribute("title", "LOC_UI_PRODUCTION_WONDERS");
         header.setAttribute("filigree-style", "h4");
-        header.setAttribute("header-bg-glow", true);
         this.panel.appendChild(header);
         // wonder list
         const frame = document.createElement("div");
@@ -83,13 +81,15 @@ class bzWonderPanel extends MinimapSubpanel {
             "LOC_TRIUMPH_NOT_AVAILABLE",
             bzWonderList.wonderList.skipped,
         );
-        this.scrollArea.firstChild?.classList.replace("mt-2", "mt-0\\.5");
+        this.scrollArea.firstChild?.classList.replace("mt-2", "mt-px");
     }
     renderList(headline, list) {
+        if (!list.length) return;
         const header = document.createElement("fxs-header");
-        header.classList.add("font-title-sm", "mt-2");
+        header.classList.add("mt-2");
+        header.setAttribute("text-class", "font-title-sm bz-header");
+        header.setAttribute("filigree-style", "none");
         header.setAttribute("title", headline);
-        header.setAttribute("filigree-style", "h4");
         header.classList.toggle("hidden", list.length == 0);
         this.scrollArea.appendChild(header);
         // table rows
@@ -98,12 +98,10 @@ class bzWonderPanel extends MinimapSubpanel {
             row.classList.value = "flex flex-col text-sm";
             this.scrollArea.appendChild(row);
             const subhead = document.createElement("fxs-header");
-            subhead.setAttribute("filigree-style", "none");
-            subhead.setAttribute("header-bg-glow", true);
-            // match height of entry row (6px above, 3px below)
-            subhead.classList.add("font-title-xs", "py-px", "mt-1\\.25", "mb-0\\.5");
-            subhead.classList.toggle("hidden", !item.subhead);
             subhead.setAttribute("title", item.subhead);
+            subhead.setAttribute("text-class", "font-title-xs bz-subhead");
+            subhead.setAttribute("filigree-style", "none");
+            subhead.classList.toggle("hidden", !item.subhead);
             row.appendChild(subhead);
             const entry = document.createElement("fxs-activatable");
             entry.addEventListener("action-activate", this.activateWonderListener);

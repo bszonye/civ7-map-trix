@@ -9,6 +9,25 @@
 .bz-wonder-list-panel {
   transform-origin: bottom;
 }
+.bz-wonder-list-panel .fxs-header.font-bold {
+  font-weight: inherit;
+}
+.bz-wonder-list-panel .fxs-header.font-title-sm {
+  letter-spacing: 0;
+  padding: 0.1111111111rem 0 0.0555555556rem;
+}
+.bz-wonder-list-panel .fxs-header.font-title-xs {
+  letter-spacing: 0;
+  padding: 0.1666666667rem 0 0.1111111111rem;
+}
+.bz-wonder-list-panel .bz-header {
+  color: #e5d2ac;
+  fxs-font-gradient-color: #0000;
+}
+.bz-wonder-list-panel .bz-subhead {
+  color: #b29e79;
+  fxs-font-gradient-color: #0000;
+}
 
 .bz-wonder-list-entry .bz-icon,
 .bz-wonder-list-entry .bz-icon img {
