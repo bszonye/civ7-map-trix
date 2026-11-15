@@ -11,6 +11,11 @@
 .bz-unit-list-panel .bz-upgrade-ready {
   filter: saturate(0) brightness(1.2) fxs-color-tint(cyan);
 }
+.bz-unit-list-panel .bz-unit-entry-selected {
+  background: linear-gradient(90deg, #4c473d99 0%, #33364099 100%);
+  color: #e5e5e5;
+  text-shadow: 0 0.0555555556rem 0.1111111111rem black;
+}
 
 /**
 Based on Robert Penner's easing equations

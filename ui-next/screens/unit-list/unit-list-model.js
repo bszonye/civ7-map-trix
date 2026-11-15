@@ -147,6 +147,14 @@ const UnitListModel = () => {
         name: unit.name
       });
     }
+    function bzUpdateSelection(data) {
+      if (!isUnitListOpen()) return;
+      if (data.unit.owner != localPlayerID()) return;
+      const index = findUnitIndex(data.unit.id);
+      const unit = Units.get(data.unit);
+      if (index < 0 || !unit) return;
+      setUnitListData("units", index, { bzSelected: data.selected });
+    }
     const events = [
       // More specific updates
       ["UnitMovementPointsChanged", updateMovement],
@@ -156,13 +164,15 @@ const UnitListModel = () => {
       ["UnitOperationStarted", updateOperations],
       ["UnitCommandStarted", updateOperations],
       ["UnitCommandStarted", updateName],
+      // TRIX
+      ["UnitSelectionChanged", bzUpdateSelection],
       // On Update is EXPENSIVE
       // It recreates the entire model from scratch
       // If we can create a more targeted update for these, we should do that.
       ["UnitAddedToMap", onUpdate],
       ["UnitRemovedFromMap", onUpdate],
       ["UnitAddedToArmy", onUpdate],
-      ["UnitRemovedFromArmy", onUpdate]
+      ["UnitRemovedFromArmy", onUpdate],
     ];
     events.forEach((event) => engine.on(event[0], event[1]));
     onCleanup(() => {
@@ -381,12 +391,10 @@ const UnitListModel = () => {
       packedUnits = armyEntry.packedUnits;
     }
     // TRIX
+    const bzSelected = UI.Player.getHeadSelectedUnit()?.id == unit.localId;
     const actions = getValidActions(unit);
     const isCommander = unit.isCommanderUnit;
-    const isPromotionAvailable =
-      !!(isCommander && actions[0]?.type == "UNITCOMMAND_PROMOTE");
     const tier = unitDef?.Tier ?? 0;
-    const isUpgradeReady = !!(tier && actions[0]?.type == "UNITCOMMAND_UPGRADE");
     return {
       id: unit.id,
       armyId: armyID,
@@ -417,8 +425,10 @@ const UnitListModel = () => {
       textSearchSnippet: `${unitName}, ${[...tags].join(", ")}, `,
       textSearch: unitTypeName,
       // TRIX
-      isPromotionAvailable,
-      isUpgradeReady,
+      bzLocalId: unit.localId,
+      bzSelected,
+      bzPromotionAvailable: !!(isCommander && actions[0]?.type == "UNITCOMMAND_PROMOTE"),
+      bzUpgradeReady: !!(tier && actions[0]?.type == "UNITCOMMAND_UPGRADE"),
     };
   }
   function populateData() {

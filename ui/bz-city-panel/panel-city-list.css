@@ -116,7 +116,8 @@
 }
 .bz-city-list-entry:focus, .bz-city-list-entry:hover, .bz-city-list-entry.pressed {
   text-shadow: 0 0.0555555556rem 0.1111111111rem black;
-  background: linear-gradient(90deg, #8c7e62 0%, #4c473d 100%);
+  /* background: linear-gradient(90deg, #8c7e62 0%, #4c473d 100%); */
+  background: linear-gradient(90deg, #4c473d 0%, #333640 100%);
   color: #e5e5e5;
 }
 .bz-city-growth-turns .bz-icon,

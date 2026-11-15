@@ -2,7 +2,8 @@ import { template, insert, className, addEventListener } from '../../../../core/
 import { createSignal, createEffect, createComponent, createMemo, Show, createRenderEffect, For, onMount, onCleanup } from '../../../../core/vendor/solid-js/dist/solid.js';
 import { ContextManager } from '../../../../core/ui/context-manager/context-manager.js';
 import { InputEngineEventName, NavigateInputEventName } from '../../../../core/ui/input/input-support.js';
-import LensManager from '../../../../core/ui/lenses/lens-manager.js';
+import { InterfaceMode } from '../../../../core/ui/interface-modes/interface-modes.js';  // TRIX
+// import LensManager from '../../../../core/ui/lenses/lens-manager.js';
 import { SocialPanelOpenEventName } from '../../../../core/ui/shell/mp-staging/mp-friends.js';
 import { ComponentID } from '../../../../core/ui/utilities/utilities-component-id.js';
 import { Layout } from '../../../../core/ui/utilities/utilities-layout.js';
@@ -203,6 +204,7 @@ const UnitListEntry = (props) => {
       const selectedUnit = UI.Player.getHeadSelectedUnit();
       if (selectedUnit && selectedUnit.id == unitData().id.id) {
         UI.Player.deselectAllUnits();
+        InterfaceMode.switchToDefault();  // TRIX
         UnitMapDecorationSupport.manager.deactivate();
         return;
       }
@@ -271,7 +273,9 @@ const UnitListEntry = (props) => {
                   "class": "relative unit-entry max-w-full grow text-accent-2",
                   get classList() {
                     return {
-                      "unit-entry-exhausted": !unitData().isSelectValid || !unitData().canMove
+                      "unit-entry-exhausted": !unitData().isSelectValid || !unitData().canMove,
+                      // TRIX
+                      "bz-unit-entry-selected" : unitData().bzSelected
                     };
                   },
                   get style() {
@@ -322,7 +326,7 @@ const UnitListEntry = (props) => {
                             "class": "size-4 ml-1 relative bz-desaturate",
                             get classList() {
                               return {
-                                "bz-upgrade-ready": !!unitData().isUpgradeReady,
+                                "bz-upgrade-ready": !!unitData().bzUpgradeReady,
                                 "-top-0\\.5": tier == 1 && !bzArmyTrix
                                 // offset tier 1 chevron so it looks centered
                               };
@@ -342,7 +346,7 @@ const UnitListEntry = (props) => {
                           var _el$8 = _tmpl$2();
                           insert(_el$8, () => unitData().promotions);
                           createRenderEffect((_p$) => {
-                            var _v$ = !!unitData().isPromotionAvailable;
+                            var _v$ = !!unitData().bzPromotionAvailable;
                             _v$ !== _p$.e && _el$8.classList.toggle("bz-promotion-available", _p$.e = _v$);
                             return _p$;
                           }, {
@@ -728,10 +732,11 @@ const UnitListComponent = () => {
     engine.on("PlayerTurnDeactivated", onClose);
     UnitSelection.onRaise.on(onUnitSelect);
     model.setIsUnitListOpen(true);
-    if (LensManager.getActiveLens() != "fxs-default-lens") {
-      LensManager.setActiveLens("fxs-default-lens");
-      UI.Player.deselectAllUnits();
-    }
+    // TRIX
+    // if (LensManager.getActiveLens() != "fxs-default-lens") {
+    //   LensManager.setActiveLens("fxs-default-lens");
+    //   UI.Player.deselectAllUnits();
+    // }
     onCleanup(() => {
       window.removeEventListener(InputEngineEventName, captureEngineInput, true);
       window.removeEventListener(NavigateInputEventName, onNavigate, true);

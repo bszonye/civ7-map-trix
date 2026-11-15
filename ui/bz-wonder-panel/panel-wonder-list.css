@@ -60,7 +60,8 @@
 }
 .bz-wonder-list-entry:focus, .bz-wonder-list-entry:hover, .bz-wonder-list-entry.pressed {
   text-shadow: 0 0.0555555556rem 0.1111111111rem black;
-  background: linear-gradient(90deg, #8c7e62 0%, #4c473d 100%);
+  /* background: linear-gradient(90deg, #8c7e62 0%, #4c473d 100%); */
+  background: linear-gradient(90deg, #4c473d 0%, #333640 100%);
   color: #e5e5e5;
 }
 .bz-wonder-list-entry:focus .bz-icon,
