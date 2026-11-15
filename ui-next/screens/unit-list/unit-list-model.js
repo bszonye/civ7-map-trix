@@ -380,6 +380,13 @@ const UnitListModel = () => {
     if (armyEntry?.commanderId.id == unit.id.id) {
       packedUnits = armyEntry.packedUnits;
     }
+    // TRIX
+    const actions = getValidActions(unit);
+    const isCommander = unit.isCommanderUnit;
+    const isPromotionAvailable =
+      !!(isCommander && actions[0]?.type == "UNITCOMMAND_PROMOTE");
+    const tier = unitDef?.Tier ?? 0;
+    const isUpgradeReady = !!(tier && actions[0]?.type == "UNITCOMMAND_UPGRADE");
     return {
       id: unit.id,
       armyId: armyID,
@@ -389,7 +396,7 @@ const UnitListModel = () => {
       typeName: unit.typeName,
       unitTypeName,
       name: unitName,
-      tier: unitDef?.Tier ?? 0,
+      tier,  // unitDef?.Tier ?? 0,
       promotions: unit.Experience?.getLevel ?? 0,
       timeoutReturn: unit.getTimeoutReturn,
       reinforcementTime: getReinforcementTime(unit),
@@ -401,14 +408,17 @@ const UnitListModel = () => {
       statusIcon: statusData[0],
       statusName: statusData[1],
       statusDescription: statusData[2],
-      actions: getValidActions(unit),
+      actions,  // getValidActions(unit),
       isOnMap: unit.isOnMap,
       location: unit.location,
       isSelectValid: unit.isOnMap || ComponentID.isValid(unit.armyId) && unit.getTimeoutReturn <= 0,
-      isCommander: unit.isCommanderUnit,
+      isCommander,  // unit.isCommanderUnit,
       packedUnits,
       textSearchSnippet: `${unitName}, ${[...tags].join(", ")}, `,
-      textSearch: unitTypeName
+      textSearch: unitTypeName,
+      // TRIX
+      isPromotionAvailable,
+      isUpgradeReady,
     };
   }
   function populateData() {

@@ -318,13 +318,11 @@ const UnitListEntry = (props) => {
                           const chevrons = bzArmyTrix ?
                             `url(fs://game/bz-army-trix/icons/bz-chevrons-${tier}.png)` :
                             `url(fs://game/unit_chevron-0${tier}.png)`;
-                          const isUpgradeReady = unitData().actions
-                            .find(a => a.type == "UNITCOMMAND_UPGRADE");
                           return createComponent(Icon, {
                             "class": "size-4 ml-1 relative bz-desaturate",
                             get classList() {
                               return {
-                                "bz-upgrade-ready": isUpgradeReady,
+                                "bz-upgrade-ready": !!unitData().isUpgradeReady,
                                 "-top-0\\.5": tier == 1 && !bzArmyTrix
                                 // offset tier 1 chevron so it looks centered
                               };
@@ -343,6 +341,13 @@ const UnitListEntry = (props) => {
                         get children() {
                           var _el$8 = _tmpl$2();
                           insert(_el$8, () => unitData().promotions);
+                          createRenderEffect((_p$) => {
+                            var _v$ = !!unitData().isPromotionAvailable;
+                            _v$ !== _p$.e && _el$8.classList.toggle("bz-promotion-available", _p$.e = _v$);
+                            return _p$;
+                          }, {
+                            e: void 0
+                          });
                           return _el$8;
                         }
                       }), null);
