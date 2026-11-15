@@ -16,7 +16,6 @@ const styles = "fs://game/bz-map-trix/ui/bz-wonder-panel/panel-wonder-list.css";
 
 class bzWonderPanel extends MinimapSubpanel {
     static savedScrollPosition = 0;
-    container = document.createElement("div");
     panel = document.createElement("fxs-vslot");
     inputContext = () => {
       console.log("Input context requested");
@@ -34,13 +33,12 @@ class bzWonderPanel extends MinimapSubpanel {
     }
     onInitialize() {
         super.onInitialize();
-        this.container.className = "bz-wonder-list-container flex flex-col justify-end items-center max-h-full pointer-events-none transition-all relative";
-        this.container.style.height = bzPanelMiniMap.instance.panelHeightPx;
+        this.Root.style.height = bzPanelMiniMap.instance.panelHeightPx;
         this.panel.setAttribute("data-navrule-up", "stop");
         this.panel.setAttribute("data-navrule-down", "stop");
         this.panel.setAttribute("data-navrule-right", "stop");
         this.panel.setAttribute("data-navrule-left", "stop");
-        this.panel.className = "mini-map__lens-panel bz-wonder-list-panel grow pointer-events-auto px-2 py-3 flex flex-col justify-start items-center relative";
+        this.panel.className = "mini-map__lens-panel bz-wonder-list-panel grow pointer-events-auto px-2 py-3 flex flex-col justify-start items-center";
         NarrativePopupManager.addIgnoredPanelClass("bz-wonder-panel");
         const closeNavHelp = document.createElement("fxs-nav-help");
         closeNavHelp.setAttribute("action-key", "inline-cancel");
@@ -49,7 +47,7 @@ class bzWonderPanel extends MinimapSubpanel {
         this.panel.appendChild(closeNavHelp);
         // header
         const header = document.createElement("fxs-header");
-        header.setAttribute("title", "LOC_UI_PRODUCTION_WONDERS");
+        header.setAttribute("title", "LOC_UI_TOGGLE_BZ_WONDER_LIST_PANEL");
         header.setAttribute("filigree-style", "h4");
         this.panel.appendChild(header);
         // wonder list
@@ -166,8 +164,7 @@ class bzWonderPanel extends MinimapSubpanel {
             }
         }
         // finish
-        this.container.appendChild(this.panel);
-        this.Root.appendChild(this.container);
+        this.Root.appendChild(this.panel);
     }
     onAttach() {
         super.onAttach();

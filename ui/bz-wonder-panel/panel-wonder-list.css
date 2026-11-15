@@ -4,17 +4,14 @@
   filter: saturate(0);
 }
 
-.bz-wonder-list-container {
+.bz-wonder-panel {
   min-width: 21.1111111111rem;
   max-width: 22.2222222222rem;
-  padding: 0 0.6666666667rem;
-  align-items: center;
+  padding: 2.4444444444rem 0.6666666667rem 0;
 }
 .bz-wonder-list-panel {
   transform-origin: bottom;
-  position: absolute;
-  top: 2.4444444444rem;
-  bottom: 0;
+  position: relative;
   width: 100%;
 }
 .bz-wonder-list-panel .fxs-header.font-bold {

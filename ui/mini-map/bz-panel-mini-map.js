@@ -236,7 +236,7 @@ class bzPanelMiniMap {
         // this.component.MAX_ASPECT_RATIO = 2.2;
         // this.component.MAX_ASPECT_RATIO = 1;
         // this.component.MIN_ASPECT_RATIO = 1;
-        this.component.MIN_ASPECT_RATIO = 2.2;
+        // this.component.MIN_ASPECT_RATIO = 2.2;
         this.patchPrototype(Object.getPrototypeOf(component));
     }
     patchPrototype(proto) {
@@ -279,7 +279,7 @@ class bzPanelMiniMap {
         this.unitsSubpanel = subpanels.find((s) => s.tag === "panel-unit-list");
         this.citySubpanel = this.addSubpanel(
             "bz-city-panel",
-            "LOC_UI_RESOURCE_ALLOCATION_SETTLEMENTS",
+            "LOC_UI_TOGGLE_BZ_CITY_LIST_PANEL",
             BZ_ICON_CITY_BUTTON
         );
         this.citySubpanel.button.classList.add("bz-city-button");
@@ -292,7 +292,7 @@ class bzPanelMiniMap {
         this.component.miniMapButtonRow.appendChild(this.unitsButton);  // move to end
         this.wonderSubpanel = this.addSubpanel(
             "bz-wonder-panel",
-            "LOC_UI_PRODUCTION_WONDERS",
+            "LOC_UI_TOGGLE_BZ_WONDER_LIST_PANEL",
             BZ_ICON_WONDER_BUTTON
         );
         this.wonderSubpanel.button.classList.add("bz-wonder-button");
@@ -307,6 +307,19 @@ class bzPanelMiniMap {
             this.miniMapMaxWidth < this.miniMapWidth ?
             this.miniMapMaxWidthPx : this.miniMapWidthPx;
         this.component.miniMapButtonRow.style.alignSelf = "flex-start";
+        // set up panel containers
+        const containerize = (el, width, height) => {
+            if (!el) return;
+            if (width != null) el.style.width = width;
+            if (height != null) el.style.height = height;
+            el.style.backgroundColor = "teal";  // TODO
+        }
+        containerize(this.component.Root.firstChild, this.miniMapWidthPx);
+        containerize(
+            document.querySelector("[name=minimap-sidepanel]"),
+            this.miniMapWidthPx,
+            this.panelHeightPx
+        );
     }
     beforeToggleSubpanel(_subpanel, _force) {
         // prevent infinite loop after force-closing subpanel
