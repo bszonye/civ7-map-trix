@@ -70,6 +70,11 @@ const CORE_CLASS_SORT_ORDER = {
   LOC_UNIT_CLASS_CIVILIAN: 2
 };
 const CORE_CLASS_LENGTH = Object.keys(CORE_CLASS_SORT_ORDER).length;
+const BZ_DOMAIN_SORT_ORDER = {
+  DOMAIN_AIR: 0,
+  DOMAIN_LAND: 1,
+  DOMAIN_SEA: 2
+};
 const sortUnits = (a, b) => {
   if (a.isCommander !== b.isCommander) {
     return a.isCommander ? -1 : 1;
@@ -78,6 +83,10 @@ const sortUnits = (a, b) => {
   if (classComparison !== 0) {
     return classComparison;
   }
+  // TRIX
+  const domainComparison =
+    (BZ_DOMAIN_SORT_ORDER[a.bzDomain] ?? -1) - (BZ_DOMAIN_SORT_ORDER[b.bzDomain] ?? -1);
+  if (domainComparison) return domainComparison;
   const nameComparison = Locale.compare(a.name, b.name);
   if (nameComparison !== 0) {
     return nameComparison;

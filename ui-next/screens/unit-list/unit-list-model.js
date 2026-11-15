@@ -427,8 +427,9 @@ const UnitListModel = () => {
       // TRIX
       bzLocalId: unit.localId,
       bzSelected,
-      bzPromotionAvailable: !!(isCommander && actions[0]?.type == "UNITCOMMAND_PROMOTE"),
-      bzUpgradeReady: !!(tier && actions[0]?.type == "UNITCOMMAND_UPGRADE"),
+      bzPromotionAvailable: isCommander && actions[0]?.type == "UNITCOMMAND_PROMOTE",
+      bzUpgradeReady: 0 < tier && actions[0]?.type == "UNITCOMMAND_UPGRADE",
+      bzDomain: unitDef?.Domain ?? "DOMAIN_LAND",
     };
   }
   function populateData() {
