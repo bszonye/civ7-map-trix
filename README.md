@@ -54,7 +54,7 @@ every map menu, lens, and decoration layer has a hotkey:
 - `6` Religion lens
 - `7` Commander lens
 - `Shift+S` Settlements panel
-- `Shift+U` Units panel
+- `Shift+U` Unit List
 - `Shift+W` Wonders panel
 - `Shift+B` Borders
 - `Shift+C` City Limits
