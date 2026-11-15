@@ -184,6 +184,12 @@
         <Replace Tag="LOC_UI_MINI_MAP_BZ_TERRAIN" Language="ru_RU">
             <Text>Ландшафт</Text>
         </Replace>
+        <Replace Tag="LOC_UI_TOGGLE_BZ_CITY_LIST_PANEL" Language="ru_RU">
+            <Text>{LOC_UI_RESOURCE_ALLOCATION_SETTLEMENTS}</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_TOGGLE_BZ_WONDER_LIST_PANEL" Language="ru_RU">
+            <Text>{LOC_UI_PRODUCTION_WONDERS}</Text>
+        </Replace>
         <Replace Tag="LOC_YIELD_BZ_TOTAL" Language="ru_RU">
             <Text>Общий Доход</Text>
         </Replace>

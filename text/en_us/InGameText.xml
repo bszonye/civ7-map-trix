@@ -184,6 +184,12 @@
         <Replace Tag="LOC_UI_MINI_MAP_BZ_TERRAIN">
             <Text>Terrain</Text>
         </Replace>
+        <Replace Tag="LOC_UI_TOGGLE_BZ_CITY_LIST_PANEL">
+            <Text>Settlement List</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_TOGGLE_BZ_WONDER_LIST_PANEL">
+            <Text>Wonder List</Text>
+        </Replace>
         <Replace Tag="LOC_YIELD_BZ_TOTAL">
             <Text>Total Yield</Text>
         </Replace>

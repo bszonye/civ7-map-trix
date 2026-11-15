@@ -192,6 +192,12 @@
         <Replace Tag="LOC_UI_MINI_MAP_BZ_TERRAIN" Language="fr_FR">
             <Text>Terrains</Text>
         </Replace>
+        <Replace Tag="LOC_UI_TOGGLE_BZ_CITY_LIST_PANEL" Language="fr_FR">
+            <Text>{LOC_UI_RESOURCE_ALLOCATION_SETTLEMENTS}</Text>
+        </Replace>
+        <Replace Tag="LOC_UI_TOGGLE_BZ_WONDER_LIST_PANEL" Language="fr_FR">
+            <Text>{LOC_UI_PRODUCTION_WONDERS}</Text>
+        </Replace>
         <Replace Tag="LOC_YIELD_BZ_TOTAL" Language="fr_FR">
             <Text>Rendement total</Text>
         </Replace>
