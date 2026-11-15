@@ -796,7 +796,7 @@ const UnitListComponent = () => {
             }
           }]
         }), createComponent(FiligreeTitle.H4, {
-          text: "LOC_UI_TOGGLE_UNIT_LIST_PANEL",
+          text: "LOC_UI_PRODUCTION_UNITS",
           "filigree-style": "h4"
         }), createComponent(Show, {
           get when() {

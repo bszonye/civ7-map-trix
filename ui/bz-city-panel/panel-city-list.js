@@ -44,7 +44,7 @@ class bzCityListPanel extends MinimapSubpanel {
         this.panel.appendChild(closeNavHelp);
         // header
         const header = document.createElement("fxs-header");
-        header.setAttribute("title", "LOC_UI_TOGGLE_BZ_CITY_LIST_PANEL");
+        header.setAttribute("title", "LOC_UI_RESOURCE_ALLOCATION_SETTLEMENTS");
         header.setAttribute("filigree-style", "h4");
         this.panel.appendChild(header);
         // city list

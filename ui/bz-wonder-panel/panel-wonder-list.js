@@ -47,7 +47,7 @@ class bzWonderListPanel extends MinimapSubpanel {
         this.panel.appendChild(closeNavHelp);
         // header
         const header = document.createElement("fxs-header");
-        header.setAttribute("title", "LOC_UI_TOGGLE_BZ_WONDER_LIST_PANEL");
+        header.setAttribute("title", "LOC_UI_PRODUCTION_WONDERS");
         header.setAttribute("filigree-style", "h4");
         this.panel.appendChild(header);
         // wonder list
