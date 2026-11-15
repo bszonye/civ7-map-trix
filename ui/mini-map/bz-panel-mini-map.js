@@ -236,7 +236,7 @@ class bzPanelMiniMap {
         // this.component.MAX_ASPECT_RATIO = 2.2;
         // this.component.MAX_ASPECT_RATIO = 1;
         // this.component.MIN_ASPECT_RATIO = 1;
-        // this.component.MIN_ASPECT_RATIO = 2.2;
+        this.component.MIN_ASPECT_RATIO = 2.2;
         this.patchPrototype(Object.getPrototypeOf(component));
     }
     patchPrototype(proto) {
@@ -312,7 +312,6 @@ class bzPanelMiniMap {
             if (!el) return;
             if (width != null) el.style.width = width;
             if (height != null) el.style.height = height;
-            el.style.backgroundColor = "teal";  // TODO
         }
         containerize(this.component.Root.firstChild, this.miniMapWidthPx);
         containerize(

@@ -6,7 +6,9 @@
   flex-shrink: 1;
 }
 .bz-mini-map .mini-map__lens-button:hover,
-.bz-mini-map .mini-map__lens-button.pressed,
+.bz-mini-map .mini-map__lens-button.pressed {
+  z-index: 2;
+}
 .bz-mini-map .mini-map__lens-button.mini-map__button--selected {
   z-index: 1;
 }
@@ -29,43 +31,30 @@
   left: 0;
   right: 0;
 }
-.unit-list-panel {
-  padding: 0;
-  background-color: #cc0c;
+.lens-panel, .unit-list-panel .pt-11, .map-search.absolute {
+  min-width: 21.1111111111rem;
+  max-width: 22.2222222222rem;
+  padding: 2.4444444444rem 0.6666666667rem 0;
 }
 .map-search.absolute {
-  min-width: 21.1111111111rem;
-  max-width: 22.2222222222rem;
-  padding: 2.4444444444rem 0.6666666667rem 0;
-  /* position: relative; */
-  background-color: #cc0c;
-  margin: 0;
-  left: -0.2222222222rem;
-  /* bottom: 0; */
+  position: absolute;
+  width: 100%;
+  bottom: 0;
 }
-.lens-panel, .unit-list-panel .pt-11 {
-  min-width: 21.1111111111rem;
-  max-width: 22.2222222222rem;
-  padding: 2.4444444444rem 0.6666666667rem 0;
-  position: relative;
+.map-search .map-search-panel-backing {
+  width: 100%;
 }
 .unit-list-panel .pt-11 {
   width: 100% !important;
   padding-bottom: 0 !important;
 }
-.lens-panel, .unit-list-panel .pt-11, .bz-city-panel, .bz-wonder-panel {
-  background-color: #cccc;
-}
-.mini-map__main {
-  background-color: #c0cc;
-}
 .bz-mini-map .mini-map__lens-panel,
-/* .map-search-panel-backing, */
+.map-search .map-search-main,
 .unit-list-panel .mini-map__lens-panel {
   position: relative;
   width: 100%;
   left: auto;
   right: auto;
-  background-color: magenta;
+  margin: 0;
 }
 /* vim: set sw=2 et : */
