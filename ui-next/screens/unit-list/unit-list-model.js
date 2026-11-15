@@ -25,7 +25,11 @@ const UNITDOMAIN_NAME = {
   DOMAIN_AIR: "LOC_TAG_UNIT_CLASS_AIRCRAFT"
 };
 const OPERATIONS_QUICK_ACCESS = ["UNITOPERATION_ALERT"];
-const COMMANDS_QUICK_ACCESS = ["UNITCOMMAND_UPGRADE", "UNITCOMMAND_PROMOTE"];
+const COMMANDS_QUICK_ACCESS = [
+  "UNITCOMMAND_WAKE",  // TRIX
+  "UNITCOMMAND_UPGRADE",
+  "UNITCOMMAND_PROMOTE"
+];
 const UnitListModel = () => {
   const updateGate = new UpdateGate(() => {
     populateData();
@@ -391,7 +395,7 @@ const UnitListModel = () => {
       packedUnits = armyEntry.packedUnits;
     }
     // TRIX
-    const bzSelected = UI.Player.getHeadSelectedUnit()?.id == unit.localId;
+    const bzSelected = UI.Player.getHeadSelectedUnit()?.id == unit.id.id;
     const actions = getValidActions(unit);
     const isCommander = unit.isCommanderUnit;
     const tier = unitDef?.Tier ?? 0;
@@ -425,7 +429,6 @@ const UnitListModel = () => {
       textSearchSnippet: `${unitName}, ${[...tags].join(", ")}, `,
       textSearch: unitTypeName,
       // TRIX
-      bzLocalId: unit.localId,
       bzSelected,
       bzPromotionAvailable: isCommander && actions[0]?.type == "UNITCOMMAND_PROMOTE",
       bzUpgradeReady: 0 < tier && actions[0]?.type == "UNITCOMMAND_UPGRADE",

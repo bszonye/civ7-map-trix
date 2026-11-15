@@ -33,6 +33,9 @@ Based on Robert Penner's easing equations
 .unit-list-status-info {
   opacity: 1;
   transform: translateY(0);
+  /* TRIX */
+  transition: all 175ms ease-in-out;
+  transition-duration: 100ms;
 }
 
 .unit-list-commands {

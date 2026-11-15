@@ -391,7 +391,9 @@ const UnitListEntry = (props) => {
                           });
                         }
                       }), null);
-                      insert(_el$13, createComponent(Show, {
+                      // TRIX: move status icon out of transition area
+                      _el$12.classList.add("gap-2");
+                      insert(_el$12, createComponent(Show, {
                         get when() {
                           return unitData().statusName;
                         },
@@ -428,15 +430,15 @@ const UnitListEntry = (props) => {
                         }
                       }), null);
                       createRenderEffect((_p$) => {
-                        var _v$3 = !!hasCommands(), _v$4 = !!hasCommands(), _v$5 = !!hasCommands();
+                        var _v$3 = !!hasCommands();  // , _v$4 = !!hasCommands(), _v$5 = !!hasCommands();
                         _v$3 !== _p$.e && _el$13.classList.toggle("unit-list-status-info", _p$.e = _v$3);
-                        _v$4 !== _p$.t && _el$13.classList.toggle("transition-all", _p$.t = _v$4);
-                        _v$5 !== _p$.a && _el$13.classList.toggle("transition-duration-100", _p$.a = _v$5);
+                        // _v$4 !== _p$.t && _el$13.classList.toggle("transition-all", _p$.t = _v$4);
+                        // _v$5 !== _p$.a && _el$13.classList.toggle("transition-duration-100", _p$.a = _v$5);
                         return _p$;
                       }, {
                         e: void 0,
-                        t: void 0,
-                        a: void 0
+                        // t: void 0,
+                        // a: void 0
                       });
                       return _el$4;
                     //})(), (() => {
@@ -547,7 +549,9 @@ const UnitListEntry = (props) => {
       },
       get children() {
         return createComponent(HSlot, {
-          "class": "unit-list-commands -right-1 flex flex-row items-center justify-end absolute transition-all transition-duration-100 gap-0\\.5",
+          "class": "unit-list-commands top-0 right-6 flex flex-row items-center justify-end absolute transition-all duration-100 pr-0\\.5",
+          // TRIX: fix duration, realign icons
+          // "class": "unit-list-commands -right-1 flex flex-row items-center justify-end absolute transition-all transition-duration-100 gap-0\\.5",
           disableFocus: true,
           get children() {
             return createComponent(For, {
