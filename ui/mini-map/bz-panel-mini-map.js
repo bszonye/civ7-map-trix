@@ -219,6 +219,7 @@ class bzPanelMiniMap {
     miniMapHeight = 239;
     miniMapWidth = 380;
     miniMapMinWidth = 380;
+    miniMapMaxWidth = 400;
     borderSize = 30;
     constructor(component) {
         bzPanelMiniMap.instance = this;
@@ -229,12 +230,13 @@ class bzPanelMiniMap {
         this.miniMapHeightPx = `${Layout.pixelsToScreenPixels(this.miniMapHeight)}px`;
         this.miniMapWidthPx = `${Layout.pixelsToScreenPixels(this.miniMapWidth)}px`;
         this.miniMapMinWidthPx = `${Layout.pixelsToScreenPixels(this.miniMapMinWidth)}px`;
+        this.miniMapMaxWidthPx = `${Layout.pixelsToScreenPixels(this.miniMapMaxWidth)}px`;
         this.panelHeightPx = `${Layout.pixelsToScreenPixels(this.panelHeight)}px`;
         this.windowHeightPx = `${Layout.pixelsToScreenPixels(this.windowHeight)}px`;
         // this.component.MAX_ASPECT_RATIO = 2.2;
         // this.component.MAX_ASPECT_RATIO = 1;
         // this.component.MIN_ASPECT_RATIO = 1;
-        // this.component.MIN_ASPECT_RATIO = 2.2;
+        this.component.MIN_ASPECT_RATIO = 2.2;
         this.patchPrototype(Object.getPrototypeOf(component));
     }
     patchPrototype(proto) {
@@ -294,14 +296,17 @@ class bzPanelMiniMap {
             BZ_ICON_WONDER_BUTTON
         );
         this.wonderSubpanel.button.classList.add("bz-wonder-button");
-        // limit button row width
-        this.component.miniMapButtonRow.maxWidth = this.component.width;
         // get minimap dimensions
         const finalAspect = Math.min(this.component.MAX_ASPECT_RATIO, Math.max(this.component.MIN_ASPECT_RATIO, this.component.getMapAspectRatio()));
         this.miniMapWidth = Math.round(
             (this.miniMapHeight - this.borderSize) * finalAspect
         ) + this.borderSize;
         this.miniMapWidthPx = `${Layout.pixelsToScreenPixels(this.miniMapWidth)}px`;
+        // limit button row width
+        this.component.miniMapButtonRow.style.maxWidth =
+            this.miniMapMaxWidth < this.miniMapWidth ?
+            this.miniMapMaxWidthPx : this.miniMapWidthPx;
+        this.component.miniMapButtonRow.style.alignSelf = "flex-start";
     }
     beforeToggleSubpanel(_subpanel, _force) {
         // prevent infinite loop after force-closing subpanel

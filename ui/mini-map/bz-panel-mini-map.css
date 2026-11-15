@@ -1,8 +1,9 @@
 .bz-mini-map .mini-map__map-tacks-button,
 .bz-mini-map .mini-map__lens-button {
   margin: 0;
-  flex: 1 1 auto;
-  max-width: 3rem;
+  /* flex: 1 1 auto; */
+  /* max-width: 3rem; */
+  flex-shrink: 1;
 }
 .bz-mini-map .mini-map__lens-button:hover,
 .bz-mini-map .mini-map__lens-button.pressed,
@@ -28,3 +29,5 @@
   left: 0;
   right: 0;
 }
+
+/* vim: set sw=2 et : */
