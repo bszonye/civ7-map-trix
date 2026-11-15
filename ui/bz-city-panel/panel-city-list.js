@@ -3,7 +3,6 @@ import { Focus } from '/core/ui/input/focus-support.js';
 import { AnchorType } from '/core/ui/panel-support.js';
 import TooltipManager from '/core/ui/tooltips/tooltip-manager.js';
 import Databind from '/core/ui/utilities/utilities-core-databinding.js';
-import { Layout } from '/core/ui/utilities/utilities-layout.js';
 import { MinimapSubpanel, SubpanelCloseEventName } from '/base-standard/ui/mini-map/minimap-support.js';
 import { NarrativePopupManager } from '/base-standard/ui/narrative-event/narrative-popup-manager.js';
 import { bzPanelMiniMap } from '/bz-map-trix/ui/mini-map/bz-panel-mini-map.js';
@@ -33,8 +32,7 @@ class bzCityPanel extends MinimapSubpanel {
     onInitialize() {
         super.onInitialize();
         this.container.className = "bz-city-list-container flex flex-col justify-end items-center max-h-full pointer-events-none transition-all relative";
-        this.container.style.height =
-            Layout.pixels(window.innerHeight * 100 / Layout.currentScale() - 239);
+        this.container.style.height = bzPanelMiniMap.instance.panelHeightPx;
         this.panel.setAttribute("data-navrule-up", "stop");
         this.panel.setAttribute("data-navrule-down", "stop");
         this.panel.setAttribute("data-navrule-right", "stop");

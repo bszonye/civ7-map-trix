@@ -2,7 +2,6 @@ import { IsControllerActive } from '/core/ui-next/services/input.js';
 import { Focus } from '/core/ui/input/focus-support.js';
 import { AnchorType } from '/core/ui/panel-support.js';
 import Databind from '/core/ui/utilities/utilities-core-databinding.js';
-import { Layout } from '/core/ui/utilities/utilities-layout.js';
 import { MinimapSubpanel, SubpanelCloseEventName } from '/base-standard/ui/mini-map/minimap-support.js';
 import { NarrativePopupManager } from '/base-standard/ui/narrative-event/narrative-popup-manager.js';
 // production tooltip support
@@ -35,9 +34,8 @@ class bzWonderPanel extends MinimapSubpanel {
     }
     onInitialize() {
         super.onInitialize();
-        this.container.className = "bz-wonder-list-container flex flex-col justify-end items-left max-h-full pt-11 pointer-events-none transition-all relative";
-        this.container.style.height =
-            Layout.pixels(window.innerHeight * 100 / Layout.currentScale() - 239);
+        this.container.className = "bz-wonder-list-container flex flex-col justify-end items-center max-h-full pointer-events-none transition-all relative";
+        this.container.style.height = bzPanelMiniMap.instance.panelHeightPx;
         this.panel.setAttribute("data-navrule-up", "stop");
         this.panel.setAttribute("data-navrule-down", "stop");
         this.panel.setAttribute("data-navrule-right", "stop");

@@ -5,10 +5,17 @@
 }
 
 .bz-wonder-list-container {
-  padding-left: 0.6666666667rem;
+  min-width: 21.1111111111rem;
+  max-width: 22.2222222222rem;
+  padding: 0 0.6666666667rem;
+  align-items: center;
 }
 .bz-wonder-list-panel {
   transform-origin: bottom;
+  position: absolute;
+  top: 2.4444444444rem;
+  bottom: 0;
+  width: 100%;
 }
 .bz-wonder-list-panel .fxs-header.font-bold {
   font-weight: inherit;
@@ -38,9 +45,9 @@
 }
 .bz-wonder-list-frame {
   position: absolute;
-  width: 19.7777777777rem;
   top: 2.4444444444rem;
   left: 0;
+  right: 0;
   bottom: 1.2222222222rem;
   background: #12151f66;
 }

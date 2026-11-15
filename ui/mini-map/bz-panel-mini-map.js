@@ -224,8 +224,13 @@ class bzPanelMiniMap {
         bzPanelMiniMap.instance = this;
         this.component = component;
         this.component.bzMapTrix = this;
+        this.windowHeight = window.innerHeight * 100 / Layout.currentScale();
+        this.panelHeight = this.windowHeight - this.miniMapHeight;
+        this.miniMapHeightPx = `${Layout.pixelsToScreenPixels(this.miniMapHeight)}px`;
         this.miniMapWidthPx = `${Layout.pixelsToScreenPixels(this.miniMapWidth)}px`;
         this.miniMapMinWidthPx = `${Layout.pixelsToScreenPixels(this.miniMapMinWidth)}px`;
+        this.panelHeightPx = `${Layout.pixelsToScreenPixels(this.panelHeight)}px`;
+        this.windowHeightPx = `${Layout.pixelsToScreenPixels(this.windowHeight)}px`;
         // this.component.MAX_ASPECT_RATIO = 2.2;
         // this.component.MAX_ASPECT_RATIO = 1;
         // this.component.MIN_ASPECT_RATIO = 1;
@@ -297,8 +302,6 @@ class bzPanelMiniMap {
             (this.miniMapHeight - this.borderSize) * finalAspect
         ) + this.borderSize;
         this.miniMapWidthPx = `${Layout.pixelsToScreenPixels(this.miniMapWidth)}px`;
-        console.warn(`TRIX SIZE ${this.miniMapWidth}x${this.miniMapHeight}`);
-        console.warn(`TRIX WIDTH ${this.miniMapWidthPx} vs ${this.component.miniMapTopContainer.style.width}`);
     }
     beforeToggleSubpanel(_subpanel, _force) {
         // prevent infinite loop after force-closing subpanel
