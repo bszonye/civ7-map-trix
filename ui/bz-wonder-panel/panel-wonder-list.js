@@ -14,7 +14,7 @@ import { bzWonderList } from '/bz-map-trix/ui/bz-wonder-panel/model-wonder-list.
 
 const styles = "fs://game/bz-map-trix/ui/bz-wonder-panel/panel-wonder-list.css";
 
-class bzWonderPanel extends MinimapSubpanel {
+class bzWonderListPanel extends MinimapSubpanel {
     static savedScrollPosition = 0;
     panel = document.createElement("fxs-vslot");
     inputContext = () => {
@@ -221,7 +221,7 @@ class bzWonderPanel extends MinimapSubpanel {
     }
 }
 Controls.define("bz-wonder-panel", {
-    createInstance: bzWonderPanel,
+    createInstance: bzWonderListPanel,
     description: "Wonder Panel",
     classNames: ["bz-wonder-panel", "relative"],
     styles: [styles],

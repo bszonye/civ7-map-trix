@@ -12,7 +12,7 @@ const BZ_CITY_TOOLTIP_STYLE = "bz-city-tooltip";
 
 const styles = "fs://game/bz-map-trix/ui/bz-city-panel/panel-city-list.css";
 
-class bzCityPanel extends MinimapSubpanel {
+class bzCityListPanel extends MinimapSubpanel {
     static savedScrollPosition = 0;
     panel = document.createElement("fxs-vslot");
     inputContext = () => {
@@ -274,7 +274,7 @@ class bzCityPanel extends MinimapSubpanel {
     onModelUpdate() { }
 }
 Controls.define("bz-city-panel", {
-    createInstance: bzCityPanel,
+    createInstance: bzCityListPanel,
     description: "City Panel",
     classNames: ["bz-city-panel", "relative"],
     styles: [styles],
