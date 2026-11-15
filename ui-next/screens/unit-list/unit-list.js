@@ -78,11 +78,6 @@ const sortUnits = (a, b) => {
   if (classComparison !== 0) {
     return classComparison;
   }
-  // TRIX: sort traders last
-  if (a.coreClass == "LOC_UNIT_CLASS_CIVILIAN") {
-    const bzTraderComparison = bzTraderTypes.has(a.type) - bzTraderTypes.has(b.type);
-    if (bzTraderComparison) return bzTraderComparison;
-  }
   const nameComparison = Locale.compare(a.name, b.name);
   if (nameComparison !== 0) {
     return nameComparison;
@@ -644,6 +639,16 @@ const UnitListComponent = () => {
     }
     return groups;
   });
+  const selectedGroup = createMemo(() => {
+    const id = UI.Player.getHeadSelectedUnit();
+    const unit = id && model.findUnit(id.id, model.data.units);
+    if (!unit?.isOnMap) return;  // not found or part of an army
+    const group =
+      unit.isCommander ?  "LOC_UNIT_LIST_COMMANDER_TITLE" :
+      bzTraderTypes.has(unit.type) ?  "LOC_COMMERCE_TRADE_ROUTES_TITLE" :
+      unit.coreClass;
+    return group;
+  });
   const startCollapsed = createMemo(() => {
     return unitGroups().commanders.length + unitGroups().military.length + unitGroups().support.length + unitGroups().civilian.length > 50;
   });
@@ -829,6 +834,11 @@ const UnitListComponent = () => {
                             headerClass: "text-xs",
                             disableFocus: false,
                             centerTitle: true,
+                            get initiallyCollapsed() {
+                              // open unless another group is selected
+                              const group = selectedGroup();
+                              return group && group != "LOC_UNIT_LIST_COMMANDER_TITLE";
+                            },
                             get children() {
                               return [(() => {
                                 var _el$23 = _tmpl$6();
@@ -870,6 +880,8 @@ const UnitListComponent = () => {
                             disableFocus: false,
                             centerTitle: true,
                             get initiallyCollapsed() {
+                              const group = selectedGroup();
+                              if (group) return group != "LOC_UNIT_CLASS_MILITARY";
                               return startCollapsed();
                             },
                             get children() {
@@ -913,6 +925,8 @@ const UnitListComponent = () => {
                             disableFocus: false,
                             centerTitle: true,
                             get initiallyCollapsed() {
+                              const group = selectedGroup();
+                              if (group) return group != "LOC_UNIT_CLASS_SUPPORT";
                               return startCollapsed();
                             },
                             get children() {
@@ -955,10 +969,11 @@ const UnitListComponent = () => {
                             headerClass: "text-xs",
                             disableFocus: false,
                             centerTitle: true,
-                            // TRIX: make civilians always searchable
-                            // get initiallyCollapsed() {
-                            //   return startCollapsed();
-                            // },
+                            get initiallyCollapsed() {
+                              // open unless another group is selected
+                              const group = selectedGroup();
+                              return group && group != "LOC_UNIT_CLASS_CIVILIAN";
+                            },
                             get children() {
                               return [(() => {
                                 var _el$26 = _tmpl$6();
@@ -999,7 +1014,11 @@ const UnitListComponent = () => {
                             headerClass: "text-xs",
                             disableFocus: false,
                             centerTitle: true,
-                            initiallyCollapsed: true,
+                            get initiallyCollapsed() {
+                              // close unless specifically selected
+                              const group = selectedGroup();
+                              return group != "LOC_COMMERCE_TRADE_ROUTES_TITLE";
+                            },
                             get children() {
                               return [(() => {
                                 var _el$26 = _tmpl$6();
