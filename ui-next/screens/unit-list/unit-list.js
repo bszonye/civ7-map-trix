@@ -435,10 +435,11 @@ const UnitListEntry = (props) => {
                         a: void 0
                       });
                       return _el$4;
-                    })(), (() => {
-                      var _el$15 = _tmpl$6();
-                      _el$15.style.setProperty("background", "rgba(77, 83, 102, 0.30)");
-                      return _el$15;
+                    //})(), (() => {
+                    //  var _el$15 = _tmpl$6();
+                    //  _el$15.style.setProperty("background", "rgba(77, 83, 102, 0.30)");
+                    //  return _el$15;
+                    //  TRIX: remove horizontal lines
                     })()];
                   }
                 });
