@@ -4,10 +4,18 @@
 }
 
 .bz-city-list-container {
-  padding-left: 0.7222222222rem;
+  /* padding-left: 0.6666666667rem; */
+  min-width: 21.1111111111rem;
+  max-width: 22.2222222222rem;
+  padding: 0 0.6666666667rem;
+  align-items: center;
 }
 .bz-city-list-panel {
   transform-origin: bottom;
+  position: absolute;
+  top: 2.4444444444rem;
+  bottom: 0;
+  width: 100%;
 }
 .bz-city-list-panel .fxs-header.font-bold {
   font-weight: inherit;
@@ -36,9 +44,9 @@
 }
 .bz-city-list-frame {
   position: absolute;
-  width: 19.7777777777rem;
   top: 2.4444444444rem;
   left: 0;
+  right: 0;
   bottom: 1.2222222222rem;
   background: #12151f66;
 }
@@ -53,12 +61,28 @@
   background-color: #a33d2966;
   border-radius: 1em;
 }
+.bz-city-unrest-turns {
+  background-color: #99090099;
+  border-radius: 1em;
+}
 .bz-city-list-entry .bz-city-list-bg {
   border-radius: 1rem;
   background-color: #333640;
 }
 .bz-city-list-entry .bz-city-list-focus .bz-city-list-bg {
   border: 0.0555555556rem solid #4c5366;
+}
+.bz-city-list-entry.bz-town-has-focus .bz-city-growth-turns {
+  opacity: 0.333;
+}
+.bz-city-list-entry.bz-town-has-focus .bz-city-growth-turns *,
+.bz-city-list-entry .bz-city-queue-turns {
+  opacity: 0;
+}
+.bz-city-list-entry.bz-town-has-focus.bz-town-is-growing .bz-city-growth-turns,
+.bz-city-list-entry.bz-town-has-focus.bz-town-is-growing .bz-city-growth-turns *,
+.bz-city-list-entry [bz-qclass] .bz-city-queue-turns {
+  opacity: 1;
 }
 .bz-city-list-entry.bz-town-has-focus.bz-town-is-growing .bz-city-list-focus-icon {
   filter: saturate(0) contrast(0.5) brightness(1.33) fxs-color-tint(#60c000)
@@ -101,6 +125,7 @@
 }
 .bz-city-growth-turns .bz-icon,
 .bz-city-queue-turns .bz-icon,
+.bz-city-unrest-turns .bz-icon,
 .bz-city-list-entry .bz-city-list-bg .bz-icon,
 .bz-city-list-entry:focus .bz-city-list-bg,
 .bz-city-list-entry:hover .bz-city-list-bg,
@@ -115,7 +140,10 @@
 .bz-city-list-entry.pressed .bz-city-growth-turns,
 .bz-city-list-entry:focus .bz-city-queue-turns,
 .bz-city-list-entry:hover .bz-city-queue-turns,
-.bz-city-list-entry.pressed .bz-city-queue-turns {
+.bz-city-list-entry.pressed .bz-city-queue-turns,
+.bz-city-list-entry:focus .bz-city-unrest-turns,
+.bz-city-list-entry:hover .bz-city-unrest-turns,
+.bz-city-list-entry.pressed .bz-city-unrest-turns {
   filter: drop-shadow(0 0.0555555556rem 0.0555555556rem black);
 }
 /* vim: set sw=2 et : */

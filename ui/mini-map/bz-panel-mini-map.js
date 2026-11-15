@@ -1,7 +1,8 @@
 import bzMapTrixOptions, { bzCommanderLens } from '/bz-map-trix/ui/options/bz-map-trix-options.js';
+import { ContextManager } from '/core/ui/context-manager/context-manager.js';
 import { InputEngineEventName } from '/core/ui/input/input-support.js';
 import LensManager, { registerUnitLensSelector } from '/core/ui/lenses/lens-manager.js';
-import { ContextManager } from '/core/ui/context-manager/context-manager.js';
+import { Layout } from '/core/ui/utilities/utilities-layout.js';
 // guarantee import order for patching
 import '/base-standard/ui/interface-modes/interface-mode-unit-selected.js';
 import '/base-standard/ui/lenses/layer/conquest-layer.js';
@@ -215,12 +216,20 @@ class bzPanelMiniMap {
     layerHotkeyListener = this.onLayerHotkey.bind(this);
     toggleCooldown = 0;
     toggleQueued = false;
+    miniMapHeight = 239;
+    miniMapWidth = 380;
+    miniMapMinWidth = 380;
+    borderSize = 30;
     constructor(component) {
         bzPanelMiniMap.instance = this;
         this.component = component;
         this.component.bzMapTrix = this;
+        this.miniMapWidthPx = `${Layout.pixelsToScreenPixels(this.miniMapWidth)}px`;
+        this.miniMapMinWidthPx = `${Layout.pixelsToScreenPixels(this.miniMapMinWidth)}px`;
         // this.component.MAX_ASPECT_RATIO = 2.2;
+        // this.component.MAX_ASPECT_RATIO = 1;
         // this.component.MIN_ASPECT_RATIO = 1;
+        // this.component.MIN_ASPECT_RATIO = 2.2;
         this.patchPrototype(Object.getPrototypeOf(component));
     }
     patchPrototype(proto) {
@@ -282,6 +291,14 @@ class bzPanelMiniMap {
         this.wonderSubpanel.button.classList.add("bz-wonder-button");
         // limit button row width
         this.component.miniMapButtonRow.maxWidth = this.component.width;
+        // get minimap dimensions
+        const finalAspect = Math.min(this.component.MAX_ASPECT_RATIO, Math.max(this.component.MIN_ASPECT_RATIO, this.component.getMapAspectRatio()));
+        this.miniMapWidth = Math.round(
+            (this.miniMapHeight - this.borderSize) * finalAspect
+        ) + this.borderSize;
+        this.miniMapWidthPx = `${Layout.pixelsToScreenPixels(this.miniMapWidth)}px`;
+        console.warn(`TRIX SIZE ${this.miniMapWidth}x${this.miniMapHeight}`);
+        console.warn(`TRIX WIDTH ${this.miniMapWidthPx} vs ${this.component.miniMapTopContainer.style.width}`);
     }
     beforeToggleSubpanel(_subpanel, _force) {
         // prevent infinite loop after force-closing subpanel

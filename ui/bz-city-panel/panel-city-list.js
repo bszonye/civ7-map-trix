@@ -32,7 +32,7 @@ class bzCityPanel extends MinimapSubpanel {
     }
     onInitialize() {
         super.onInitialize();
-        this.container.className = "bz-city-list-container flex flex-col justify-end items-left max-h-full pt-11 pointer-events-none transition-all relative";
+        this.container.className = "bz-city-list-container flex flex-col justify-end items-center max-h-full pointer-events-none transition-all relative";
         this.container.style.height =
             Layout.pixels(window.innerHeight * 100 / Layout.currentScale() - 239);
         this.panel.setAttribute("data-navrule-up", "stop");
@@ -142,10 +142,9 @@ class bzCityPanel extends MinimapSubpanel {
                 const timer = document.createElement("div");
                 timer.classList.value = style;
                 timer.classList.add("flex", "items-center", "justify-center", "pl-1\\.5");
-                Databind.classToggle(column, "invisible", `{{${turns}}}==-1`);
                 const timerTurns = document.createElement("div");
                 timerTurns.classList.value = "text-right";
-                timerTurns.style.width = "calc(1.2em)";  // two digits
+                timerTurns.style.width = "1.2em";  // two digits
                 Databind.value(timerTurns, turns);
                 timer.appendChild(timerTurns);
                 const timerClock = document.createElement("div");
@@ -154,6 +153,12 @@ class bzCityPanel extends MinimapSubpanel {
                 timer.appendChild(timerClock);
                 column.appendChild(timer);
                 stats.appendChild(column);
+                return column;
+            }
+            function turnSpacer() {
+                const column = document.createElement("div");
+                column.className = "mx-1";
+                column.style.width = "calc(1.2em + 1.6666666667rem)";  // two digits
                 return column;
             }
             // population
@@ -177,12 +182,6 @@ class bzCityPanel extends MinimapSubpanel {
             queue.classList.value = "bz-city-queue flex items-center";
             Databind.attribute(queue, "bz-qkind", "entry.queueKind");
             Databind.attribute(queue, "bz-qclass", "entry.queueClass");
-            const queueTurns = turnTimer(
-                "bz-city-queue-turns",
-                "entry.queueTurns",
-            );
-            queueTurns.classList.add("mx-1");
-            queue.appendChild(queueTurns);
             const qslot = document.createElement("div");
             qslot.classList.value = "bz-city-list-queue relative size-6 mx-1";
             const queueBG = document.createElement("div");
@@ -195,32 +194,51 @@ class bzCityPanel extends MinimapSubpanel {
             if (!hasCityTooltip) Databind.tooltip(queueIcon, "entry.queueTooltip");
             queueBG.appendChild(queueIcon);
             queue.appendChild(qslot);
+            const queueTurns = turnTimer(
+                "bz-city-queue-turns",
+                "entry.queueTurns",
+            );
+            queueTurns.classList.add("mx-1");
+            queue.appendChild(queueTurns);
             stats.appendChild(queue);
             // town focus
             const focus = document.createElement("div");
             Databind.classToggle(focus, "hidden", "!{{entry.isTown}}");
-            focus.classList.value = "bz-city-list-focus relative size-6 mx-1";
+            focus.classList.value = "bz-city-list-focus flex items-center";
+            const fslot = document.createElement("div");
+            fslot.classList.value = "relative size-6 mx-1";
             const focusBG = document.createElement("div");
             focusBG.classList.value = "bz-city-list-bg absolute size-full";
             Databind.classToggle(focusBG, "hidden", "!{{entry.focusIcon}}");
-            focus.appendChild(focusBG);
+            fslot.appendChild(focusBG);
             const focusIcon = document.createElement("div");
             focusIcon.classList.value = "bz-city-list-focus-icon bz-icon size-full";
             focusIcon.style.backgroundSize = "125%";
             Databind.bgImg(focusIcon, "entry.focusIcon");
             Databind.tooltip(focusIcon, "entry.focusTooltip");
             focusBG.appendChild(focusIcon);
+            focus.appendChild(fslot);
+            focus.appendChild(turnSpacer());
             stats.appendChild(focus);
             // unrest and razing
             const unrest = document.createElement("div");
-            unrest.classList.value = "bz-city-list-unrest hidden relative size-6 mx-1";
+            unrest.classList.value = "bz-city-list-unrest hidden flex items-center";
+            const uslot = document.createElement("div");
+            uslot.classList.value = "relative size-6 mx-1";
             const unrestBG = document.createElement("div");
             unrestBG.classList.value = "bz-city-list-bg absolute size-full";
-            unrest.appendChild(unrestBG);
+            uslot.appendChild(unrestBG);
             const unrestIcon = document.createElement("div");
             unrestIcon.classList.value = "bz-city-list-unrest-icon bz-icon size-full";
             Databind.bgImg(unrestIcon, "entry.unrestIcon");
             unrestBG.appendChild(unrestIcon);
+            unrest.appendChild(uslot);
+            const unrestTurns = turnTimer(
+                "bz-city-unrest-turns",
+                "entry.unrestTurns",
+            );
+            unrestTurns.classList.add("mx-1");
+            unrest.appendChild(unrestTurns);
             stats.appendChild(unrest);
         }
         // finish

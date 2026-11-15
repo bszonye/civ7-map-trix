@@ -125,6 +125,8 @@ class bzCityListModel {
         }));
         const hasUnrest = Boolean(city.Happiness?.hasUnrest);
         const isRazing = city.isBeingRazed;
+        const unrestTurns = isRazing ? city.getTurnsUntilRazed :
+            Math.max(0, city.Happiness?.turnsOfUnrest ?? 0);
         const isGrowing = city.Growth.growthType == GrowthTypes.EXPAND;
         const growthTurns = isGrowing ? city.Growth.turnsUntilGrowth : -1;
         const religion = GameInfo.Religions.lookup(city.Religion?.majorityReligion ?? -1);
@@ -137,7 +139,7 @@ class bzCityListModel {
         // compile entry
         const entry = {
             city, id, owner, localId, icon, name, isCapital, isTown, isDistantLands,
-            hasDamage, hasUnrest, isRazing, isGrowing,
+            hasDamage, hasUnrest, isRazing, unrestTurns, isGrowing,
             location, population, growthTurns, religion, religionIcon,
         };
         if (isTown) {
@@ -198,6 +200,10 @@ class bzCityListModel {
                 entry.queueKind = "PROJECT";
                 entry.queueIcon = UI.getIcon(info.ProjectType);
                 entry.queueTooltip = info.Name;
+            } else if (hasDamage) {
+                entry.queueKind = "DAMAGE";
+                entry.queueIcon = "blp:fonticon_damaged";
+                entry.queueTooltip = "LOC_PLOT_TOOLTIP_DAMAGED";
             }
         }
         this._cities.set(localId, entry);
