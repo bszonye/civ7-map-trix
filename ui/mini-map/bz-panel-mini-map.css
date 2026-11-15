@@ -31,7 +31,7 @@
   left: 0;
   right: 0;
 }
-.lens-panel, .unit-list-panel .pt-11, .map-search.absolute {
+.lens-panel, .map-search.absolute {
   min-width: 21.1111111111rem;
   max-width: 22.2222222222rem;
   padding: 2.4444444444rem 0.6666666667rem 0;
@@ -44,13 +44,7 @@
 .map-search .map-search-panel-backing {
   width: 100%;
 }
-.unit-list-panel .pt-11 {
-  width: 100% !important;
-  padding-bottom: 0 !important;
-}
-.bz-mini-map .mini-map__lens-panel,
-.map-search .map-search-main,
-.unit-list-panel .mini-map__lens-panel {
+.bz-mini-map .mini-map__lens-panel, .map-search .map-search-main {
   position: relative;
   width: 100%;
   left: auto;

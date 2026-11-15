@@ -15,6 +15,7 @@ export default [
         },
         languageOptions: {
             globals: {
+                Armies: "readonly",
                 Camera: "readonly",
                 Cities: "readonly",
                 CityCommandTypes: "readonly",
@@ -68,6 +69,7 @@ export default [
                 UIHTMLCursorTypes: "readonly",
                 UniqueQuarterTypes: "readonly",
                 UnitActivityTypes: "readonly",
+                UnitCoreClassTypes: "readonly",
                 Units: "readonly",
                 Visibility: "readonly",
                 WorldUI: "readonly",
