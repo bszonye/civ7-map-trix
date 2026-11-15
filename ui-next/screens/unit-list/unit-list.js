@@ -49,6 +49,20 @@ var
   _tmpl$11 = template(`<div class="relative flex-1 min-h-0 w-full py-1 fxs-inner-frame-darker"><div class="absolute top-0 inset-x-0 filigree-inner-frame-top"></div><div class="absolute bottom-0 inset-x-0 filigree-inner-frame-bottom"></div></div>`),
   _tmpl$12 = template(`<div class="bz-unit-list-panel h-full flex flex-col justify-end items-center max-h-full pointer-events-none transition-all relative"tabindex="-1"></div>`);
   // _tmpl$12 = template(`<div class="bz-unit-list-panel h-full flex flex-col justify-end items-center max-h-full pt-11 pointer-events-none transition-all relative"tabindex="-1"></div>`);
+
+// TRIX: active mods
+function bzGetActiveMods() {
+  const installed = Modding.getInstalledMods();
+  const handles = new Map(installed.map(mod => [mod.handle, mod.id]));
+  return new Set(Modding.getActiveMods().map(handle => handles.get(handle)));
+}
+const bzActiveMods = bzGetActiveMods();
+const bzArmyTrix = bzActiveMods.has("bz-army-trix");
+// TRIX: automated trade units
+const bzTagTypes = (tag) => GameInfo.TypeTags
+    .filter(e => e.Tag == tag).map(e => Game.getHash(e.Type));
+const bzTraderTypes = new Set(bzTagTypes("UNIT_CLASS_TRADE_ROUTE"));
+
 const CORE_CLASS_SORT_ORDER = {
   LOC_UNIT_CLASS_MILITARY: 0,
   LOC_UNIT_CLASS_SUPPORT: 1,
@@ -62,6 +76,11 @@ const sortUnits = (a, b) => {
   const classComparison = (CORE_CLASS_SORT_ORDER[a.coreClass] ?? CORE_CLASS_LENGTH) - (CORE_CLASS_SORT_ORDER[b.coreClass] ?? CORE_CLASS_LENGTH);
   if (classComparison !== 0) {
     return classComparison;
+  }
+  // TRIX: sort traders last
+  if (a.coreClass == "LOC_UNIT_CLASS_CIVILIAN") {
+    const bzTraderComparison = bzTraderTypes.has(a.type) - bzTraderTypes.has(b.type);
+    if (bzTraderComparison) return bzTraderComparison;
   }
   const nameComparison = Locale.compare(a.name, b.name);
   if (nameComparison !== 0) {
@@ -295,16 +314,23 @@ const UnitListEntry = (props) => {
                           return unitData().tier > 0;
                         },
                         get children() {
+                          const tier = unitData().tier;
+                          const chevrons = bzArmyTrix ?
+                            `url(fs://game/bz-army-trix/icons/bz-chevrons-${tier}.png)` :
+                            `url(fs://game/unit_chevron-0${tier}.png)`;
+                          const isUpgradeReady = unitData().actions
+                            .find(a => a.type == "UNITCOMMAND_UPGRADE");
                           return createComponent(Icon, {
-                            "class": "size-4 ml-1 relative",
+                            "class": "size-4 ml-1 relative bz-desaturate",
                             get classList() {
                               return {
-                                "-top-0\\.5": unitData().tier == 1
-                                //Offset tier 1 units so it looks centered
+                                "bz-upgrade-ready": isUpgradeReady,
+                                "-top-0\\.5": tier == 1 && !bzArmyTrix
+                                // offset tier 1 chevron so it looks centered
                               };
                             },
                             get name() {
-                              return `url('fs://game/unit_chevron-0${unitData().tier}.png')`;
+                              return chevrons;
                             },
                             isUrl: true
                           });
@@ -584,7 +610,8 @@ const UnitListComponent = () => {
       commanders: [],
       military: [],
       support: [],
-      civilian: []
+      civilian: [],
+      trade: []  // TRIX
     };
     for (const unit of model.data.units) {
       if (!unitIsValid(unit) || !filter(unit, searchResults(), textFilter())) {
@@ -596,6 +623,8 @@ const UnitListComponent = () => {
         groups.military.push(unit);
       } else if (unit.coreClass == "LOC_UNIT_CLASS_SUPPORT") {
         groups.support.push(unit);
+      } else if (bzTraderTypes.has(unit.type)) {
+        groups.trade.push(unit);
       } else {
         groups.civilian.push(unit);
       }
@@ -915,9 +944,10 @@ const UnitListComponent = () => {
                             headerClass: "text-xs",
                             disableFocus: false,
                             centerTitle: true,
-                            get initiallyCollapsed() {
-                              return startCollapsed();
-                            },
+                            // TRIX: make civilians always searchable
+                            // get initiallyCollapsed() {
+                            //   return startCollapsed();
+                            // },
                             get children() {
                               return [(() => {
                                 var _el$26 = _tmpl$6();
@@ -926,6 +956,47 @@ const UnitListComponent = () => {
                               })(), createComponent(For, {
                                 get each() {
                                   return unitGroups().civilian;
+                                },
+                                children: (unit) => createComponent(UnitListEntry, {
+                                  unit,
+                                  indentLevel: 0,
+                                  get filteredUnits() {
+                                    return searchResults();
+                                  },
+                                  get textSearch() {
+                                    return textFilter();
+                                  },
+                                  autoFocus: false,
+                                  setUnitToSelect
+                                })
+                              })];
+                            }
+                          });
+                        }
+                      });
+                    }
+                  }), createComponent(VSlot, {
+                    get children() {
+                      return createComponent(Show, {
+                        get when() {
+                          return unitGroups().trade.length > 0;
+                        },
+                        get children() {
+                          return createComponent(CollapsibleContainer, {
+                            titleText: "LOC_COMMERCE_TRADE_ROUTES_TITLE",
+                            "class": "w-full h-auto mb-1",
+                            headerClass: "text-xs",
+                            disableFocus: false,
+                            centerTitle: true,
+                            initiallyCollapsed: true,
+                            get children() {
+                              return [(() => {
+                                var _el$26 = _tmpl$6();
+                                _el$26.style.setProperty("background", "rgba(77, 83, 102, 0.30)");
+                                return _el$26;
+                              })(), createComponent(For, {
+                                get each() {
+                                  return unitGroups().trade;
                                 },
                                 children: (unit) => createComponent(UnitListEntry, {
                                   unit,

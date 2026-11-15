@@ -236,7 +236,7 @@ class bzPanelMiniMap {
         // this.component.MAX_ASPECT_RATIO = 2.2;
         // this.component.MAX_ASPECT_RATIO = 1;
         // this.component.MIN_ASPECT_RATIO = 1;
-        this.component.MIN_ASPECT_RATIO = 2.2;
+        // this.component.MIN_ASPECT_RATIO = 2.2;
         this.patchPrototype(Object.getPrototypeOf(component));
     }
     patchPrototype(proto) {

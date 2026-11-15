@@ -2,6 +2,12 @@
   margin-left: 0;
   margin-right: -0.8888888889rem;
 }
+.bz-unit-list-panel .bz-desaturate {
+  filter: saturate(0) brightness(0.85);
+}
+.bz-unit-list-panel .bz-upgrade-ready {
+  filter: saturate(0) fxs-color-tint(cyan);
+}
 
 /**
 Based on Robert Penner's easing equations

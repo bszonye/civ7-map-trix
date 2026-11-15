@@ -57,6 +57,7 @@ export default [
                 MapPlotEffects: "readonly",
                 MapStorms: "readonly",
                 MapUnits: "readonly",
+                Modding: "readonly",
                 PlacementMode: "readonly",
                 PlayerIds: "readonly",
                 Players: "readonly",
