@@ -255,10 +255,12 @@ const UnitListEntry = (props) => {
   });
   return [(() => {
     var _el$3 = _tmpl$8();
-    insert(_el$3, createComponent(AudioContextProvider, {
-      segment: "UnitList",
-      get children() {
-        return createComponent(Tooltip, {
+    // TRIX: move this to CollapsibleContainer, one per group
+    // insert(_el$3, createComponent(AudioContextProvider, {
+    //   segment: "UnitList",
+    //   get children() {
+    //     return createComponent(Tooltip, {
+        insert(_el$3, createComponent(Tooltip, {
           showFiligrees: false,
           get initialVPosition() {
             return TooltipVerticalPosition.CENTER;
@@ -542,8 +544,8 @@ const UnitListEntry = (props) => {
               }
             })];
           }
-        });
-      }
+        // });
+      // }
     }), null);
     insert(_el$3, createComponent(Show, {
       get when() {
@@ -667,7 +669,7 @@ const UnitListComponent = () => {
     return group;
   });
   const startCollapsed = createMemo(() => {
-    return unitGroups().commanders.length + unitGroups().military.length + unitGroups().support.length + unitGroups().civilian.length < 0;  // TRIX TODO > 50;
+    return unitGroups().commanders.length + unitGroups().military.length + unitGroups().support.length + unitGroups().civilian.length > 50;
   });
   const handleEngineInput = (inputEvent) => {
     if (inputEvent.detail.name == "mousewheel-up" || inputEvent.detail.name == "mousewheel-down") {
@@ -866,6 +868,10 @@ const UnitListComponent = () => {
                               const group = selectedGroup();
                               return group && group != "LOC_UNIT_LIST_COMMANDER_TITLE";
                             },
+                            // TRIX: move audio context here
+                            children: () => createComponent(AudioContextProvider, {
+                              // segment: "SideBarOpen/Activatable",
+                              segment: "UnitList",
                             get children() {
                               return [(() => {
                                 var _el$23 = _tmpl$6();
@@ -888,7 +894,8 @@ const UnitListComponent = () => {
                                   setUnitToSelect
                                 })
                               })];
-                            }
+                            }})  // TRIX
+                            // }
                           });
                         }
                       });
@@ -917,6 +924,10 @@ const UnitListComponent = () => {
                               if (group) return group != "LOC_UNIT_CLASS_MILITARY";
                               return startCollapsed();
                             },
+                            // TRIX: move audio context here
+                            children: () => createComponent(AudioContextProvider, {
+                              // segment: "SideBarOpen/Activatable",
+                              segment: "UnitList",
                             get children() {
                               return [(() => {
                                 var _el$24 = _tmpl$6();
@@ -939,7 +950,8 @@ const UnitListComponent = () => {
                                   setUnitToSelect
                                 })
                               })];
-                            }
+                            }})  // TRIX
+                            // }
                           });
                         }
                       });
@@ -968,6 +980,10 @@ const UnitListComponent = () => {
                               if (group) return group != "LOC_UNIT_CLASS_SUPPORT";
                               return startCollapsed();
                             },
+                            // TRIX: move audio context here
+                            children: () => createComponent(AudioContextProvider, {
+                              // segment: "SideBarOpen/Activatable",
+                              segment: "UnitList",
                             get children() {
                               return [(() => {
                                 var _el$25 = _tmpl$6();
@@ -990,7 +1006,8 @@ const UnitListComponent = () => {
                                   setUnitToSelect
                                 })
                               })];
-                            }
+                            }})  // TRIX
+                            // }
                           });
                         }
                       });
@@ -1019,6 +1036,10 @@ const UnitListComponent = () => {
                               const group = selectedGroup();
                               return group && group != "LOC_UNIT_CLASS_CIVILIAN";
                             },
+                            // TRIX: move audio context here
+                            children: () => createComponent(AudioContextProvider, {
+                              // segment: "SideBarOpen/Activatable",
+                              segment: "UnitList",
                             get children() {
                               return [(() => {
                                 var _el$26 = _tmpl$6();
@@ -1041,7 +1062,8 @@ const UnitListComponent = () => {
                                   setUnitToSelect
                                 })
                               })];
-                            }
+                            }})  // TRIX
+                            // }
                           });
                         }
                       });
@@ -1070,6 +1092,10 @@ const UnitListComponent = () => {
                               const group = selectedGroup();
                               return group != "LOC_COMMERCE_TRADE_ROUTES_TITLE";
                             },
+                            // TRIX: move audio context here
+                            children: () => createComponent(AudioContextProvider, {
+                              segment: "SideBarOpen/Activatable",
+                              // segment: "UnitList",
                             get children() {
                               return [(() => {
                                 var _el$26 = _tmpl$6();
@@ -1092,7 +1118,8 @@ const UnitListComponent = () => {
                                   setUnitToSelect
                                 })
                               })];
-                            }
+                            }})  // TRIX
+                            // }
                           });
                         }
                       });
