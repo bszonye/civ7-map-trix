@@ -68,6 +68,31 @@ const UnitListModel = () => {
   const onUpdate = () => {
     updateGate.call("unitListUpdate");
   };
+  const bzCountPromotionsAvailable = (unit) => {
+    const xp = unit.Experience;
+    return (xp?.getStoredCommendations ?? 0) + (xp?.getStoredPromotionPoints ?? 0);
+  };
+  const bzCheckUpgradeAvailable = (unit) => {
+    return Boolean(
+      Game.UnitCommands?.canStart(unit.id, "UNITCOMMAND_UPGRADE", {}, true)?.Success
+    );
+  };
+  const bzGetActions = (unit) => {
+    const actions = getValidActions(unit);
+    const bzPromotionAvailable = bzCountPromotionsAvailable(unit) ?
+      checkCommandValid(unit, "UNITCOMMAND_PROMOTE") : void 0;
+    if (bzPromotionAvailable) actions.unshift(bzPromotionAvailable);
+    const bzUpgradeAvailable = bzCheckUpgradeAvailable(unit) || void 0;
+    const bzUpgradeReady = bzUpgradeAvailable ?
+      checkCommandValid(unit, "UNITCOMMAND_UPGRADE") : void 0;
+    if (bzUpgradeReady) actions.unshift(bzUpgradeReady);
+    return {
+      actions,
+      bzPromotionAvailable,
+      bzUpgradeAvailable,
+      bzUpgradeReady,
+    };
+  };
   createEffect(() => {
     if (isUnitListOpen()) {
       onUpdate();
@@ -86,7 +111,7 @@ const UnitListModel = () => {
         movesRemaining: data.newPoints,
         canMove: unit.canMove,
         location: unit.location,
-        // TRIX: update promotion & upgrade readiness
+        // TRIX: update actions including promotion & upgrade readiness
         ...bzGetActions(unit),
       });
       if (unit.isCommanderUnit) {
@@ -111,7 +136,7 @@ const UnitListModel = () => {
       setUnitListData("units", index, {
         statusIcon: statusData[0],
         statusName: statusData[1],
-        // TRIX
+        // TRIX: update actions including promotion & upgrade readiness
         ...bzGetActions(unit),
       });
       if (unit.isCommanderUnit) {
@@ -129,10 +154,10 @@ const UnitListModel = () => {
       const index = findUnitIndex(data.unit.id);
       const unit = Units.get(data.unit);
       if (index < 0 || !unit) return;
-      // TRIX: update promotion & upgrade readiness
-      // TODO
       setUnitListData("units", index, {
-        promotions: unit.Experience?.getLevel ?? 0
+        promotions: unit.Experience?.getLevel ?? 0,
+        // TRIX: update actions including promotion & upgrade readiness
+        ...bzGetActions(unit),
       });
       updateOperations(data);
     }
