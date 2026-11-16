@@ -657,9 +657,10 @@ const UnitListComponent = () => {
     }
     return groups;
   });
-  const selectedGroup = createMemo(() => {
-    const id = UI.Player.getHeadSelectedUnit();
-    if (id) console.warn(`TRIX MODEL ${model.data.units.length}`);
+  const [bzSelectedUnit, bzSetSelectedUnit] =
+    createSignal(UI.Player.getHeadSelectedUnit());
+  const bzSelectedGroup = createMemo(() => {
+    const id = bzSelectedUnit();
     const unit = id && model.findUnit(id.id, model.data.units);
     if (!unit?.isOnMap) return;  // not found or part of an army
     const group =
@@ -686,10 +687,11 @@ const UnitListComponent = () => {
     }
     return;
   };
-  const onUnitSelect = () => {
+  const onUnitSelect = (id) => {
     if (IsControllerActive()) {
       onClose();
     }
+    if (id && ComponentID.isValid(id)) bzSetSelectedUnit(id);
   };
   let hasPoppedContext = false;
   const onClose = () => {
@@ -865,7 +867,7 @@ const UnitListComponent = () => {
                             centerTitle: true,
                             get initiallyCollapsed() {
                               // open unless another group is selected
-                              const group = selectedGroup();
+                              const group = bzSelectedGroup();
                               return group && group != "LOC_UNIT_LIST_COMMANDER_TITLE";
                             },
                             // TRIX: move audio context here
@@ -920,7 +922,7 @@ const UnitListComponent = () => {
                             disableFocus: false,
                             centerTitle: true,
                             get initiallyCollapsed() {
-                              const group = selectedGroup();
+                              const group = bzSelectedGroup();
                               if (group) return group != "LOC_UNIT_CLASS_MILITARY";
                               return startCollapsed();
                             },
@@ -976,7 +978,7 @@ const UnitListComponent = () => {
                             disableFocus: false,
                             centerTitle: true,
                             get initiallyCollapsed() {
-                              const group = selectedGroup();
+                              const group = bzSelectedGroup();
                               if (group) return group != "LOC_UNIT_CLASS_SUPPORT";
                               return startCollapsed();
                             },
@@ -1033,7 +1035,7 @@ const UnitListComponent = () => {
                             centerTitle: true,
                             get initiallyCollapsed() {
                               // open unless another group is selected
-                              const group = selectedGroup();
+                              const group = bzSelectedGroup();
                               return group && group != "LOC_UNIT_CLASS_CIVILIAN";
                             },
                             // TRIX: move audio context here
@@ -1089,7 +1091,7 @@ const UnitListComponent = () => {
                             centerTitle: true,
                             get initiallyCollapsed() {
                               // close unless specifically selected
-                              const group = selectedGroup();
+                              const group = bzSelectedGroup();
                               return group != "LOC_COMMERCE_TRADE_ROUTES_TITLE";
                             },
                             // TRIX: move audio context here
