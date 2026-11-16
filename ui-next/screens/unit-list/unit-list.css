@@ -8,6 +8,9 @@
 .bz-unit-list-panel .bz-promotion-available {
   color: cyan;
 }
+.bz-unit-list-panel .bz-upgrade-available {
+  filter: saturate(0) fxs-color-tint(#ff6644);
+}
 .bz-unit-list-panel .bz-upgrade-ready {
   filter: saturate(0) brightness(1.2) fxs-color-tint(cyan);
 }

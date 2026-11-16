@@ -330,6 +330,7 @@ const UnitListEntry = (props) => {
                             "class": "size-4 ml-1 relative bz-desaturate",
                             get classList() {
                               return {
+                                "bz-upgrade-available": !!unitData().bzUpgradeAvailable,
                                 "bz-upgrade-ready": !!unitData().bzUpgradeReady,
                                 "-top-0\\.5": tier == 1 && !bzArmyTrix
                                 // offset tier 1 chevron so it looks centered

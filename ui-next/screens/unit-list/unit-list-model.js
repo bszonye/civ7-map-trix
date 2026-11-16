@@ -27,8 +27,8 @@ const UNITDOMAIN_NAME = {
 const OPERATIONS_QUICK_ACCESS = ["UNITOPERATION_ALERT"];
 const COMMANDS_QUICK_ACCESS = [
   "UNITCOMMAND_WAKE",  // TRIX
-  "UNITCOMMAND_UPGRADE",
-  "UNITCOMMAND_PROMOTE"
+  // "UNITCOMMAND_UPGRADE",
+  // "UNITCOMMAND_PROMOTE"
 ];
 const UnitListModel = () => {
   const updateGate = new UpdateGate(() => {
@@ -85,7 +85,9 @@ const UnitListModel = () => {
       setUnitListData("units", index, {
         movesRemaining: data.newPoints,
         canMove: unit.canMove,
-        location: unit.location
+        location: unit.location,
+        // TRIX: update promotion & upgrade readiness
+        ...bzGetActions(unit),
       });
       if (unit.isCommanderUnit) {
         const armyEntry = findArmy(unit.armyId.id, unitListData.armies);
@@ -105,11 +107,12 @@ const UnitListModel = () => {
       const unit = Units.get(unitEntry.id);
       if (!unit) return;
       const statusData = getStatusData(unit);
-      const actions = getValidActions(unit);
+      // const actions = getValidActions(unit);
       setUnitListData("units", index, {
         statusIcon: statusData[0],
         statusName: statusData[1],
-        actions
+        // TRIX
+        ...bzGetActions(unit),
       });
       if (unit.isCommanderUnit) {
         const armyEntry = findArmy(unit.armyId.id, unitListData.armies);
@@ -126,6 +129,8 @@ const UnitListModel = () => {
       const index = findUnitIndex(data.unit.id);
       const unit = Units.get(data.unit);
       if (index < 0 || !unit) return;
+      // TRIX: update promotion & upgrade readiness
+      // TODO
       setUnitListData("units", index, {
         promotions: unit.Experience?.getLevel ?? 0
       });
@@ -395,10 +400,6 @@ const UnitListModel = () => {
       packedUnits = armyEntry.packedUnits;
     }
     // TRIX
-    const bzSelected = UI.Player.getHeadSelectedUnit()?.id == unit.id.id;
-    const actions = getValidActions(unit);
-    const isCommander = unit.isCommanderUnit;
-    const tier = unitDef?.Tier ?? 0;
     return {
       id: unit.id,
       armyId: armyID,
@@ -408,7 +409,7 @@ const UnitListModel = () => {
       typeName: unit.typeName,
       unitTypeName,
       name: unitName,
-      tier,  // unitDef?.Tier ?? 0,
+      tier: unitDef?.Tier ?? 0,
       promotions: unit.Experience?.getLevel ?? 0,
       timeoutReturn: unit.getTimeoutReturn,
       reinforcementTime: getReinforcementTime(unit),
@@ -420,19 +421,18 @@ const UnitListModel = () => {
       statusIcon: statusData[0],
       statusName: statusData[1],
       statusDescription: statusData[2],
-      actions,  // getValidActions(unit),
+      // actions: getValidActions(unit),
       isOnMap: unit.isOnMap,
       location: unit.location,
       isSelectValid: unit.isOnMap || ComponentID.isValid(unit.armyId) && unit.getTimeoutReturn <= 0,
-      isCommander,  // unit.isCommanderUnit,
+      isCommander: unit.isCommanderUnit,
       packedUnits,
       textSearchSnippet: `${unitName}, ${[...tags].join(", ")}, `,
       textSearch: unitTypeName,
       // TRIX
-      bzSelected,
-      bzPromotionAvailable: isCommander && actions[0]?.type == "UNITCOMMAND_PROMOTE",
-      bzUpgradeReady: 0 < tier && actions[0]?.type == "UNITCOMMAND_UPGRADE",
+      bzSelected: UI.Player.getHeadSelectedUnit()?.id == unit.id.id,
       bzDomain: unitDef?.Domain ?? "DOMAIN_LAND",
+      ...bzGetActions(unit)
     };
   }
   function populateData() {
