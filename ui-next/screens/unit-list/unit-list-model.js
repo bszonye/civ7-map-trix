@@ -32,6 +32,7 @@ const COMMANDS_QUICK_ACCESS = [
 ];
 const UnitListModel = () => {
   const updateGate = new UpdateGate(() => {
+    console.warn(`TRIX UPDATE`);
     populateData();
   });
   let unitListSearch = new FullTextSearch("UnitListFilter");
@@ -95,13 +96,15 @@ const UnitListModel = () => {
   };
   createEffect(() => {
     if (isUnitListOpen()) {
-      onUpdate();
+      console.warn(`TRIX OPEN`);
+      // onUpdate();
     }
   });
   onMount(() => {
+    console.warn(`TRIX MOUNT`);
     onUpdate();
     function updateMovement(data) {
-      if (!isUnitListOpen()) return;
+      // TRIX TODO: if (!isUnitListOpen()) return;
       if (data.unit.owner != localPlayerID()) return;
       const index = findUnitIndex(data.unit.id);
       if (index < 0) return;
@@ -124,7 +127,7 @@ const UnitListModel = () => {
       }
     }
     function updateOperations(data) {
-      if (!isUnitListOpen()) return;
+      // TRIX TODO: if (!isUnitListOpen()) return;
       if (data.unit.owner != localPlayerID()) return;
       const index = findUnitIndex(data.unit.id);
       const unitEntry = unitListData.units[index];
@@ -149,7 +152,7 @@ const UnitListModel = () => {
       }
     }
     function updateExperience(data) {
-      if (!isUnitListOpen()) return;
+      // TRIX TODO: if (!isUnitListOpen()) return;
       if (data.unit.owner != localPlayerID()) return;
       const index = findUnitIndex(data.unit.id);
       const unit = Units.get(data.unit);
@@ -162,7 +165,7 @@ const UnitListModel = () => {
       updateOperations(data);
     }
     function updateDamage(data) {
-      if (!isUnitListOpen()) return;
+      // TRIX TODO: if (!isUnitListOpen()) return;
       if (data.unit.owner != localPlayerID()) return;
       const index = findUnitIndex(data.unit.id);
       if (index < 0) return;
@@ -171,7 +174,7 @@ const UnitListModel = () => {
       });
     }
     function updateName(data) {
-      if (!isUnitListOpen()) return;
+      // TRIX TODO: if (!isUnitListOpen()) return;
       if (data.unit.owner != localPlayerID()) return;
       if (data.command != Database.makeHash("UNITCOMMAND_NAME_UNIT")) return;
       const index = findUnitIndex(data.unit.id);
@@ -182,7 +185,7 @@ const UnitListModel = () => {
       });
     }
     function bzUpdateSelection(data) {
-      if (!isUnitListOpen()) return;
+      // TRIX TODO: if (!isUnitListOpen()) return;
       if (data.unit.owner != localPlayerID()) return;
       const index = findUnitIndex(data.unit.id);
       const unit = Units.get(data.unit);
@@ -461,7 +464,8 @@ const UnitListModel = () => {
     };
   }
   function populateData() {
-    if (!isUnitListOpen()) return;
+    console.warn(`TRIX POPULATE`);
+    // TRIX TODO: if (!isUnitListOpen()) return;
     const playerID = localPlayerID();
     const player = Players.get(playerID);
     const units = player?.Units?.getUnits() ?? [];

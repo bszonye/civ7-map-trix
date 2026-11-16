@@ -655,6 +655,7 @@ const UnitListComponent = () => {
   });
   const selectedGroup = createMemo(() => {
     const id = UI.Player.getHeadSelectedUnit();
+    if (id) console.warn(`TRIX MODEL ${model.data.units.length}`);
     const unit = id && model.findUnit(id.id, model.data.units);
     if (!unit?.isOnMap) return;  // not found or part of an army
     const group =
@@ -664,7 +665,7 @@ const UnitListComponent = () => {
     return group;
   });
   const startCollapsed = createMemo(() => {
-    return unitGroups().commanders.length + unitGroups().military.length + unitGroups().support.length + unitGroups().civilian.length > 50;
+    return unitGroups().commanders.length + unitGroups().military.length + unitGroups().support.length + unitGroups().civilian.length < 0;  // TRIX TODO > 50;
   });
   const handleEngineInput = (inputEvent) => {
     if (inputEvent.detail.name == "mousewheel-up" || inputEvent.detail.name == "mousewheel-down") {
