@@ -169,7 +169,6 @@ const UnitListCommand = (props) => {
   });
 };
 const UnitListEntry = (props) => {
-  console.warn(`TRIX ENTRY`);
   const MEDIUM_HEALTH_THRESHOLD = 0.75;
   const LOW_HEALTH_THRESHOLD = 0.5;
   const model = useUnitListModel();
