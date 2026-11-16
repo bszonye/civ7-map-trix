@@ -95,9 +95,9 @@ const UnitListModel = () => {
     };
   };
   createEffect(() => {
-    if (isUnitListOpen()) {
-      console.warn(`TRIX OPEN`);
-      // onUpdate();
+    // TRIX: update when the list closes, not when it opens
+    if (!isUnitListOpen()) {
+      onUpdate();
     }
   });
   onMount(() => {

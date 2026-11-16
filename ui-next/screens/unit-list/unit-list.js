@@ -169,6 +169,7 @@ const UnitListCommand = (props) => {
   });
 };
 const UnitListEntry = (props) => {
+  console.warn(`TRIX ENTRY`);
   const MEDIUM_HEALTH_THRESHOLD = 0.75;
   const LOW_HEALTH_THRESHOLD = 0.5;
   const model = useUnitListModel();
@@ -624,6 +625,7 @@ const UnitListComponent = () => {
   const unitIsValid = (unit) => {
     return unit.isOnMap || unit.timeoutReturn >= 0;
   };
+  const bzShowingDebug = createMemo(() => UI.isDebugPlotInfoVisible());
   const unitGroups = createMemo(() => {
     const groups = {
       commanders: [],
@@ -833,6 +835,10 @@ const UnitListComponent = () => {
             reserveSpace: true,
             useProxy: true,
             get children() {
+              const bzGroupTitle = (title, count) => {
+                if (!bzShowingDebug()) return title;
+                  return Locale.compose("LOC_BZ_PARENTHESIS", title, count);
+              };
               return createComponent(VSlot, {
                 "class": "flex-auto flex-col",
                 get children() {
@@ -844,7 +850,13 @@ const UnitListComponent = () => {
                         },
                         get children() {
                           return createComponent(CollapsibleContainer, {
-                            titleText: "LOC_UNIT_LIST_COMMANDER_TITLE",
+                            get titleText() {
+                              return bzGroupTitle(
+                                "LOC_UNIT_LIST_COMMANDER_TITLE",
+                                unitGroups().commanders.length
+                              );
+                            },
+                            // titleText: "LOC_UNIT_LIST_COMMANDER_TITLE",
                             "class": "w-full h-auto mb-1",
                             headerClass: "text-xs",
                             disableFocus: false,
@@ -889,7 +901,13 @@ const UnitListComponent = () => {
                         },
                         get children() {
                           return createComponent(CollapsibleContainer, {
-                            titleText: "LOC_UNIT_CLASS_MILITARY",
+                            get titleText() {
+                              return bzGroupTitle(
+                                "LOC_UNIT_CLASS_MILITARY",
+                                unitGroups().military.length
+                              );
+                            },
+                            // titleText: "LOC_UNIT_CLASS_MILITARY",
                             "class": "w-full h-auto mb-1",
                             headerClass: "text-xs",
                             disableFocus: false,
@@ -934,7 +952,13 @@ const UnitListComponent = () => {
                         },
                         get children() {
                           return createComponent(CollapsibleContainer, {
-                            titleText: "LOC_UNIT_CLASS_SUPPORT",
+                            get titleText() {
+                              return bzGroupTitle(
+                                "LOC_UNIT_CLASS_SUPPORT",
+                                unitGroups().support.length
+                              );
+                            },
+                            // titleText: "LOC_UNIT_CLASS_SUPPORT",
                             "class": "w-full h-auto mb-1",
                             headerClass: "text-xs",
                             disableFocus: false,
@@ -979,7 +1003,13 @@ const UnitListComponent = () => {
                         },
                         get children() {
                           return createComponent(CollapsibleContainer, {
-                            titleText: "LOC_UNIT_CLASS_CIVILIAN",
+                            get titleText() {
+                              return bzGroupTitle(
+                                "LOC_UNIT_CLASS_CIVILIAN",
+                                unitGroups().civilian.length
+                              );
+                            },
+                            // titleText: "LOC_UNIT_CLASS_CIVILIAN",
                             "class": "w-full h-auto mb-1",
                             headerClass: "text-xs",
                             disableFocus: false,
@@ -1024,7 +1054,13 @@ const UnitListComponent = () => {
                         },
                         get children() {
                           return createComponent(CollapsibleContainer, {
-                            titleText: "LOC_COMMERCE_TRADE_ROUTES_TITLE",
+                            get titleText() {
+                              return bzGroupTitle(
+                                "LOC_COMMERCE_TRADE_ROUTES_TITLE",
+                                unitGroups().trade.length
+                              );
+                            },
+                            // titleText: "LOC_COMMERCE_TRADE_ROUTES_TITLE",
                             "class": "w-full h-auto mb-1",
                             headerClass: "text-xs",
                             disableFocus: false,
