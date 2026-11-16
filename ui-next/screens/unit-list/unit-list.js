@@ -302,7 +302,7 @@ const UnitListEntry = (props) => {
                     return [(() => {
                       var _el$4 = _tmpl$5(), _el$5 = _el$4.firstChild, _el$6 = _el$5.firstChild, _el$7 = _el$6.firstChild, _el$11 = _el$5.nextSibling, _el$12 = _el$11.nextSibling, _el$13 = _el$12.firstChild;
                       insert(_el$5, createComponent(Icon, {
-                        "class": "size-6 unit-entry-info",
+                        "class": "bz-icon size-6 unit-entry-info",
                         get name() {
                           return unitData().typeName;
                         }
@@ -328,7 +328,7 @@ const UnitListEntry = (props) => {
                             `url(fs://game/bz-army-trix/icons/bz-chevrons-${tier}.png)` :
                             `url(fs://game/unit_chevron-0${tier}.png)`;
                           return createComponent(Icon, {
-                            "class": "size-4 ml-1 relative bz-desaturate",
+                            "class": "bz-chevrons bz-icon size-4 ml-1 relative",
                             get classList() {
                               return {
                                 "bz-upgrade-available": !!unitData().bzUpgradeAvailable,
@@ -389,7 +389,7 @@ const UnitListEntry = (props) => {
                             get args() {
                               return [unitData().movesRemaining, unitData().maxMoves];
                             },
-                            "class": "text-xs"
+                            "class": "bz-fonticon text-xs"
                           });
                         }
                       }), null);
@@ -415,14 +415,14 @@ const UnitListEntry = (props) => {
                                 },
                                 "class": "text-xs unit-entry-info mr-1"
                               }), createComponent(Icon, {
-                                "class": "size-4 mr-2 unit-entry-info",
+                                "class": "bz-icon size-4 mr-2 unit-entry-info",
                                 name: `url("blp:turn_icon")`,
                                 isUrl: true
                               })];
                             }
                           }), null);
                           insert(_el$14, createComponent(Icon, {
-                            "class": "size-6",
+                            "class": "bz-icon size-6",
                             get name() {
                               return unitData().statusIcon;
                             },

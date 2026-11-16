@@ -2,8 +2,28 @@
   margin-left: 0;
   margin-right: -0.8888888889rem;
 }
-.bz-unit-list-panel .bz-desaturate {
-  filter: saturate(0) brightness(0.85);
+.bz-unit-list-panel .bz-chevrons {
+  filter: saturate(0) brightness(0.833);
+}
+.bz-unit-list-panel .bz-unit-entry-selected {
+  background: linear-gradient(90deg, #4c473d99 0%, #33364099 100%);
+  color: white;
+  text-shadow: 0 0.0555555556rem 0.1111111111rem black;
+}
+.bz-unit-list-panel .bz-unit-entry-selected .bz-icon,
+.bz-unit-list-panel .bz-unit-entry-selected .bz-fonticon img {
+  filter: brightness(1.2) drop-shadow(0 0.0555555556rem 0.1111111111rem black);
+}
+.bz-unit-list-panel .bz-unit-entry-selected .bz-chevrons.bz-icon {
+  filter: saturate(0) drop-shadow(0 0.0555555556rem 0.1111111111rem black);
+}
+.bz-unit-list-panel .bz-unit-entry-selected .bz-upgrade-available.bz-chevrons.bz-icon {
+  filter: saturate(0) fxs-color-tint(#ff6644)
+          drop-shadow(0 0.0555555556rem 0.1111111111rem black);
+}
+.bz-unit-list-panel .bz-unit-entry-selected .bz-upgrade-ready.bz-chevrons.bz-icon {
+  filter: saturate(0) brightness(1.2) fxs-color-tint(cyan)
+          drop-shadow(0 0.0555555556rem 0.1111111111rem black);
 }
 .bz-unit-list-panel .bz-promotion-available {
   color: cyan;
@@ -13,11 +33,6 @@
 }
 .bz-unit-list-panel .bz-upgrade-ready {
   filter: saturate(0) brightness(1.2) fxs-color-tint(cyan);
-}
-.bz-unit-list-panel .bz-unit-entry-selected {
-  background: linear-gradient(90deg, #4c473d99 0%, #33364099 100%);
-  color: #e5e5e5;
-  text-shadow: 0 0.0555555556rem 0.1111111111rem black;
 }
 
 /**
