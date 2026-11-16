@@ -661,9 +661,9 @@ const UnitListComponent = () => {
   const bzSelectedGroup = createMemo(() => {
     const id = bzSelectedUnit();
     const unit = id && model.findUnit(id.id, model.data.units);
-    if (!unit?.isOnMap) return;  // not found or part of an army
+    if (!unit) return;  // not found or part of an army
     const group =
-      unit.isCommander ?  "LOC_UNIT_LIST_COMMANDER_TITLE" :
+      unit.isCommander || !unit.isOnMap ?  "LOC_UNIT_LIST_COMMANDER_TITLE" :
       bzTraderTypes.has(unit.type) ?  "LOC_COMMERCE_TRADE_ROUTES_TITLE" :
       unit.coreClass;
     return group;
