@@ -700,7 +700,10 @@ const UnitListComponent = () => {
     const unit = id && model.findUnit(id.id, model.data.units);
     if (!unit) return;
     for (const [key, group] of Object.entries(unitGroups())) {
-      if (group.find(u => u.id.id == unit.id.id)) return key;
+      if (group.find(u => u.id.id == unit.id.id)) {
+        if (key == "packed") break;
+        return key;
+      }
     }
   });
   const startCollapsed = createMemo(() => {
@@ -891,9 +894,9 @@ const UnitListComponent = () => {
                       return Object.keys(unitGroups());
                     },
                     children: (key) => {
-                      const group = unitGroups()[key];
                       return createComponent(VSlot, {
                         get children() {
+                          const group = unitGroups()[key];
                           return createComponent(Show, {
                             get when() {
                               return group.length && key.includes("LOC_");  // TRIX
