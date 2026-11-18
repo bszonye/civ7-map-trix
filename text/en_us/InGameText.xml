@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Database>
     <EnglishText>
-        <Replace Tag="LOC_BZ_DIVIDER_DOT">
-            <Text>&nbsp;{LOC_PLOT_DIVIDER_DOT} </Text>
-        </Replace>
         <Replace Tag="LOC_BZ_PARENTHESIS">
             <Text>{1_text} ({2_parenthesis})</Text>
         </Replace>
