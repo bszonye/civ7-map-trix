@@ -26,6 +26,7 @@ import { ComponentRegistry } from '../../../../core/ui-next/services/component-r
 import { FocusManager } from '../../../../core/ui-next/services/focus-manager.js';
 import { IsControllerActive, IsTouchActive } from '../../../../core/ui-next/services/input.js';
 import { ComponentUtilities } from '../../../../core/ui-next/utilities/component-utilities.js';
+import { useLocalPlayerId } from '../../../../core/ui-next/utilities/game-core-utilities.js';
 import { UnitMapDecorationSupport } from '../../../ui/interface-modes/support-unit-map-decoration.js';
 import { SubpanelCloseEventName } from '../../../ui/mini-map/minimap-support.js';
 import { NarrativePopupManager } from '../../../ui/narrative-event/narrative-popup-manager.js';
@@ -58,7 +59,11 @@ function bzGetActiveMods() {
   return new Set(Modding.getActiveMods().map(handle => handles.get(handle)));
 }
 const bzActiveMods = bzGetActiveMods();
+// TRIX: alternate art
 const bzArmyTrix = bzActiveMods.has("bz-army-trix");
+const bzChevrons = bzArmyTrix ?
+  (tier) => `url(fs://game/bz-army-trix/icons/bz-chevrons-${tier}.png)` :
+  (tier) => `url(fs://game/unit_chevron-0${tier}.png)`;
 // TRIX: automated trade units
 const bzTagTypes = (tag) => GameInfo.TypeTags
     .filter(e => e.Tag == tag).map(e => Game.getHash(e.Type));
@@ -71,9 +76,9 @@ const CORE_CLASS_SORT_ORDER = {
 };
 const CORE_CLASS_LENGTH = Object.keys(CORE_CLASS_SORT_ORDER).length;
 const BZ_DOMAIN_SORT_ORDER = {
-  DOMAIN_AIR: 0,
-  DOMAIN_LAND: 1,
-  DOMAIN_SEA: 2
+  LOC_TAG_UNIT_CLASS_AIRCRAFT: 0,
+  LOC_TAG_UNIT_CLASS_LAND: 1,
+  LOC_TAG_UNIT_CLASS_NAVAL: 2
 };
 const sortUnits = (a, b) => {
   if (a.isCommander !== b.isCommander) {
@@ -325,9 +330,7 @@ const UnitListEntry = (props) => {
                         },
                         get children() {
                           const tier = unitData().tier;
-                          const chevrons = bzArmyTrix ?
-                            `url(fs://game/bz-army-trix/icons/bz-chevrons-${tier}.png)` :
-                            `url(fs://game/unit_chevron-0${tier}.png)`;
+                          const chevrons = bzChevrons(unitData().tier);
                           return createComponent(Icon, {
                             "class": "bz-chevrons bz-icon size-4 ml-1 relative",
                             get classList() {
@@ -626,30 +629,64 @@ const UnitListComponent = () => {
   const unitIsValid = (unit) => {
     return unit.isOnMap || unit.timeoutReturn >= 0;
   };
+  const localPlayerID = useLocalPlayerId();  // TRIX
   const bzShowingDebug = createMemo(() => UI.isDebugPlotInfoVisible());
   const unitGroups = createMemo(() => {
     const groups = {
-      commanders: [],
-      military: [],
-      support: [],
-      civilian: [],
-      trade: []  // TRIX
+      LOC_UNIT_LIST_COMMANDER_TITLE: [],
+      "{LOC_PEDIA_PAGEGROUP_COMMAND_UNITS_NAME} • {LOC_TAG_UNIT_CLASS_AIRCRAFT}": [],
+      "{LOC_PEDIA_PAGEGROUP_COMMAND_UNITS_NAME} • {LOC_TAG_UNIT_CLASS_LAND}": [],
+      "{LOC_PEDIA_PAGEGROUP_COMMAND_UNITS_NAME} • {LOC_TAG_UNIT_CLASS_NAVAL}": [],
+      // commanders: [],
+      LOC_UNIT_CLASS_MILITARY: [],
+      "{LOC_UNIT_CLASS_MILITARY} • {LOC_TAG_UNIT_CLASS_AIRCRAFT}": [],
+      "{LOC_UNIT_CLASS_MILITARY} • {LOC_TAG_UNIT_CLASS_LAND}": [],
+      "{LOC_UNIT_CLASS_MILITARY} • {LOC_TAG_UNIT_CLASS_NAVAL}": [],
+      // military: [],
+      LOC_UNIT_CLASS_SUPPORT: [],
+      // support: [],
+      LOC_UNIT_CLASS_CIVILIAN: [],
+      // civilian: [],
+      LOC_COMMERCE_TRADE_ROUTES_TITLE: [],  // TRIX
+      packed: [],  // TRIX
+      invalid: [],  // TRIX
     };
     for (const unit of model.data.units) {
-      if (!unitIsValid(unit) || !filter(unit, searchResults(), textFilter())) {
-        continue;
-      }
-      if (unit.isCommander) {
-        groups.commanders.push(unit);
+      // if (!unitIsValid(unit) || !filter(unit, searchResults(), textFilter())) {
+      //   continue;
+      // }
+      if (!filter(unit, searchResults(), textFilter())) continue;
+      if (!unitIsValid(unit)) {
+        if (unit.armyId?.owner == localPlayerID()) {
+          groups.packed.push(unit);
+        } else {
+          groups.invalid.push(unit);
+        }
+      } else if (unit.isCommander) {
+        groups.LOC_UNIT_LIST_COMMANDER_TITLE.push(unit);
       } else if (unit.coreClass == "LOC_UNIT_CLASS_MILITARY") {
-        groups.military.push(unit);
+        groups.LOC_UNIT_CLASS_MILITARY.push(unit);
       } else if (unit.coreClass == "LOC_UNIT_CLASS_SUPPORT") {
-        groups.support.push(unit);
+        groups.LOC_UNIT_CLASS_SUPPORT.push(unit);
       } else if (bzTraderTypes.has(unit.type)) {
-        groups.trade.push(unit);
+        groups.LOC_COMMERCE_TRADE_ROUTES_TITLE.push(unit);
       } else {
-        groups.civilian.push(unit);
+        groups.LOC_UNIT_CLASS_CIVILIAN.push(unit);
       }
+    }
+    if (20 < groups.LOC_UNIT_LIST_COMMANDER_TITLE.length + groups.packed.length) {
+      for (const unit of groups.LOC_UNIT_LIST_COMMANDER_TITLE) {
+        const key = `{LOC_PEDIA_PAGEGROUP_COMMAND_UNITS_NAME} • {${unit.bzDomain}}`;
+        groups[key].push(unit);
+      }
+      groups.LOC_UNIT_LIST_COMMANDER_TITLE = [];
+    }
+    if (20 < groups.LOC_UNIT_CLASS_MILITARY.length) {
+      for (const unit of groups.LOC_UNIT_CLASS_MILITARY) {
+        const key = `{LOC_UNIT_CLASS_MILITARY} • {${unit.bzDomain}}`;
+        groups[key].push(unit);
+      }
+      groups.LOC_UNIT_CLASS_MILITARY = [];
     }
     for (const group of Object.values(groups)) {
       group.sort(sortUnits);
@@ -661,15 +698,18 @@ const UnitListComponent = () => {
   const bzSelectedGroup = createMemo(() => {
     const id = bzSelectedUnit();
     const unit = id && model.findUnit(id.id, model.data.units);
-    if (!unit) return;  // not found or part of an army
-    const group =
-      unit.isCommander || !unit.isOnMap ?  "LOC_UNIT_LIST_COMMANDER_TITLE" :
-      bzTraderTypes.has(unit.type) ?  "LOC_COMMERCE_TRADE_ROUTES_TITLE" :
-      unit.coreClass;
-    return group;
+    if (!unit) return;
+    for (const [key, group] of Object.entries(unitGroups())) {
+      if (group.find(u => u.id.id == unit.id.id)) return key;
+    }
   });
   const startCollapsed = createMemo(() => {
-    return unitGroups().commanders.length + unitGroups().military.length + unitGroups().support.length + unitGroups().civilian.length > 50;
+    // return unitGroups().commanders.length + unitGroups().military.length + unitGroups().support.length + unitGroups().civilian.length > 50;
+    // TRIX: count packed units too
+    const total = Object.values(unitGroups())
+      .map(g => g.length)
+      .reduce((a, c) => a + c, 0);
+    return 50 < total - unitGroups().invalid.length;
   });
   const handleEngineInput = (inputEvent) => {
     if (inputEvent.detail.name == "mousewheel-up" || inputEvent.detail.name == "mousewheel-down") {
@@ -838,294 +878,79 @@ const UnitListComponent = () => {
             reserveSpace: true,
             useProxy: true,
             get children() {
-              const bzGroupTitle = (title, count) => {
+              const bzGroupTitle = (key, count) => {
+                const title = Locale.stylize(key);
                 if (!bzShowingDebug()) return title;
-                  return Locale.compose("LOC_BZ_PARENTHESIS", title, count);
+                return Locale.compose("LOC_BZ_PARENTHESIS", title, count);
               };
               return createComponent(VSlot, {
                 "class": "flex-auto flex-col",
                 get children() {
-                  return [createComponent(VSlot, {
-                    get children() {
-                      return createComponent(Show, {
-                        get when() {
-                          return unitGroups().commanders.length > 0;
-                        },
+                  return createComponent(For, {
+                    get each() {
+                      return Object.keys(unitGroups());
+                    },
+                    children: (key) => {
+                      const group = unitGroups()[key];
+                      return createComponent(VSlot, {
                         get children() {
-                          return createComponent(CollapsibleContainer, {
-                            get titleText() {
-                              return bzGroupTitle(
-                                "LOC_UNIT_LIST_COMMANDER_TITLE",
-                                unitGroups().commanders.length
-                              );
+                          return createComponent(Show, {
+                            get when() {
+                              return group.length && key.includes("LOC_");  // TRIX
+                              // return group.length > 0;
                             },
-                            // titleText: "LOC_UNIT_LIST_COMMANDER_TITLE",
-                            "class": "w-full h-auto mb-1",
-                            headerClass: "text-xs",
-                            disableFocus: false,
-                            centerTitle: true,
-                            get initiallyCollapsed() {
-                              // open unless another group is selected
-                              const group = bzSelectedGroup();
-                              return group && group != "LOC_UNIT_LIST_COMMANDER_TITLE";
-                            },
-                            // TRIX: move audio context here
-                            children: () => createComponent(AudioContextProvider, {
-                              // segment: "SideBarOpen/Activatable",
-                              segment: "UnitList",
                             get children() {
-                              return [(() => {
-                                var _el$23 = _tmpl$6();
-                                _el$23.style.setProperty("background", "rgba(77, 83, 102, 0.30)");
-                                return _el$23;
-                              })(), createComponent(For, {
-                                get each() {
-                                  return unitGroups().commanders;
+                              return createComponent(CollapsibleContainer, {
+                                get titleText() {
+                                  return bzGroupTitle(key, group.length);
                                 },
-                                children: (unit) => createComponent(UnitListEntry, {
-                                  unit,
-                                  indentLevel: 0,
-                                  get filteredUnits() {
-                                    return searchResults();
-                                  },
-                                  get textSearch() {
-                                    return textFilter();
-                                  },
-                                  autoFocus: false,
-                                  setUnitToSelect
-                                })
-                              })];
-                            }})  // TRIX
-                            // }
+                                "class": "w-full h-auto mb-1",
+                                headerClass: "text-xs",
+                                disableFocus: false,
+                                centerTitle: true,
+                                get initiallyCollapsed() {
+                                  // open unless another group is selected
+                                  const group = bzSelectedGroup();
+                                  if (group) return key != group;
+                                  if (key.includes("COMMAND")) return false;
+                                  if (key.includes("CIVILIAN")) return false;
+                                  if (key.includes("TRADE_ROUTE")) return true;
+                                  return startCollapsed();
+                                },
+                                // TRIX: move audio context here
+                                children: () => createComponent(AudioContextProvider, {
+                                  segment: "UnitList",
+                                  get children() {
+                                    return [(() => {
+                                      var _el$23 = _tmpl$6();
+                                      _el$23.style.setProperty("background", "rgba(77, 83, 102, 0.30)");
+                                      return _el$23;
+                                    })(), createComponent(For, {
+                                      get each() {
+                                        return group;
+                                      },
+                                      children: (unit) => createComponent(UnitListEntry, {
+                                        unit,
+                                        indentLevel: 0,
+                                        get filteredUnits() {
+                                          return searchResults();
+                                        },
+                                        get textSearch() {
+                                          return textFilter();
+                                        },
+                                        autoFocus: false,
+                                        setUnitToSelect
+                                      })
+                                    })];
+                                  }
+                                }),
+                              });
+                            }
                           });
                         }
                       });
-                    }
-                  }), createComponent(VSlot, {
-                    get children() {
-                      return createComponent(Show, {
-                        get when() {
-                          return unitGroups().military.length > 0;
-                        },
-                        get children() {
-                          return createComponent(CollapsibleContainer, {
-                            get titleText() {
-                              return bzGroupTitle(
-                                "LOC_UNIT_CLASS_MILITARY",
-                                unitGroups().military.length
-                              );
-                            },
-                            // titleText: "LOC_UNIT_CLASS_MILITARY",
-                            "class": "w-full h-auto mb-1",
-                            headerClass: "text-xs",
-                            disableFocus: false,
-                            centerTitle: true,
-                            get initiallyCollapsed() {
-                              const group = bzSelectedGroup();
-                              if (group) return group != "LOC_UNIT_CLASS_MILITARY";
-                              return startCollapsed();
-                            },
-                            // TRIX: move audio context here
-                            children: () => createComponent(AudioContextProvider, {
-                              // segment: "SideBarOpen/Activatable",
-                              segment: "UnitList",
-                            get children() {
-                              return [(() => {
-                                var _el$24 = _tmpl$6();
-                                _el$24.style.setProperty("background", "rgba(77, 83, 102, 0.30)");
-                                return _el$24;
-                              })(), createComponent(For, {
-                                get each() {
-                                  return unitGroups().military;
-                                },
-                                children: (unit) => createComponent(UnitListEntry, {
-                                  unit,
-                                  indentLevel: 0,
-                                  get filteredUnits() {
-                                    return searchResults();
-                                  },
-                                  get textSearch() {
-                                    return textFilter();
-                                  },
-                                  autoFocus: false,
-                                  setUnitToSelect
-                                })
-                              })];
-                            }})  // TRIX
-                            // }
-                          });
-                        }
-                      });
-                    }
-                  }), createComponent(VSlot, {
-                    get children() {
-                      return createComponent(Show, {
-                        get when() {
-                          return unitGroups().support.length > 0;
-                        },
-                        get children() {
-                          return createComponent(CollapsibleContainer, {
-                            get titleText() {
-                              return bzGroupTitle(
-                                "LOC_UNIT_CLASS_SUPPORT",
-                                unitGroups().support.length
-                              );
-                            },
-                            // titleText: "LOC_UNIT_CLASS_SUPPORT",
-                            "class": "w-full h-auto mb-1",
-                            headerClass: "text-xs",
-                            disableFocus: false,
-                            centerTitle: true,
-                            get initiallyCollapsed() {
-                              const group = bzSelectedGroup();
-                              if (group) return group != "LOC_UNIT_CLASS_SUPPORT";
-                              return startCollapsed();
-                            },
-                            // TRIX: move audio context here
-                            children: () => createComponent(AudioContextProvider, {
-                              // segment: "SideBarOpen/Activatable",
-                              segment: "UnitList",
-                            get children() {
-                              return [(() => {
-                                var _el$25 = _tmpl$6();
-                                _el$25.style.setProperty("background", "rgba(77, 83, 102, 0.30)");
-                                return _el$25;
-                              })(), createComponent(For, {
-                                get each() {
-                                  return unitGroups().support;
-                                },
-                                children: (unit) => createComponent(UnitListEntry, {
-                                  unit,
-                                  indentLevel: 0,
-                                  get filteredUnits() {
-                                    return searchResults();
-                                  },
-                                  get textSearch() {
-                                    return textFilter();
-                                  },
-                                  autoFocus: false,
-                                  setUnitToSelect
-                                })
-                              })];
-                            }})  // TRIX
-                            // }
-                          });
-                        }
-                      });
-                    }
-                  }), createComponent(VSlot, {
-                    get children() {
-                      return createComponent(Show, {
-                        get when() {
-                          return unitGroups().civilian.length > 0;
-                        },
-                        get children() {
-                          return createComponent(CollapsibleContainer, {
-                            get titleText() {
-                              return bzGroupTitle(
-                                "LOC_UNIT_CLASS_CIVILIAN",
-                                unitGroups().civilian.length
-                              );
-                            },
-                            // titleText: "LOC_UNIT_CLASS_CIVILIAN",
-                            "class": "w-full h-auto mb-1",
-                            headerClass: "text-xs",
-                            disableFocus: false,
-                            centerTitle: true,
-                            get initiallyCollapsed() {
-                              // open unless another group is selected
-                              const group = bzSelectedGroup();
-                              return group && group != "LOC_UNIT_CLASS_CIVILIAN";
-                            },
-                            // TRIX: move audio context here
-                            children: () => createComponent(AudioContextProvider, {
-                              // segment: "SideBarOpen/Activatable",
-                              segment: "UnitList",
-                            get children() {
-                              return [(() => {
-                                var _el$26 = _tmpl$6();
-                                _el$26.style.setProperty("background", "rgba(77, 83, 102, 0.30)");
-                                return _el$26;
-                              })(), createComponent(For, {
-                                get each() {
-                                  return unitGroups().civilian;
-                                },
-                                children: (unit) => createComponent(UnitListEntry, {
-                                  unit,
-                                  indentLevel: 0,
-                                  get filteredUnits() {
-                                    return searchResults();
-                                  },
-                                  get textSearch() {
-                                    return textFilter();
-                                  },
-                                  autoFocus: false,
-                                  setUnitToSelect
-                                })
-                              })];
-                            }})  // TRIX
-                            // }
-                          });
-                        }
-                      });
-                    }
-                  }), createComponent(VSlot, {
-                    get children() {
-                      return createComponent(Show, {
-                        get when() {
-                          return unitGroups().trade.length > 0;
-                        },
-                        get children() {
-                          return createComponent(CollapsibleContainer, {
-                            get titleText() {
-                              return bzGroupTitle(
-                                "LOC_COMMERCE_TRADE_ROUTES_TITLE",
-                                unitGroups().trade.length
-                              );
-                            },
-                            // titleText: "LOC_COMMERCE_TRADE_ROUTES_TITLE",
-                            "class": "w-full h-auto mb-1",
-                            headerClass: "text-xs",
-                            disableFocus: false,
-                            centerTitle: true,
-                            get initiallyCollapsed() {
-                              // close unless specifically selected
-                              const group = bzSelectedGroup();
-                              return group != "LOC_COMMERCE_TRADE_ROUTES_TITLE";
-                            },
-                            // TRIX: move audio context here
-                            children: () => createComponent(AudioContextProvider, {
-                              segment: "SideBarOpen/Activatable",
-                              // segment: "UnitList",
-                            get children() {
-                              return [(() => {
-                                var _el$26 = _tmpl$6();
-                                _el$26.style.setProperty("background", "rgba(77, 83, 102, 0.30)");
-                                return _el$26;
-                              })(), createComponent(For, {
-                                get each() {
-                                  return unitGroups().trade;
-                                },
-                                children: (unit) => createComponent(UnitListEntry, {
-                                  unit,
-                                  indentLevel: 0,
-                                  get filteredUnits() {
-                                    return searchResults();
-                                  },
-                                  get textSearch() {
-                                    return textFilter();
-                                  },
-                                  autoFocus: false,
-                                  setUnitToSelect
-                                })
-                              })];
-                            }})  // TRIX
-                            // }
-                          });
-                        }
-                      });
-                    }
-                  })];
+                    },
+                  });
                 }
               });
             }

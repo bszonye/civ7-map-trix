@@ -458,7 +458,7 @@ const UnitListModel = () => {
       textSearch: unitTypeName,
       // TRIX
       bzSelected: UI.Player.getHeadSelectedUnit()?.id == unit.id.id,
-      bzDomain: unitDef?.Domain ?? "DOMAIN_LAND",
+      bzDomain: unitDomainName ?? "LOC_TAG_UNIT_CLASS_LAND",
       ...bzGetActions(unit)
     };
   }
