@@ -24,9 +24,13 @@ const UNITDOMAIN_NAME = {
   DOMAIN_SEA: "LOC_TAG_UNIT_CLASS_NAVAL",
   DOMAIN_AIR: "LOC_TAG_UNIT_CLASS_AIRCRAFT"
 };
-const OPERATIONS_QUICK_ACCESS = ["UNITOPERATION_ALERT"];
+const OPERATIONS_QUICK_ACCESS = [
+  "UNITOPERATION_REST_UNTIL_HEALED",  // TRIX: moved
+  "UNITOPERATION_SLEEP",  // TRIX: moved
+  "UNITOPERATION_ALERT"
+];
 const COMMANDS_QUICK_ACCESS = [
-  "UNITCOMMAND_WAKE",  // TRIX
+  // "UNITCOMMAND_WAKE",  // TRIX
   // "UNITCOMMAND_UPGRADE",
   // "UNITCOMMAND_PROMOTE"
 ];
@@ -333,13 +337,14 @@ const UnitListModel = () => {
   }
   function getValidActions(unit) {
     const actions = [];
-    for (const operationType of ["UNITOPERATION_REST_UNTIL_HEALED", "UNITOPERATION_SLEEP"]) {
-      const action = checkOperationValid(unit, operationType);
-      if (action) {
-        actions.push(action);
-        break;
-      }
-    }
+    // TRIX: redundant with OPERATIONS_QUICK_ACCESS
+    // for (const operationType of ["UNITOPERATION_REST_UNTIL_HEALED", "UNITOPERATION_SLEEP"]) {
+    //   const action = checkOperationValid(unit, operationType);
+    //   if (action) {
+    //     actions.push(action);
+    //     break;
+    //   }
+    // }
     for (const operationType of OPERATIONS_QUICK_ACCESS) {
       const action = checkOperationValid(unit, operationType);
       if (action) {
