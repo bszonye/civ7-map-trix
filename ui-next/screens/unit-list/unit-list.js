@@ -706,6 +706,7 @@ const UnitListComponent = () => {
         groups[key] = [];
       }
     }
+    // 20 units is about a screenful
     consolidateGroups(BZ_COMMAND_GROUPS, 20 - groups.packed.length);
     consolidateGroups(BZ_MILITARY_GROUPS, 20);
     return groups;
