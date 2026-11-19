@@ -676,12 +676,10 @@ const UnitListComponent = () => {
       } else if (unit.isCommander) {
         const domain = unit.bzDomain;
         const key = BZ_COMMAND_GROUPS[domain] ?? BZ_COMMAND_GROUPS.base;
-        console.warn(`TRIX CKEY ${domain} => ${key}`);
         groups[key].push(unit);
       } else if (unit.coreClass == "LOC_UNIT_CLASS_MILITARY") {
         const domain = unit.bzDomain;
         const key = BZ_MILITARY_GROUPS[domain] ?? BZ_MILITARY_GROUPS.base;
-        console.warn(`TRIX MKEY ${domain} => ${key}`);
         groups[key].push(unit);
       } else if (unit.coreClass == "LOC_UNIT_CLASS_SUPPORT") {
         groups.LOC_UNIT_CLASS_SUPPORT.push(unit);
