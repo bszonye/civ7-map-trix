@@ -76,9 +76,21 @@ const CORE_CLASS_SORT_ORDER = {
 };
 const CORE_CLASS_LENGTH = Object.keys(CORE_CLASS_SORT_ORDER).length;
 const BZ_DOMAIN_SORT_ORDER = {
-  LOC_TAG_UNIT_CLASS_AIRCRAFT: 0,
-  LOC_TAG_UNIT_CLASS_LAND: 1,
-  LOC_TAG_UNIT_CLASS_NAVAL: 2
+  DOMAIN_LAND: 0,
+  DOMAIN_AIR: 1,
+  DOMAIN_SEA: 2
+};
+const BZ_COMMAND_GROUPS = {
+  base: "LOC_UNIT_LIST_COMMANDER_TITLE",
+  DOMAIN_LAND: "LOC_UNIT_LIST_COMMANDER_TITLE",
+  DOMAIN_AIR: "{LOC_PEDIA_PAGEGROUP_COMMAND_UNITS_NAME} • {LOC_TAG_UNIT_CLASS_AIRCRAFT}",
+  DOMAIN_SEA: "{LOC_PEDIA_PAGEGROUP_COMMAND_UNITS_NAME} • {LOC_TAG_UNIT_CLASS_NAVAL}",
+};
+const BZ_MILITARY_GROUPS = {
+  base: "LOC_UNIT_CLASS_MILITARY",
+  DOMAIN_LAND: "{LOC_UNIT_CLASS_MILITARY} • {LOC_TAG_UNIT_CLASS_LAND}",
+  DOMAIN_AIR: "{LOC_UNIT_CLASS_MILITARY} • {LOC_TAG_UNIT_CLASS_AIRCRAFT}",
+  DOMAIN_SEA: "{LOC_UNIT_CLASS_MILITARY} • {LOC_TAG_UNIT_CLASS_NAVAL}",
 };
 const sortUnits = (a, b) => {
   if (a.isCommander !== b.isCommander) {
@@ -635,12 +647,11 @@ const UnitListComponent = () => {
     const groups = {
       LOC_UNIT_LIST_COMMANDER_TITLE: [],
       "{LOC_PEDIA_PAGEGROUP_COMMAND_UNITS_NAME} • {LOC_TAG_UNIT_CLASS_AIRCRAFT}": [],
-      "{LOC_PEDIA_PAGEGROUP_COMMAND_UNITS_NAME} • {LOC_TAG_UNIT_CLASS_LAND}": [],
       "{LOC_PEDIA_PAGEGROUP_COMMAND_UNITS_NAME} • {LOC_TAG_UNIT_CLASS_NAVAL}": [],
       // commanders: [],
       LOC_UNIT_CLASS_MILITARY: [],
-      "{LOC_UNIT_CLASS_MILITARY} • {LOC_TAG_UNIT_CLASS_AIRCRAFT}": [],
       "{LOC_UNIT_CLASS_MILITARY} • {LOC_TAG_UNIT_CLASS_LAND}": [],
+      "{LOC_UNIT_CLASS_MILITARY} • {LOC_TAG_UNIT_CLASS_AIRCRAFT}": [],
       "{LOC_UNIT_CLASS_MILITARY} • {LOC_TAG_UNIT_CLASS_NAVAL}": [],
       // military: [],
       LOC_UNIT_CLASS_SUPPORT: [],
@@ -663,9 +674,15 @@ const UnitListComponent = () => {
           groups.invalid.push(unit);
         }
       } else if (unit.isCommander) {
-        groups.LOC_UNIT_LIST_COMMANDER_TITLE.push(unit);
+        const domain = unit.bzDomain;
+        const key = BZ_COMMAND_GROUPS[domain] ?? BZ_COMMAND_GROUPS.base;
+        console.warn(`TRIX CKEY ${domain} => ${key}`);
+        groups[key].push(unit);
       } else if (unit.coreClass == "LOC_UNIT_CLASS_MILITARY") {
-        groups.LOC_UNIT_CLASS_MILITARY.push(unit);
+        const domain = unit.bzDomain;
+        const key = BZ_MILITARY_GROUPS[domain] ?? BZ_MILITARY_GROUPS.base;
+        console.warn(`TRIX MKEY ${domain} => ${key}`);
+        groups[key].push(unit);
       } else if (unit.coreClass == "LOC_UNIT_CLASS_SUPPORT") {
         groups.LOC_UNIT_CLASS_SUPPORT.push(unit);
       } else if (bzTraderTypes.has(unit.type)) {
@@ -674,23 +691,23 @@ const UnitListComponent = () => {
         groups.LOC_UNIT_CLASS_CIVILIAN.push(unit);
       }
     }
-    if (20 < groups.LOC_UNIT_LIST_COMMANDER_TITLE.length + groups.packed.length) {
-      for (const unit of groups.LOC_UNIT_LIST_COMMANDER_TITLE) {
-        const key = `{LOC_PEDIA_PAGEGROUP_COMMAND_UNITS_NAME} • {${unit.bzDomain}}`;
-        groups[key].push(unit);
-      }
-      groups.LOC_UNIT_LIST_COMMANDER_TITLE = [];
-    }
-    if (20 < groups.LOC_UNIT_CLASS_MILITARY.length) {
-      for (const unit of groups.LOC_UNIT_CLASS_MILITARY) {
-        const key = `{LOC_UNIT_CLASS_MILITARY} • {${unit.bzDomain}}`;
-        groups[key].push(unit);
-      }
-      groups.LOC_UNIT_CLASS_MILITARY = [];
-    }
+    // sort groups before merging small clusters
     for (const group of Object.values(groups)) {
       group.sort(sortUnits);
     }
+    const consolidateGroups = (cluster, size) => {
+      const total = Object.values(cluster)
+        .map(key => groups[key]?.length ?? 0)
+        .reduce((a, c) => a + c, 0);
+      if (size < total) return;
+      for (const key of Object.values(cluster)) {
+        if (key == cluster.base) continue;
+        groups[cluster.base].push(...groups[key] ?? []);
+        groups[key] = [];
+      }
+    }
+    consolidateGroups(BZ_COMMAND_GROUPS, 20 - groups.packed.length);
+    consolidateGroups(BZ_MILITARY_GROUPS, 20);
     return groups;
   });
   const [bzSelectedUnit, bzSetSelectedUnit] =

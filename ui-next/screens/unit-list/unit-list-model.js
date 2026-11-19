@@ -463,7 +463,7 @@ const UnitListModel = () => {
       textSearch: unitTypeName,
       // TRIX
       bzSelected: UI.Player.getHeadSelectedUnit()?.id == unit.id.id,
-      bzDomain: unitDomainName ?? "LOC_TAG_UNIT_CLASS_LAND",
+      bzDomain: unitDef?.Domain ?? "DOMAIN_LAND",
       ...bzGetActions(unit)
     };
   }
