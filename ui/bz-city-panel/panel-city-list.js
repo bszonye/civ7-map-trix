@@ -1,8 +1,10 @@
+import { IsControllerActive } from '/core/ui-next/services/input.js';
 import { Focus } from '/core/ui/input/focus-support.js';
 import { AnchorType } from '/core/ui/panel-support.js';
 import TooltipManager from '/core/ui/tooltips/tooltip-manager.js';
 import Databind from '/core/ui/utilities/utilities-core-databinding.js';
-import { MinimapSubpanel } from '/base-standard/ui/mini-map/minimap-support.js';
+import { MinimapSubpanel, SubpanelCloseEventName } from '/base-standard/ui/mini-map/minimap-support.js';
+import { NarrativePopupManager } from '/base-standard/ui/narrative-event/narrative-popup-manager.js';
 import { bzPanelMiniMap } from '/bz-map-trix/ui/mini-map/bz-panel-mini-map.js';
 import { bzCityList } from '/bz-map-trix/ui/bz-city-panel/model-city-list.js';
 
@@ -10,12 +12,16 @@ const BZ_CITY_TOOLTIP_STYLE = "bz-city-tooltip";
 
 const styles = "fs://game/bz-map-trix/ui/bz-city-panel/panel-city-list.css";
 
-class bzCityPanel extends MinimapSubpanel {
+class bzCityListPanel extends MinimapSubpanel {
     static savedScrollPosition = 0;
     panel = document.createElement("fxs-vslot");
-    inputContext = InputContext.Unit;
+    inputContext = () => {
+      console.log("Input context requested");
+      return IsControllerActive() ? InputContext.Shell : InputContext.World;
+    };
     activateCityListener = this.activateCity.bind(this);
     modelUpdateListener = this.onModelUpdate.bind(this);
+    subpanelCloseListener = this.onSubpanelClose.bind(this);
     listContainer = document.createElement("fxs-scrollable");
     constructor(root) {
         super(root);
@@ -24,11 +30,13 @@ class bzCityPanel extends MinimapSubpanel {
     }
     onInitialize() {
         super.onInitialize();
+        this.Root.style.height = bzPanelMiniMap.instance.panelHeightPx;
         this.panel.setAttribute("data-navrule-up", "stop");
         this.panel.setAttribute("data-navrule-down", "stop");
         this.panel.setAttribute("data-navrule-right", "stop");
         this.panel.setAttribute("data-navrule-left", "stop");
-        this.panel.classList.add("mini-map__city-panel", "left-3", "px-2", "py-3");
+        this.panel.className = "mini-map__lens-panel bz-city-list-panel grow pointer-events-auto px-2 py-3 flex flex-col justify-start items-center";
+        NarrativePopupManager.addIgnoredPanelClass("bz-city-panel");
         const closeNavHelp = document.createElement("fxs-nav-help");
         closeNavHelp.setAttribute("action-key", "inline-cancel");
         closeNavHelp.classList.add("absolute", "-right-4", "-top-3", "z-1");
@@ -36,10 +44,8 @@ class bzCityPanel extends MinimapSubpanel {
         this.panel.appendChild(closeNavHelp);
         // header
         const header = document.createElement("fxs-header");
-        header.classList.add("mb-2", "font-title-base", "text-secondary");
         header.setAttribute("title", "LOC_UI_RESOURCE_ALLOCATION_SETTLEMENTS");
         header.setAttribute("filigree-style", "h4");
-        header.setAttribute("header-bg-glow", true);
         this.panel.appendChild(header);
         // city list
         const frame = document.createElement("div");
@@ -50,7 +56,7 @@ class bzCityPanel extends MinimapSubpanel {
         this.renderList(
             "LOC_UI_SETTLEMENT_TAB_BAR_CITIES",
             "g_bzCityListModel.cityList",
-            "mt-0\\.5",
+            "mt-px",
         );
         this.renderList(
             "LOC_UI_SETTLEMENT_TAB_BAR_TOWNS",
@@ -61,25 +67,23 @@ class bzCityPanel extends MinimapSubpanel {
     renderList(headline, list, ...style) {
         const hasCityTooltip = TooltipManager.types[BZ_CITY_TOOLTIP_STYLE] != null;
         const header = document.createElement("fxs-header");
-        header.classList.add("font-title-sm");
         if (style.length) header.classList.add(...style);
+        header.setAttribute("text-class", "font-title-sm bz-header");
+        header.setAttribute("filigree-style", "none");
         header.setAttribute("title", headline);
-        header.setAttribute("filigree-style", "h4");
         Databind.classToggle(header, "hidden", `{{${list}.length}}==0`);
         this.listContainer.appendChild(header);
         // table rows
         const row = document.createElement("div");
-        row.classList.value = "flex flex-col text.sm";
+        row.classList.value = "flex flex-col text-sm";
         this.listContainer.appendChild(row);
         Databind.for(row, list, "entry");
         {
             const subhead = document.createElement("fxs-header");
-            subhead.setAttribute("filigree-style", "none");
-            subhead.setAttribute("header-bg-glow", true);
-            // match height of entry row (6px above, 3px below)
-            subhead.classList.add("font-title-xs", "py-px", "mt-1\\.25", "mb-0\\.5");
-            Databind.classToggle(subhead, "hidden", "!{{entry.subhead}}");
             Databind.attribute(subhead, "title", "entry.subhead");
+            subhead.setAttribute("text-class", "font-title-xs bz-subhead");
+            subhead.setAttribute("filigree-style", "none");
+            Databind.classToggle(subhead, "hidden", "!{{entry.subhead}}");
             row.appendChild(subhead);
             const entry = document.createElement("fxs-activatable");
             entry.addEventListener("action-activate", this.activateCityListener);
@@ -134,10 +138,9 @@ class bzCityPanel extends MinimapSubpanel {
                 const timer = document.createElement("div");
                 timer.classList.value = style;
                 timer.classList.add("flex", "items-center", "justify-center", "pl-1\\.5");
-                Databind.classToggle(column, "invisible", `{{${turns}}}==-1`);
                 const timerTurns = document.createElement("div");
                 timerTurns.classList.value = "text-right";
-                timerTurns.style.width = "calc(1.2em)";  // two digits
+                timerTurns.style.width = "1.2em";  // two digits
                 Databind.value(timerTurns, turns);
                 timer.appendChild(timerTurns);
                 const timerClock = document.createElement("div");
@@ -146,6 +149,12 @@ class bzCityPanel extends MinimapSubpanel {
                 timer.appendChild(timerClock);
                 column.appendChild(timer);
                 stats.appendChild(column);
+                return column;
+            }
+            function turnSpacer() {
+                const column = document.createElement("div");
+                column.className = "mx-1";
+                column.style.width = "calc(1.2em + 1.6666666667rem)";  // two digits
                 return column;
             }
             // population
@@ -169,12 +178,6 @@ class bzCityPanel extends MinimapSubpanel {
             queue.classList.value = "bz-city-queue flex items-center";
             Databind.attribute(queue, "bz-qkind", "entry.queueKind");
             Databind.attribute(queue, "bz-qclass", "entry.queueClass");
-            const queueTurns = turnTimer(
-                "bz-city-queue-turns",
-                "entry.queueTurns",
-            );
-            queueTurns.classList.add("mx-1");
-            queue.appendChild(queueTurns);
             const qslot = document.createElement("div");
             qslot.classList.value = "bz-city-list-queue relative size-6 mx-1";
             const queueBG = document.createElement("div");
@@ -187,32 +190,51 @@ class bzCityPanel extends MinimapSubpanel {
             if (!hasCityTooltip) Databind.tooltip(queueIcon, "entry.queueTooltip");
             queueBG.appendChild(queueIcon);
             queue.appendChild(qslot);
+            const queueTurns = turnTimer(
+                "bz-city-queue-turns",
+                "entry.queueTurns",
+            );
+            queueTurns.classList.add("mx-1");
+            queue.appendChild(queueTurns);
             stats.appendChild(queue);
             // town focus
             const focus = document.createElement("div");
             Databind.classToggle(focus, "hidden", "!{{entry.isTown}}");
-            focus.classList.value = "bz-city-list-focus relative size-6 mx-1";
+            focus.classList.value = "bz-city-list-focus flex items-center";
+            const fslot = document.createElement("div");
+            fslot.classList.value = "relative size-6 mx-1";
             const focusBG = document.createElement("div");
             focusBG.classList.value = "bz-city-list-bg absolute size-full";
             Databind.classToggle(focusBG, "hidden", "!{{entry.focusIcon}}");
-            focus.appendChild(focusBG);
+            fslot.appendChild(focusBG);
             const focusIcon = document.createElement("div");
             focusIcon.classList.value = "bz-city-list-focus-icon bz-icon size-full";
             focusIcon.style.backgroundSize = "125%";
             Databind.bgImg(focusIcon, "entry.focusIcon");
             Databind.tooltip(focusIcon, "entry.focusTooltip");
             focusBG.appendChild(focusIcon);
+            focus.appendChild(fslot);
+            focus.appendChild(turnSpacer());
             stats.appendChild(focus);
             // unrest and razing
             const unrest = document.createElement("div");
-            unrest.classList.value = "bz-city-list-unrest hidden relative size-6 mx-1";
+            unrest.classList.value = "bz-city-list-unrest hidden flex items-center";
+            const uslot = document.createElement("div");
+            uslot.classList.value = "relative size-6 mx-1";
             const unrestBG = document.createElement("div");
             unrestBG.classList.value = "bz-city-list-bg absolute size-full";
-            unrest.appendChild(unrestBG);
+            uslot.appendChild(unrestBG);
             const unrestIcon = document.createElement("div");
             unrestIcon.classList.value = "bz-city-list-unrest-icon bz-icon size-full";
             Databind.bgImg(unrestIcon, "entry.unrestIcon");
             unrestBG.appendChild(unrestIcon);
+            unrest.appendChild(uslot);
+            const unrestTurns = turnTimer(
+                "bz-city-unrest-turns",
+                "entry.unrestTurns",
+            );
+            unrestTurns.classList.add("mx-1");
+            unrest.appendChild(unrestTurns);
             stats.appendChild(unrest);
         }
         // finish
@@ -220,17 +242,22 @@ class bzCityPanel extends MinimapSubpanel {
     }
     onAttach() {
         super.onAttach();
+        window.addEventListener(SubpanelCloseEventName, this.subpanelCloseListener);
         window.addEventListener("bz-model-city-list-update", this.modelUpdateListener);
         bzPanelMiniMap.toggleCooldownTimer = 250;
     }
     onDetach() {
-        super.onDetach();
+        window.removeEventListener(SubpanelCloseEventName, this.subpanelCloseListener);
         window.removeEventListener("bz-model-city-list-update", this.modelUpdateListener);
         bzPanelMiniMap.toggleCooldownTimer = 500;
+        super.onDetach();
     }
     onReceiveFocus() {
         super.onReceiveFocus();
         Focus.setContextAwareFocus(this.panel, this.Root);
+    }
+    onSubpanelClose(event) {
+        if (event.detail.tag == "bz-city-panel") this.close();
     }
     close() {
         super.close();
@@ -247,9 +274,9 @@ class bzCityPanel extends MinimapSubpanel {
     onModelUpdate() { }
 }
 Controls.define("bz-city-panel", {
-    createInstance: bzCityPanel,
+    createInstance: bzCityListPanel,
     description: "City Panel",
-    classNames: ["bz-city-panel"],
+    classNames: ["bz-city-panel", "relative"],
     styles: [styles],
     tabIndex: -1
 });
