@@ -34,7 +34,7 @@ class bzUnitsPanel extends MinimapSubpanel {
         this.panel.setAttribute("data-navrule-down", "stop");
         this.panel.setAttribute("data-navrule-right", "stop");
         this.panel.setAttribute("data-navrule-left", "stop");
-        this.panel.classList.add("mini-map__units-panel", "left-3", "px-2", "py-3");
+        this.panel.classList.add("bz-mini-map__units-panel", "left-3", "px-2", "py-3");
         const closeNavHelp = document.createElement("fxs-nav-help");
         closeNavHelp.setAttribute("action-key", "inline-cancel");
         closeNavHelp.classList.add("absolute", "-right-4", "-top-3", "z-1");

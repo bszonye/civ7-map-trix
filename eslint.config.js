@@ -15,6 +15,7 @@ export default [
         },
         languageOptions: {
             globals: {
+                Armies: "readonly",
                 Camera: "readonly",
                 Cities: "readonly",
                 CityCommandTypes: "readonly",
@@ -56,6 +57,7 @@ export default [
                 MapPlotEffects: "readonly",
                 MapStorms: "readonly",
                 MapUnits: "readonly",
+                Modding: "readonly",
                 PlacementMode: "readonly",
                 PlayerIds: "readonly",
                 Players: "readonly",
@@ -68,12 +70,14 @@ export default [
                 UIHTMLCursorTypes: "readonly",
                 UniqueQuarterTypes: "readonly",
                 UnitActivityTypes: "readonly",
+                UnitCoreClassTypes: "readonly",
                 Units: "readonly",
                 Visibility: "readonly",
                 WorldUI: "readonly",
                 clearInterval: "readonly",
                 clearTimeout: "readonly",
                 console: "readonly",
+                delayByFrame: "readonly",
                 document: "readonly",
                 engine: "readonly",
                 localStorage: "readonly",
@@ -81,6 +85,7 @@ export default [
                 requestAnimationFrame: "readonly",
                 setInterval: "readonly",
                 setTimeout: "readonly",
+                waitForLayout: "readonly",
                 window: "readonly",
             }
         }

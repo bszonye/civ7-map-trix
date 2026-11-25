@@ -1,7 +1,8 @@
 import bzMapTrixOptions, { bzCommanderLens } from '/bz-map-trix/ui/options/bz-map-trix-options.js';
+import { ContextManager } from '/core/ui/context-manager/context-manager.js';
 import { InputEngineEventName } from '/core/ui/input/input-support.js';
 import LensManager, { registerUnitLensSelector } from '/core/ui/lenses/lens-manager.js';
-import { ContextManager } from '/core/ui/context-manager/context-manager.js';
+import { Layout } from '/core/ui/utilities/utilities-layout.js';
 // guarantee import order for patching
 import '/base-standard/ui/interface-modes/interface-mode-unit-selected.js';
 import '/base-standard/ui/lenses/layer/conquest-layer.js';
@@ -13,6 +14,8 @@ import '/base-standard/ui/lenses/lens/discovery-lens.js';
 import '/base-standard/ui/lenses/lens/general-appeal-lens.js';
 import '/base-standard/ui/lenses/lens/settler-lens.js';
 import '/base-standard/ui/lenses/lens/trade-lens.js';
+
+Controls.loadStyle("fs://game/bz-map-trix/ui/mini-map/bz-panel-mini-map.css");
 
 const LENS_CATALOG_OBJECT_NAME = "tracked-lens";
 
@@ -213,10 +216,27 @@ class bzPanelMiniMap {
     layerHotkeyListener = this.onLayerHotkey.bind(this);
     toggleCooldown = 0;
     toggleQueued = false;
+    miniMapHeight = 239;
+    miniMapWidth = 380;
+    miniMapMinWidth = 380;
+    miniMapMaxWidth = 400;
+    borderSize = 30;
     constructor(component) {
         bzPanelMiniMap.instance = this;
         this.component = component;
         this.component.bzMapTrix = this;
+        this.windowHeight = window.innerHeight * 100 / Layout.currentScale();
+        this.panelHeight = this.windowHeight - this.miniMapHeight;
+        this.miniMapHeightPx = `${Layout.pixelsToScreenPixels(this.miniMapHeight)}px`;
+        this.miniMapWidthPx = `${Layout.pixelsToScreenPixels(this.miniMapWidth)}px`;
+        this.miniMapMinWidthPx = `${Layout.pixelsToScreenPixels(this.miniMapMinWidth)}px`;
+        this.miniMapMaxWidthPx = `${Layout.pixelsToScreenPixels(this.miniMapMaxWidth)}px`;
+        this.panelHeightPx = `${Layout.pixelsToScreenPixels(this.panelHeight)}px`;
+        this.windowHeightPx = `${Layout.pixelsToScreenPixels(this.windowHeight)}px`;
+        // this.component.MAX_ASPECT_RATIO = 2.2;
+        // this.component.MAX_ASPECT_RATIO = 1;
+        // this.component.MIN_ASPECT_RATIO = 1;
+        // this.component.MIN_ASPECT_RATIO = 2.2;
         this.patchPrototype(Object.getPrototypeOf(component));
     }
     patchPrototype(proto) {
@@ -238,17 +258,30 @@ class bzPanelMiniMap {
             return brv ?? crv;
         }
     }
+    addSubpanel(targetClassName, tooltipKey, iconPath) {
+        const slots = document.querySelector("[name='minimap-sidepanel']");
+        if (slots) {
+            // CREATE CONTEXT SLOT
+            const id = "target-slot-" + targetClassName;
+            const slot = document.createElement("div");
+            slot.setAttribute("name", id);
+            slot.setAttribute("id", id);
+            slot.className = "fxs-slot-target " + id;
+            slots.appendChild(slot);
+        }
+        this.component.addSubpanel(targetClassName, tooltipKey, iconPath);
+        return this.component.subpanels.find((s) => s.tag === targetClassName);
+    }
     afterInitialize() {
         this.component.Root.classList.add("bz-mini-map");
         const subpanels = this.component.subpanels;
         this.searchSubpanel = subpanels.find((s) => s.tag === "map-search");
         this.unitsSubpanel = subpanels.find((s) => s.tag === "panel-unit-list");
-        this.component.addSubpanel(
+        this.citySubpanel = this.addSubpanel(
             "bz-city-panel",
-            "LOC_UI_RESOURCE_ALLOCATION_SETTLEMENTS",
-            BZ_ICON_CITY_BUTTON,
+            "LOC_UI_TOGGLE_BZ_CITY_LIST_PANEL",
+            BZ_ICON_CITY_BUTTON
         );
-        this.citySubpanel = subpanels.find((s) => s.tag === "bz-city-panel");
         this.citySubpanel.button.classList.add("bz-city-button");
         // this.component.addSubpanel(
         //     "bz-units-panel",
@@ -257,13 +290,35 @@ class bzPanelMiniMap {
         // );
         this.unitsButton = this.unitsSubpanel.button;
         this.component.miniMapButtonRow.appendChild(this.unitsButton);  // move to end
-        this.component.addSubpanel(
+        this.wonderSubpanel = this.addSubpanel(
             "bz-wonder-panel",
-            "LOC_UI_PRODUCTION_WONDERS",
-            BZ_ICON_WONDER_BUTTON,
+            "LOC_UI_TOGGLE_BZ_WONDER_LIST_PANEL",
+            BZ_ICON_WONDER_BUTTON
         );
-        this.wonderSubpanel = subpanels.find((s) => s.tag === "bz-wonder-panel");
         this.wonderSubpanel.button.classList.add("bz-wonder-button");
+        // get minimap dimensions
+        const finalAspect = Math.min(this.component.MAX_ASPECT_RATIO, Math.max(this.component.MIN_ASPECT_RATIO, this.component.getMapAspectRatio()));
+        this.miniMapWidth = Math.round(
+            (this.miniMapHeight - this.borderSize) * finalAspect
+        ) + this.borderSize;
+        this.miniMapWidthPx = `${Layout.pixelsToScreenPixels(this.miniMapWidth)}px`;
+        // limit button row width
+        this.component.miniMapButtonRow.style.maxWidth =
+            this.miniMapMaxWidth < this.miniMapWidth ?
+            this.miniMapMaxWidthPx : this.miniMapWidthPx;
+        this.component.miniMapButtonRow.style.alignSelf = "flex-start";
+        // set up panel containers
+        const containerize = (el, width, height) => {
+            if (!el) return;
+            if (width != null) el.style.width = width;
+            if (height != null) el.style.height = height;
+        }
+        containerize(this.component.Root.firstChild, this.miniMapWidthPx);
+        containerize(
+            document.querySelector("[name=minimap-sidepanel]"),
+            this.miniMapWidthPx,
+            this.panelHeightPx
+        );
     }
     beforeToggleSubpanel(_subpanel, _force) {
         // prevent infinite loop after force-closing subpanel

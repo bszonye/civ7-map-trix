@@ -1,0 +1,54 @@
+.bz-mini-map .mini-map__map-tacks-button,
+.bz-mini-map .mini-map__lens-button {
+  margin: 0;
+  /* flex: 1 1 auto; */
+  /* max-width: 3rem; */
+  flex-shrink: 1;
+}
+.bz-mini-map .mini-map__lens-button:hover,
+.bz-mini-map .mini-map__lens-button.pressed {
+  z-index: 2;
+}
+.bz-mini-map .mini-map__lens-button.mini-map__button--selected {
+  z-index: 1;
+}
+.bz-mini-map .mini-map__lens-button__bg,
+.bz-mini-map .mini-map__map-tacks-button__bg {
+  background-size: 2.6666666667rem;
+  background-image: url("blp:hud_sub_circle_bk");
+}
+.bz-mini-map .mini-map__lens-button__icon,
+.bz-mini-map .mini-map__map-tacks-button__icon {
+  background-size: 1.8888888889rem;
+}
+.bz-mini-map .mini-map__lens-button__bg,
+.bz-mini-map .mini-map__map-tacks-button__bg,
+.bz-mini-map .mini-map__lens-button__icon,
+.bz-mini-map .mini-map__map-tacks-button__icon {
+  background-position: center;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+.lens-panel, .map-search.absolute {
+  min-width: 21.1111111111rem;
+  max-width: 22.2222222222rem;
+  padding: 2.4444444444rem 0.6666666667rem 0;
+}
+.map-search.absolute {
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+}
+.map-search .map-search-panel-backing {
+  width: 100%;
+}
+.bz-mini-map .mini-map__lens-panel, .map-search .map-search-main {
+  position: relative;
+  width: 100%;
+  left: auto;
+  right: auto;
+  margin: 0;
+}
+/* vim: set sw=2 et : */
